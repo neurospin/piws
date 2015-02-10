@@ -7,8 +7,11 @@
 # for details.
 ##########################################################################
 
-from cubicweb.view import View
+# System import
 import numpy
+
+# CUBICWEB import
+from cubicweb.view import View
 
 
 ###############################################################################

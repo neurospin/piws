@@ -7,14 +7,18 @@
 # for details.
 ##########################################################################
 
+# CUBICWEB import
 from cubicweb.web import component
-from cubicweb.predicates import is_instance, nonempty_rset, anonymous_user
-from cubes.brainomics.views.components import (
-    BrainomicsLinksCenters, BrainomicsEditBox,BrainomicsDownloadBox)
+from cubicweb.predicates import is_instance
+from cubicweb.predicates import nonempty_rset
+from cubicweb.predicates import anonymous_user
+from cubes.brainomics.views.components import BrainomicsLinksCenters
+from cubes.brainomics.views.components import BrainomicsEditBox
+from cubes.brainomics.views.components import BrainomicsDownloadBox
 
 
 ###############################################################################
-# Navigation Box 
+# Navigation Box
 ###############################################################################
 
 class NSNavigationtBox(component.CtxComponent):
@@ -63,7 +67,15 @@ class NSNavigationtBox(component.CtxComponent):
         # QuestionnaireRun
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any QR Where QR is QuestionnaireRun")
+        ajaxcallback = "get_questionnaires_data"
+        rql_rows = ("Any COUNT(Q) WHERE Q is Questionnaire")
+        rql_labels = ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
+                      "A timepoint T")
+        href = self._cw.build_url(
+            "view", vid="jtable-table",
+            rql_rows=rql_rows, rql_labels=rql_labels,
+            ajaxcallback=ajaxcallback, title="All Questionnaires",
+            elts_to_sort=["ID"])
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Measures</a>')
         w(u'</div></div><br/>')
@@ -104,9 +116,10 @@ class NSSubjectStatistics(component.CtxComponent):
         w(u'</div></div><br/>')
 
         # Create a view to see the subject handedness repartition in the db
-        href = self._cw.build_url("view", vid="highcharts-basic-pie",
-                                  rql="Any H WHERE S is Subject, S handedness H",
-                                  title="Subject handednesses")
+        href = self._cw.build_url(
+            "view", vid="highcharts-basic-pie",
+            rql="Any H WHERE S is Subject, S handedness H",
+            title="Subject handednesses")
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
