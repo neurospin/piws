@@ -123,7 +123,7 @@ class JtableView(View):
             fields_str += "{0}:{{title:'{1}',sorting:{2}}},".format(
                 label_cleaner(label_text[0]),
                 "> " + label_text[0].replace(" ", ""), sort_val)
-            headers_str += "{0}@".format(label_cleaner(label_text[0]))
+            headers_str += "{0}@".format(label_text[0])
         fields_str += "}"
 
         # > create a div for the in progress resource
@@ -150,7 +150,7 @@ class JtableView(View):
         html += "columnResizable: true,"
         html += "sorting: true,"
         html += "multiSorting: false,"
-        html += "selectingCheckboxes: true,"
+        # html += "selectingCheckboxes: true,"
         html += "defaultSorting: 'undefined',"
 
         # > export csv options
