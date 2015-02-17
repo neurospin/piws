@@ -10,6 +10,9 @@
 # System import
 from string import maketrans
 from collections import OrderedDict
+import json
+import os
+import copy
 
 # CUBICWEB import
 from cubicweb.view import View
@@ -28,7 +31,7 @@ class JtableView(View):
     paginable = False
     div_id = "jtable-table"
 
-    mandatory_params = ["vid", "rql_rows", "rql_labels", "ajaxcallback",
+    mandatory_params = ["vid", "rql_labels", "ajaxcallback",
                         "title", "elts_to_sort", "csvcallback"]
 
     def __init__(self, *args, **kwargs):
@@ -42,21 +45,17 @@ class JtableView(View):
             self._cw = kwargs["parent_view"]._cw
             self.w = kwargs["parent_view"].w
 
-    def call(self, rql_rows=None, rql_labels=None, ajaxcallback=None,
+    def call(self, rql_labels=None, ajaxcallback=None,
              csvcallback=None, title="", elts_to_sort=None, **kwargs):
         """ Method that will create a table.
-
-        When right clicking on the table header, you can choose to hide some
-        columns.
 
         When left clicking on a row, the row is selected (highlighted) Click
         again on this row to deselect it.
 
-        On the right side of each herder box, you can decide to sort the the
-        the row.
+        On the right side of each herder box, you can decide to sort the
+        the row if the option is available.
 
-        1) Extra parameters will be sorted by names and passed to the ajax
-        callback.
+        1) Extra parameters will be passed to the ajax callback.
 
         2) Column labels must not contain space ' ' and they need to be
         replaced: use the 'label_cleaner' function.
@@ -68,8 +67,6 @@ class JtableView(View):
 
         Parameters
         ----------
-        rql_rows: string (mandatory)
-            a rql that will be executed to get the number of rows in the table.
         rql_labels: string (mandatory)
             a rql that will be executed to get the columns labels.
         ajaxcallback: @func (mandatory)
@@ -86,7 +83,6 @@ class JtableView(View):
             if key not in self.mandatory_params:
                 kwargs[key] = self._cw.form[key]
         title = title or self._cw.form.get("title", "")
-        rql_rows = rql_rows or self._cw.form.get("rql_rows", "")
         rql_labels = rql_labels or self._cw.form.get("rql_labels", "")
         ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
         csvcallback = csvcallback or self._cw.form.get("csvcallback", None)
@@ -94,150 +90,173 @@ class JtableView(View):
         if not isinstance(elts_to_sort, list):
             elts_to_sort = [elts_to_sort]
 
-        # Add some js resources
-        self._cw.add_js("jtable-2.4.0/jquery.jtable.min.js")
-        self._cw.add_css("jtable-2.4.0/themes/lightcolor/blue/jtable.css")
-
         # Get the path to the in progress resource
         wait_image_url = self._cw.data_url("images/please_wait.gif")
 
+        # Add external js resources
+        table_url = "http://www.datatables.net/release-datatables"     
+        self._cw.add_css(
+            "http://cdn.datatables.net/1.10.5/css/jquery.dataTables.min.css",
+            localfile=False)
+        self._cw.add_css(
+            os.path.join(table_url, "extensions", "TableTools", "css", 
+                         "dataTables.tableTools.css"),
+            localfile=False)
+        self._cw.add_css(
+            os.path.join(table_url, "extensions", "FixedColumns", "css", 
+                         "dataTables.fixedColumns.css"),
+            localfile=False)
+        self._cw.add_js(
+             "http://code.jquery.com/jquery-1.11.2.min.js",
+             localfile=False)
+        self._cw.add_js(
+            "http://cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js",
+            localfile=False)
+        self._cw.add_js(
+            os.path.join(table_url, "extensions", "TableTools", "js", 
+                         "dataTables.tableTools.js"),
+            localfile=False)
+        self._cw.add_js(
+            os.path.join(table_url, "extensions", "FixedColumns", "js", 
+                         "dataTables.fixedColumns.js"),
+            localfile=False)
+        self._cw.add_js(
+            "http://cdn.datatables.net/plug-ins/f2c75b7247b/api/fnSetFilteringDelay.js",        
+            localfile=False)
+
         # Get table meta information
         labels = self._cw.execute(rql_labels)
-        nb_rows = self._cw.execute(rql_rows)[0][0]
-        nb_cols = len(labels)
 
         # Generate the script
 
-        # > table column headers
-        headers_str = "ID@"
-        fields_str = "{"
-        sort_val = "false"
-        if "ID" in elts_to_sort:
-            sort_val = "true"
-        fields_str += "ID:{{key:true,title:'> ID',sorting:{0}}},".format(
-            sort_val)
-        for label_text in labels:
-            sort_val = "false"
-            if label_text[0] in elts_to_sort:
-                sort_val = "true"
-            fields_str += "{0}:{{title:'{1}',sorting:{2}}},".format(
-                label_cleaner(label_text[0]),
-                "> " + label_text[0].replace(" ", ""), sort_val)
-            headers_str += "{0}@".format(label_text[0])
-        fields_str += "}"
+        # > table column headers and sort option
+        headers = [{"sTitle": "ID"}]
+        hide_sort_indices = []
+        label_list = ["ID"]
+        for cnt, label_text in enumerate(labels):
+            
+            # >> select if we can sort this column
+            if label_text[0] not in elts_to_sort:
+                hide_sort_indices.append(cnt + 1)
 
-        # > create a div for the in progress resource
-        html = ("<div id='loadingmessage' style='display:none' "
-                "align='center'><img src='{0}'/></div>".format(wait_image_url))
-
-        # > create a div to display a scroll bar
-        html += "<div style='overflow:auto;height: 100%; width: 90%;'>"
-        html += "<div id='PatientTableContainer'></div>"
+            # >> add this column to the table definition parameters
+            label_list.append(label_cleaner(label_text[0]))
+            headers.append({"sTitle": label_text[0]})
 
         # > create the table
-        html += "<script type='text/javascript'> "
-        html += "$(document).ready(function () { "
-        html += "$('#PatientTableContainer').jtable({"
-
-        # > set a title
-        html += "title: '{0}',".format(title)
+        html = "<script type='text/javascript'> "
+        html += "$(document).ready(function() {"
+        html += "var table = $('#the_table').dataTable( { "
 
         # > set table display options
-        html += "paging: true,"
-        html += "pageSize: 10,"
-        html += "selecting: true,"
-        html += "multiselect: true,"
-        html += "columnResizable: true,"
-        html += "sorting: true,"
-        html += "multiSorting: false,"
-        # html += "selectingCheckboxes: true,"
-        html += "defaultSorting: 'undefined',"
+        html += "'scrollX': true,"
+        html += "'scrollY': '600px',"
+        html += "'scrollCollapse': true,"
+        html += "'dom': 'T<\"clear\">lfrtip',"
+        html += "'lengthMenu': [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ],"
+        html += "'sServerMethod': 'POST',"
+        html += "'oLanguage': {'sSearch': 'ID'},"
+        html += "'pagingType': 'full_numbers',"
+        html += "'bProcessing': true,"
+        html += "'bServerSide': true,"
 
         # > export csv options
+        buttons = "'copy', 'print'"
         if csvcallback is not None:
-            html += ("toolbar: {hoverAnimation: true, "
-                     "hoverAnimationDuration: 5, "
-                     "hoverAnimationEasing: undefined, items: [{icon: "
-                     "'/images/excel.png', text: 'CSV export', "
-                     "click: function() {")
+            # >> create a custom button to download all the table
+            export_button = (
+                "{'sExtends': 'ajax', 'sButtonText': 'CSV - All results', ")
+            # >> when you click the button display a processing message and
+            # >> run the callback
+            export_button += "'fnClick': function () { "
+            export_button += "$('#loadingmessage').show();"
+            export_button += "var post = $.ajax({ "
+            export_button += "url: 'ajax?fname={0}', ".format(csvcallback)
+            export_button += "type: 'POST', "
+            export_button += "dataType: 'json', "
+            csv_callback_parms = copy.deepcopy(kwargs)
+            csv_callback_parms["rql_labels"] = rql_labels
+            export_button += "data: {0}".format(json.dumps(csv_callback_parms))
+            export_button += "}); "
+            # >> handle sucess case
+            export_button += "post.done(function(p){ "
+            export_button += "window.location = p.dl_url; "
+            export_button += "$('#loadingmessage').hide(); "
+            export_button += "});"
+            # >> handle error case
+            export_button += "post.fail(function(){ "
+            export_button += "$('#loadingmessage').hide(); "
+            export_button += "alert('Error : Download Failed!'); "
+            export_button += "}); "
+            # >> end click event
+            export_button += "}"
+            # >> end custom button
+            export_button += "} "
+            buttons += ", 'csv', {0}".format(export_button)
 
-            # > export csv callback
-            html += "$('#loadingmessage').show();"
-            html += "var post = $.ajax({"
-            html += ("url: 'json?fname={0}'".format(csvcallback))
-            html += " + '&arg=' + '\"{0}\"'".format(headers_str)
-            for key, value in kwargs.items():
-                if isinstance(value, basestring):
-                    html += " + '&arg=' + '\"{0}\"'".format(str(value))
-                else:
-                    html += " + '&arg=' + {0}".format(value)
-            html += ","
-            html += "data: {json: JSON.stringify({dl_url: 'stringify'})},"
-            html += "type: 'POST'});"
+        # > display the export buttons
+        html += ("'tableTools': {{ "
+                 "'sRowSelect': 'multi', "
+                 "'sSwfPath': 'http://cdn.datatables.net/tabletools/2.2.2/"
+                    "swf/copy_csv_xls_pdf.swf', "
+                 "'aButtons': [{0}] }}, ".format(buttons))
 
-            # > export csv redirection: success
-            html += "post.done(function(p){"
-            html += "window.location = p.dl_url;"
-            html += "$('#loadingmessage').hide();"
-            html += "});"
+        # > set table header
+        html += "'aoColumns': {0},".format(json.dumps(headers))
 
-            # > export csv redirection: success
-            html += "post.fail(function(){"
-            html += "$('#loadingmessage').hide();"
-            html += "alert('Error : Download Failed!');"
-            html += "});"
-
-            # > export csv callback end
-            html += "}"
-
-            # > export csv options end
-            html += "}]},"
-
-        # > continue export csv options: callback to get the data dynamically
-        html += "actions: {"
-        html += "listAction: function (postData, jtParams) {"
-        html += "return $.Deferred(function ($dfd) {"
-        html += "$.ajax({"
-        html += ("url: 'json?fname={0}&"
-                 "arg=\"' + jtParams.jtSorting + "
-                 "'\"&arg=' + jtParams.jtStartIndex + "
-                 "'&arg=' + jtParams.jtPageSize + "
-                 "'&arg=' + {1} + '&arg=' + {2}".format(ajaxcallback,
-                                                        nb_rows, nb_cols))
+        # > set sort widget on column
+        html += "'aoColumnDefs': [ "
+        html += "{{ 'bSortable': false, 'aTargets': {0} }}".format(str(hide_sort_indices))
+        html += "],"
+        
+        # > set the ajax callback to fill dynamically the table
+        html += "'sAjaxSource':'ajax?fname={0}',".format(ajaxcallback)
+        html += "'fnServerParams': function (aoData) {"
+        html += "aoData.push("
+        html += "{ name: 'labels', "
+        html += "value: '{0}'".format(json.dumps(label_list))
+        html += "}, "
         for key, value in kwargs.items():
             if isinstance(value, basestring):
-                html += " + '&arg=' + '\"{0}\"'".format(str(value))
+                html += "{{name: '{0}', value: '{1}'}}, ".format(key, str(value))
             else:
-                html += " + '&arg=' + {0}".format(value)
-        html += ","
-        html += "type: 'POST',"
-        html += "dataType: 'json',"
-        html += "data: postData,"
-        html += "success: function (data) {"
-        html += "$dfd.resolve(data);"
-        html += "},"
-        html += "error: function () {"
-        html += "$dfd.reject();"
-        html += "}"
-        html += "});"
-        html += "});"
-        html += "},"
+                html += "{{name: '{0}', value: {1}}}, ".format(key, value)
+
+        # Remove extre comma
+        html = html[:-2]
+
+        # > close push data
+        html += ");"
+
+        # > close function fnServerParams
         html += "},"
 
-        # > continue export csv options: column labels
-        html += "fields: "
-        html += fields_str
-        html += "});"
+        # > close table
+        html += "} );"
 
-        # > load the table data
-        html += "$('#PatientTableContainer').jtable('load');"
-        html += "});"
+        # > the first column is static in the display
+        html += "new $.fn.dataTable.FixedColumns( table, {leftColumns: 1} );"
+        html += "table.fnSetFilteringDelay(1000);"
+
+        # > close script
+        html += "} );"
 
         # Close script div
         html += "</script>"
 
-        # Close scrollbar div
-        html += "</div>"
+        # > set a title
+        html += "<h1>{0}</h1>".format(title)
+
+        # > create a div for the in progress resource
+        html += ("<div id='loadingmessage' style='display:none' "
+                 "align='center'><img src='{0}'/></div>".format(wait_image_url))
+
+        # > display the table in the body
+        html += "<table id='the_table', class='display'>"
+        html += "<thead></thead>"
+        html += "<tbody>"
+        html += "</tbody>"
+        html += "</table>"
 
         # Creat the corrsponding html page
         self.w(unicode(html))
@@ -281,7 +300,7 @@ class CSVJtableView(CSVMixIn, View):
     __regid__ = "jtable-csvexport"
     title = _("csv export")
 
-    def call(self, rql=None, header=None):
+    def call(self, rql=None, rql_labels=None):
         """ Dump a table in csv format.
 
         A rql is executed where the first returned element is expected to be
@@ -291,12 +310,15 @@ class CSVJtableView(CSVMixIn, View):
         ----------
         rql: str (mandatory)
             the rql to execute in order to fill the desired table.
-        header: list of str (mandatory)
-            the jtable headers.
+        rql_labels: string (mandatory)
+            a rql that will be executed to get the columns labels.
         """
         # Get function parameters
         rql = rql or self._cw.form.get("rql", "")
-        header = header or self._cw.form.get("header", "")
+        rql_labels = rql_labels or self._cw.form.get("rql_labels", "")
+
+        # Get the questionnaire associated questions
+        header = [item[0] for item in self._cw.execute(rql_labels)]
 
         # Execute the full request
         rset = self._cw.execute(rql)
@@ -325,13 +347,13 @@ class CSVJtableView(CSVMixIn, View):
 ###############################################################################
 
 @ajaxfunc(output_type="json")
-def csv_open_answers_export(self, header, qname, timepoint):
+def csv_open_answers_export(self):
     """ Export the answers in the database in csv format.
 
     Parameters
     ----------
-    header: string (mandatory)
-        the jtable header elements separated by the '@' character.
+    rql_labels: string (mandatory)
+        a rql that will be executed to get the columns labels.
     qname: string (mandatory)
         the name of the questionnaire we want to export.
     timepoint: string (mandatory)
@@ -340,21 +362,23 @@ def csv_open_answers_export(self, header, qname, timepoint):
     Returns
     -------
     link: dict
-        the jtable structure that contains the download link.
+        the table structure that contains the download link.
     """
-    # Execute the full request
+    # Get parameters
+    rql_labels = self._cw.form["rql_labels"]
+    qname = self._cw.form["qname"]
+    timepoint = self._cw.form["timepoint"]
+
+    # Define the full request
     rql = ("Any ID, QUT, OAV "
            "Where OA is OpenAnswer, OA questionnaire_run QR, "
            "OA question QU, QR in_assessment A, A timepoint '{0}', "
            "QR instance_of Q, Q name '{1}', OA value OAV, QU text QUT, "
            "QR concerns S, S code_in_study ID".format(timepoint, qname))
 
-    # Split the headers
-    header = header.split("@")
-
     # Build the download url
     url = self._cw.build_url("view", vid="jtable-csvexport", rql=rql,
-                             header=header)
+                             rql_labels=rql_labels)
 
     # Create the export jtable structure
     link = {"dl_url": url}
@@ -363,9 +387,8 @@ def csv_open_answers_export(self, header, qname, timepoint):
 
 
 @ajaxfunc(output_type="json")
-def get_open_answers_data(self, jtsort, jtstartindex, jtpagesize,
-                          nb_rows, nb_cols, qname, timepoint):
-    """ Get the subject answer data formated for jtable.
+def get_open_answers_data(self):
+    """ Get the subject answer data.
 
     Parameters
     ----------
@@ -375,11 +398,10 @@ def get_open_answers_data(self, jtsort, jtstartindex, jtpagesize,
         the current index provided by jtable.
     jtpagesize: int
         the number of rows per page.
-    nb_rows: int
-        the total number of rao elements in the table.
-    nb_cols: int
-        if the rql request return multiple line that must be displayed in one
-        row use this parameter as an offset.
+    id_pattern: str
+        pattern to search in the ID column.
+    labels: list of str
+        the table column names.
     qname: string (mandatory)
         the name of the questionnaire we want to export.
     timepoint: string (mandatory)
@@ -388,60 +410,78 @@ def get_open_answers_data(self, jtsort, jtstartindex, jtpagesize,
     Returns
     -------
     data: dict
-        the jtable content.
+        the table content.
     """
+    # Get parameters
+    jtsort = self._cw.form['sSortDir_0']
+    jtstartindex = int(self._cw.form['iDisplayStart'])
+    jtpagesize = int(self._cw.form['iDisplayLength'])
+    id_pattern = self._cw.form['sSearch']
+    labels = json.loads(self._cw.form['labels'])
+    qname = self._cw.form['qname']
+    timepoint = self._cw.form['timepoint']
+
     # Deal with sort options
-    if jtsort not in ["undefined", "ID ASC", "ID DESC"]:
-        raise ValueError("Unsupported sort key '{0}'.".format(jtsort))
-    if jtsort == "undefined":
-        jtsort = ""
+    jtsort = "ORDERBY ID {0}".format(jtsort)
+
+    # Get the all the questionnaire runs and associated subjects
+    rql = ("Any ID, QR {0} "
+           "Where QR is QuestionnaireRun, QR concerns S, S code_in_study ID, "
+           "QR instance_of Q, Q name '{1}', QR in_assessment A, "
+           "A timepoint '{2}'".format(jtsort, qname, timepoint))
+    rset = self._cw.execute(rql)
+
+    # Filter the rset with the ID pattern
+    filtered_rset = []
+    for item in rset:
+        if id_pattern == "" or id_pattern in item[0]:
+            filtered_rset.append([item[0], item[1]])
+
+    # Set the appropriate range to access the data
+    # > if the user want to show all the results
+    if jtpagesize == -1 or jtpagesize > len(rset):
+        rset_range = range(len(filtered_rset))
+    # > otherwise
     else:
-        jtsort = "ORDERBY {0}".format(jtsort)
+        rset_range = range(jtstartindex,
+                           min(jtstartindex + jtpagesize, len(filtered_rset)))
 
-    # Get the all the answers and associated subjects
-    rql_all = ("Any ID, QUT, OAV {0} LIMIT {1} OFFSET {2} "
-               "Where OA is OpenAnswer, OA questionnaire_run QR, "
-               "OA question QU, QR in_assessment A, A timepoint '{3}', "
-               "QR instance_of Q, Q name '{4}', OA value OAV, QU text QUT, "
-               "QR concerns S, S code_in_study ID".format(
-                   jtsort, int(jtpagesize * nb_cols),
-                   int(jtstartindex * nb_cols), timepoint, qname))
-    rset_all = self._cw.execute(rql_all)
-
-    # Create a structure to be able to sort by subject id
-    sstruct = OrderedDict()
-    for item in rset_all:
-        sstruct.setdefault(item[0], []).append(
-            (label_cleaner(item[1]), item[2]))
-
-    # Build the dict that will be dumped in the jtable
+    # Get the answers of the desired subset of subjects
     records = []
-    for subject_id, answer_items in sstruct.iteritems():
+    for row_nb in rset_range:
 
-        # Start filling the jtabel dataset
-        dstruct = {"ID": subject_id}
+        # Start filling the tabel dataset
+        dstruct = [""] * len(labels)
+        dstruct[0] = filtered_rset[row_nb][0]
+
+        # Execute an rql to get the subject answers
+        questionnaire_run_eid = filtered_rset[row_nb][1]
+        rql = "Any QN, V Where QR eid '{0}', A is OpenAnswer, " \
+              "A questionnaire_run QR, A question Q, Q text QN, " \
+              "A value V".format(questionnaire_run_eid)
+        answer_rset = self._cw.execute(rql)
 
         # Go through all answers
-        for qname, answer in answer_items:
-            dstruct[qname] = answer
+        for qname, answer in answer_rset:
+            answer_index = labels.index(label_cleaner(qname))
+            dstruct[answer_index] = answer
 
-        # Store the jtabel formated row
+        # Store the tabel formated row
         records.append(dstruct)
 
-    # Jtable formatting
-    data = {"Result": "OK",
-            "Records": records,
-            "TotalRecordCount": nb_rows}
+    # Table formatting
+    data = {"iTotalRecords": rset.rowcount,
+            "iTotalDisplayRecords": len(filtered_rset),
+            "aaData": records}
 
     return data
 
 
 @ajaxfunc(output_type="json")
-def get_questionnaires_data(self, jtsort, jtstartindex, jtpagesize, nb_rows,
-                            nb_cols):
-    """ Get the questionnaires data formated for jtable.
+def get_questionnaires_data(self):
+    """ Get the questionnaires data.
 
-    Parameters
+    Attributes
     ----------
     jtsort: str
         the sorting option to use.
@@ -449,55 +489,67 @@ def get_questionnaires_data(self, jtsort, jtstartindex, jtpagesize, nb_rows,
         the current index provided by jtable.
     jtpagesize: int
         the number of rows per page.
-    nb_rows: int
-        the total number of rao elements in the table.
-    nb_cols: int
-        if the rql request return multiple line that must be displayed in one
-        row use this parameter as an offset.
+    column_to_filter: int
+        index of the column to filter.
+    id_pattern: str
+        pattern to search in the ID column.
+    labels: list of str
+        the table column names.
 
     Returns
     -------
     data: dict
-        the jtable content.
+        the table content.
     """
+    # Get parameters
+    jtsort = self._cw.form['sSortDir_0']
+    jtstartindex = int(self._cw.form['iDisplayStart'])
+    jtpagesize = int(self._cw.form['iDisplayLength'])
+    id_pattern = self._cw.form['sSearch']
+    labels = json.loads(self._cw.form['labels'])
+    column_to_filter = int(self._cw.form['iSortCol_0'])
+
+    # Only the ID column can be filtered
+    if column_to_filter != 0:
+        raise Exception("Only the 'ID' column can be filtered by "
+                        "'get_questionnaires_data' ajax callback.")
+  
     # Deal with sort options
-    if jtsort not in ["undefined", "ID ASC", "ID DESC"]:
-        raise ValueError("Unsupported sort key '{0}'.".format(jtsort))
-    if jtsort == "undefined":
-        jtsort = ""
-    else:
-        jtsort = "ORDERBY {0}".format(jtsort)
+    jtsort = "ORDERBY ID {0}".format(jtsort)
 
     # Get the all the questionnaire and associated timepoints
-    rql = ("DISTINCT Any ID, T {0} LIMIT {1} OFFSET {2} "
+    rql = ("DISTINCT Any ID, T {0} "
            "Where Q is Questionnaire, QR is QuestionnaireRun, "
            "QR instance_of Q, QR in_assessment A, Q name ID, "
-           "A timepoint T".format(jtsort, int(jtpagesize * nb_cols),
-                                  int(jtstartindex * nb_cols)))
+           "A timepoint T".format(jtsort))
     rset = self._cw.execute(rql)
+
+    # Filter the rset with the ID pattern
+    filtered_rset = []
+    nb_of_rows = len(set([item[0] for item in rset]))
+    for item in rset:
+        if id_pattern == "" or id_pattern in item[0]:
+            filtered_rset.append([item[0], item[1]])
 
     # Create a structure to be able to sort by questionnaire name
     qstruct = OrderedDict()
-    for item in rset:
+    for item in filtered_rset:
         qstruct.setdefault(item[0], []).append(
             label_cleaner(item[1]))
 
-    # Open answer jtable parameters
+    # Open answer table parameters
     ajaxcallback = "get_open_answers_data"
-    rql_rows = ("Any COUNT(SID) WHERE QR is QuestionnaireRun, "
-                "QR concerns S, S code_in_study SID, "
-                "QR instance_of Q, Q name '{0}', QR in_assessment A,"
-                "A timepoint '{1}'")
     rql_labels = ("Any QUT ORDERBY QUT WHERE Q is Questionnaire, "
                   "QU questionnaire Q, QU text QUT, "
                   "Q name '{0}'")
 
-    # Build the dict that will be dumped in the jtable
+    # Build the dict that will be dumped in the table
     records = []
     for qname in qstruct.keys():
 
-        # Start filling the jtabel dataset
-        dstruct = {"ID": qname}
+        # Start filling the tabel dataset
+        dstruct = [""] * len(labels)
+        dstruct[0] = qname
 
         # Go through all decalred timepoints
         for timepoint in qstruct[qname]:
@@ -505,20 +557,20 @@ def get_questionnaires_data(self, jtsort, jtstartindex, jtpagesize, nb_rows,
             # Construct the answer table view
             href = self._cw.build_url(
                 "view", vid="jtable-table",
-                rql_rows=rql_rows.format(qname, timepoint),
                 rql_labels=rql_labels.format(qname),
                 ajaxcallback=ajaxcallback, title=qname,
                 qname=qname, timepoint=timepoint, elts_to_sort=["ID"],
                 csvcallback="csv_open_answers_export")
-            dstruct[timepoint] = "<a href='{0}'>link</a>".format(href)
+            timepoint_index = labels.index(timepoint)
+            dstruct[timepoint_index] = "<a href='{0}'>link</a>".format(href)
 
-        # Store the jtabel formated row
+        # Store the tabel formated row
         records.append(dstruct)
 
-    # Jtable formatting
-    data = {"Result": "OK",
-            "Records": records,
-            "TotalRecordCount": nb_rows}
+    # Table formatting
+    data = {"iTotalRecords": nb_of_rows,
+            "iTotalDisplayRecords": len(qstruct),
+            "aaData": records}
 
     return data
 

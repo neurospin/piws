@@ -68,14 +68,12 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         ajaxcallback = "get_questionnaires_data"
-        rql_rows = ("Any COUNT(Q) WHERE Q is Questionnaire")
         rql_labels = ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
                       "A timepoint T")
         href = self._cw.build_url(
             "view", vid="jtable-table",
-            rql_rows=rql_rows, rql_labels=rql_labels,
-            ajaxcallback=ajaxcallback, title="All Questionnaires",
-            elts_to_sort=["ID"])
+            rql_labels=rql_labels, ajaxcallback=ajaxcallback,
+            title="All Questionnaires", elts_to_sort=["ID"])
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Measures</a>')
         w(u'</div></div><br/>')
