@@ -93,36 +93,25 @@ class JtableView(View):
         # Get the path to the in progress resource
         wait_image_url = self._cw.data_url("images/please_wait.gif")
 
-        # Add external js resources
-        table_url = "http://www.datatables.net/release-datatables"     
-        self._cw.add_css(
-            "http://cdn.datatables.net/1.10.5/css/jquery.dataTables.min.css",
-            localfile=False)
-        self._cw.add_css(
-            os.path.join(table_url, "extensions", "TableTools", "css", 
-                         "dataTables.tableTools.css"),
-            localfile=False)
-        self._cw.add_css(
-            os.path.join(table_url, "extensions", "FixedColumns", "css", 
-                         "dataTables.fixedColumns.css"),
-            localfile=False)
-        self._cw.add_js(
-             "http://code.jquery.com/jquery-1.11.2.min.js",
-             localfile=False)
-        self._cw.add_js(
-            "http://cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js",
-            localfile=False)
-        self._cw.add_js(
-            os.path.join(table_url, "extensions", "TableTools", "js", 
-                         "dataTables.tableTools.js"),
-            localfile=False)
-        self._cw.add_js(
-            os.path.join(table_url, "extensions", "FixedColumns", "js", 
-                         "dataTables.fixedColumns.js"),
-            localfile=False)
-        self._cw.add_js(
-            "http://cdn.datatables.net/plug-ins/f2c75b7247b/api/fnSetFilteringDelay.js",        
-            localfile=False)
+        # Add css resources
+        self._cw.add_css("datatables-1.10.5/media/css/jquery.dataTables.min.css")
+        self._cw.add_css("datatables-1.10.5/extensions/TableTools/css/"
+                         "dataTables.tableTools.min.css")
+        self._cw.add_css("datatables-1.10.5/extensions/FixedColumns/css/"
+                         "dataTables.fixedColumns.css")
+
+        # Add js resources
+        self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
+        self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
+        self._cw.add_js("datatables-1.10.5/extensions/TableTools/js/"
+                         "dataTables.tableTools.min.js")
+        self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
+                        "dataTables.fixedColumns.js")
+        self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
+
+        # Add swf resources
+        swf_export = self._cw.data_url("datatables-1.10.5/extensions/"
+                                       "TableTools/swf/copy_csv_xls.swf")
 
         # Get table meta information
         labels = self._cw.execute(rql_labels)
@@ -149,9 +138,10 @@ class JtableView(View):
         html += "var table = $('#the_table').dataTable( { "
 
         # > set table display options
-        html += "'scrollX': true,"
+        html += "'scrollX': '100%',"
         html += "'scrollY': '600px',"
         html += "'scrollCollapse': true,"
+        html += "'sPaginationType': 'bootstrap',"
         html += "'dom': 'T<\"clear\">lfrtip',"
         html += "'lengthMenu': [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ],"
         html += "'sServerMethod': 'POST',"
@@ -197,9 +187,8 @@ class JtableView(View):
         # > display the export buttons
         html += ("'tableTools': {{ "
                  "'sRowSelect': 'multi', "
-                 "'sSwfPath': 'http://cdn.datatables.net/tabletools/2.2.2/"
-                    "swf/copy_csv_xls_pdf.swf', "
-                 "'aButtons': [{0}] }}, ".format(buttons))
+                 "'sSwfPath': '{0}', "
+                 "'aButtons': [{1}] }}, ".format(swf_export, buttons))
 
         # > set table header
         html += "'aoColumns': {0},".format(json.dumps(headers))
@@ -235,7 +224,9 @@ class JtableView(View):
         html += "} );"
 
         # > the first column is static in the display
-        html += "new $.fn.dataTable.FixedColumns( table, {leftColumns: 1} );"
+        html += "var fc = new $.fn.dataTable.FixedColumns( "
+        html += "table, {leftColumns: 1} "
+        html += ");"
         html += "table.fnSetFilteringDelay(1000);"
 
         # > close script
@@ -252,10 +243,9 @@ class JtableView(View):
                  "align='center'><img src='{0}'/></div>".format(wait_image_url))
 
         # > display the table in the body
-        html += "<table id='the_table', class='display'>"
+        html += "<table id='the_table' class='cell-border display'>"
         html += "<thead></thead>"
-        html += "<tbody>"
-        html += "</tbody>"
+        html += "<tbody></tbody>"
         html += "</table>"
 
         # Creat the corrsponding html page

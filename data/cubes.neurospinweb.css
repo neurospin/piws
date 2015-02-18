@@ -8,6 +8,16 @@ div.dataTables_wrapper {
     margin: 0 auto;
 }
 
+div.DTFC_LeftBodyLiner {
+    overflow-x: hidden;
+}
+
+.dataTables_processing{
+    position: fixed;
+    z-index: 999;
+}
+
+
 
 [class*="span"] {
     float: left;
