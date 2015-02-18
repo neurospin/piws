@@ -31,7 +31,7 @@ class JtableView(View):
     paginable = False
     div_id = "jtable-table"
 
-    mandatory_params = ["vid", "rql_labels", "ajaxcallback",
+    mandatory_params = ["vid", "rql_labels", "ajaxcallback", "labels",
                         "title", "elts_to_sort", "csvcallback"]
 
     def __init__(self, *args, **kwargs):
@@ -45,7 +45,7 @@ class JtableView(View):
             self._cw = kwargs["parent_view"]._cw
             self.w = kwargs["parent_view"].w
 
-    def call(self, rql_labels=None, ajaxcallback=None,
+    def call(self, rql_labels=None, labels=None, ajaxcallback=None,
              csvcallback=None, title="", elts_to_sort=None, **kwargs):
         """ Method that will create a table.
 
@@ -67,7 +67,9 @@ class JtableView(View):
 
         Parameters
         ----------
-        rql_labels: string (mandatory)
+        rql_labels: string (rql_labels)
+            a rql that will be executed to get the columns labels.
+        labels: list of string (xor rql_labels)
             a rql that will be executed to get the columns labels.
         ajaxcallback: @func (mandatory)
             a function thaty will be called by jtable to create dynamically the
@@ -83,7 +85,8 @@ class JtableView(View):
             if key not in self.mandatory_params:
                 kwargs[key] = self._cw.form[key]
         title = title or self._cw.form.get("title", "")
-        rql_labels = rql_labels or self._cw.form.get("rql_labels", "")
+        rql_labels = rql_labels or self._cw.form.get("rql_labels", None)
+        labels = rql_labels or self._cw.form.get("labels", None)
         ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
         csvcallback = csvcallback or self._cw.form.get("csvcallback", None)
         elts_to_sort = elts_to_sort or self._cw.form.get("elts_to_sort", [])
@@ -114,7 +117,12 @@ class JtableView(View):
                                        "TableTools/swf/copy_csv_xls.swf")
 
         # Get table meta information
-        labels = self._cw.execute(rql_labels)
+        if rql_labels is not None:
+            labels = self._cw.execute(rql_labels)
+        if rql_labels is None and labels is not None:
+            labels = [[str(item)] for item in labels]
+        if labels is None:
+            raise Exception("No labels can be selected when creatin the jtable")
 
         # Generate the script
 
@@ -429,7 +437,7 @@ def get_open_answers_data(self):
 
     # Set the appropriate range to access the data
     # > if the user want to show all the results
-    if jtpagesize == -1 or jtpagesize > len(rset):
+    if jtpagesize == -1 or jtpagesize > len(filtered_rset):
         rset_range = range(len(filtered_rset))
     # > otherwise
     else:
