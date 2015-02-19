@@ -32,7 +32,8 @@ class JtableView(View):
     div_id = "jtable-table"
 
     mandatory_params = ["vid", "rql_labels", "ajaxcallback", "labels",
-                        "title", "elts_to_sort", "csvcallback"]
+                        "title", "elts_to_sort", "csvcallback",
+                        "use_server"]
 
     def __init__(self, *args, **kwargs):
         """ Initialize the JtableView class.
@@ -46,7 +47,8 @@ class JtableView(View):
             self.w = kwargs["parent_view"].w
 
     def call(self, rql_labels=None, labels=None, ajaxcallback=None,
-             csvcallback=None, title="", elts_to_sort=None, **kwargs):
+             csvcallback=None, title="", elts_to_sort=None,
+             use_server=True, **kwargs):
         """ Method that will create a table.
 
         When left clicking on a row, the row is selected (highlighted) Click
@@ -79,6 +81,10 @@ class JtableView(View):
             available.
         title: string (optional, default '')
             the title of the table.
+        elts_to_sort: list of str (optional)
+            the colums label that can be sortable.
+        use_server: bool (optional, default True)
+            if True, use server-side processing.
         """
         # Get the parameters
         for key in sorted(self._cw.form.keys()):
@@ -87,11 +93,15 @@ class JtableView(View):
         title = title or self._cw.form.get("title", "")
         rql_labels = rql_labels or self._cw.form.get("rql_labels", None)
         labels = rql_labels or self._cw.form.get("labels", None)
+        if labels is not None and not isinstance(labels, list):
+            labels = [labels]
         ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
         csvcallback = csvcallback or self._cw.form.get("csvcallback", None)
         elts_to_sort = elts_to_sort or self._cw.form.get("elts_to_sort", [])
         if not isinstance(elts_to_sort, list):
             elts_to_sort = [elts_to_sort]
+        if "use_server" in self._cw.form:
+            use_server = eval(self._cw.form.get("use_server"))
 
         # Get the path to the in progress resource
         wait_image_url = self._cw.data_url("images/please_wait.gif")
@@ -130,6 +140,8 @@ class JtableView(View):
         headers = [{"sTitle": "ID"}]
         hide_sort_indices = []
         label_list = ["ID"]
+        if "ID" not in elts_to_sort:
+            hide_sort_indices.append(0)
         for cnt, label_text in enumerate(labels):
             
             # >> select if we can sort this column
@@ -156,10 +168,13 @@ class JtableView(View):
         html += "'oLanguage': {'sSearch': 'ID'},"
         html += "'pagingType': 'full_numbers',"
         html += "'bProcessing': true,"
-        html += "'bServerSide': true,"
+        if use_server:
+            html += "'bServerSide': true,"
+        else:
+            html += "'bServerSide': false,"
 
         # > export csv options
-        buttons = "'copy', 'print'"
+        buttons = "'copy'"
         if csvcallback is not None:
             # >> create a custom button to download all the table
             export_button = (
@@ -173,7 +188,10 @@ class JtableView(View):
             export_button += "type: 'POST', "
             export_button += "dataType: 'json', "
             csv_callback_parms = copy.deepcopy(kwargs)
-            csv_callback_parms["rql_labels"] = rql_labels
+            if rql_labels is not None:
+                csv_callback_parms["rql_labels"] = rql_labels           
+            else:
+                csv_callback_parms["labels"] = label_list
             export_button += "data: {0}".format(json.dumps(csv_callback_parms))
             export_button += "}); "
             # >> handle sucess case
@@ -203,7 +221,8 @@ class JtableView(View):
 
         # > set sort widget on column
         html += "'aoColumnDefs': [ "
-        html += "{{ 'bSortable': false, 'aTargets': {0} }}".format(str(hide_sort_indices))
+        html += "{{ 'bSortable': false, 'aTargets': {0} }}".format(
+            str(hide_sort_indices))
         html += "],"
         
         # > set the ajax callback to fill dynamically the table
