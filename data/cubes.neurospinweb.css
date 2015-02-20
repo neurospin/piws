@@ -1,7 +1,14 @@
 .search-query {
-    padding-left: 80%;
-    margin-top: 10px;
-    width: 100%;
+    margin-top: 20px;
+    width: 800px;;
+}
+
+.navbar-nav {
+    float: left !important;
+}
+
+.navbar-right {
+    float: left !important;
 }
 
 th, td {
