@@ -24,6 +24,264 @@ from cubicweb.web.views.csvexport import CSVMixIn
 # Jtable
 ###############################################################################
 
+class JhugetableView(View):
+    """ Create a table view with Jtable.
+    """
+    __regid__ = "jtable-hugetable-clientside"
+    paginable = False
+    div_id = "jhugetable-table"
+
+    mandatory_params = ["vid", "rql_labels", "ajaxcallback", "labels",
+                        "title", "csvcallback"]
+
+    def __init__(self, *args, **kwargs):
+        """ Initialize the JtableView class.
+
+        If you want to construct the table manually in your view pass the
+        parent view in the 'parent_view' attribute.
+        """
+        super(JhugetableView, self).__init__(*args, **kwargs)
+        if "parent_view" in kwargs:
+            self._cw = kwargs["parent_view"]._cw
+            self.w = kwargs["parent_view"].w
+
+    def call(self, rql_labels=None, labels=None, ajaxcallback=None,
+             title="", csvcallback=None, use_scroller=False, **kwargs):
+        """ Method that will create a table for huge datasets (million of
+        entries).
+
+        An ajax call is emulated within the javascript so this function is
+        client side only.
+
+        When left clicking on a row, the row is selected (highlighted) Click
+        again on this row to deselect it.
+
+        1) Extra parameters will be passed to the ajax callback that is called
+        one time
+
+        2) Column labels must not contain space ' ' and they need to be
+        replaced: use the 'label_cleaner' function.
+
+        3) A special 'ID' column must be specified in the ajax callback that
+        contains the row string description.
+
+        Parameters
+        ----------
+        rql_labels: string (rql_labels)
+            a rql that will be executed to get the columns labels.
+        labels: list of string (xor rql_labels)
+            a rql that will be executed to get the columns labels.
+        ajaxcallback: @func (mandatory)
+            a function thaty will be called by jtable to create dynamically the
+            data to display: do not foget the decorator @ajaxfunc.
+        title: string (optional, default '')
+            the title of the table.
+        csvcallback: @func (optional)
+            if an ajax callback is given then an export button will be
+            available.
+        use_scroller: bool (optional default False)
+            if True de not use pagination.
+        """
+        # Get the parameters
+        for key in sorted(self._cw.form.keys()):
+            if key not in self.mandatory_params:
+                kwargs[key] = self._cw.form[key]
+        title = title or self._cw.form.get("title", "")
+        rql_labels = rql_labels or self._cw.form.get("rql_labels", None)
+        labels = labels or self._cw.form.get("labels", None)
+        if labels is not None and not isinstance(labels, list):
+            labels = [labels]
+        ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
+        csvcallback = csvcallback or self._cw.form.get("csvcallback", None)
+        if "use_scroller" in self._cw.form:
+            use_scroller = eval(self._cw.form.get("use_scroller"))
+
+        # Get the path to the in progress resource
+        wait_image_url = self._cw.data_url("images/please_wait.gif")
+
+        # Add css resources
+        self._cw.add_css("datatables-1.10.5/media/css/jquery.dataTables.min.css")
+        self._cw.add_css("datatables-1.10.5/extensions/TableTools/css/"
+                         "dataTables.tableTools.css")
+        self._cw.add_css("datatables-1.10.5/extensions/FixedColumns/css/"
+                         "dataTables.fixedColumns.css")
+        self._cw.add_css("datatables-1.10.5/extensions/Scroller/css/"
+                         "dataTables.scroller.css")
+
+        # Add js resources
+        self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
+        self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
+        self._cw.add_js("datatables-1.10.5/extensions/TableTools/js/"
+                         "dataTables.tableTools.js")
+        self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
+                        "dataTables.fixedColumns.js")
+        self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
+        self._cw.add_js("datatables-1.10.5/extensions/Scroller/js/"
+                        "dataTables.scroller.js")
+
+        # Add swf resources
+        swf_export = self._cw.data_url("datatables-1.10.5/extensions/"
+                                       "TableTools/swf/copy_csv_xls_pdf.swf")
+
+        # Get table meta information
+        if rql_labels is not None:
+            labels = [item[0] for item in self._cw.execute(rql_labels)]
+        if labels is None:
+            raise Exception("No labels can be selected while creating the "
+                            "hugejtable")
+
+        # Table column headers
+        headers = []
+        for label_text in labels:
+            headers.append({"sTitle": label_text})
+
+        # Generate the script
+        html = "<script type='text/javascript'> "
+        html += "$(document).ready(function() {"
+
+        # > call the ajax callback to get the data and display a processing
+        # > message
+        html += "$('#loadingmessage').show();"
+        html += "var post = $.ajax({"
+        html += "url: 'ajax?fname={0}', ".format(ajaxcallback)
+        html += "type: 'POST', "
+        html += "dataType: 'json', "
+        html += "data: {0}".format(json.dumps(kwargs))
+        html += "});"
+
+        # > start post: when data are loaded, hide the processing message
+        html += "post.done(function(p){"
+        html += "$('#loadingmessage').hide();"
+
+        # > global variable with the data
+        html += "var jdata = p['aaData'];"
+
+        # > create the table
+        html += "var table = $('#the_table').dataTable( { "
+
+        # > set table display options
+        html += "serverSide: true, "
+        html += "ordering: false, "
+        html += "searching: true, "
+        html += "scrollX: '100%',"
+        html += "scrollY: 600,"
+        html += "scrollCollapse: true,"
+        html += "aoColumns: {0}, ".format(json.dumps(headers))
+        if use_scroller:
+            html += "dom: 'T<\"clear\">frtiS', "
+            html += "scroller: {loadingIndicator: true}, "
+        else:
+            html += "dom: 'T<\"clear\">lfrtip', "
+            html += "lengthMenu: [ [25, 50, 100, 200], [25, 50, 100, 200] ],"
+            html += "pagingType: 'full_numbers',"
+            html += "bProcessing: true, "
+
+        buttons = "'copy'"
+        if csvcallback is not None:
+            # >> create a custom button to download all the table
+            export_button = (
+                "{'sExtends': 'ajax', 'sButtonText': 'CSV - All results', ")
+            # >> when you click the button display a processing message and
+            # >> run the callback
+            export_button += "'fnClick': function () { "
+            export_button += "$('#loadingmessage').show();"
+            export_button += "var post = $.ajax({ "
+            export_button += "url: 'ajax?fname={0}', ".format(csvcallback)
+            export_button += "type: 'POST', "
+            export_button += "dataType: 'json', "
+            csv_callback_parms = copy.deepcopy(kwargs)
+            if rql_labels is not None:
+                csv_callback_parms["rql_labels"] = rql_labels           
+            else:
+                csv_callback_parms["labels"] = labels
+            export_button += "data: {0}".format(json.dumps(csv_callback_parms))
+            export_button += "}); "
+            # >> handle sucess case
+            export_button += "post.done(function(p){ "
+            export_button += "window.location = p.dl_url; "
+            export_button += "$('#loadingmessage').hide(); "
+            export_button += "});"
+            # >> handle error case
+            export_button += "post.fail(function(){ "
+            export_button += "$('#loadingmessage').hide(); "
+            export_button += "alert('Error : Download Failed!'); "
+            export_button += "}); "
+            # >> end click event
+            export_button += "}"
+            # >> end custom button
+            export_button += "} "
+            buttons += ", {0}".format(export_button)
+
+        # > display the export buttons
+        html += ("'tableTools': {{ "
+                 "'sRowSelect': 'multi', "
+                 "'sSwfPath': '{0}', "
+                 "'aButtons': [{1}] }}, ".format(swf_export, buttons))
+
+        # > build the inner ajax call
+        html += "ajax: function ( data, callback, settings ) {"
+        # >> inner parameters
+        html += "var out = [];"
+        html += "var filtered_jdata = [];"
+        # >> filter the dataset using a regex
+        html += "if (data.search.value != '') {"
+        html += "for ( var i=0, ien=jdata.length ; i<ien ; i++ ) {"
+        html += "var reg = new RegExp(data.search.value);"
+        html += "if (jdata[i][0].match(reg)) {"
+        html += "filtered_jdata.push( jdata[i] );"
+        html += "}"
+        html += "}"
+        html += "}"
+        html += "else {"
+        html += "filtered_jdata = jdata;"
+        html += "}"
+        # >> display only a subset of the filtered dataset
+        html += ("for ( var i=data.start, ien=Math.min(data.start+data.length, "
+                 "filtered_jdata.length) ; i<ien ; i++ ) {")
+        html += "out.push( filtered_jdata[i] );"
+        html += "}"
+        # >> return the generated subset and add a timeout
+        html += "setTimeout( function () {"
+        html += "callback( {"
+        html += "draw: data.draw, "
+        html += "data: out, "
+        html += "recordsTotal: jdata.length, "
+        html += "recordsFiltered: filtered_jdata.length"
+        html += "} );"
+        html += "}, 50 );"
+        # >> close ajax
+        html += "}"
+
+        # > close table
+        html += "} );"
+
+        # > post done
+        html += "});"
+
+        # > error when loading the data
+        html += "post.fail(function(){"
+        html += " alert('Error : Download Failed!');"
+        html += "});"
+
+        # > close function
+        html += "} );"
+
+        # > close script
+        html += "</script>"
+
+        # > create a div for the in progress resource
+        html += ("<div id='loadingmessage' style='display:none' "
+                 "align='center'><img src='{0}'/></div>".format(wait_image_url))
+
+        # > display the table in the body
+        html += "<table id='the_table' class='cell-border display'>"
+        html += "<thead></thead>"
+        html += "</table>"
+
+        # Creat the corrsponding html page
+        self.w(unicode(html))
+
+
 class JtableView(View):
     """ Create a table view with Jtable.
     """
@@ -92,7 +350,7 @@ class JtableView(View):
                 kwargs[key] = self._cw.form[key]
         title = title or self._cw.form.get("title", "")
         rql_labels = rql_labels or self._cw.form.get("rql_labels", None)
-        labels = rql_labels or self._cw.form.get("labels", None)
+        labels = labels or self._cw.form.get("labels", None)
         if labels is not None and not isinstance(labels, list):
             labels = [labels]
         ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
@@ -132,7 +390,7 @@ class JtableView(View):
         if rql_labels is None and labels is not None:
             labels = [[str(item)] for item in labels]
         if labels is None:
-            raise Exception("No labels can be selected when creatin the jtable")
+            raise Exception("No labels can be selected while creating the jtable")
 
         # Generate the script
 
@@ -598,6 +856,7 @@ def get_questionnaires_data(self):
 
 def registration_callback(vreg):
     vreg.register(JtableView)
+    vreg.register(JhugetableView)
     vreg.register(get_open_answers_data)
     vreg.register(get_questionnaires_data)
     vreg.register(csv_open_answers_export)
