@@ -269,6 +269,9 @@ class JhugetableView(View):
         # > close script
         html += "</script>"
 
+        # > set a title
+        html += "<h1>{0}</h1>".format(title)
+
         # > create a div for the in progress resource
         html += ("<div id='loadingmessage' style='display:none' "
                  "align='center'><img src='{0}'/></div>".format(wait_image_url))
