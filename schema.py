@@ -171,7 +171,7 @@ ENTITIES = [
 
 
 DEFAULT_PERMISSIONS = {
-    "read": ("managers", "users"),
+    "read": ("managers", "users", "guests"),
     "add": ("managers",),
     "update": ("managers",),
     "delete": ("managers",),

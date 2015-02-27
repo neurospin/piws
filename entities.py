@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from cubicweb.predicates import is_instance
-from cubes.rsetftp.entities import BaseIFilePathAdapter
+# from cubes.rsetftp.entities import BaseIFilePathAdapter
 from cubicweb.entities import AnyEntity
 
 from cubes.medicalexp.config import ASSESSMENT_CONTAINER
