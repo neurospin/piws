@@ -78,6 +78,14 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'Measures</a>')
         w(u'</div></div><br/>')
 
+        # GenomicMeasures
+        w(u'<div class="btn-toolbar">')
+        w(u'<div class="btn-group-vertical btn-block">')
+        href = self._cw.build_url(rql="Any GM Where GM is GenomicMeasure")
+        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+        w(u'Genomic measures</a>')
+        w(u'</div></div><br/>')
+
         # BioSamples
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')

@@ -188,6 +188,7 @@ class Scans(Base):
                     assessment_eid = self._create_assessment(
                         assessment_struct, subject_eid, study_eid, center_eid,
                         groups)
+                    self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################
                 # Go through the scans - processings - scores
@@ -284,96 +285,3 @@ class Scans(Base):
                     subjtype="ScoreValue")
 
         return scan_eid
-
-    def _create_assessment(self, assessment_struct, subject_eid, study_eid,
-                           center_eid, groups):
-        """ Create an assessment and its associated relations.
-        """ 
-        # Create the assessment
-        assessment_id = assessment_struct["identifier"]
-        assessment_entity, is_created = self._get_or_create_unique_entity(
-            rql=("Any X Where X is Assessment, X identifier "
-                 "'{0}'".format(assessment_id)),
-            check_unicity=True,
-            entity_name="Assessment",
-            **assessment_struct)
-        assessment_eid = assessment_entity.eid
-        self.inserted_assessments[assessment_id] = assessment_eid
-
-        # If we just create the assessment, relate the entity
-        if is_created:
-            # > add relation with the study
-            self._set_unique_relation(
-                assessment_eid, "related_study", study_eid, check_unicity=False,
-                subjtype="Assessment")
-            # > add relation with the subject
-            self._set_unique_relation(
-                subject_eid, "concerned_by", assessment_eid, check_unicity=False)
-            self._set_unique_relation(
-                assessment_eid, "concerns", subject_eid, check_unicity=False,
-                subjtype="Assessment")
-            # > add relation with the center
-            self._set_unique_relation(
-                center_eid, "holds", assessment_eid, check_unicity=False)
-
-            # Set the permissions
-            # Create/get the related assessment groups
-            assessment_id = assessment_id.split("_")
-            related_groups = [
-                assessment_id[0],
-                "_".join(assessment_id[:2])
-            ]
-            for group_name in related_groups:
-
-                # Check the group is created
-                if group_name in groups:
-                    group_eid = groups[group_name]
-                else:
-                    raise ValueError(
-                        "Please create first the group '{0}'.".format(group_name))
-
-                # > add relation with group
-                if self.can_read:
-                    self._set_unique_relation(
-                        group_eid, "can_read", assessment_eid)
-                if self.can_update:
-                    self._set_unique_relation(
-                        group_eid, "can_update", assessment_eid)
-    
-        return assessment_eid   
-
-    def _import_file_set(self, fset_struct, extfiles, parent_eid,
-                         assessment_eid):
-        """ Add the file set attached to a parent entity.
-        """
-        # Create the file set
-        fset_entity, _ = self._get_or_create_unique_entity(
-            rql="",
-            check_unicity=False,
-            entity_name="FileSet",
-            **fset_struct)
-        # > add relation with the parent
-        self._set_unique_relation(parent_eid,
-            "results_files", fset_entity.eid,
-            check_unicity=False)
-        # > add relation with the assessment
-        self._set_unique_relation(fset_entity.eid,
-            "in_assessment", assessment_eid,
-            check_unicity=False, subjtype="FileSet")
-
-        # Create the external files
-        for extfile_struct in extfiles:
-            file_entity, _ = self._get_or_create_unique_entity(
-                rql="",
-                check_unicity=False,
-                entity_name="ExternalFile",
-                **extfile_struct)
-            # > add relation with the file set
-            self._set_unique_relation(fset_entity.eid,
-                "file_entries", file_entity.eid,
-                check_unicity=False) 
-            # > add relation with the assessment
-            self._set_unique_relation(file_entity.eid,
-                "in_assessment", assessment_eid,
-                check_unicity=False, subjtype="ExternalFile")                     
-

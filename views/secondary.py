@@ -109,7 +109,7 @@ class NSAssessmentOutOfContextView(EntityView):
         entity = self.cw_rset.get_entity(row, col)
 
         # Get the subject/study/center related entities
-        subject = entity.reverse_concerned_by[0]
+        related_subjects = entity.reverse_concerned_by
         study = entity.related_study[0]
         center = entity.reverse_holds[0]
         run_items = []
@@ -144,12 +144,14 @@ class NSAssessmentOutOfContextView(EntityView):
         self.w(u'<dl class="dl-horizontal">')
         self.w(u'<dt>Acquisition center</dt><dd>{0}</dd>'.format(
             center.name))
-        self.w(u'<dt>Gender</dt><dd>{0}</dd>'.format(
-            subject.gender))
-        self.w(u'<dt>Handedness</dt><dd>{0}</dd>'.format(
-            subject.handedness))
-        self.w(u'<dt>Age</dt><dd>{0}</dd>'.format(
-            entity.age_of_subject))
+        if len(related_subjects) == 1:
+            subject = related_subjects[0]
+            self.w(u'<dt>Gender</dt><dd>{0}</dd>'.format(
+                subject.gender))
+            self.w(u'<dt>Handedness</dt><dd>{0}</dd>'.format(
+                subject.handedness))
+            self.w(u'<dt>Age</dt><dd>{0}</dd>'.format(
+                entity.age_of_subject))
         self.w(u'<dt>Identifier</dt><dd>{0}</dd>'.format(
             entity.identifier))
         self.w(u'<dt>Related runs</dt><dd>{0}</dd>'.format(

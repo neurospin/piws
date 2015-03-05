@@ -17,18 +17,34 @@
 
 """cubicweb-neurospinweb schema"""
 
-from yams.buildobjs import (
-    SubjectRelation, EntityType, String, Float, RelationDefinition, Datetime)
-from yams.constraints import BoundaryConstraint, Attribute
+from yams.buildobjs import SubjectRelation
+from yams.buildobjs import EntityType
+from yams.buildobjs import String
+from yams.buildobjs import Float
+from yams.buildobjs import RelationDefinition
+from yams.buildobjs import Datetime
+from yams.constraints import BoundaryConstraint
+from yams.constraints import Attribute
 
-from cubicweb.schema import RRQLExpression, ERQLExpression
-from cubes.medicalexp.schema import (
-    Assessment, Subject, FileSet, ExternalFile, ScoreValue, ProcessingRun,
-    Center, Study)
-from cubes.neuroimaging.schema import (
-    Scan, DMRIData, PETData, MRIData)
-from cubes.questionnaire.schema import (
-    QuestionnaireRun, Questionnaire, Question)
+from cubicweb.schema import RRQLExpression
+from cubicweb.schema import ERQLExpression
+
+from cubes.medicalexp.schema import Assessment
+from cubes.medicalexp.schema import Subject
+from cubes.medicalexp.schema import FileSet
+from cubes.medicalexp.schema import ExternalFile
+from cubes.medicalexp.schema import ScoreValue
+from cubes.medicalexp.schema import ProcessingRun
+from cubes.medicalexp.schema import Center
+from cubes.medicalexp.schema import Study
+from cubes.neuroimaging.schema import Scan
+from cubes.neuroimaging.schema import DMRIData
+from cubes.neuroimaging.schema import PETData
+from cubes.neuroimaging.schema import MRIData
+from cubes.questionnaire.schema import QuestionnaireRun
+from cubes.questionnaire.schema import Questionnaire
+from cubes.questionnaire.schema import Question
+from cubes.genomics.schema import GenomicMeasure
 
 
 ###############################################################################
@@ -62,6 +78,18 @@ FileSet.add_relation(
 # Add identifier to ExternalFile entity
 ExternalFile.add_relation(
     String(maxsize=128, fulltextindexed=True), name="identifier")
+
+# Add label to GenomicMeasure entity
+GenomicMeasure.add_relation(
+    String(maxsize=128, fulltextindexed=True), name="label")
+
+# Add chromset to Genomicmeasure
+GenomicMeasure.add_relation(String(maxsize=64), name="chromset")
+
+# Add related_subjects relation to Genomicmeasure
+GenomicMeasure.add_relation(
+    SubjectRelation("Subject", cardinality="**", inlined=False),
+    name="related_subjects")
 
 # Add shape to DMRIData entity
 DMRIData.add_relation(Float(required=True, indexed=True), name="shape_x")
@@ -167,7 +195,7 @@ class in_assessment(RelationDefinition):
 ENTITIES = [
     Scan, FMRIData, DMRIData, PETData, MRIData, FileSet, ExternalFile,
     ScoreValue, ProcessingRun, QuestionnaireRun, Questionnaire, Question,
-    OpenAnswer]
+    OpenAnswer, GenomicMeasure]
 
 
 DEFAULT_PERMISSIONS = {

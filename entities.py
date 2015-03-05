@@ -56,8 +56,12 @@ class Assessment(AnyEntity):
     def dc_title(self):
         """ Method the defined the assessment entity title
         """
-        subject = self.reverse_concerned_by[0]
-        return "{0}".format(subject.code_in_study)
+        related_subject = self.reverse_concerned_by
+        if len(related_subject) > 0:
+            subject = related_subject[0]
+            return "{0}".format(subject.code_in_study)
+        else:
+            return "genomic measure"
 
     @property
     def symbol(self):

@@ -50,28 +50,30 @@ class Questionnaires(Base):
         -----
         Here is an axemple of the definiton of the 'questionnaires' parameter:
 
-        questionnaires = [ 
-            {
-                "Questionnaires": {
-                    "Personal": {u"mood": 5}
-                    "ID": {u"gender": u"male", u"age": 27, u"handedness": u"right"}
+        questionnaires = {
+            "subject1": [ 
+                {
+                    "Questionnaires": {
+                        "Personal": {u"mood": 5}
+                        "ID": {u"gender": u"male", u"age": 27, u"handedness": u"right"}
+                    }
+                    "Assessment": {
+                        "age_of_subject": 27, "identifier": u"toy_V1_subject1",
+                        "timepoint": u"V1'"
+                    }
+                }, 
+                {
+                    "Questionnaires": {
+                        "Personal": {u"mood": 5}
+                        "ID": {u"gender": u"male", u"age": 27, u"handedness": u"right"}
+                    }
+                    "Assessment": {
+                        "age_of_subject": 27, "identifier": u"toy_V0_subject1",
+                        "timepoint": u"V0"
+                    }
                 }
-                "Assessment": {
-                    "age_of_subject": 27, "identifier": u"toy_V1_subject1",
-                    "timepoint": u"V1'"
-                }
-            }, 
-            {
-                "Questionnaires": {
-                    "Personal": {u"mood": 5}
-                    "ID": {u"gender": u"male", u"age": 27, u"handedness": u"right"}
-                }
-                "Assessment": {
-                    "age_of_subject": 27, "identifier": u"toy_V0_subject1",
-                    "timepoint": u"V0"
-                }
-            }
-        ]
+            ]
+        }
         """
         # Inheritance
         super(Questionnaires, self).__init__(session, use_store)
@@ -83,6 +85,9 @@ class Questionnaires(Base):
         self.center_name = center_name
         self.can_read = can_read
         self.can_update = can_update
+
+        # Speed up parameters
+        self.inserted_assessments = {}
 
     ###########################################################################
     #   Public Methods
@@ -108,7 +113,7 @@ class Questionnaires(Base):
                  "'{0}'".format(self.project_name)),
             entity_name="Study",
             name=unicode(self.project_name),
-            data_filepath=unicode(self.data_path))
+            data_filepath=unicode(self.data_filepath))
         study_eid = study_entity.eid
 
         #######################################################################
@@ -134,16 +139,17 @@ class Questionnaires(Base):
 
         # Get the questionnaire structure
         qstructure = {}
-        for dquestionnaires in self.questionnaires:
-            for qname, question_struct in dquestionnaires[
+        for subject_questionnaires in self.questionnaires.values():
+            for dquestionnaires in subject_questionnaires:
+                for qname, question_struct in dquestionnaires[
                                             "Questionnaires"].iteritems():
-                qstructure.setdefault(qname, ()).union(
-                    set(question_struct.keys()))
+                    qstructure.setdefault(qname, []).extend(
+                        question_struct.keys())
 
         # Then fill the questionnaire form
         questionnaire_eids = {}
         question_eids = {}
-        for qname, question_names in self.qstructure.iteritems():
+        for qname, question_names in qstructure.iteritems():
 
             # Create a questionnaire form
             questionnaire_entity, _ = self._get_or_create_unique_entity(
@@ -151,23 +157,24 @@ class Questionnaires(Base):
                      "'{0}'".format(qname)),
                 check_unicity=True,
                 entity_name = "Questionnaire",
-                identifier=unicode(questionnaire_name),
-                name=unicode(questionnaire_name),
+                identifier=unicode(qname),
+                name=unicode(qname),
                 type=u"unknown")
             questionnaire_eids[qname] = questionnaire_entity.eid
             question_eids[qname] = {}
 
             # Create corresponding questions
-            for question in question_names:
+            for question_name in set(question_names):
+                question_id = qname + "_" + question_name
                 question_entity, _ = self._get_or_create_unique_entity(
-                    rql=("Any X Where X is Question, X text "
-                         "'{0}'".format(question_name)),
+                    rql=("Any X Where X is Question, X identifier "
+                         "'{0}'".format(question_id)),
                     check_unicity=True,
                     entity_name = "Question",
-                    identifier=unicode(question_name),
+                    identifier=unicode(question_id),
                     text=unicode(question_name),
                     type=u"text")
-                question_eids[qname][question] = question_entity.eid
+                question_eids[qname][question_name] = question_entity.eid
                 # > add relation with the questionnaire form
                 self._set_unique_relation(question_entity.eid, "questionnaire",
                                           questionnaire_entity.eid)
@@ -177,139 +184,129 @@ class Questionnaires(Base):
         #######################################################################
 
         # Information to create a progress bar
-        nb_of_subjects = float(len(self.dataset["Subject"]))
+        nb_of_subjects = float(len(self.questionnaires))
         cnt_subject = 1.
 
         # Add the data
-        for subject_struct, measure_item in zip(
-            self.dataset["Subject"], self.dataset["Measure"]):
+        for subject_id, list_questionnaires in self.questionnaires.iteritems():
 
             # Print a progress bar
             self._progress_bar(
-                cnt_subject/nb_of_subjects,
-                title="{0}(measures)".format(subject_struct["code_in_study"]),
+                cnt_subject / nb_of_subjects,
+                title="{0}(quetionnaire)".format(subject_id),
                 bar_length=40)
             cnt_subject += 1
 
-            # Create subject
-            subject_entity, _ = self._get_or_create_unique_entity(
-                rql=("Any X Where X is Subject, X identifier "
-                     "'{0}'".format(subject_struct["identifier"])),
-                entity_name="Subject",
-                **subject_struct)
+            ###################################################################
+            # Check the subject exists in the database
+            ###################################################################
 
-            # Create all measures
-            for sub_exam_name, answer_item in measure_item.iteritems():
+            if subject_id in study_subjects:
+                subject_eid = study_subjects[subject_id]
+            else:
+                raise ValueError("The subject '{0}' in not known by the "
+                                 "database.".format(subject_id))
+
+            ###################################################################
+            # Insert all the subject questionnaires
+            ###################################################################
+
+            for timepoint_questionnaires in list_questionnaires:
 
                 ##############################################################
-                # Create assessment
+                # Create the assessment
                 ##############################################################
 
-                assessment_struct = answer_item["Assessment"]
-                assessment_entity, is_created = self._get_or_create_unique_entity(
-                    rql=("Any X Where X is Assessment, X identifier "
-                         "'{0}'".format(assessment_struct["identifier"])),
-                    entity_name="Assessment",
-                    **assessment_struct)
-                if is_created:
-                    # > add relation with the study
-                    self._set_unique_relation(assessment_entity.eid,
-                        "related_study", study_entity.eid, check_unicity=False)
-                    # > add relation with the subject
-                    self._set_unique_relation(subject_entity.eid,
-                        "concerned_by", assessment_entity.eid, check_unicity=False)
-                    self._set_unique_relation(assessment_entity.eid,
-                        "concerns", subject_entity.eid, check_unicity=False)
-                    # > add relation with the center
-                    self._set_unique_relation(center_entity.eid,
-                        "holds", assessment_entity.eid, check_unicity=False)
+                # Get the assessment identifier
+                assessment_struct = timepoint_questionnaires["Assessment"]
+                assessment_id = assessment_struct["identifier"]
 
-                    # Set the permissions
-                    # Create/get the related assessment groups
-                    assessment_id = assessment_struct["identifier"].split("_")
-                    related_groups = [
-                        assessment_id[0],
-                        assessment_id[1],
-                        "_".join(assessment_id[:2]),
-                        "_".join(assessment_id[1:3]),
-                    ]
-                    for group_name in related_groups:
+                # Check if this item has already been inserted
+                if assessment_id in self.inserted_assessments:
+                    assessment_eid = self.inserted_assessments[assessment_id]
 
-                        # Create/get the entity
-                        group_entity, is_created = self._get_or_create_unique_entity(
-                            rql=("Any X Where X is CWGroup, X name "
-                                 "'{0}'".format(group_name)),
-                            entity_name="CWGroup",
-                            name=unicode(group_name))
-                        # > add relation with group
-                        if self.can_read:
-                            self._set_unique_relation(group_entity.eid,
-                                "can_read", assessment_entity.eid)
-                        if self.can_update:
-                            self._set_unique_relation(group_entity.eid,
-                                "can_update", assessment_entity.eid) 
+                # Create the assessment
+                else:
+                    assessment_eid = self._create_assessment(
+                        assessment_struct, subject_eid, study_eid, center_eid,
+                        groups)
+                    self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################
                 # Insert the patient answers in the db
                 ###############################################################
 
-                for q_name, q_items in answer_item["Answers"].iteritems():
+                for q_name, q_items in timepoint_questionnaires[
+                                                "Questionnaires"].iteritems():
 
-                    # Unpack questionnaire items
-                    qr_struct, answer_items = q_items
+                    qr_eid = self._create_questionnaire(
+                        q_name, q_items, assessment_id, subject_id, subject_eid,
+                        study_eid, assessment_eid, questionnaire_eids,
+                        question_eids)
 
-                    # Get the corresponding questionnaire name
-                    questionnaire_name = qr_struct["user_ident"].split("_")[0]
 
-                    # Create a questionnaire run
-                    print qr_struct
-                    qr_entity, is_created = self._get_or_create_unique_entity(
-                        rql=("Any X Where X is QuestionnaireRun, X user_ident "
-                             "'{0}'".format(qr_struct["user_ident"])),
-                        entity_name="QuestionnaireRun",
-                        **qr_struct)
-                    if is_created:
-                        # > add relation with the questionnaire
-                        self._set_unique_relation(qr_entity.eid, "instance_of",
-                            questionnaire_entities[questionnaire_name].eid,
-                            check_unicity=False)
-                        # > add relation with the assessment
-                        self._set_unique_relation(
-                            assessment_entity.eid, "uses",
-                            qr_entity.eid, check_unicity=False)
-                        self._set_unique_relation(qr_entity.eid,
-                            "in_assessment", assessment_entity.eid,
-                            check_unicity=False)
-                        # > add relation with the study
-                        self._set_unique_relation(qr_entity.eid, "related_study",
-                            study_entity.eid, check_unicity=False)
-                        # > add relation with the subject
-                        self._set_unique_relation(qr_entity.eid, "concerns",
-                            subject_entity.eid, check_unicity=False)
+    def _create_questionnaire(self, questionnaire_name, q_items,
+                              identifier_prefix, subject_id, subject_eid,
+                              study_eid, assessment_eid, questionnaire_eids,
+                              question_eids):
+        """ Create a scans and its associated relations.
+        """
+        # Create a questionnaire run
+        qr_id = identifier_prefix + "_" + questionnaire_name
+        qr_entity, is_created = self._get_or_create_unique_entity(
+            rql=("Any X Where X is QuestionnaireRun, X label "
+                 "'{0}'".format(qr_id)),
+            check_unicity=True,
+            entity_name="QuestionnaireRun",
+            user_ident=unicode(subject_id),
+            label=unicode(qr_id))
 
-                        # Go through all answers
-                        for answer_struct in answer_items:
+        # If we just create the questionnaire run, specify and relate the entity
+        if is_created:
+            # > add relation with the questionnaire
+            self._set_unique_relation(
+                qr_entity.eid, "instance_of",
+                questionnaire_eids[questionnaire_name], check_unicity=False)
+            # > add relation with the assessment
+            self._set_unique_relation(
+                assessment_eid, "uses", qr_entity.eid, check_unicity=False)
+            self._set_unique_relation(
+                qr_entity.eid, "in_assessment", assessment_eid,
+                check_unicity=False, subjtype="QuestionnaireRun")
+            # > add relation with the study
+            self._set_unique_relation(
+                qr_entity.eid, "related_study", study_eid, check_unicity=False,
+                subjtype="QuestionnaireRun")
+            # > add relation with the subject
+            self._set_unique_relation(
+                qr_entity.eid, "concerns", subject_eid, check_unicity=False,
+                subjtype="QuestionnaireRun")
 
-                            # Get the corresponding question name
-                            question_name = answer_struct[
-                                "identifier"].split("_")[1]
-                            # Get the question entity
-                            question_entity = questions_entities[
-                                questionnaire_name][question_name]
+            # Go through all answers
+            for question_name, answer in q_items.iteritems():
 
-                            # Create an open answer
-                            answer_entity, _ = self._get_or_create_unique_entity(
-                                rql="",
-                                entity_name="OpenAnswer",
-                                check_unicity=False,
-                                **answer_struct)
-                            # > add relation with the question
-                            self._set_unique_relation(answer_entity.eid, "question",
-                                question_entity.eid)
-                            # > add relation with the questionnaire run
-                            self._set_unique_relation(answer_entity.eid,
-                                "questionnaire_run", qr_entity.eid)
-                            # > add relation with the assessment
-                            self._set_unique_relation(answer_entity.eid,
-                                "in_assessment", assessment_entity.eid,
-                                check_unicity=False)
+                # Get the question entity
+                question_eid = question_eids[questionnaire_name][
+                    question_name]
+
+                # Create an open answer
+                answer_entity, _ = self._get_or_create_unique_entity(
+                    rql="",
+                    check_unicity=False,
+                    entity_name="OpenAnswer",
+                    identifier=unicode(qr_id + "_" + question_name),
+                    value=unicode(answer))
+                # > add relation with the question
+                self._set_unique_relation(
+                    answer_entity.eid, "question", question_eid,
+                    check_unicity=False, subjtype="OpenAnswer")
+                # > add relation with the questionnaire run
+                self._set_unique_relation(
+                    answer_entity.eid, "questionnaire_run", qr_entity.eid,
+                    check_unicity=False, subjtype="OpenAnswer")
+                # > add relation with the assessment
+                self._set_unique_relation(
+                    answer_entity.eid, "in_assessment", assessment_eid,
+                    check_unicity=False, subjtype="OpenAnswer")
+
+        return qr_entity.eid
