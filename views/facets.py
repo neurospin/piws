@@ -16,6 +16,9 @@ from cubicweb.selectors import is_instance
 ############################################################################
 
 class TimepointFacet(facet.RQLPathFacet):
+    """ Filter on timepoint (on Assessment entity). This facet is applied on
+        Scan and Questionnaires
+    """
     __regid__ = "timepoint-facet"
     __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
     path = ["X in_assessment A", "A timepoint T"]
@@ -25,6 +28,9 @@ class TimepointFacet(facet.RQLPathFacet):
 
 
 class StudyFacet(facet.RQLPathFacet):
+    """ Filter on study name (on Study entity). This facet is applied on
+        Scan and Questionnaires
+    """
     __regid__ = "study-facet"
     __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
     path = ["X in_assessment A", "A related_study S", "S name N"]
@@ -34,6 +40,9 @@ class StudyFacet(facet.RQLPathFacet):
 
 
 class SubjectFacet(facet.RQLPathFacet):
+    """ Filter on subject code (on Subject entity). This facet is applied on
+        Scan and Questionnaires
+    """
     __regid__ = "subject-facet"
     __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
     path = ["X in_assessment A", "A concerns S", "S code_in_study C"]
@@ -70,6 +79,9 @@ class AssessmentTimepointFacet(facet.RQLPathFacet):
 
 
 class AssessmentStudyFacet(facet.RQLPathFacet):
+    """ Filter on assessment name (on Assessment entity).
+        This facet is applied on Assessment only
+    """
     __regid__ = "assessment-study-facet"
     __select__ = is_instance("Assessment")
     path = ["X related_study S", "S name N"]
