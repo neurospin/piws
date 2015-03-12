@@ -43,6 +43,11 @@ class Groups(Base):
 
     def import_data(self):
         """ Method that import the groups in CW.
+
+        .. note::
+    
+            This procedure create a 'CWGroup' entity for each input group
+            name.
         """
         # Go through the goup names
         nb_of_groups = float(len(self.list_group_names))

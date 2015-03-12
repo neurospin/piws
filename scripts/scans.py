@@ -24,13 +24,6 @@ class Scans(Base):
                  use_store=True):
         """ Initialize the Scans class.
 
-        The cw groups are generated dynamically from the assessment
-        identifiers:
-
-            * we '_' split the string and create all the combinations.
-            * the permissions 'can_read', 'can_update' relate the assessments
-              with the corresponding group.
-
         Parameters
         ----------
         session: Session (mandatory)
@@ -57,29 +50,33 @@ class Scans(Base):
         -----
         Here is an axemple of the definiton of the 'scans' parameter:
 
-        scans = {
-            "subjects1": [ {
-                "Assessment": {
-                    "age_of_subject": 27, "identifier": u"toy_V1_subject1",
-                    "timepoint": u"V1"},
-                "Scans": [ {
-                    "TypeData": {
-                        "fov_y": 0, "fov_x": 0, "voxel_res_y": 2.0,
-                        "voxel_res_x": 2.0, "voxel_res_z": 2.0, "field": "3T",
-                        "tr": 2.5, "shape_y": 2, "shape_x": 2, "shape_z": 2,
-                        "te": 0, "type": u"MRIData"},
-                    "ExternalResources": [ {
-                        "absolute_path": True,
-                        "identifier": u"toy_V1_subject1_t1_1", "name": u"t1",
-                        "filepath": u"/tmp/demo/V1/subject1/images/t1/t1.nii.gz"}],
-                    "FileSet": {
-                        "identifier": u"toy_V1_subject1_t1", "name": u"T1"},
-                    "Scan": {
-                        "format": u"Nifti", "label": u"T1",
-                        "identifier": u"toy_V1_subject1_t1", "type": u"MRIData"}
-                }]
-            } ]
-        }
+        ::
+
+            scans = {
+                "subjects1": [ {
+                    "Assessment": {
+                        "age_of_subject": 27, "identifier": u"toy_V1_subject1",
+                        "timepoint": u"V1"},
+                    "Scans": [ {
+                        "TypeData": {
+                            "fov_y": 0, "fov_x": 0, "voxel_res_y": 2.0,
+                            "voxel_res_x": 2.0, "voxel_res_z": 2.0, 
+                            "field": "3T", "tr": 2.5, "shape_y": 2,
+                            "shape_x": 2, "shape_z": 2, "te": 0,
+                            "type": u"MRIData"},
+                        "ExternalResources": [ {
+                            "absolute_path": True, "name": u"t1",
+                            "identifier": u"toy_V1_subject1_t1_1",
+                            "filepath": u"/tmp/demo/V1/subject1/images/t1/t1.nii.gz"}],
+                        "FileSet": {
+                            "identifier": u"toy_V1_subject1_t1", "name": u"T1"},
+                        "Scan": {
+                            "format": u"Nifti", "label": u"T1",
+                            "identifier": u"toy_V1_subject1_t1",
+                            "type": u"MRIData"}
+                    }]
+                } ]
+            }
         """
         # Inheritance
         super(Scans, self).__init__(session, use_store)
@@ -96,12 +93,55 @@ class Scans(Base):
         self.inserted_assessments = {}
         self.inserted_scans = {}
 
+        # Define the relations involved
+        self.relations = (
+            self.fileset_relations + self.assessment_relations + [
+            ("Scan", "related_study", "Study"),
+            ("Scan", "concerns", "Subject"),
+            ("Assessment", "uses", "Scan"),
+            ("Scan", "in_assessment", "Assessment"),
+            ("Scan", "has_data", "PETData"),
+            ("PETData", "in_assessment", "Assessment"),
+            ("Scan", "has_data", "FMRIData"),
+            ("FMRIData", "in_assessment", "Assessment"),
+            ("Scan", "has_data", "DMRIData"),
+            ("DMRIData", "in_assessment", "Assessment"),
+            ("Scan", "has_data", "MRIData"),
+            ("MRIData", "in_assessment", "Assessment"),
+            ("Scan", "measure", "ScoreValue"),
+            ("ScoreValue", "in_assessment", "Assessment")]
+        )
+        self.relations[0][0] = "Scan"
+
     ###########################################################################
     #   Public Methods
     ###########################################################################
 
     def import_data(self):
         """ Method that import the scan data in the db.
+
+        .. note::
+
+            Below the schema used to insert the scans:
+
+            |
+
+            .. image:: ../schemas/scan.png
+                :width: 600px
+                :align: center
+                :alt: schema
+
+        .. warning::
+
+            In the 'scans' input structure, the 'TypeData' item contains a
+            special key 'type' corresponding to the data type. The associated
+            value is a string representing the entity name that must be in
+            ['PETData', 'FMRIData', 'DMRIData', 'MRIData'].
+
+        .. warning::
+
+            This method assumes that all the subjects and groups have already
+            been inserted in the database.
         """
 
         #######################################################################

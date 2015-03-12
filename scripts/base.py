@@ -11,6 +11,7 @@
 import os
 import sys
 import hashlib
+import pygraphviz as pgv
 
 # Cubicweb import
 from cubicweb.dataimport import SQLGenObjectStore
@@ -18,7 +19,38 @@ from cubicweb.dataimport import SQLGenObjectStore
 
 class Base(object):
     """ This class enables us to add new entities and relations in CW.
+
+    Attributes
+    ----------
+    relations: list of 3-uplet (mandatory)
+        all the relations involved in schema we want to document.
+
+    Notes
+    -----
+    Here is an example of the definition of the 'relations' parameter:
+
+    ::
+
+        relations = [
+            ("CWUser", "in_group", "CWGroup")
+        ]
     """
+    relations = []
+    assessment_relations = [
+        ("Assessment", "related_study", "Study"),
+        ("Subject", "concerned_by", "Assessment"),
+        ("Assessment", "concerns", "Subject"),
+        ("Center", "holds", "Assessment"),
+        ("CWGroup", "can_read", "Assessment"),
+        ("CWGroup", "can_update", "Assessment")
+    ]
+    fileset_relations = [
+        ["ParentEntitiyName", "results_files", "FileSet"],
+        ("FileSet", "in_assessment", "Assessment"),
+        ("FileSet", "file_entries", "ExternalFile"),
+        ("ExternalFile", "in_assessment", "Assessment") 
+    ]
+
     def __init__(self, session, use_store=True):
         """ Initialize the SeniorData class.
 
@@ -63,6 +95,46 @@ class Base(object):
     #   Private Methods
     ###########################################################################
 
+    def schema(self, outfname, text_font="sans-serif",
+               node_text_size=12):
+        """ Create a view of the schema described in a python structure.
+
+        Parameters
+        ----------
+        outfname: str (mandatory)
+            the path to the output file where the graph will be saved. The
+            directory containing this file must be created.
+        text_font: str (optional, default 'sans-serif')
+            the font used to display the text in the final image.
+        node_text_size: int (optional, default 12)
+            the text size.      
+        """
+        # Create a graph
+        graph = pgv.AGraph(strict=False, directed=True, rankdir="LR",
+                           overlap=False)
+
+        # Get all the entity names involved
+        entities = set()
+        for link in self.relations:
+            entities.add(link[0])
+            entities.add(link[2])
+
+        # Go through all the entities and create a graphic table
+        for entity_name in entities:
+            attributes = ("cw authorized attributes")
+            graph.add_node(entity_name, style="filled", fillcolor="blue",
+                           fontcolor="white", fontsize=node_text_size,
+                           fontname=text_font,
+                           label=entity_name + "|" + attributes,
+                           shape="Mrecord")
+
+        # Relate the entities
+        for link in self.relations:
+            graph.add_edge(link[0], link[2], label=link[1])
+
+        # Save the graph
+        graph.draw(outfname, prog="dot")
+
     def _md5_sum(self, path):
         """ Create a md5 sum of a path.
 
@@ -79,6 +151,29 @@ class Base(object):
         m = hashlib.md5()
         m.update(path)
         return m.hexdigest()
+
+    def _progress_bar(self, ratio, title="", bar_length=40):
+        """ Method to generate a progress bar.
+
+        Parameters
+        ----------
+        ratio: float (mandatory 0<ratio<1)
+            float describing the current processing status.
+        title: str (optional)
+            a title to identify the progress bar.
+        bar_length: int (optional)
+            the length of the bar that will be ploted.
+        """
+        progress = int(ratio * 100.)
+        block = int(round(bar_length * ratio))
+        text = "\r{2} in Progress: [{0}] {1}%".format(
+            "=" * block + " " * (bar_length - block), progress, title)
+        sys.stdout.write(text)
+        sys.stdout.flush()
+
+    ###########################################################################
+    #   Private Insertion Methods
+    ###########################################################################
 
     def _set_unique_relation(self, source_eid, relation_name, detination_eid,
                              check_unicity=True, subjtype=None):
@@ -167,32 +262,17 @@ class Base(object):
 
         return entity, is_created
 
-    def _progress_bar(self, ratio, title="", bar_length=40):
-        """ Method to generate a progress bar.
-
-        Parameters
-        ----------
-        ratio: float (mandatory 0<ratio<1)
-            float describing the current processing status.
-        title: str (optional)
-            a title to identify the progress bar.
-        bar_length: int (optional)
-            the length of the bar that will be ploted.
-        """
-        progress = int(ratio * 100.)
-        block = int(round(bar_length * ratio))
-        text = "\r{2} in Progress: [{0}] {1}%".format(
-            "=" * block + " " * (bar_length - block), progress, title)
-        sys.stdout.write(text)
-        sys.stdout.flush()
-
-    ###########################################################################
-    #   Private Insertion Methods
-    ###########################################################################
-
     def _create_assessment(self, assessment_struct, subject_eid, study_eid,
                            center_eid, groups):
         """ Create an assessment and its associated relations.
+
+        The groups that can access the 'in_assessment' linked entities are
+        generated dynamically from the assessment identifiers:
+
+            * we '_' split the string and create a group with the first retuned
+              item and the concatenation of the two first items.
+            * the permissions 'can_read', 'can_update' relate the assessments
+              with the corresponding groups.
         """ 
         # Create the assessment
         assessment_id = assessment_struct["identifier"]

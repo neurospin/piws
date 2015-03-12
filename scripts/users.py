@@ -36,25 +36,27 @@ class Users(Base):
 
         Notes
         -----
-        Here is an axemple of the definiton of the 'users' parameter:
+        Here is an example of the definition of the 'users' parameter:
 
-        users = {
-            "user1": {
-                "login": "user1",
-                "password": "user1",
-                "group_names": ["group_v0", "users"]
-            },
-            "user2": {
-                "login": "user2",
-                "password": "user2",
-                "group_names": ["group_v1", "users"]
-            },
-            "user3": {
-                "login": "user3",
-                "password": "user3",
-                "group_names": ["group_v0v1", "users"]
+        ::
+
+            users = {
+                "user1": {
+                    "login": "user1",
+                    "password": "user1",
+                    "group_names": ["group_v0", "users"]
+                },
+                "user2": {
+                    "login": "user2",
+                    "password": "user2",
+                    "group_names": ["group_v1", "users"]
+                },
+                "user3": {
+                    "login": "user3",
+                    "password": "user3",
+                    "group_names": ["group_v0v1", "users"]
+                }
             }
-        }
         """
         # Inheritance
         super(Users, self).__init__(session, use_store)
@@ -62,12 +64,34 @@ class Users(Base):
         # Class parameters
         self.users = users
 
+        # Define the relations involved
+        self.relations = [
+            ("CWUser", "in_group", "CWGroup")
+        ]
+
     ###########################################################################
     #   Public Methods
     ###########################################################################
 
     def import_data(self):
         """ Method that import the users in cw.
+
+        .. note::
+
+            This procedure create a user as a 'CWUser' entity which is related
+            to different groups through the 'in_group' relation.
+
+            |
+
+            .. image:: ../schemas/user.png
+                :width: 500px
+                :align: center
+                :alt: schema
+
+        .. warning::
+
+            This procedure expect that the 'CWGroup' of interest are already
+            created.
         """
         # Go through the goup names
         nb_of_users = float(len(self.users))

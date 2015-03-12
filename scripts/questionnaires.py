@@ -22,7 +22,7 @@ class Questionnaires(Base):
     def __init__(self, session, project_name, center_name, questionnaires,
                  can_read=True, can_update=True, data_filepath=None,
                  use_store=True):
-        """ Initialize the Questionnaires class.
+        """ Initialize the 'Questionnaires' class.
 
         Parameters
         ----------
@@ -48,32 +48,38 @@ class Questionnaires(Base):
 
         Notes
         -----
-        Here is an axemple of the definiton of the 'questionnaires' parameter:
+        Here is an example of the definition of the 'questionnaires' parameter:
 
-        questionnaires = {
-            "subject1": [ 
-                {
-                    "Questionnaires": {
-                        "Personal": {u"mood": 5}
-                        "ID": {u"gender": u"male", u"age": 27, u"handedness": u"right"}
+        ::
+
+            questionnaires = {
+                "subject1": [ 
+                    {
+                        "Questionnaires": {
+                            "Personal": {u"mood": 5}
+                            "ID": {u"gender": u"male", u"age": 27,
+                                   u"handedness": u"right"}
+                        }
+                        "Assessment": {
+                            "age_of_subject": 27,
+                            "identifier": u"toy_V1_subject1",
+                            "timepoint": u"V1'"
+                        }
+                    }, 
+                    {
+                        "Questionnaires": {
+                            "Personal": {u"mood": 5}
+                            "ID": {u"gender": u"male", u"age": 27,
+                                   u"handedness": u"right"}
+                        }
+                        "Assessment": {
+                            "age_of_subject": 27,
+                            "identifier": u"toy_V0_subject1",
+                            "timepoint": u"V0"
+                        }
                     }
-                    "Assessment": {
-                        "age_of_subject": 27, "identifier": u"toy_V1_subject1",
-                        "timepoint": u"V1'"
-                    }
-                }, 
-                {
-                    "Questionnaires": {
-                        "Personal": {u"mood": 5}
-                        "ID": {u"gender": u"male", u"age": 27, u"handedness": u"right"}
-                    }
-                    "Assessment": {
-                        "age_of_subject": 27, "identifier": u"toy_V0_subject1",
-                        "timepoint": u"V0"
-                    }
-                }
-            ]
-        }
+                ]
+            }
         """
         # Inheritance
         super(Questionnaires, self).__init__(session, use_store)
@@ -89,12 +95,41 @@ class Questionnaires(Base):
         # Speed up parameters
         self.inserted_assessments = {}
 
+        # Define the relations involved
+        self.relations = self.assessment_relations + [
+            ("Question", "questionnaire", "Questionnaire"),
+            ("QuestionnaireRun", "instance_of", "Questionnaire"),
+            ("Assessment", "uses", "QuestionnaireRun"),
+            ("QuestionnaireRun", "in_assessment", "Assessment"),
+            ("QuestionnaireRun", "related_study", "Study"),
+            ("QuestionnaireRun", "concerns", "Subject"),
+            ("OpenAnswer", "question", "Question"),
+            ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
+            ("OpenAnswer", "in_assessment", "Assessment"),
+        ]
+
     ###########################################################################
     #   Public Methods
     ###########################################################################
 
     def import_data(self):
         """ Method that import some questionnaires in the db.
+
+        .. note::
+
+            Below the schema used to insert the questionnaires:
+
+            |
+
+            .. image:: ../schemas/questionnaire.png
+                :width: 600px
+                :align: center
+                :alt: schema
+
+        .. warning::
+
+            This method assumes that all the subjects and groups have already
+            been inserted in the database.
         """
 
         #######################################################################

@@ -35,22 +35,24 @@ class Subjects(Base):
 
         Notes
         -----
-        Here is an axemple of the definiton of the 'subjects' parameter:
+        Here is an axemple of the definiton of the 'subjects' parameter
 
-        subjects = {
-            "subject1": {
-                "code_in_study": "subject1",
-                "identifier": "toy_subject1",
-                "gender": "male",
-                "handedness": "right"
-            },
-            "subject2": {
-                "code_in_study": "subject2",
-                "identifier": "toy_subject2",
-                "gender": "female",
-                "handedness": "ambidextrous"
+        ::
+
+            subjects = {
+                "subject1": {
+                    "code_in_study": "subject1",
+                    "identifier": "toy_subject1",
+                    "gender": "male",
+                    "handedness": "right"
+                },
+                "subject2": {
+                    "code_in_study": "subject2",
+                    "identifier": "toy_subject2",
+                    "gender": "female",
+                    "handedness": "ambidextrous"
+                }
             }
-        }
         """
         # Inheritance
         super(Subjects, self).__init__(session, use_store)
@@ -64,6 +66,18 @@ class Subjects(Base):
 
     def import_data(self):
         """ Method that import the subjects in cw.
+
+        .. note::
+
+            This procedure create a 'Subject' entity for each input subject
+            name.
+
+        .. warning::
+
+            The dictionary associated to each subject name in the 'subjects'
+            parameter must match the entity attributes defined by
+            the cubicweb schema (it may depends on the version of the cubes
+            you are using).
         """
         # Go through the subject names
         nb_of_subjects = float(len(self.subjects))

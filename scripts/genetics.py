@@ -36,7 +36,7 @@ class Genetics(Base):
             the genetic measure description: the first dictionary contains the
             timepoint as keys and then a list of dictionaries with two keys
             (GenomicMeasures - Assessment) that contains the entities parameter
-            decriptions.
+            descriptions.
         can_read: bool (optional, default True)
             set the read permission to the imported data.
         can_update: bool (optional, default True)
@@ -48,43 +48,47 @@ class Genetics(Base):
 
         Notes
         -----
-        Here is an axemple of the definiton of the 'genetics' parameter:
+        Here is an example of the definition of the 'genetics' parameter:
 
-        genetics = {
-            "V1": [{
-                "GenomicMeasures": [{
-                    "GenomicPlatform": {
-                        "related_snps": [
-                            u"rs325623", u"rs272569", u"rs400", u"rs1053026"
-                        ],
-                        "name": u"Illumina",
-                        "related_subjects": [
-                            u"subject0", u"subject1", u"subject2", u"subject3",
-                            u"subject4", u"subject5", u"subject6", u"subject7",
-                            u"subject8", u"subject9"
-                        ]
-                    },
-                    "GenomicMeasure": {
-                        "label": u"toy_V1_genetic_Illumina_raw_json",
-                        "type": u"raw",
-                        "format": u"json"
-                    },
-                    "FileSet": {
+        ::
+
+            genetics = {
+                "V1": [{
+                    "GenomicMeasures": [{
+                        "GenomicPlatform": {
+                            "related_snps": [
+                                u"rs325623", u"rs272569", u"rs400",
+                                u"rs1053026"
+                            ],
+                            "name": u"Illumina",
+                            "related_subjects": [
+                                u"subject0", u"subject1", u"subject2",
+                                u"subject3", u"subject4", u"subject5",
+                                u"subject6", u"subject7", u"subject8",
+                                u"subject9"
+                            ]
+                        },
+                        "GenomicMeasure": {
+                            "label": u"toy_V1_genetic_Illumina_raw_json",
+                            "type": u"raw",
+                            "format": u"json"
+                        },
+                        "FileSet": {
+                            "identifier": u"toy_V1_genetic",
+                            "name": u"raw genetic measure"
+                        },
+                        "ExternalResources": [{
+                            "absolute_path": True,
+                            "identifier": u"toy_V1_genetic_1",
+                            "name": u"genetic",
+                            "filepath": u"/tmp/demo/V1/genetic/genetic.json"
+                        }]
+                    }],
+                    "Assessment": {
                         "identifier": u"toy_V1_genetic",
-                        "name": u"raw genetic measure"
-                    },
-                    "ExternalResources": [{
-                        "absolute_path": True,
-                        "identifier": u"toy_V1_genetic_1",
-                        "name": u"genetic",
-                        "filepath": u"/tmp/demo/V1/genetic/genetic.json"
-                    }]
-                }],
-                "Assessment": {
-                    "identifier": u"toy_V1_genetic",
-                    "timepoint": u"V1"}
-            }]
-        }
+                        "timepoint": u"V1"}
+                }]
+            }
 
         """
         # Inheritance
@@ -104,12 +108,40 @@ class Genetics(Base):
         self.inserted_platforms = {}
         self.inserted_snps = {}
 
+        # Define the relations involved
+        self.relations = (
+            self.fileset_relations +  self.assessment_relations + [
+            ("GenomicMeasure", "related_study", "Study"),
+            ("GenomicMeasure", "related_subjects", "Subject"),
+            ("Assessment", "uses", "GenomicMeasure"),
+            ("GenomicMeasure", "in_assessment", "Assessment"),
+            ("GenomicMeasure", "platform", "GenomicPlatform"),
+            ("GenomicPlatform", "related_snps", "Snp")]
+        )
+        self.relations[0][0] = "GenomicMeasure"
+
     ###########################################################################
     #   Public Methods
     ###########################################################################
 
     def import_data(self):
         """ Method that import some genetic data in the db.
+
+        .. note::
+
+            Below the schema used to insert the genetic data:
+
+            |
+
+            .. image:: ../schemas/genetic.png
+                :width: 600px
+                :align: center
+                :alt: schema
+
+        .. warning::
+
+            This method assumes that all the subjects and groups have already
+            been inserted in the database.
         """
 
         #######################################################################
