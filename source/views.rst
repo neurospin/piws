@@ -55,15 +55,6 @@ paging, sorting, ....).
     table_views.JhugetableView
     table_views.JtableView
 
-CSV inner exporter
-------------------
-
-.. autosummary::
-    :toctree: generated/table/
-    :template: class.rst
-
-    table_views.CSVJtableView
-
 Inner tools
 -----------
 
@@ -80,6 +71,5 @@ Ajax inner callbacks
     :toctree: generated/table/
     :template: function.rst
 
-    table_views.csv_open_answers_export
     table_views.get_open_answers_data
     table_views.get_questionnaires_data
