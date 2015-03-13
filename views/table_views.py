@@ -46,23 +46,23 @@ class JhugetableView(View):
             self.w = kwargs["parent_view"].w
 
     def call(self, rql_labels=None, labels=None, ajaxcallback=None,
-             title="", csvcallback=None, use_scroller=False, **kwargs):
+             title="", csvcallback=False, use_scroller=False, **kwargs):
         """ Method that will create a table for huge datasets (million of
         entries).
 
-        An ajax call is emulated within the javascript so this function is
+        An Ajax call is emulated within the JavaScript so this function is
         client side only.
 
         When left clicking on a row, the row is selected (highlighted) Click
         again on this row to deselect it.
 
-        1) Extra parameters will be passed to the ajax callback that is called
+        1) Extra parameters will be passed to the Ajax callback that is called
         one time
 
         2) Column labels must not contain space ' ' and they need to be
         replaced: use the 'label_cleaner' function.
 
-        3) A special 'ID' column must be specified in the ajax callback that
+        3) A special 'ID' column must be specified in the Ajax callback that
         contains the row string description.
 
         Parameters
@@ -76,9 +76,8 @@ class JhugetableView(View):
             data to display: do not foget the decorator @ajaxfunc.
         title: string (optional, default '')
             the title of the table.
-        csvcallback: @func (optional)
-            if an ajax callback is given then an export button will be
-            available.
+        csvcallback: bool (optional)
+            if True an export button will be available.
         use_scroller: bool (optional default False)
             if True de not use pagination.
         """
@@ -92,7 +91,8 @@ class JhugetableView(View):
         if labels is not None and not isinstance(labels, list):
             labels = [labels]
         ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
-        csvcallback = csvcallback or self._cw.form.get("csvcallback", None)
+        if self._cw.form.get("csvcallback", None) is not None:
+            csvcallback = self._cw.form.get("csvcallback")
         if "use_scroller" in self._cw.form:
             use_scroller = eval(self._cw.form.get("use_scroller"))
 
@@ -156,6 +156,46 @@ class JhugetableView(View):
         # > global variable with the data
         html += "var jdata = p['aaData'];"
 
+        # > create a new csv download button
+        html += "$.fn.dataTable.TableTools.buttons.download = $.extend("
+        html += "true,"
+        html += "{},"
+        html += "$.fn.dataTable.TableTools.buttonBase,"
+        html += "{"
+        html += "'sButtonText': 'Download',"
+        html += "'sUrl': '',"
+        html += "'sType': 'POST',"
+
+        # > define what happened when clicking the download button
+        html += "'fnClick': function( button, config ) {"
+
+        # > display a processing message
+        html += "$('#loadingmessage').show();"
+
+        html += "var csvRows = [{0}];".format(json.dumps(labels))
+        html += "for(var i=0, l=jdata.length; i<l; ++i){"
+        html += "csvRows.push(jdata[i].join(','));"
+        html += "}"
+
+        # > create a download link
+        html += "var csvString = csvRows.join('%0A');"
+        html += "var a = document.createElement('a');"
+        html += "a.href  = 'data:attachment/csv,' + csvString;"
+        html += "a.target = '_blank';"
+        html += "a.download = 'datatable.csv';"
+
+        # > hide the processing message
+        html += "document.body.appendChild(a);"
+        html += "a.click();"
+        html += "$('#loadingmessage').hide();"
+
+        # > end click
+        html += "}"
+        # > end button base
+        html += "}"
+        # > end button
+        html += ");"
+
         # > create the table
         html += "var table = $('#the_table').dataTable( { "
 
@@ -177,39 +217,10 @@ class JhugetableView(View):
             html += "bProcessing: true, "
 
         buttons = "'copy'"
-        if csvcallback is not None:
+        if csvcallback:
             # >> create a custom button to download all the table
             export_button = (
-                "{'sExtends': 'ajax', 'sButtonText': 'CSV - All results', ")
-            # >> when you click the button display a processing message and
-            # >> run the callback
-            export_button += "'fnClick': function () { "
-            export_button += "$('#loadingmessage').show();"
-            export_button += "var post = $.ajax({ "
-            export_button += "url: 'ajax?fname={0}', ".format(csvcallback)
-            export_button += "type: 'POST', "
-            export_button += "dataType: 'json', "
-            csv_callback_parms = copy.deepcopy(kwargs)
-            if rql_labels is not None:
-                csv_callback_parms["rql_labels"] = rql_labels           
-            else:
-                csv_callback_parms["labels"] = labels
-            export_button += "data: {0}".format(json.dumps(csv_callback_parms))
-            export_button += "}); "
-            # >> handle sucess case
-            export_button += "post.done(function(p){ "
-            export_button += "window.location = p.dl_url; "
-            export_button += "$('#loadingmessage').hide(); "
-            export_button += "});"
-            # >> handle error case
-            export_button += "post.fail(function(){ "
-            export_button += "$('#loadingmessage').hide(); "
-            export_button += "alert('Error : Download Failed!'); "
-            export_button += "}); "
-            # >> end click event
-            export_button += "}"
-            # >> end custom button
-            export_button += "} "
+                "{'sExtends': 'download', 'sButtonText': 'CSV - All results'}")
             buttons += ", {0}".format(export_button)
 
         # > display the export buttons
@@ -308,7 +319,7 @@ class JtableView(View):
             self.w = kwargs["parent_view"].w
 
     def call(self, rql_labels=None, labels=None, ajaxcallback=None,
-             csvcallback=None, title="", elts_to_sort=None,
+             csvcallback=False, title="", elts_to_sort=None,
              use_server=True, **kwargs):
         """ Method that will create a table.
 
@@ -337,9 +348,8 @@ class JtableView(View):
         ajaxcallback: @func (mandatory)
             a function thaty will be called by jtable to create dynamically the
             data to display: do not foget the decorator @ajaxfunc.
-        csvcallback: @func (optional)
-            if an ajax callback is given then an export button will be
-            available.
+        csvcallback: bool (optional)
+            if True an export button will be available.
         title: string (optional, default '')
             the title of the table.
         elts_to_sort: list of str (optional)
@@ -357,7 +367,8 @@ class JtableView(View):
         if labels is not None and not isinstance(labels, list):
             labels = [labels]
         ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
-        csvcallback = csvcallback or self._cw.form.get("csvcallback", None)
+        if self._cw.form.get("csvcallback", None) is not None:
+            csvcallback = self._cw.form.get("csvcallback")
         elts_to_sort = elts_to_sort or self._cw.form.get("elts_to_sort", [])
         if not isinstance(elts_to_sort, list):
             elts_to_sort = [elts_to_sort]
@@ -413,9 +424,79 @@ class JtableView(View):
             label_list.append(label_cleaner(label_text[0]))
             headers.append({"sTitle": label_text[0]})
 
-        # > create the table
+        # > begin the script
         html = "<script type='text/javascript'> "
         html += "$(document).ready(function() {"
+
+        # > create a new csv download button
+        html += "$.fn.dataTable.TableTools.buttons.download = $.extend("
+        html += "true,"
+        html += "{},"
+        html += "$.fn.dataTable.TableTools.buttonBase,"
+        html += "{"
+        html += "'sButtonText': 'Download',"
+        html += "'sUrl': '',"
+        html += "'sType': 'POST',"
+
+        # > define what happened when clicking the download button
+        html += "'fnClick': function( button, config ) {"
+
+        # > display a processing message
+        html += "$('#loadingmessage').show();"
+
+        # > get information from the data table
+        html += "var dt = new $.fn.dataTable.Api( this.s.dt );"
+        html += "var postData = dt.ajax.params() || {};"
+
+        # > set options to retrieve all the full result set from the ajax
+        # callback
+        html += "postData.iDisplayStart = 0;"
+        html += "postData.iDisplayLength = -1;"
+        html += "postData.sSearch = '';"
+
+        # > execute the ajax callback
+        html += "var post = $.ajax({"
+        html += "url: config.sUrl,"
+        html += "type: config.sType,"
+        html += "data: postData"
+        html += "});"
+
+        # > the ajax callback is done, get the result set
+        html += "post.done(function(p){"
+        html += "var jdata = p.aaData;"
+        html += "headers = JSON.parse(postData.labels);"
+        html += "var csvRows = [headers];"
+        html += "for(var i=0, l=jdata.length; i<l; ++i){"
+        html += "csvRows.push(jdata[i].join(','));"
+        html += "}"
+
+        # > create a download link
+        html += "var csvString = csvRows.join('%0A');"
+        html += "var a = document.createElement('a');"
+        html += "a.href  = 'data:attachment/csv,' + csvString;"
+        html += "a.target = '_blank';"
+        html += "a.download = 'datatable.csv';"
+
+        # > hide the processing message
+        html += "document.body.appendChild(a);"
+        html += "a.click();"
+        html += "$('#loadingmessage').hide();"
+        html += "});"
+
+        # > if the ajax callback failed display an alert
+        html += "post.fail(function(){"
+        html += "$('#loadingmessage').hide();"
+        html += "alert('Error : Download Failed!');"
+        html += "});"
+
+        # > end fct click
+        html += "}"
+        # > end button
+        html += "}"
+        # > end button
+        html += ");"
+
+        # > create the table
         html += "var table = $('#the_table').dataTable( { "
 
         # > set table display options
@@ -436,40 +517,12 @@ class JtableView(View):
 
         # > export csv options
         buttons = "'copy'"
-        if csvcallback is not None:
+        if csvcallback:
             # >> create a custom button to download all the table
             export_button = (
-                "{'sExtends': 'ajax', 'sButtonText': 'CSV - All results', ")
-            # >> when you click the button display a processing message and
-            # >> run the callback
-            export_button += "'fnClick': function () { "
-            export_button += "$('#loadingmessage').show();"
-            export_button += "var post = $.ajax({ "
-            export_button += "url: 'ajax?fname={0}', ".format(csvcallback)
-            export_button += "type: 'POST', "
-            export_button += "dataType: 'json', "
-            csv_callback_parms = copy.deepcopy(kwargs)
-            if rql_labels is not None:
-                csv_callback_parms["rql_labels"] = rql_labels           
-            else:
-                csv_callback_parms["labels"] = label_list
-            export_button += "data: {0}".format(json.dumps(csv_callback_parms))
-            export_button += "}); "
-            # >> handle sucess case
-            export_button += "post.done(function(p){ "
-            export_button += "window.location = p.dl_url; "
-            export_button += "$('#loadingmessage').hide(); "
-            export_button += "});"
-            # >> handle error case
-            export_button += "post.fail(function(){ "
-            export_button += "$('#loadingmessage').hide(); "
-            export_button += "alert('Error : Download Failed!'); "
-            export_button += "}); "
-            # >> end click event
-            export_button += "}"
-            # >> end custom button
-            export_button += "} "
-            buttons += ", 'csv', {0}".format(export_button)
+                "{{'sExtends': 'download', 'sButtonText': 'CSV - All results', "
+                "'sUrl':'ajax?fname={0}'}}").format(ajaxcallback)
+            buttons += ", {0}".format(export_button)
 
         # > display the export buttons
         html += ("'tableTools': {{ "
@@ -569,100 +622,8 @@ def label_cleaner(string_label):
 
 
 ###############################################################################
-# CW CSV tuned export
-###############################################################################
-
-class CSVJtableView(CSVMixIn, View):
-    """ Dumps a jtable in a CSV.
-    """
-    __regid__ = "jtable-csvexport"
-    title = _("csv export")
-
-    def call(self, rql=None, rql_labels=None):
-        """ Dump a table in csv format.
-
-        A rql is executed where the first returned element is expected to be
-        the row identifier 'ID'.
-
-        Parameters
-        ----------
-        rql: str (mandatory)
-            the rql to execute in order to fill the desired table.
-        rql_labels: string (mandatory)
-            a rql that will be executed to get the columns labels.
-        """
-        # Get function parameters
-        rql = rql or self._cw.form.get("rql", "")
-        rql_labels = rql_labels or self._cw.form.get("rql_labels", "")
-
-        # Get the questionnaire associated questions
-        header = [item[0] for item in self._cw.execute(rql_labels)]
-
-        # Execute the full request
-        rset = self._cw.execute(rql)
-
-        # Create a structure to be able to sort by subject id
-        jtable_data = OrderedDict()
-        for item in rset:
-            if item[0] not in jtable_data:
-                jtable_data[item[0]] = OrderedDict((key, "nc")
-                                                   for key in header)
-            jtable_data[item[0]][item[1]] = item[2]
-
-        # Create a CW csv writer
-        writer = self.csvwriter()
-
-        # Write a header row
-        writer.writerow(header)
-
-        # Write the jtable content row by row
-        for rowid, data in jtable_data.iteritems():
-            writer.writerow([rowid] + data.values())
-
-
-###############################################################################
 # Interact with jtable js
 ###############################################################################
-
-@ajaxfunc(output_type="json")
-def csv_open_answers_export(self):
-    """ Export the answers in the database in csv format.
-
-    Parameters
-    ----------
-    rql_labels: string (mandatory)
-        a rql that will be executed to get the columns labels.
-    qname: string (mandatory)
-        the name of the questionnaire we want to export.
-    timepoint: string (mandatory)
-        filter request on a timepoint.
-
-    Returns
-    -------
-    link: dict
-        the table structure that contains the download link.
-    """
-    # Get parameters
-    rql_labels = self._cw.form["rql_labels"]
-    qname = self._cw.form["qname"]
-    timepoint = self._cw.form["timepoint"]
-
-    # Define the full request
-    rql = ("Any ID, QUT, OAV "
-           "Where OA is OpenAnswer, OA questionnaire_run QR, "
-           "OA question QU, QR in_assessment A, A timepoint '{0}', "
-           "QR instance_of Q, Q name '{1}', OA value OAV, QU text QUT, "
-           "QR concerns S, S code_in_study ID".format(timepoint, qname))
-
-    # Build the download url
-    url = self._cw.build_url("view", vid="jtable-csvexport", rql=rql,
-                             rql_labels=rql_labels)
-
-    # Create the export jtable structure
-    link = {"dl_url": url}
-
-    return link
-
 
 @ajaxfunc(output_type="json")
 def get_open_answers_data(self):
@@ -838,7 +799,7 @@ def get_questionnaires_data(self):
                 rql_labels=rql_labels.format(qname),
                 ajaxcallback=ajaxcallback, title=qname,
                 qname=qname, timepoint=timepoint, elts_to_sort=["ID"],
-                csvcallback="csv_open_answers_export")
+                csvcallback=True)
             timepoint_index = labels.index(timepoint)
             dstruct[timepoint_index] = "<a href='{0}'>link</a>".format(href)
 
@@ -862,5 +823,3 @@ def registration_callback(vreg):
     vreg.register(JhugetableView)
     vreg.register(get_open_answers_data)
     vreg.register(get_questionnaires_data)
-    vreg.register(csv_open_answers_export)
-    vreg.register(CSVJtableView)
