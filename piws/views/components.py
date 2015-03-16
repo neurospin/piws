@@ -7,11 +7,13 @@
 # for details.
 ##########################################################################
 
-# CUBICWEB import
+# Cubicweb import
 from cubicweb.web import component
 from cubicweb.predicates import is_instance
 from cubicweb.predicates import nonempty_rset
 from cubicweb.predicates import anonymous_user
+
+# Cubes import
 from cubes.brainomics.views.components import BrainomicsLinksCenters
 from cubes.brainomics.views.components import BrainomicsEditBox
 from cubes.brainomics.views.components import BrainomicsDownloadBox

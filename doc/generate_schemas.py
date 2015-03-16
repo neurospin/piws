@@ -14,12 +14,12 @@ import os
 from cubicweb import cwconfig
 from cubicweb.dbapi import in_memory_repo_cnx
 
-# Neurospinweb import
-from cubes.neurospinweb.scripts.users import Users
-from cubes.neurospinweb.scripts.subjects import Subjects
-from cubes.neurospinweb.scripts.scans import Scans
-from cubes.neurospinweb.scripts.questionnaires import Questionnaires
-from cubes.neurospinweb.scripts.genetics import Genetics
+# Piws import
+from cubes.piws.scripts.users import Users
+from cubes.piws.scripts.subjects import Subjects
+from cubes.piws.scripts.scans import Scans
+from cubes.piws.scripts.questionnaires import Questionnaires
+from cubes.piws.scripts.genetics import Genetics
 
 # Define the output_directory
 out_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)),

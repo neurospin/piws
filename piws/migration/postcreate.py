@@ -15,16 +15,16 @@
 # You should have received a copy of the GNU Lesser General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""cubicweb-neurospinweb postcreate script, executed at instance creation time or when
+"""cubicweb-piws postcreate script, executed at instance creation time or when
 the cube is added to an existing instance.
 
 You could setup site properties or a workflow here for example.
 """
 
 # Change the site name
-set_property("ui.site-title", "NeuroSpinWeb")
+set_property("ui.site-title", "PIWS")
 
 # Set cards
-from cubes.neurospinweb.migration.cards import create_or_update_static_cards
+from cubes.piws.migration.cards import create_or_update_static_cards
 create_or_update_static_cards(session)
 

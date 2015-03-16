@@ -7,10 +7,11 @@
 # for details.
 ##########################################################################
 
+# Cubicweb import
 from cubicweb.web.views.urlrewrite import SimpleReqRewriter, rgx
 
 
-class NeuroSpinWebReqRewriter(SimpleReqRewriter):
+class PiwsReqRewriter(SimpleReqRewriter):
     """ Associate a request that generate a view with a specific url.
     """
     rules = [

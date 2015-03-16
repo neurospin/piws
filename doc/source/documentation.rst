@@ -2,8 +2,8 @@
 
   <div class="container-index">
 
-Documentation of the Neurospinweb cube
-======================================
+Documentation of the 'piws' cube
+================================
 
 .. raw:: html
 

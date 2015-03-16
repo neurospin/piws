@@ -10,7 +10,7 @@
 
 STYLESHEETS += [
     data('fullcalendar-2.0.1/fullcalendar.css'),
-    data('cubes.neurospinweb.css')
+    data('cubes.piws.css')
 ]
 
 
@@ -20,9 +20,8 @@ STYLESHEETS_PRINT += [
 
 
 JAVASCRIPTS += [
-    data('cubes.neurospinweb.js'),
+    data('cubes.piws.js'),
     data('fullcalendar-2.0.1/lib/moment.min.js'),
-#   data('fullcalendar-2.0.1/lib/jquery.min.js'),
     data('fullcalendar-2.0.1/lib/jquery-ui.custom.min.js'),
     data('fullcalendar-2.0.1/fullcalendar.min.js'),
 ]

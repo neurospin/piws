@@ -7,6 +7,7 @@
 # for details.
 ##########################################################################
 
+# Cubicweb import
 from cubicweb.web import facet
 from cubicweb.selectors import is_instance
 

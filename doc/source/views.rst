@@ -8,10 +8,10 @@ Views documentation
 
 Documentation regarding views defined on the cube.
 
-:mod:`neurospinweb.views.highcharts_views`: HighChartsBasicPieView
-==================================================================
+:mod:`piws.views.highcharts_views`: HighChartsBasicPieView
+==========================================================
 
-.. currentmodule:: neurospinweb.views
+.. currentmodule:: piws.views
 
 All the views designed in this section are based on the 'highcharts' JavaScript
 library. The aim here is to propose a bunch of views to summarize the
@@ -29,14 +29,14 @@ User Views
     highcharts_views.HighChartsBasicPlotView
 
 
-:mod:`neurospinweb.views.table_views`: Table views
-==================================================
+:mod:`piws.views.table_views`: Table views
+==========================================
 
 All the views designed in this section are based on the 'datatables' JavaScript
 library. Such views are convenient to display questionnaires associated answers
 or huge dataset as we may be confronted when treating genetic data.
 
-.. currentmodule:: neurospinweb.views
+.. currentmodule:: piws.views
 
 User Views
 ----------

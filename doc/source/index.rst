@@ -4,8 +4,8 @@
     contain the root `toctree` directive.
 
 
-Neurospinweb
-============
+Population Imaging Web Service: PIWS
+====================================
 
 Summary
 -------

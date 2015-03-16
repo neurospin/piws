@@ -15,12 +15,12 @@ import sys, os
 
 # Doc generation depends on being able to import nsap and nipype
 sys.path.append(
-    os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "cubes"))
+    os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
 try:
-    import neurospinweb
-    import neurospinweb.__pkginfo__ as release_info
+    import piws
+    import piws.__pkginfo__ as release_info
 except ImportError:
-    raise RuntimeError("Cannot import 'neurospinweb', please investigate.")
+    raise RuntimeError("Cannot import 'piws', please investigate.")
 
 from distutils.version import LooseVersion
 import sphinx
@@ -71,7 +71,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Neurospinweb Cube'
+project = u'Population Imaging Web Service Cube'
 copyright = u'2015, NSAp developers <antoine.grigis@cea.fr>'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -145,10 +145,10 @@ html_theme_path = ['_themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = "Neurospinweb"
+html_title = "PIWS"
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = "Neurospinweb"
+html_short_title = "PIWS"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -200,7 +200,7 @@ html_show_sourcelink = False
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'neurospinweb-doc'
+htmlhelp_basename = 'piws-doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -214,7 +214,7 @@ htmlhelp_basename = 'neurospinweb-doc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'neurospinweb.tex', u'Neurospinweb Documentation',
+  ('index', 'piws.tex', u'Population Imaging Web Service Documentation',
    u'Grigis', 'manual'),
 ]
 

@@ -12,8 +12,8 @@ import os
 import sys
 import hashlib
 
-# Neurospinweb import
-from cubes.neurospinweb.scripts.base import Base
+# Piws import
+from .base import Base
 
 
 class Samples(Base):

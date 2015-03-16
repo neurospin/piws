@@ -2,23 +2,20 @@
 # copyright 2014 nsap, all rights reserved.
 # contact http://www.logilab.fr -- mailto:antoine.grigis@cea.fr
 #
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation, either version 2.1 of the License, or (at your option)
-# any later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#! /usr/bin/env python
+##########################################################################
+# NSAp - Copyright (C) CEA, 2013
+# Distributed under the terms of the CeCILL-B license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+# for details.
+##########################################################################
 
+# Cubicweb import
 from cubicweb.predicates import is_instance
-# from cubes.rsetftp.entities import BaseIFilePathAdapter
 from cubicweb.entities import AnyEntity
 
+# Cubes import
 from cubes.medicalexp.config import ASSESSMENT_CONTAINER
 
 
@@ -159,70 +156,3 @@ class BioSample(AnyEntity):
         """
         return "images/samples.png"
 
-
-##############################################################################
-# Define adaptors for the CWSearch entity
-##############################################################################
-
-
-#class ScanIFilePathAdapter(BaseIFilePathAdapter):
-#    __select__ = (BaseIFilePathAdapter.__select__ &
-#                  is_instance("Scan", "QuestionnaireRun","GenomicMeasure"))
-
-#    def get_paths(self):
-#        rset = self._cw.execute("Any F, ABS, S, FP, DF WHERE "
-#                                "X eid %(eid)s, X results_files RF, "
-#                                "RF file_entries F, "
-#                                "F absolute_path ABS, F study_path S, "
-#                                "S data_filepath DF, F filepath FP",
-#                                {"eid": self.entity.eid})
-        #for f in rset.entities():
-            #fp = f.cw_adapt_to("IFilePath")
-            #for p in fp.get_paths():
-            #    yield p
-#        for row in rset.rows:
-#            yield row[3]
-
-
-#class ScanIFilePathAdapter(BaseIFilePathAdapter):
-#    __select__ = (BaseIFilePathAdapter.__select__ &
-#                  is_instance("Scan", "QuestionnaireRun", "GenomicMeasure"))
-
-#    def get_paths(self):
-#        for f in self.entity.results_files:
-#            fp = f.cw_adapt_to("IFilePath")
-#            for p in fp.get_paths():
-#                yield p
-
-
-#class FileIFilePathAdapter(BaseIFilePathAdapter):
-#    __select__ = BaseIFilePathAdapter.__select__ & is_instance("File")
-
-#    def get_paths(self):
-#        try:
-#            storage = self._cw.repo.system_source.storage('File', 'data')
-#            yield storage.current_fs_path(self.entity, "data")
-#        except:
-            # if there is no storage for attribute data of entity File
-            # this mean file is stored in db (not in filesystem)
-#            pass
-#        yield osp.join("/", "%s_%s" % (self.entity.data_name, self.entity.eid))
-
-
-#class ExternalIFilePathAdapter(BaseIFilePathAdapter):
-#    __select__ = BaseIFilePathAdapter.__select__ & is_instance("ExternalFile")
-#
-#    def get_paths(self):
-#        p = self.entity.filepath
-#        if not self.entity.absolute_path:
-#            p = osp.join(self.entity.study_path[0].data_filepath, p)
-#        yield p
-
-
-#class FileSetIFilePathAdapter(BaseIFilePathAdapter):
-#    __select__ = BaseIFilePathAdapter.__select__ & is_instance("FileSet")
-#
-#    def get_paths(self):
-#        for f in self.entity.file_entries:
-#            for p in f.cw_adapt_to("IFilePath").get_paths():
-#                yield p

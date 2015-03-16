@@ -1,20 +1,21 @@
 
 .. _install_guid:
 
-=========================
-Installing `Neurospinweb`
-=========================
+=================
+Installing `PIWS`
+=================
 
-This tutorial will walk you through the process of installing Neurospinweb:
+This tutorial will walk you through the process of installing the Population
+Imaging Web Service:
 
-    * **neurospinweb**: a cube that can only be instanciated
+    * **piws**: a cube that can only be instanciated
       if `cubicweb is installed <https://docs.cubicweb.org/admin/setup>`_.
 
 
-.. _install_neurospinweb:
+.. _install_piws:
 
-Installing neurospinweb
-=======================
+Installing piws
+===============
 
 Installing the current version
 ------------------------------
@@ -25,11 +26,11 @@ Install from *github*
 **Clone the project**
 
 >>> cd $CLONEDIR
->>> git clone https://github.com/neurospin/neurospinweb.git
+>>> git clone https://github.com/neurospin/piws.git
 
 **Update your CW_CUBES_PATH**
 
->>> export CW_CUBES_PATH=$CLONE_DIR/neurospinweb:$CW_CUBES_PATH
+>>> export CW_CUBES_PATH=$CLONE_DIR/piws:$CW_CUBES_PATH
 
 Make sure the cube is in CubicWeb's path
 ----------------------------------------
@@ -39,7 +40,7 @@ Make sure the cube is in CubicWeb's path
 Create an instance of the cube
 ------------------------------
 
->>> cubicweb-ctl create neurospinweb toy_instance
+>>> cubicweb-ctl create piws toy_instance
 
 You can then run the instance in debug mode:
 

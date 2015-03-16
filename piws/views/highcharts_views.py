@@ -10,7 +10,7 @@
 # System import
 import numpy
 
-# CUBICWEB import
+# Cubicweb import
 from cubicweb.view import View
 
 

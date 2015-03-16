@@ -12,10 +12,10 @@ that in turn enables us to design common views.
 
 .. _scripts_class:
 
-:mod:`neurospinweb.scripts`: Unified importation methods
-========================================================
+:mod:`piws.scripts`: Unified importation methods
+================================================
 
-.. currentmodule:: neurospinweb.scripts
+.. currentmodule:: piws.scripts
 
 .. autosummary::
     :toctree: generated/scripts/
@@ -32,8 +32,8 @@ that in turn enables us to design common views.
 
 .. _scripts_demo:
 
-:mod:`neurospinweb.demo`: Demonstration
-=======================================
+:mod:`piws.demo`: Demonstration
+===============================
 
 To exemplify the proposed unified importation methods, a demonstrator has been
 leveraged. By executing the 'generate_toy_dataset.py' function, a toy neuroimaging

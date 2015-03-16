@@ -7,14 +7,17 @@
 # for details.
 ##########################################################################
 
+# Cubicweb import
 from cubicweb.web.views.startup import IndexView
-from cubes.brainomics.views.startup import BrainomicsIndexView
 from cubicweb.predicates import is_instance
 from cubicweb.web.views.primary import PrimaryView
 
+# Cubes import
+from cubes.brainomics.views.startup import BrainomicsIndexView
+
 
 class NSIndexView(IndexView):
-    """ Class that defines the neurospinweb index view.
+    """ Class that defines the piws index view.
     """
 
     def call(self, **kwargs):

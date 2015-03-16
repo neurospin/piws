@@ -13,8 +13,8 @@ import sys
 import hashlib
 import logging
 
-# Neurospinweb import
-from cubes.neurospinweb.scripts.base import Base
+# Piws import
+from .base import Base
 
 
 class Users(Base):

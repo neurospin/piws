@@ -2,20 +2,20 @@
 
 .. _features_guide:
 
-###################################
-Neurospinweb features documentation
-###################################
+######################
+Features documentation
+######################
 
 Documentation regarding all other features implemented in this cube,
 especially access rights and facets
 
-:mod:`neurospinweb.views.facets`
---------------------------------
+:mod:`piws.views.facets`
+------------------------
 
 CubicWeb has a builtin facet system to define restrictions filters.
 A number of criteria have been set up to restrict searches in this cube.
 
-.. automodule:: neurospinweb.views.facets
+.. automodule:: piws.views.facets
 
 The access rights management
 ----------------------------

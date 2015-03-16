@@ -25,9 +25,9 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs -i
-	NO_SETUPTOOLS=1 python setup.py -q install --no-compile --prefix=debian/cubicweb-neurospinweb/usr/
+	NO_SETUPTOOLS=1 python setup.py -q install --no-compile --prefix=debian/cubicweb-piws/usr/
 	# remove generated .egg-info file
-	rm -rf debian/cubicweb-neurospinweb/usr/lib/python*
+	rm -rf debian/cubicweb-piws/usr/lib/python*
 
 
 # Build architecture-independent files here.

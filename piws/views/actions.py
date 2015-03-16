@@ -7,6 +7,7 @@
 # for details.
 ##########################################################################
 
+# Cubicweb import
 from cubicweb.predicates import is_instance, yes
 from cubicweb.web.action import Action
 from cubicweb.web.views.wdoc import HelpAction, AboutAction

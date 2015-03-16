@@ -7,11 +7,15 @@
 # for details.
 ##########################################################################
 
+# Cubicweb import
 from cubicweb.predicates import is_instance
 from cubicweb.view import EntityView
-from cubes.brainomics.views.outofcontext import (
-    ScanOutOfContextView, AssessmentOutOfContextView,
-    QuestionnaireRunOutOfContextView, SubjectOutOfContextView)
+
+# Cubes import
+from cubes.brainomics.views.outofcontext import ScanOutOfContextView
+from cubes.brainomics.views.outofcontext import AssessmentOutOfContextView
+from cubes.brainomics.views.outofcontext import QuestionnaireRunOutOfContextView
+from cubes.brainomics.views.outofcontext import SubjectOutOfContextView)
 
 
 ###############################################################################

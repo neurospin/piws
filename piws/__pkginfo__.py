@@ -1,8 +1,14 @@
 # pylint: disable=W0622
-"""cubicweb-neurospinweb application packaging information"""
+##########################################################################
+# NSAp - Copyright (C) CEA, 2013
+# Distributed under the terms of the CeCILL-B license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+# for details.
+##########################################################################
 
-modname = 'neurospinweb'
-distname = 'cubicweb-neurospinweb'
+modname = 'piws'
+distname = 'cubicweb-piws'
 
 numversion = (0, 1, 0)
 version = '.'.join(str(num) for num in numversion)
@@ -10,7 +16,7 @@ version = '.'.join(str(num) for num in numversion)
 license = 'LGPL'
 author = 'nsap'
 author_email = 'antoine.grigis@cea.fr'
-description = 'neurospinweb'
+description = 'piws'
 web = 'http://www.cubicweb.org/project/%s' % distname
 
 __depends__ = {

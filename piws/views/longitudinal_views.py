@@ -7,6 +7,7 @@
 # for details.
 ##########################################################################
 
+# Cubicweb import
 from cubicweb.view import View
 
 

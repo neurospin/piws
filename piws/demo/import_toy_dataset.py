@@ -16,13 +16,13 @@ import getpass
 from cubicweb import cwconfig
 from cubicweb.dbapi import in_memory_repo_cnx
 
-# Neurospinweb import
-from cubes.neurospinweb.scripts.groups import Groups
-from cubes.neurospinweb.scripts.users import Users
-from cubes.neurospinweb.scripts.subjects import Subjects
-from cubes.neurospinweb.scripts.scans import Scans
-from cubes.neurospinweb.scripts.questionnaires import Questionnaires
-from cubes.neurospinweb.scripts.genetics import Genetics
+# Piws import
+from cubes.piws.scripts.groups import Groups
+from cubes.piws.scripts.users import Users
+from cubes.piws.scripts.subjects import Subjects
+from cubes.piws.scripts.scans import Scans
+from cubes.piws.scripts.questionnaires import Questionnaires
+from cubes.piws.scripts.genetics import Genetics
 from parse_toy_data import subject_parser
 from parse_toy_data import scan_parser
 from parse_toy_data import questionnaire_parser

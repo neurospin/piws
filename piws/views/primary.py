@@ -7,8 +7,11 @@
 # for details.
 ##########################################################################
 
-from cubes.brainomics.views.primary import BrainomicsPrimaryView
+# Cubicweb import
 from cubicweb.web.views.primary import PrimaryView
+
+# Cubes import
+from cubes.brainomics.views.primary import BrainomicsPrimaryView
 
 
 def registration_callback(vreg):

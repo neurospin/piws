@@ -14,7 +14,7 @@ import json
 import os
 import copy
 
-# CUBICWEB import
+# Cubicweb import
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
 from cubicweb.web.views.csvexport import CSVMixIn
