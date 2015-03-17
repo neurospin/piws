@@ -10,6 +10,7 @@
 # System import
 from __future__ import print_function
 import os
+import sys
 import getpass
 
 # CubicWeb import
@@ -17,12 +18,13 @@ from cubicweb import cwconfig
 from cubicweb.dbapi import in_memory_repo_cnx
 
 # Piws import
-from cubes.piws.scripts.groups import Groups
-from cubes.piws.scripts.users import Users
-from cubes.piws.scripts.subjects import Subjects
-from cubes.piws.scripts.scans import Scans
-from cubes.piws.scripts.questionnaires import Questionnaires
-from cubes.piws.scripts.genetics import Genetics
+sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+from piws.scripts.groups import Groups
+from piws.scripts.users import Users
+from piws.scripts.subjects import Subjects
+from piws.scripts.scans import Scans
+from piws.scripts.questionnaires import Questionnaires
+from piws.scripts.genetics import Genetics
 from parse_toy_data import subject_parser
 from parse_toy_data import scan_parser
 from parse_toy_data import questionnaire_parser

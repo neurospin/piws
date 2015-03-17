@@ -15,7 +15,7 @@ from cubicweb.view import EntityView
 from cubes.brainomics.views.outofcontext import ScanOutOfContextView
 from cubes.brainomics.views.outofcontext import AssessmentOutOfContextView
 from cubes.brainomics.views.outofcontext import QuestionnaireRunOutOfContextView
-from cubes.brainomics.views.outofcontext import SubjectOutOfContextView)
+from cubes.brainomics.views.outofcontext import SubjectOutOfContextView
 
 
 ###############################################################################
