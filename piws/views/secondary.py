@@ -33,8 +33,8 @@ class NSScanOutOfContextView(EntityView):
         entity = self.cw_rset.get_entity(row, col)
 
         # Get the subject/study related entities
-        subject = entity.concerns[0]
-        study = entity.related_study[0]
+        subject = entity.subject[0]
+        study = entity.study[0]
 
         # Get the scan image url
         image = u'<img alt="" src="%s">' %  self._cw.data_url(entity.symbol)
@@ -113,9 +113,9 @@ class NSAssessmentOutOfContextView(EntityView):
         entity = self.cw_rset.get_entity(row, col)
 
         # Get the subject/study/center related entities
-        related_subjects = entity.reverse_concerned_by
-        study = entity.related_study[0]
-        center = entity.reverse_holds[0]
+        related_subjects = entity.subjects
+        study = entity.study[0]
+        center = entity.center[0]
         run_items = []
         run_items.extend(entity.related_processing)
         run_items.extend(entity.uses)

@@ -663,10 +663,10 @@ def get_open_answers_data(self):
     # Deal with sort options
     jtsort = "ORDERBY ID {0}".format(jtsort)
 
-    # Get the all the questionnaire runs and associated subjects
+    # Get all the questionnaire runs and associated subjects
     rql = ("Any ID, QR {0} "
-           "Where QR is QuestionnaireRun, QR concerns S, S code_in_study ID, "
-           "QR instance_of Q, Q name '{1}', QR in_assessment A, "
+           "Where QR is QuestionnaireRun, QR instance_of Q, Q name '{1}', "
+           "QR subject S, S code_in_study ID, QR in_assessment A, "
            "A timepoint '{2}'".format(jtsort, qname, timepoint))
     rset = self._cw.execute(rql)
 
@@ -695,9 +695,8 @@ def get_open_answers_data(self):
 
         # Execute an rql to get the subject answers
         questionnaire_run_eid = filtered_rset[row_nb][1]
-        rql = "Any QN, V Where QR eid '{0}', A is OpenAnswer, " \
-              "A questionnaire_run QR, A question Q, Q text QN, " \
-              "A value V".format(questionnaire_run_eid)
+        rql = ("Any QN, V Where QR eid '{0}', QR open_answers A, A question Q,"
+               "Q text QN, A value V".format(questionnaire_run_eid))
         answer_rset = self._cw.execute(rql)
 
         # Go through all answers
@@ -756,7 +755,7 @@ def get_questionnaires_data(self):
     # Deal with sort options
     jtsort = "ORDERBY ID {0}".format(jtsort)
 
-    # Get the all the questionnaire and associated timepoints
+    # Get all the questionnaire and associated timepoints
     rql = ("DISTINCT Any ID, T {0} "
            "Where Q is Questionnaire, QR is QuestionnaireRun, "
            "QR instance_of Q, QR in_assessment A, Q name ID, "
@@ -778,9 +777,8 @@ def get_questionnaires_data(self):
 
     # Open answer table parameters
     ajaxcallback = "get_open_answers_data"
-    rql_labels = ("Any QUT ORDERBY QUT WHERE Q is Questionnaire, "
-                  "QU questionnaire Q, QU text QUT, "
-                  "Q name '{0}'")
+    rql_labels = ("Any QUT ORDERBY QUT WHERE Q is Questionnaire, Q name '{0}', "
+                  "Q questions QU, QU text QUT")
 
     # Build the dict that will be dumped in the table
     records = []

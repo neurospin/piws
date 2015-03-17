@@ -111,12 +111,15 @@ class Genetics(Base):
         # Define the relations involved
         self.relations = (
             self.fileset_relations +  self.assessment_relations + [
-            ("GenomicMeasure", "related_study", "Study"),
-            ("GenomicMeasure", "related_subjects", "Subject"),
-            ("Assessment", "uses", "GenomicMeasure"),
+            ("GenomicMeasure", "study", "Study"),
+            ("Study", "genomic_measures", "GenomicMeasure"),
+            ("GenomicMeasure", "subjects", "Subject"),
+            ("Subject", "genomic_measures", "GenomicMeasure"),
+            ("Assessment", "genomic_measures", "GenomicMeasure"),
             ("GenomicMeasure", "in_assessment", "Assessment"),
             ("GenomicMeasure", "platform", "GenomicPlatform"),
-            ("GenomicPlatform", "related_snps", "Snp")]
+            ("GenomicPlatform", "genomic_measures", "GenomicMeasure"),
+            ("GenomicPlatform", "snps", "Snp")]
         )
         self.relations[0][0] = "GenomicMeasure"
 
@@ -282,22 +285,30 @@ class Genetics(Base):
         if is_created:
             # > add relation with the study
             self._set_unique_relation(
-                measure_eid, "related_study", study_eid, check_unicity=False,
-                subjtype="GenomicMeasure")
+                measure_eid, "study", study_eid, check_unicity=False)
+            self._set_unique_relation(
+                study_eid, "genomic_measures", measure_eid, check_unicity=False)
             # > add relation with the subjects
             for subject_id in related_subjects:
                 self._set_unique_relation(
-                    measure_eid, "related_subjects", study_subjects[subject_id],
+                    measure_eid, "subjects", study_subjects[subject_id],
+                    check_unicity=False)
+                self._set_unique_relation(
+                    study_subjects[subject_id], "genomic_measures", measure_eid,
                     check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
-                assessment_eid, "uses", measure_eid, check_unicity=False)
+                assessment_eid, "genomic_measures", measure_eid,
+                check_unicity=False)
             self._set_unique_relation(
                 measure_eid, "in_assessment", assessment_eid,
                 check_unicity=False, subjtype="GenomicMeasure")
             # > add relation with the platform
             self._set_unique_relation(
                 measure_eid, "platform", platform_eid, check_unicity=False)
+            self._set_unique_relation(
+                platform_eid, "genomic_measures", measure_eid,
+                check_unicity=False)
 
             # Add the file set attached to a scan entity
             self._import_file_set(fset_struct, extfiles, measure_eid,
@@ -338,6 +349,6 @@ class Genetics(Base):
                     snp_eid = snp_entity.eid
                     self.inserted_platforms[rs_id] = snp_eid
                 self._set_unique_relation(
-                    platform_eid, "related_snps", snp_eid, check_unicity=False)
+                    platform_eid, "snps", snp_eid, check_unicity=False)
 
         return platform_eid

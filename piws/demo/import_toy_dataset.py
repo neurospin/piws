@@ -83,7 +83,8 @@ genetics = genetic_parser(demo_path, STUDY_NAME)
 db_grp_importer = Groups(session, ["toy_V0", "toy_V1", "toy"],
                          use_store=True)
 db_user_importer = Users(session, USERS, use_store=True)
-db_subject_importer = Subjects(session, subjects, use_store=True)
+db_subject_importer = Subjects(
+    session, STUDY_NAME, subjects, use_store=True)
 db_scan_importer = Scans(
     session, STUDY_NAME, CENTER_NAME, scans, can_read=True, can_update=False,
     data_filepath=demo_path, use_store=True)

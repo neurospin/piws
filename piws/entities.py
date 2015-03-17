@@ -53,7 +53,7 @@ class Assessment(AnyEntity):
     def dc_title(self):
         """ Method the defined the assessment entity title
         """
-        related_subject = self.reverse_concerned_by
+        related_subject = self.subjects
         if len(related_subject) > 0:
             subject = related_subject[0]
             return "{0}".format(subject.code_in_study)
@@ -65,27 +65,20 @@ class Assessment(AnyEntity):
         """ This property will return a symbol cooresponding to the scan
         type
         """
-        if self.uses:
-            run_item = self.uses[0]
-        elif self.related_processing:
-            run_item = self.related_processing[0]
-        else:
-            run_item = type("Dummy", (object, ), {})
-
-        if run_item.__class__.__name__ == "QuestionnaireRun":
-            return "images/questionnaire.png"
-        elif run_item.__class__.__name__ == "Scan":
-            field = run_item.has_data[0].field
+        if self.scans:
+            field = self.scans[0].has_data[0].field
             if field == "3T":
                 return "images/irm3t.png"
             elif field == "7T":
                 return "images/irm7t.png"
             else:
                 return "images/unknown.png"
-        elif run_item.__class__.__name__ == "ProcessingRun":
+        elif self.related_processing:
             return "images/processing.png"
-        else:
-            return "images/unknown.png"
+        elif self.questionnaire_runs:
+            return "images/questionnaire.png"
+        elif self.genomic_measures:
+            return "images/samples.png"
 
 
 class Subject(AnyEntity):
@@ -139,20 +132,4 @@ class ProcessingRun(AnyEntity):
         run type
         """
         return "images/processing.png"
-
-
-class BioSample(AnyEntity):
-    __regid__ = "BioSample"
-
-    def dc_title(self):
-        """ Method the defined the bio sample entity title
-        """
-        return "{0}-{1}".format(self.label, self.sample_creation_date)
-
-    @property
-    def symbol(self):
-        """ This property will return a symbol cooresponding to the bio
-        sample type
-        """
-        return "images/samples.png"
 

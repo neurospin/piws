@@ -36,11 +36,17 @@ from cubes.questionnaire.schema import QuestionnaireRun
 from cubes.questionnaire.schema import Questionnaire
 from cubes.questionnaire.schema import Question
 from cubes.genomics.schema import GenomicMeasure
+from cubes.genomics.schema import ColumnRef
+from cubes.genomics.schema import GenomicPlatform
+from cubes.genomics.schema import Snp
+
 
 
 ###############################################################################
 # Modification of the schema
 ###############################################################################
+
+# ATTRIBUTES
 
 # Add label to QuestionnaireRun entity
 QuestionnaireRun.add_relation(
@@ -75,108 +81,196 @@ GenomicMeasure.add_relation(
     String(maxsize=128, fulltextindexed=True), name="label")
 
 # Add chromset to Genomicmeasure
-GenomicMeasure.add_relation(String(maxsize=64), name="chromset")
-
-# Add related_subjects relation to Genomicmeasure
 GenomicMeasure.add_relation(
-    SubjectRelation("Subject", cardinality="**", inlined=False),
-    name="related_subjects")
+    String(maxsize=64), name="chromset")
 
 # Add shape to DMRIData entity
-DMRIData.add_relation(Float(required=True, indexed=True), name="shape_x")
-DMRIData.add_relation(Float(required=True, indexed=True), name="shape_y")
-DMRIData.add_relation(Float(required=True, indexed=True), name="shape_z")
+DMRIData.add_relation(
+    Float(), name="shape_x")
+DMRIData.add_relation(
+    Float(), name="shape_y")
+DMRIData.add_relation(
+    Float(), name="shape_z")
 
 # Add field to *Data entity
-DMRIData.add_relation(String(maxsize=64, indexed=True), name="field")
-MRIData.add_relation(String(maxsize=64, indexed=True), name="field")
+DMRIData.add_relation(
+    String(maxsize=10, indexed=True), name="field")
+MRIData.add_relation(
+    String(maxsize=10, indexed=True), name="field")
 
 
-# Add entity to store some generic scores
+# RELATIONS
+
+# SCAN
+Scan.add_relation(
+    SubjectRelation("Study", cardinality="1*", inlined=False),
+    name="study")
+Scan.remove_relation(name="concerns")
+Scan.add_relation(
+    SubjectRelation("Subject", cardinality="1*", inlined=False),
+    name="subject")
+Scan.remove_relation(name="measure")
+Scan.add_relation(
+    SubjectRelation("ScoreValue", cardinality="*1", inlined=False),
+    name="score_values")
+
+# CENTER
+Center.remove_relation(name="holds")
+Center.add_relation(
+    SubjectRelation("Assessment", cardinality="*1", inlined=False),
+    name="assessments")
+
+# ASSESSMENT
+Assessment.add_relation(
+    SubjectRelation("Center", cardinality="1*", inlined=False),
+    name="center")
+Assessment.remove_relation(name="related_study")
+Assessment.add_relation(
+    SubjectRelation("Study", cardinality="1*", inlined=False),
+    name="study")
+Assessment.remove_relation(name="uses")
+Assessment.add_relation(
+    SubjectRelation("Scan", cardinality="*1", inlined=False),
+    name="scans")
+Assessment.add_relation(
+    SubjectRelation("QuestionnaireRun", cardinality="*1", inlined=False),
+    name="questionnaire_runs")
+Assessment.add_relation(
+    SubjectRelation("GenomicMeasure", cardinality="*1", inlined=False),
+    name="genomic_measures")
+Assessment.remove_relation(name="concerns")
+Assessment.add_relation(
+    SubjectRelation("Subject", cardinality="**", inlined=False),
+    name="subjects")
+
+# STUDY
+Study.add_relation(
+    SubjectRelation("Assessment", cardinality="*1", inlined=False),
+    name="assessments")
+Study.add_relation(
+    SubjectRelation("Subject", cardinality="*1", inlined=False),
+    name="subjects")
+Study.add_relation(
+    SubjectRelation("GenomicMeasure", cardinality="*1", inlined=False),
+    name="genomic_measures")
+Study.add_relation(
+    SubjectRelation("Scan", cardinality="*1", inlined=False),
+    name="scans")
+Study.add_relation(
+    SubjectRelation("QuestionnaireRun", cardinality="*1", inlined=False),
+    name="questionnaire_runs")
+
+# SUBJECT
+Subject.add_relation(
+    SubjectRelation("Study", cardinality="1*", inlined=False),
+    name="study")
+Subject.add_relation(
+    SubjectRelation("GenomicMeasure", cardinality="**", inlined=False),
+    name="genomic_measures")
+Subject.remove_relation(name="concerned_by")
+Subject.add_relation(
+    SubjectRelation("Assessment", cardinality="**", inlined=False),
+    name="assessments")
+Subject.add_relation(
+    SubjectRelation("Scan", cardinality="*1", inlined=False),
+    name="scans")
+Subject.add_relation(
+    SubjectRelation("QuestionnaireRun", cardinality="*1", inlined=False),
+    name="questionnaire_runs")
+
+# QUESTIONNAIRE RUN
+QuestionnaireRun.add_relation(
+    SubjectRelation("OpenAnswer", cardinality="*1", inlined=False),
+    name="open_answers")
+QuestionnaireRun.remove_relation(name="related_study")
+QuestionnaireRun.add_relation(
+    SubjectRelation("Study", cardinality="1*", inlined=False),
+    name="study")
+QuestionnaireRun.remove_relation(name="concerns")
+QuestionnaireRun.add_relation(
+    SubjectRelation("Subject", cardinality="1*", inlined=False),
+    name="subject")
+
+# QUESTION
+Question.add_relation(
+    SubjectRelation("OpenAnswer", cardinality="*1", inlined=False),
+    name="open_answers")
+
+# QUESTIONNAIRE
+Questionnaire.add_relation(
+    SubjectRelation("Question", cardinality="*1", inlined=False),
+    name="questions")
+Questionnaire.add_relation(
+    SubjectRelation("QuestionnaireRun", cardinality="*1", inlined=False),
+    name="questionnaire_runs")
+
+# GENOMIC MEASURE
+GenomicMeasure.add_relation(
+    SubjectRelation("Subject", cardinality="**", inlined=False),
+    name="subjects")
+GenomicMeasure.remove_relation(name="related_study")
+GenomicMeasure.add_relation(
+    SubjectRelation("Study", cardinality="1*", inlined=False),
+    name="study")
+
+# GENOMIC PLATFORM
+GenomicPlatform.add_relation(
+    SubjectRelation("GenomicMeasure", cardinality="*1", inlined=False),
+    name="genomic_measures")
+GenomicPlatform.remove_relation(name="related_snps")
+GenomicPlatform.add_relation(
+    SubjectRelation("Snp", cardinality="**", inlined=False),
+    name="snps")
+
+# SNP
+Snp.add_relation(
+    SubjectRelation("GenomicPlatform", cardinality="**", inlined=False),
+    name="platforms")
+
+# CWGROUP
+class can_read(RelationDefinition):
+    subject = "CWGroup"
+    object = "Assessment"
+    cardinality = "*+"
+class can_update(RelationDefinition):
+    subject = "CWGroup"
+    object = "Assessment"
+    cardinality = "*+"
+
+# RIGHTS
+class in_assessment(RelationDefinition):
+    subject = ("ProcessingRun", "ExternalFile")
+    object = "Assessment"
+    cardinality = "1*"
+    inlined = True
+
+
+
+# ENTITIES
+
+# OPENANSWER
 class OpenAnswer(EntityType):
-    value = String(required=True, indexed=True)
-    identifier = String(maxsize=64, indexed=True)
+    value = String(required=True)
+    identifier = String(maxsize=64, indexed=True, unique=True)
     question = SubjectRelation("Question", cardinality="1*", inlined=True)
     questionnaire_run = SubjectRelation("QuestionnaireRun", cardinality="1*",
                                         inlined=True)
 
-
-# Add entity to select fmri data
+# FMRIDATA
 class FMRIData(EntityType):
-    shape_x = Float(required=True, indexed=True)
-    shape_y = Float(required=True, indexed=True)
-    shape_z = Float(required=True, indexed=True)
-    voxel_res_x = Float(required=True, indexed=True)
-    voxel_res_y = Float(required=True, indexed=True)
-    voxel_res_z = Float(required=True, indexed=True)
-    fov_x = Float(indexed=True)
-    fov_y = Float(indexed=True)
-    tr = Float(required=True, indexed=True)
-    te = Float(required=True, indexed=True)
-    field = String(maxsize=64, indexed=True)
+    shape_x = Float()
+    shape_y = Float()
+    shape_z = Float()
+    voxel_res_x = Float(required=True)
+    voxel_res_y = Float(required=True)
+    voxel_res_z = Float(required=True)
+    fov_x = Float()
+    fov_y = Float()
+    tr = Float(required=True)
+    te = Float()
+    field = String(maxsize=10, indexed=True)
 Scan.add_relation(SubjectRelation("FMRIData", cardinality='?1',
                   composite="subject", inlined=True), name="has_data")
-
-
-# Add entity to store bio samples
-class BioSample(EntityType):
-    identifier = String(maxsize=64, indexed=True)
-    label = String(maxsize=64, indexed=False)
-    sample_creation_date = Datetime()
-    box_id = String(maxsize=64, indexed=False)
-    tube_name = String(maxsize=64, indexed=False)
-    extraction_lab_name = String(maxsize=64, indexed=False)
-    send_extraction_lab_date = Datetime()
-#        constraints=[BoundaryConstraint('>=', Attribute("sample_creation_date"))])
-    receive_extraction_lab_date = Datetime(
-        constraints=[BoundaryConstraint('>=', Attribute("send_extraction_lab_date"))])
-    destruction_date = Datetime()
-    hybridation_lab_name = String(maxsize=64, indexed=False)
-    send_hybridation_lab_date = Datetime(
-        constraints=[BoundaryConstraint('>=', Attribute("sample_creation_date"))])
-    receive_hybridation_lab_date = Datetime(
-        constraints=[BoundaryConstraint('>=', Attribute("send_hybridation_lab_date"))])
-    qc_nano = String(maxsize=64, indexed=False)
-    qc_spectro = String(maxsize=64, indexed=False)
-BioSample.add_relation(SubjectRelation(
-    "Subject", cardinality="1*", inlined=True), name="concerns")
-Assessment.add_relation(SubjectRelation(
-    "BioSample", cardinality="**", composite="subject"), name="uses")
-BioSample.add_relation(SubjectRelation(
-    "Study", cardinality="1*", inlined=True, composite="object"),
-    name="related_study")
-BioSample.add_relation(SubjectRelation(
-    ("File", "FileSet", "ExternalFile"), cardinality="**", composite="subject"),
-    name="results_files")
-
-
-# Add Assessment/CWGroup relations
-class can_read(RelationDefinition):
-    subject = "CWGroup"
-    object = "Assessment"
-    cardinality = "**"
-
-
-class can_update(RelationDefinition):
-    subject = "CWGroup"
-    object = "Assessment"
-    cardinality = "**"
-
-
-# Add Assessment/Subject ralation
-class concerns(RelationDefinition):
-    subject = "Assessment"
-    object = ("Subject", "SubjectGroup")
-    cardinality = "1*"
-    inlined = True
-
-
-# Add Assessment/ProcessingRun relation
-class in_assessment(RelationDefinition):
-    subject = ("ProcessingRun", "ExternalFile", "BioSample")
-    object = "Assessment"
-    cardinality = "1*"
-    inlined = True
 
 
 ###############################################################################

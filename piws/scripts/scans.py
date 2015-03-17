@@ -29,9 +29,9 @@ class Scans(Base):
         session: Session (mandatory)
             a cubicweb session.
         project_name: str (mandatory)
-            the name of the project
+            the name of the project.
         center_name: str (mandatory)
-            the center name
+            the center name.
         scans: dict of list of dict (mandatory)
             the scan description: the first dictionary contains the subject
             name as keys and then a list of dictionaries with four keys (Scans -
@@ -96,9 +96,11 @@ class Scans(Base):
         # Define the relations involved
         self.relations = (
             self.fileset_relations + self.assessment_relations + [
-            ("Scan", "related_study", "Study"),
-            ("Scan", "concerns", "Subject"),
-            ("Assessment", "uses", "Scan"),
+            ("Scan", "study", "Study"),
+            ("Study", "scans", "Scan"),
+            ("Scan", "subject", "Subject"),
+            ("Subject", "scans", "Scan"),
+            ("Assessment", "scans", "Scan"),
             ("Scan", "in_assessment", "Assessment"),
             ("Scan", "has_data", "PETData"),
             ("PETData", "in_assessment", "Assessment"),
@@ -108,7 +110,7 @@ class Scans(Base):
             ("DMRIData", "in_assessment", "Assessment"),
             ("Scan", "has_data", "MRIData"),
             ("MRIData", "in_assessment", "Assessment"),
-            ("Scan", "measure", "ScoreValue"),
+            ("Scan", "score_values", "ScoreValue"),
             ("ScoreValue", "in_assessment", "Assessment")]
         )
         self.relations[0][0] = "Scan"
@@ -272,15 +274,17 @@ class Scans(Base):
         if is_created:
             # > add relation with the study
             self._set_unique_relation(
-                scan_eid, "related_study", study_eid, check_unicity=False,
-                subjtype="Scan")
+                scan_eid, "study", study_eid, check_unicity=False)
+            self._set_unique_relation(
+                study_eid, "scans", scan_eid, check_unicity=False)
             # > add relation with the subject
             self._set_unique_relation(
-                scan_eid, "concerns", subject_eid, check_unicity=False,
-                subjtype="Scan")
+                scan_eid, "subject", subject_eid, check_unicity=False)
+            self._set_unique_relation(
+                subject_eid, "scans", scan_eid, check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
-                assessment_eid, "uses", scan_eid, check_unicity=False)
+                assessment_eid, "scans", scan_eid, check_unicity=False)
             self._set_unique_relation(
                 scan_eid, "in_assessment", assessment_eid, check_unicity=False,
                 subjtype="Scan")
@@ -318,7 +322,7 @@ class Scans(Base):
                     **score_struct)
                 # > add relation with the scan
                 self._set_unique_relation(
-                    scan_eid, "measure", score_entity.eid)
+                    scan_eid, "score_values", score_entity.eid)
                 # > add relation with the assessment
                 self._set_unique_relation(
                     score_entity.eid, "in_assessment", assessment_eid,

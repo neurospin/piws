@@ -98,13 +98,19 @@ class Questionnaires(Base):
         # Define the relations involved
         self.relations = self.assessment_relations + [
             ("Question", "questionnaire", "Questionnaire"),
+            ("Questionnaire", "questions", "Question"),
             ("QuestionnaireRun", "instance_of", "Questionnaire"),
-            ("Assessment", "uses", "QuestionnaireRun"),
+            ("Questionnaire", "questionnaire_runs", "QuestionnaireRun"),
+            ("Assessment", "questionnaire_runs", "QuestionnaireRun"),
             ("QuestionnaireRun", "in_assessment", "Assessment"),
-            ("QuestionnaireRun", "related_study", "Study"),
-            ("QuestionnaireRun", "concerns", "Subject"),
+            ("QuestionnaireRun", "study", "Study"),
+            ("Study", "questionnaire_runs", "QuestionnaireRun"),
+            ("QuestionnaireRun", "subject", "Subject"),
+            ("Subject", "questionnaire_runs", "QuestionnaireRun"),
             ("OpenAnswer", "question", "Question"),
+            ("Question", "open_answers", "OpenAnswer"),
             ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
+            ("QuestionnaireRun", "open_answers", "OpenAnswer"),
             ("OpenAnswer", "in_assessment", "Assessment"),
         ]
 
@@ -213,6 +219,8 @@ class Questionnaires(Base):
                 # > add relation with the questionnaire form
                 self._set_unique_relation(question_entity.eid, "questionnaire",
                                           questionnaire_entity.eid)
+                self._set_unique_relation(questionnaire_entity.eid, "questions",
+                                          question_entity.eid)
 
         #######################################################################
         # Insert each subject answers
@@ -302,20 +310,28 @@ class Questionnaires(Base):
             self._set_unique_relation(
                 qr_entity.eid, "instance_of",
                 questionnaire_eids[questionnaire_name], check_unicity=False)
+            self._set_unique_relation(
+                questionnaire_eids[questionnaire_name], "questionnaire_runs",
+                qr_entity.eid, check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
-                assessment_eid, "uses", qr_entity.eid, check_unicity=False)
+                assessment_eid, "questionnaire_runs", qr_entity.eid,
+                check_unicity=False)
             self._set_unique_relation(
                 qr_entity.eid, "in_assessment", assessment_eid,
                 check_unicity=False, subjtype="QuestionnaireRun")
             # > add relation with the study
             self._set_unique_relation(
-                qr_entity.eid, "related_study", study_eid, check_unicity=False,
-                subjtype="QuestionnaireRun")
+                qr_entity.eid, "study", study_eid, check_unicity=False)
+            self._set_unique_relation(
+                study_eid, "questionnaire_runs", qr_entity.eid,
+                check_unicity=False)
             # > add relation with the subject
             self._set_unique_relation(
-                qr_entity.eid, "concerns", subject_eid, check_unicity=False,
-                subjtype="QuestionnaireRun")
+                qr_entity.eid, "subject", subject_eid, check_unicity=False)
+            self._set_unique_relation(
+                subject_eid, "questionnaire_runs", qr_entity.eid,
+                check_unicity=False)
 
             # Go through all answers
             for question_name, answer in q_items.iteritems():
@@ -335,10 +351,16 @@ class Questionnaires(Base):
                 self._set_unique_relation(
                     answer_entity.eid, "question", question_eid,
                     check_unicity=False, subjtype="OpenAnswer")
+                self._set_unique_relation(
+                    question_eid, "open_answers", answer_entity.eid,
+                    check_unicity=False)
                 # > add relation with the questionnaire run
                 self._set_unique_relation(
                     answer_entity.eid, "questionnaire_run", qr_entity.eid,
                     check_unicity=False, subjtype="OpenAnswer")
+                self._set_unique_relation(
+                    qr_entity.eid, "open_answers", answer_entity.eid,
+                    check_unicity=False)
                 # > add relation with the assessment
                 self._set_unique_relation(
                     answer_entity.eid, "in_assessment", assessment_eid,

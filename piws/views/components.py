@@ -77,7 +77,7 @@ class NSNavigationtBox(component.CtxComponent):
             rql_labels=rql_labels, ajaxcallback=ajaxcallback,
             title="All Questionnaires", elts_to_sort=["ID"])
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Measures</a>')
+        w(u'Questionaires</a>')
         w(u'</div></div><br/>')
 
         # GenomicMeasures
@@ -87,14 +87,6 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Genomic measures</a>')
         w(u'</div></div><br/>')
-
-        # BioSamples
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any BS Where BS is BioSample")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Bio samples</a>')
-        w(u'</div></div>')
 
 
 ###############################################################################

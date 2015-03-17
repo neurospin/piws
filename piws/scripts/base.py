@@ -37,10 +37,12 @@ class Base(object):
     """
     relations = []
     assessment_relations = [
-        ("Assessment", "related_study", "Study"),
-        ("Subject", "concerned_by", "Assessment"),
-        ("Assessment", "concerns", "Subject"),
-        ("Center", "holds", "Assessment"),
+        ("Assessment", "study", "Study"),
+        ("Study", "assessments", "Assessment"),
+        ("Subject", "assessments", "Assessment"),
+        ("Assessment", "subjects", "Subject"),
+        ("Center", "assessments", "Assessment"),
+        ("Assessment", "center", "Center"),
         ("CWGroup", "can_read", "Assessment"),
         ("CWGroup", "can_update", "Assessment")
     ]
@@ -289,19 +291,24 @@ class Base(object):
         if is_created:
             # > add relation with the study
             self._set_unique_relation(
-                assessment_eid, "related_study", study_eid, check_unicity=False,
+                assessment_eid, "study", study_eid, check_unicity=False,
+                subjtype="Assessment")
+            self._set_unique_relation(
+                study_eid, "assessments", assessment_eid, check_unicity=False,
                 subjtype="Assessment")
             # > add relation with the subject
             if subject_eid is not None:
                 self._set_unique_relation(
-                    subject_eid, "concerned_by", assessment_eid,
+                    subject_eid, "assessments", assessment_eid,
                     check_unicity=False)
                 self._set_unique_relation(
-                    assessment_eid, "concerns", subject_eid,
+                    assessment_eid, "subjects", subject_eid,
                     check_unicity=False, subjtype="Assessment")
             # > add relation with the center
             self._set_unique_relation(
-                center_eid, "holds", assessment_eid, check_unicity=False)
+                center_eid, "assessments", assessment_eid, check_unicity=False)
+            self._set_unique_relation(
+                assessment_eid, "center", center_eid, check_unicity=False)
 
             # Set the permissions
             # Create/get the related assessment groups
