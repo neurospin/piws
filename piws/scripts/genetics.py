@@ -204,9 +204,25 @@ class Genetics(Base):
                     bar_length=40)
                 cnt_measure += 1
 
-                ###################################################################
+                ###############################################################
+                # Check all the subjects exist in the database
+                ###############################################################
+
+                timepoint_subjects = set()
+                for tgenetic_measure in tgenetic_item["GenomicMeasures"]:
+                    platform_struct = tgenetic_measure["GenomicPlatform"]
+                    related_subjects = platform_struct["related_subjects"]
+                    for subject_id in related_subjects:
+                        if not subject_id in study_subjects:
+                            raise ValueError(
+                                "The subject '{0}' in not known by the "
+                                "database.".format(subject_id))
+                        timepoint_subjects.add(study_subjects[subject_id])
+                timepoint_subjects = list(timepoint_subjects)
+
+                ###############################################################
                 # Create the assessment
-                ###################################################################
+                ###############################################################
 
                 # Get the assessment identifier
                 assessment_struct = tgenetic_item["Assessment"]
@@ -219,8 +235,8 @@ class Genetics(Base):
                 # Create the assessment
                 else:
                     assessment_eid = self._create_assessment(
-                        assessment_struct, None, study_eid, center_eid,
-                        groups)
+                        assessment_struct, timepoint_subjects, study_eid,
+                        center_eid, groups)
                     self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################
@@ -229,16 +245,8 @@ class Genetics(Base):
 
                 for tgenetic_measure in tgenetic_item["GenomicMeasures"]:
 
-                    ###########################################################
-                    # Check all the subjects exist in the database
-                    ###########################################################
                     platform_struct = tgenetic_measure["GenomicPlatform"]
                     related_subjects = platform_struct.pop("related_subjects")
-                    for subject_id in related_subjects:
-                        if not subject_id in study_subjects:
-                            raise ValueError(
-                                "The subject '{0}' in not known by the "
-                                "database.".format(subject_id))
 
                     ############################################################
                     # Create the genomic platform

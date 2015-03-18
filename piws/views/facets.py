@@ -17,11 +17,14 @@ from cubicweb.selectors import is_instance
 ############################################################################
 
 class TimepointFacet(facet.RQLPathFacet):
-    """ Filter on timepoint (on Assessment entity). This facet is applied on
-        Scan and Questionnaires
+    """ Filter on timepoint (form the 'Assessment' entity).
+
+    This filter can be applied is applied on 'Scan', 'ProcessingRun',
+    'QuestionnaireRun' and 'GenomicMeasure' entities.
     """
     __regid__ = "timepoint-facet"
-    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
+    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun",
+                             "GenomicMeasure")
     path = ["X in_assessment A", "A timepoint T"]
     order = 1
     filter_variable = "T"
@@ -29,30 +32,40 @@ class TimepointFacet(facet.RQLPathFacet):
 
 
 class StudyFacet(facet.RQLPathFacet):
-    """ Filter on study name (on Study entity). This facet is applied on
-        Scan and Questionnaires
+    """ Filter on study name (from the 'Study' entity).
+
+    This filter can be applied is applied on 'Scan', 'ProcessingRun',
+    'QuestionnaireRun' and 'GenomicMeasure' entities.
     """
     __regid__ = "study-facet"
-    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
-    path = ["X in_assessment A", "A related_study S", "S name N"]
+    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun",
+                             "GenomicMeasure")
+    path = ["X in_assessment A", "A study S", "S name N"]
     order = 2
     filter_variable = "N"
     title = _("Studies")
 
 
 class SubjectFacet(facet.RQLPathFacet):
-    """ Filter on subject code (on Subject entity). This facet is applied on
-        Scan and Questionnaires
+    """ Filter on subject code (from the 'Subject' entity).
+
+    This filter can be applied is applied on 'Scan', 'ProcessingRun',
+    'QuestionnaireRun' and 'GenomicMeasure' entities.
     """
     __regid__ = "subject-facet"
-    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
-    path = ["X in_assessment A", "A concerns S", "S code_in_study C"]
+    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun",
+                             "GenomicMeasure")
+    path = ["X in_assessment A", "A subjects S", "S code_in_study C"]
     order = 3
     filter_variable = "C"
     title = _("Subjects")
 
 
 class ScanFieldFacet(facet.RQLPathFacet):
+    """ Filter the scan fields.
+
+    This filter can be applied is applied on 'Scan'.
+    """
     __regid__ = "scan-field-facet"
     __select__ = is_instance("Scan")
     path = ["X has_data D", "D field F"]
@@ -62,6 +75,10 @@ class ScanFieldFacet(facet.RQLPathFacet):
 
 
 class ScanFormatFacet(facet.RQLPathFacet):
+    """ Filter the scan formats.
+
+    This filter can be applied is applied on 'Scan'.
+    """
     __regid__ = "scan-format-facet"
     __select__ = is_instance("Scan")
     path = ["X format F"]
@@ -71,6 +88,10 @@ class ScanFormatFacet(facet.RQLPathFacet):
 
 
 class AssessmentTimepointFacet(facet.RQLPathFacet):
+    """ Filter the assessment timepoints.
+
+    This filter can be applied is applied on 'Assessment'.
+    """
     __regid__ = "assessment-timepoint-facet"
     __select__ = is_instance("Assessment")
     path = ["X timepoint T"]
@@ -79,35 +100,28 @@ class AssessmentTimepointFacet(facet.RQLPathFacet):
     title = _("Timepoints")
 
 
-class AssessmentStudyFacet(facet.RQLPathFacet):
-    """ Filter on assessment name (on Assessment entity).
-        This facet is applied on Assessment only
-    """
-    __regid__ = "assessment-study-facet"
-    __select__ = is_instance("Assessment")
-    path = ["X related_study S", "S name N"]
-    order = 2
-    filter_variable = "N"
-    title = _("Studies")
-
-
 class AssessmentSubjectFacet(facet.RQLPathFacet):
+    """ Filter the assessment subjects.
+
+    This filter can be applied is applied on 'Assessment'.
+    """
     __regid__ = "assessment-subject-facet"
     __select__ = is_instance("Assessment")
-    path = ["X concerns S", "S code_in_study C"]
+    path = ["X subjects S", "S code_in_study C"]
     order = 3
     filter_variable = "C"
     title = _("Subjects")
 
 
-def registration_callback(vreg):
+###############################################################################
+# Registration callback
+###############################################################################
 
-    # Update the facets
+def registration_callback(vreg):
     vreg.register(TimepointFacet)
     vreg.register(StudyFacet)
     vreg.register(SubjectFacet)
     vreg.register(ScanFieldFacet)
     vreg.register(ScanFormatFacet)
     vreg.register(AssessmentTimepointFacet)
-    vreg.register(AssessmentStudyFacet)
     vreg.register(AssessmentSubjectFacet)

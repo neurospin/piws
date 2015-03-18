@@ -303,43 +303,6 @@ class NSProcessingRunOutOfContextView(EntityView):
 
 
 ###############################################################################
-# ProcessingRun 
-###############################################################################
-
-class NSBioSampleOutOfContextView(EntityView):
-    __regid__ = "outofcontext"
-    __select__ = EntityView.__select__ & is_instance("BioSample")
-
-    def cell_call(self, row, col):
-        """ Create the NSBioSampleOutOfContextView view line by line
-        """
-        # Get the processing run entity
-        entity = self.cw_rset.get_entity(row, col)
-
-        # Get the subject/study/center related entities
-        subject = entity.concerns[0]
-
-        # Get the subject gender image url
-        image = u'<img alt="" src="%s">' %  self._cw.data_url(entity.symbol)
-
-        # Create the div that will contain the list item
-        self.w(u'<div class="ooview"><div class="well">')
-
-        # Create a bootstrap row item
-        self.w(u'<div class="row">')
-        # > first element: the image
-        self.w(u'<div class="col-md-2"><p class="text-center">{0}</p></div>'.format(image))
-        # > second element: the sample description + link
-        self.w(u'<div class="col-md-4"><h4>{0}</h4>'.format(entity.view("incontext")))
-        self.w(u'Subject <em>{0}</em></div>'.format(subject.view("incontext")))
-        # Close row item
-        self.w(u'</div>')
-
-        # Close list item
-        self.w(u'</div></div>')
-
-
-###############################################################################
 # QuestionnaireRun 
 ###############################################################################
 
@@ -354,7 +317,7 @@ class NSQuestionnaireRunOutOfContextView(EntityView):
         entity = self.cw_rset.get_entity(row, col)
 
         # Get the subject/study/center related entities
-        subject = entity.concerns[0]
+        subject = entity.subject[0]
         questionnaire = entity.instance_of[0]
 
         # Get the subject gender image url
@@ -395,7 +358,6 @@ class NSQuestionnaireRunOutOfContextView(EntityView):
 def registration_callback(vreg):
     """ Update outofcontext views
     """
-    vreg.register(NSBioSampleOutOfContextView)
     vreg.register_and_replace(
         NSAssessmentOutOfContextView, AssessmentOutOfContextView)
     vreg.register_and_replace(NSScanOutOfContextView, ScanOutOfContextView)

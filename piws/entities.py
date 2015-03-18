@@ -30,7 +30,9 @@ class Scan(AnyEntity):
         """ Method the defined the scan entity title
         """
         dtype = self.has_data[0]
-        return "{0} ({1})".format(self.label, dtype.__class__.__name__)
+        return "{0} ({1}-{2}-{3})".format(
+            self.label, self.in_assessment[0].timepoint,
+            dtype.__class__.__name__, self.subject[0].code_in_study)
 
     @property
     def symbol(self):
@@ -53,30 +55,27 @@ class Assessment(AnyEntity):
     def dc_title(self):
         """ Method the defined the assessment entity title
         """
-        related_subject = self.subjects
-        if len(related_subject) > 0:
-            subject = related_subject[0]
-            return "{0}".format(subject.code_in_study)
+        if self.scans and self.questionnaire_runs:
+            return "Scans - Questionnaire Run ({0}-{1})".format(
+                self.timepoint, self.subjects[0].code_in_study)
+        elif self.scans:
+            return "Scans ({0}-{1})".format(
+                self.timepoint, self.subjects[0].code_in_study)
+        elif self.questionnaire_runs:
+            return "Questionnaire Run ({0}-{1})".format(
+                self.timepoint, self.subjects[0].code_in_study)
         else:
-            return "genomic measure"
+            return "Genomic Measure ({0})".format(self.timepoint)
 
     @property
     def symbol(self):
         """ This property will return a symbol cooresponding to the scan
         type
         """
-        if self.scans:
-            field = self.scans[0].has_data[0].field
-            if field == "3T":
-                return "images/irm3t.png"
-            elif field == "7T":
-                return "images/irm7t.png"
-            else:
-                return "images/unknown.png"
+        if self.scans or self.questionnaire_runs:
+            return "images/questionnaire.png"
         elif self.related_processing:
             return "images/processing.png"
-        elif self.questionnaire_runs:
-            return "images/questionnaire.png"
         elif self.genomic_measures:
             return "images/samples.png"
 
@@ -132,4 +131,21 @@ class ProcessingRun(AnyEntity):
         run type
         """
         return "images/processing.png"
+
+
+class GenomicMeasure(AnyEntity):
+    __regid__ = "GenomicMeasure"
+
+    def dc_title(self):
+        """ Method the defined the processing run entity title
+        """
+        return "Genomic Measure ({0}-{1})".format(
+            self.in_assessment[0].timepoint, self.type)
+
+    @property
+    def symbol(self):
+        """ This property will return a symbol cooresponding to the processing
+        run type
+        """
+        return "images/samples.png"
 

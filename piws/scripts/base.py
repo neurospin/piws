@@ -264,7 +264,7 @@ class Base(object):
 
         return entity, is_created
 
-    def _create_assessment(self, assessment_struct, subject_eid, study_eid,
+    def _create_assessment(self, assessment_struct, subject_eids, study_eid,
                            center_eid, groups):
         """ Create an assessment and its associated relations.
 
@@ -275,7 +275,11 @@ class Base(object):
               item and the concatenation of the two first items.
             * the permissions 'can_read', 'can_update' relate the assessments
               with the corresponding groups.
-        """ 
+        """
+        # Format inputs
+        if not isinstance(subject_eids, list):
+            subject_eids = [subject_eids]
+
         # Create the assessment
         assessment_id = assessment_struct["identifier"]
         assessment_entity, is_created = self._get_or_create_unique_entity(
@@ -297,7 +301,7 @@ class Base(object):
                 study_eid, "assessments", assessment_eid, check_unicity=False,
                 subjtype="Assessment")
             # > add relation with the subject
-            if subject_eid is not None:
+            for subject_eid in subject_eids:
                 self._set_unique_relation(
                     subject_eid, "assessments", assessment_eid,
                     check_unicity=False)
