@@ -13,6 +13,10 @@ import sys
 import hashlib
 import logging
 
+# Cubicweb import
+from cubicweb import Binary
+from cubicweb.server.utils import crypt_password
+
 # Piws import
 from .base import Base
 
@@ -93,6 +97,16 @@ class Users(Base):
             This procedure expect that the 'CWGroup' of interest are already
             created.
         """
+        # Get the activated State entity
+        rql = "Any X Where X is State, X name 'activated'"
+        rset = self.session.execute(rql)
+        if rset.rowcount != 1:
+            logging.error(
+                "Can't insert users, no activated State entity detected.")
+            raise Exception("Can't insert users, no activated State entity "
+                            "detected.")
+        state_eid = rset[0][0]
+     
         # Go through the goup names
         nb_of_users = float(len(self.users))
         cnt_user = 1.
@@ -106,13 +120,19 @@ class Users(Base):
             cnt_user += 1.
 
             # Create the user
-            user_entity, _ = self._get_or_create_unique_entity(
+            crypted = crypt_password(user_item["password"])
+            user_entity, is_created = self._get_or_create_unique_entity(
                 rql=("Any X Where X is CWUser, X login "
                      "'{0}'".format(user_item["login"])),
                 check_unicity=True,
                 entity_name="CWUser",
                 login=unicode(user_item["login"]),
-                upassword=unicode(user_item["password"]))
+                upassword=Binary(crypted))
+
+            # If the user is created, add relation with the State entity
+            if is_created:
+                self._set_unique_relation(user_entity.eid,
+                        "in_state", state_eid, check_unicity=False)                
 
             # Go through group names
             for group_name in user_item["group_names"]:
