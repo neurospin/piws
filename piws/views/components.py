@@ -88,6 +88,23 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'Genomic measures</a>')
         w(u'</div></div><br/>')
 
+        # CWSearch
+        w(u'<hr>')
+        w(u'<div class="btn-toolbar">')
+        w(u'<div class="btn-group-vertical btn-block">')
+        href = self._cw.build_url(rql="Any S Where S is CWSearch")
+        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+        w(u'My searches</a>')
+        w(u'</div></div><br/>')
+
+        # CWUpload
+        w(u'<div class="btn-toolbar">')
+        w(u'<div class="btn-group-vertical btn-block">')
+        href = self._cw.build_url(rql="Any U Where U is CWUpload")
+        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+        w(u'My uploads</a>')
+        w(u'</div></div><br/>')
+
 
 ###############################################################################
 # Statistic boxes

@@ -355,9 +355,40 @@ class NSQuestionnaireRunOutOfContextView(EntityView):
         self.w(u'</div></div>')
 
 
+###############################################################################
+# Default
+###############################################################################
+
+class NSDefaultOutOfContextView(EntityView):
+    __regid__ = "outofcontext"
+    __select__ = EntityView.__select__ & is_instance("CWSearch", "CWUpload")
+
+    def cell_call(self, row, col):
+        """ Create the default view line by line.
+        """
+        # Get the processing run entity
+        entity = self.cw_rset.get_entity(row, col)
+
+        # Create the div that will contain the list item
+        self.w(u'<div class="ooview"><div class="well">')
+
+        # Create a bootstrap row item
+        self.w(u'<div class="row">')
+        # > add the scan description + link
+        self.w(u'<div class="col-md-4"><h4>{0}</h4>'.format(
+            entity.view("incontext")))
+        self.w(u'</div>')
+        # Close row item
+        self.w(u'</div>')
+
+        # Close list item
+        self.w(u'</div></div>')
+
+
 def registration_callback(vreg):
     """ Update outofcontext views
     """
+    vreg.register(NSDefaultOutOfContextView)
     vreg.register_and_replace(
         NSAssessmentOutOfContextView, AssessmentOutOfContextView)
     vreg.register_and_replace(NSScanOutOfContextView, ScanOutOfContextView)

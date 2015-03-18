@@ -102,6 +102,7 @@ MRIData.add_relation(
 # RELATIONS
 
 # SCAN
+Scan.remove_relation(name="related_study")
 Scan.add_relation(
     SubjectRelation("Study", cardinality="1*", inlined=False),
     name="study")
@@ -279,8 +280,7 @@ Scan.add_relation(SubjectRelation("FMRIData", cardinality='?1',
 
 ENTITIES = [
     Scan, FMRIData, DMRIData, PETData, MRIData, FileSet, ExternalFile,
-    ScoreValue, ProcessingRun, QuestionnaireRun, Questionnaire, Question,
-    OpenAnswer, GenomicMeasure]
+    ScoreValue, ProcessingRun, QuestionnaireRun, OpenAnswer, GenomicMeasure]
 
 
 DEFAULT_PERMISSIONS = {
@@ -339,17 +339,19 @@ ENTITY_PERMISSIONS = {
 # Set the assessment entity permissions
 Assessment.set_permissions(ASSESSMENT_PERMISSIONS)
 
-# Set the subject/center/study entities permissions
+# Set the subject/center/study/questionnaire/question entities permissions
 Subject.set_permissions(DEFAULT_PERMISSIONS)
 Center.set_permissions(DEFAULT_PERMISSIONS)
 Study.set_permissions(DEFAULT_PERMISSIONS)
+Questionnaire.set_permissions(DEFAULT_PERMISSIONS)
+Question.set_permissions(DEFAULT_PERMISSIONS)
 
 # Set the permissions on the used entities only
 for entity in ENTITIES:
     entity.__permissions__ = ENTITY_PERMISSIONS
 
 # Update the entities list to set relation permissions
-ENTITIES.extend([Assessment, Subject, Center, Study])
+ENTITIES.extend([Assessment, Subject, Center, Study, Questionnaire, Question])
 
 # Set the permissions on the ised entities relations only
 for entity in ENTITIES:
