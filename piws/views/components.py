@@ -146,9 +146,9 @@ class NSSubjectStatistics(component.CtxComponent):
         # Create a view to see the db subject status
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
-            rql="Any S WHERE S is Subject", title="Insertion status",
-            relation="concerned_by", subject_attr="identifier",
-            object_attr="timepoint")
+            rql="Any A WHERE A is Assessment", title="Insertion status",
+            relations="subjects", subject_attr="timepoint",
+            object_attr="identifier")
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
@@ -172,7 +172,8 @@ class NSAssessmentStatistics(component.CtxComponent):
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
             rql="Any A WHERE A is Assessment", title="Acquisition status",
-            relation="uses", subject_attr="timepoint", object_attr="label")
+            relations=["scans", "questionnaire_runs", "genomic_measures"],
+            subject_attr="timepoint", object_attr="label")
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
@@ -183,7 +184,7 @@ class NSAssessmentStatistics(component.CtxComponent):
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
             rql="Any A WHERE A is Assessment", title="Processing status",
-            relation="related_processing", subject_attr="timepoint",
+            relations="related_processing", subject_attr="timepoint",
             object_attr="tool")
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')

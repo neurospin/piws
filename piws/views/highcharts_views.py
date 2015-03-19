@@ -136,22 +136,22 @@ class HighChartsRelationSummaryView(View):
     paginable = False
     div_id = "highcharts-relation-summary-view"  
 
-    def rset_to_data(self, rset, relation, subject_attr, object_attr):
+    def rset_to_data(self, rset, relations, subject_attr, object_attr):
         """ Method that format the rset parameters for highcharts table view.
 
         We only consider the first entity of each resultset row to construct the 
         highcharts formated parameters.
         The object entities are related to the subject entities with the
         'relation' link.
-        The columns corresspond to the subject entity 'subject_attr' attributes.
+        The columns correspond to the subject entity 'subject_attr' attributes.
         The lines corresspond to the object entity 'object_attr' attributes.
 
         Parameters
         ----------
         rset: resultset (mandatory)
             a  cw resultset
-        relation: str (mandatory)
-            the relation to follow.
+        relations: list of str (mandatory)
+            the relations to follow.
         subject_attr: str (mandatory)
             the subject attribute.
         object_attr: str (mandatory)
@@ -162,6 +162,7 @@ class HighChartsRelationSummaryView(View):
         fdata: dict
             the highcharts formated parameters: 'x' contains the x labels,
             'y' contains the y labels and 'grid' the table values and positions.
+            If -1 is returned, this mean that no data can be displayed.
         """
         # Get the first element of each resultset row
         data = {}
@@ -169,7 +170,10 @@ class HighChartsRelationSummaryView(View):
 
             # Get the subject/object entities
             subject_entity = rset.get_entity(line_number, 0)
-            object_entities = eval("subject_entity.{0}".format(relation))
+            object_entities = []
+            for relation in relations:
+                object_entities.extend(
+                    eval("subject_entity.{0}".format(relation)))
 
             # Get the subject/object attributes
             col_name = eval("subject_entity.{0}".format(subject_attr))
@@ -210,6 +214,11 @@ class HighChartsRelationSummaryView(View):
                     x_count, y_count, nb_of_elements))
                 y_count += 1
             x_count += 1
+
+        # > if no data on the grid return -1
+        if len(sdata["grid"]) == 0:
+            return -1
+
         # > format the data outputs
         sdata["x"] = "['" + "', '".join(sdata["x"]) + "']"
         sdata["y"] = "['" + "', '".join(all_y_labels) + "']"
@@ -217,7 +226,7 @@ class HighChartsRelationSummaryView(View):
 
         return sdata
         
-    def call(self, relation=None, subject_attr=None, object_attr=None, 
+    def call(self, relations=None, subject_attr=None, object_attr=None, 
              rset=None, title="", **kwargs):
         """ Method that will create a table view from a cw resultset.
 
@@ -226,8 +235,8 @@ class HighChartsRelationSummaryView(View):
 
         Parameters
         ----------
-        relation: str (optional, default None)
-            the relation to follow.
+        relations: list of str (optional, default None)
+            the relations to follow.
         subject_attr: str (optional, default None)
             the subject attribute that will be used to create the table columns.
         object_attr: str (optional, default None)
@@ -243,18 +252,49 @@ class HighChartsRelationSummaryView(View):
         # Get the method parameters: if we use 'build_url' method, the data
         # are in the firm dictionary
         title = title or self._cw.form.get("title", "")
-        relation = relation or self._cw.form.get("relation", None)
+        relations = relations or self._cw.form.get("relations", None)
         subject_attr = subject_attr or self._cw.form.get("subject_attr", None)
         object_attr = object_attr or self._cw.form.get("object_attr", None)
 
+        # Relations has to be a list
+        if not isinstance(relations, list):
+            relations = [relations]
+
         # Check that we have all the required information
-        if relation is None or subject_attr is None or object_attr is None:
+        if relations is None or subject_attr is None or object_attr is None:
             self.w(u'<a>Wrong input arguments in HighChartsRelationSummaryView '
                     'class.</a>')
-            return
+            return -1
 
         # Get the highcharts string representation of the data
-        data = self.rset_to_data(rset, relation, subject_attr, object_attr)
+        try:
+            data = self.rset_to_data(rset, relations, subject_attr, object_attr)
+        except:
+            self.w(u'<div class="panel panel-danger">')
+            self.w(u'<div class="panel-heading">')
+            self.w(u'<h2 class="panel-title">Error</h2>')
+            self.w(u'</div>')
+            self.w(u'<div class="panel-body">')
+            self.w(u"<h3>Summary View Definition</h3>")
+            self.w(u"Did you specify valid subject/object attributes and "
+                    "associated relations?")
+            self.w(u'</div>')
+            self.w(u'</div>')
+            return -1        
+
+        # No data can be displayed
+        if data == -1:
+            self.w(u'<div class="panel panel-warning">')
+            self.w(u'<div class="panel-heading">')
+            self.w(u'<h2 class="panel-title">WARNING</h2>')
+            self.w(u'</div>')
+            self.w(u'<div class="panel-body">')
+            self.w(u"<h3>Summary View</h3>")
+            self.w(u"No data available.")
+            self.w(u'</div>')
+            self.w(u'</div>')
+            return -1
+            
 
         # Add some js resources
         self._cw.add_js(
@@ -285,7 +325,7 @@ class HighChartsRelationSummaryView(View):
                 'this.series.xAxis.categories[this.point.x] + '
                 '"</b> {0} <br><b>" + this.point.value + '
                 '"</b> items <br><b>" + this.series.yAxis.categories['
-                'this.point.y] + "</b>";}}}}, '.format(relation))
+                'this.point.y] + "</b>";}}}}, '.format(", ".join(relations)))
         # > configure series
         self.w(u'series: [{{name: "Number of item per timepoint", borderWidth: 1, '
                 'data: {0}, dataLabels: {{enabled: true, color: "black", style: '
@@ -333,13 +373,17 @@ class HighChartsBasicPlotView(View):
         sdata: string
             the highcharts formated parameter
         """
-        # Get the first element of each resultset row
+        # Get the first element of each resultset row and store it if it is
+        # a float
         data = []
         for element in rset.rows:
-            data.append(float(element[0]))
+            try:
+                data.append(float(element[0]))
+            except:
+                pass
 
         # Create the histogram with numpy
-        hist, bin_edges = numpy.histogram(data, density=True, bins=20)
+        hist, bin_edges = numpy.histogram(data, density=True, bins=10)
         bin_center = ["%.1f" % ((bin_edges[i] + bin_edges[i+1]) / 2.)
                       for i in range(len(bin_edges) - 1)]
         hist = [str(value) for value in hist]

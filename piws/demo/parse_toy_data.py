@@ -333,7 +333,8 @@ def genetic_parser(root, project_name):
 
                 # Create the scan entity structure
                 gmeasure_struct = {
-                    "label": assessment_id + "_Illumina_raw_json",
+                    "identifier": assessment_id + "_Illumina_raw_json",
+                    "label": "Illumina_raw_json",
                     "type": u"raw",
                     "format": u"json"
                 }

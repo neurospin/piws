@@ -282,8 +282,8 @@ class Genetics(Base):
         """  
         # Create the measure      
         measure_entity, is_created = self._get_or_create_unique_entity(
-            rql=("Any X Where X is GenomicMeasure, X label "
-                 "'{0}'".format(measure_struct["label"])),
+            rql=("Any X Where X is GenomicMeasure, X identifier "
+                 "'{0}'".format(measure_struct["identifier"])),
             check_unicity=True,
             entity_name="GenomicMeasure",
             **measure_struct)

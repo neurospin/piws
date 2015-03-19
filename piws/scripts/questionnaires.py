@@ -297,12 +297,13 @@ class Questionnaires(Base):
         # Create a questionnaire run
         qr_id = identifier_prefix + "_" + questionnaire_name
         qr_entity, is_created = self._get_or_create_unique_entity(
-            rql=("Any X Where X is QuestionnaireRun, X label "
+            rql=("Any X Where X is QuestionnaireRun, X identifier "
                  "'{0}'".format(qr_id)),
             check_unicity=True,
             entity_name="QuestionnaireRun",
             user_ident=unicode(subject_id),
-            label=unicode(qr_id))
+            identifier=unicode(qr_id),
+            label=unicode(questionnaire_name))
 
         # If we just create the questionnaire run, specify and relate the entity
         if is_created:

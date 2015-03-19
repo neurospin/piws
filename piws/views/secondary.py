@@ -217,22 +217,23 @@ class NSSubjectOutOfContextView(EntityView):
         # > create longitudinal summary views
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
-            rql="Any A WHERE S eid '{0}', S concerned_by A".format(entity.eid),
-            relation="uses", subject_attr="timepoint", object_attr="label",
+            rql="Any A WHERE S eid '{0}', S assessments A".format(entity.eid),
+            relations=["scans", "questionnaire_runs", "genomic_measures"],
+            subject_attr="timepoint", object_attr="label",
             title="Acquisition status: {0}".format(entity.code_in_study))
         self.w(u'<dt>Acquisition summary</dt><dd><a href="{0}">'
                 'status</a></dd>'.format(href))
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
-            rql="Any A WHERE S eid '{0}', S concerned_by A".format(entity.eid),
-            relation="related_processing", subject_attr="timepoint",
+            rql="Any A WHERE S eid '{0}', S assessments A".format(entity.eid),
+            relations="related_processing", subject_attr="timepoint",
             object_attr="tool", title="Processing status: {0}".format(entity.code_in_study))
         self.w(u'<dt>Processing summary</dt><dd><a href="{0}">'
                 'status</a></dd>'.format(href))
         href = self._cw.build_url(
             "view", vid="questionnaire-longitudinal-measures",
-            rql=("Any QR WHERE S eid '{0}', S concerned_by A, A uses QR, "
-                 "QR is QuestionnaireRun".format(entity.eid)),
+            rql=("Any QR WHERE S eid '{0}', S assessments A, "
+                 "A questionnaire_runs QR".format(entity.eid)),
             patient_id=entity.code_in_study)
         self.w(u'<dt>Measure summary</dt><dd><a href="{0}">status</a>'
                 '</dd>'.format(href))

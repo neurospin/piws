@@ -50,7 +50,10 @@ from cubes.genomics.schema import Snp
 
 # Add label to QuestionnaireRun entity
 QuestionnaireRun.add_relation(
-    String(maxsize=128, fulltextindexed=True), name="label")
+    String(maxsize=64), name="label")
+# Add identifier to QuestionnaireRun entity
+QuestionnaireRun.add_relation(
+    String(maxsize=128, fulltextindexed=True), name="identifier")
 
 # Add code_in_study to Subject entity
 Subject.add_relation(
@@ -58,7 +61,7 @@ Subject.add_relation(
 
 # Add identifier to Assessment entity
 Assessment.add_relation(
-    String(maxsize=64, fulltextindexed=True), name="identifier")
+    String(maxsize=128, fulltextindexed=True), name="identifier")
 
 # Add identifier to ProcessingRun entity
 ProcessingRun.add_relation(
@@ -78,7 +81,10 @@ ExternalFile.add_relation(
 
 # Add label to GenomicMeasure entity
 GenomicMeasure.add_relation(
-    String(maxsize=128, fulltextindexed=True), name="label")
+    String(maxsize=64), name="label")
+# Add identifier to GenomicMeasure entity
+GenomicMeasure.add_relation(
+    String(maxsize=128, fulltextindexed=True), name="identifier")
 
 # Add chromset to Genomicmeasure
 GenomicMeasure.add_relation(
