@@ -70,7 +70,7 @@ class JhugetableView(View):
         rql_labels: string (rql_labels)
             a rql that will be executed to get the columns labels.
         labels: list of string (xor rql_labels)
-            a rql that will be executed to get the columns labels.
+            the columns labels.
         ajaxcallback: @func (mandatory)
             a function thaty will be called by jtable to create dynamically the
             data to display: do not foget the decorator @ajaxfunc.
@@ -79,7 +79,7 @@ class JhugetableView(View):
         csvcallback: bool (optional)
             if True an export button will be available.
         use_scroller: bool (optional default False)
-            if True de not use pagination.
+            if True do not use pagination.
         """
         # Get the parameters
         for key in sorted(self._cw.form.keys()):
@@ -107,6 +107,9 @@ class JhugetableView(View):
                          "dataTables.fixedColumns.css")
         self._cw.add_css("datatables-1.10.5/extensions/Scroller/css/"
                          "dataTables.scroller.css")
+        self._cw.add_css(
+            "https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css",
+            localfile=False)
 
         # Add js resources
         self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
@@ -118,6 +121,8 @@ class JhugetableView(View):
         self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
         self._cw.add_js("datatables-1.10.5/extensions/Scroller/js/"
                         "dataTables.scroller.js")
+        self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
+                        localfile=False)
 
         # Add swf resources
         swf_export = self._cw.data_url("datatables-1.10.5/extensions/"
@@ -126,14 +131,39 @@ class JhugetableView(View):
         # Get table meta information
         if rql_labels is not None:
             labels = [item[0] for item in self._cw.execute(rql_labels)]
+            labels.insert(0, u"ID")
         if labels is None:
             raise Exception("No labels can be selected while creating the "
                             "hugejtable")
 
+        # Get the instance questionnaire map
+        qmapfile = self._cw.vreg.config.get("questionnaire_map", "")
+        if os.path.isfile(qmapfile):
+            with open(qmapfile) as openfile:
+                qmap = json.load(openfile)
+
+            # Associate a tooltip to each label
+            tooltips = []
+            for label_text in labels:
+                if label_text in qmap:
+                    tooltips.append(qmap[label_text])
+                else:
+                    tooltips.append("")
+
+        # Otherwise: no tooltip provided
+        else:
+            qmap = {}
+            tooltips = [""] * len(labels)
+
         # Table column headers
         headers = []
         for label_text in labels:
-            headers.append({"sTitle": label_text})
+            if label_text in qmap:
+                headers.append(
+                    {"sTitle": "<span class='fake-link'> {0} "
+                     "</span>".format(label_text)})
+            else:
+                headers.append({"sTitle": label_text})
 
         # Generate the script
         html = "<script type='text/javascript'> "
@@ -172,15 +202,17 @@ class JhugetableView(View):
         # > display a processing message
         html += "$('#loadingmessage').show();"
 
-        html += "var csvRows = [{0}];".format(json.dumps(labels))
+        html += "var csvRows = [{0}.join(';')];".format(json.dumps(labels))
+        html += "csvRows.push({0}.join(';'));".format(json.dumps(tooltips))
         html += "for(var i=0, l=jdata.length; i<l; ++i){"
-        html += "csvRows.push(jdata[i].join(','));"
+        html += "csvRows.push(jdata[i].join(';'));"
         html += "}"
 
         # > create a download link
-        html += "var csvString = csvRows.join('%0A');"
+        html += "var csvString = csvRows.join('\\r\\n');"
         html += "var a = document.createElement('a');"
-        html += "a.href  = 'data:attachment/csv,' + csvString;"
+        html += ("a.href = 'data:application/csv;charset=utf-8,' "
+                 "+ encodeURIComponent(csvString);")
         html += "a.target = '_blank';"
         html += "a.download = 'datatable.csv';"
 
@@ -264,6 +296,18 @@ class JhugetableView(View):
         html += "}"
 
         # > close table
+        html += "} );"
+
+        # Add tooltip in table column header
+        html += "var question_text = {0};".format(json.dumps(tooltips))
+        html += "$('thead th').each(function(index, value){"
+        html += "var sTitle = question_text[index];"
+        html += "this.setAttribute( 'title', sTitle );"
+        html += "} );"
+        html += "$( table.fnGetNodes() ).tooltip( {"
+        html += "'delay': 0,"
+        html += "'track': true,"
+        html += "'fade': 250"
         html += "} );"
 
         # > post done
@@ -384,6 +428,9 @@ class JtableView(View):
                          "dataTables.tableTools.min.css")
         self._cw.add_css("datatables-1.10.5/extensions/FixedColumns/css/"
                          "dataTables.fixedColumns.css")
+        self._cw.add_css(
+            "https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css",
+            localfile=False)
 
         # Add js resources
         self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
@@ -393,6 +440,8 @@ class JtableView(View):
         self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
+        self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
+                        localfile=False)
 
         # Add swf resources
         swf_export = self._cw.data_url("datatables-1.10.5/extensions/"
@@ -404,7 +453,28 @@ class JtableView(View):
         if rql_labels is None and labels is not None:
             labels = [[str(item)] for item in labels]
         if labels is None:
-            raise Exception("No labels can be selected while creating the jtable")
+            raise Exception("No labels can be selected while creating the "
+                            "jtable")
+
+        # Get the instance questionnaire map
+        qmapfile = self._cw.vreg.config.get("questionnaire_map", "")
+        if os.path.isfile(qmapfile):
+            with open(qmapfile) as openfile:
+                qmap = json.load(openfile)
+
+            # Associate a tooltip to each label
+            tooltips = [""]
+            for label_text in labels:
+                label_text = label_text[0]
+                if label_text in qmap:
+                    tooltips.append(qmap[label_text])
+                else:
+                    tooltips.append("")
+
+        # Otherwise: no tooltip provided
+        else:
+            qmap = {}
+            tooltips = [""] * (len(labels) + 1)
 
         # Generate the script
 
@@ -422,7 +492,12 @@ class JtableView(View):
 
             # >> add this column to the table definition parameters
             label_list.append(label_cleaner(label_text[0]))
-            headers.append({"sTitle": label_text[0]})
+            if label_text[0] in qmap:
+                headers.append(
+                    {"sTitle": "<span class='fake-link'> {0} "
+                     "</span>".format(label_text[0])})
+            else:
+                headers.append({"sTitle": label_text[0]})
 
         # > begin the script
         html = "<script type='text/javascript'> "
@@ -465,15 +540,17 @@ class JtableView(View):
         html += "post.done(function(p){"
         html += "var jdata = p.aaData;"
         html += "headers = JSON.parse(postData.labels);"
-        html += "var csvRows = [headers];"
+        html += "var csvRows = [headers.join(';')];"
+        html += "csvRows.push({0}.join(';'));".format(json.dumps(tooltips))
         html += "for(var i=0, l=jdata.length; i<l; ++i){"
-        html += "csvRows.push(jdata[i].join(','));"
+        html += "csvRows.push(jdata[i].join(';'));"
         html += "}"
 
         # > create a download link
-        html += "var csvString = csvRows.join('%0A');"
+        html += "var csvString = csvRows.join('\\r\\n');"
         html += "var a = document.createElement('a');"
-        html += "a.href  = 'data:attachment/csv,' + csvString;"
+        html += ("a.href = 'data:application/csv;charset=utf-8,' "
+                 "+ encodeURIComponent(csvString);")
         html += "a.target = '_blank';"
         html += "a.download = 'datatable.csv';"
 
@@ -569,6 +646,18 @@ class JtableView(View):
         html += "table, {leftColumns: 1} "
         html += ");"
         html += "table.fnSetFilteringDelay(1000);"
+
+        # Add tooltip in table column header
+        html += "var question_text = {0};".format(json.dumps(tooltips))
+        html += "$('thead th').each(function(index, value){"
+        html += "var sTitle = question_text[index];"
+        html += "this.setAttribute( 'title', sTitle );"
+        html += "} );"
+        html += "$( table.fnGetNodes() ).tooltip( {"
+        html += "'delay': 0,"
+        html += "'track': true,"
+        html += "'fade': 250"
+        html += "} );"
 
         # > close script
         html += "} );"
