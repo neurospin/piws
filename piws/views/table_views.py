@@ -855,7 +855,7 @@ def get_questionnaires_data(self):
     filtered_rset = []
     nb_of_rows = len(set([item[0] for item in rset]))
     for item in rset:
-        if id_pattern == "" or id_pattern in item[0]:
+        if id_pattern == "" or id_pattern.lower() in item[0].lower():
             filtered_rset.append([item[0], item[1]])
 
     # Set the appropriate range to access the data
