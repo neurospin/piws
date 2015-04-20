@@ -840,7 +840,7 @@ def get_questionnaires_data(self):
     if column_to_filter != 0:
         raise Exception("Only the 'ID' column can be filtered by "
                         "'get_questionnaires_data' ajax callback.")
-  
+
     # Deal with sort options
     jtsort = "ORDERBY ID {0}".format(jtsort)
 
@@ -858,9 +858,19 @@ def get_questionnaires_data(self):
         if id_pattern == "" or id_pattern in item[0]:
             filtered_rset.append([item[0], item[1]])
 
+    # Set the appropriate range to access the data
+    # > if the user want to show all the results
+    if jtpagesize == -1 or jtpagesize > len(filtered_rset):
+        rset_range = range(len(filtered_rset))
+    # > otherwise
+    else:
+        rset_range = range(jtstartindex,
+                           min(jtstartindex + jtpagesize, len(filtered_rset)))
+
     # Create a structure to be able to sort by questionnaire name
     qstruct = OrderedDict()
-    for item in filtered_rset:
+    for row_nb in rset_range:
+        item = filtered_rset[row_nb]
         qstruct.setdefault(item[0], []).append(
             label_cleaner(item[1]))
 
@@ -895,7 +905,7 @@ def get_questionnaires_data(self):
 
     # Table formatting
     data = {"iTotalRecords": nb_of_rows,
-            "iTotalDisplayRecords": len(qstruct),
+            "iTotalDisplayRecords": len(filtered_rset),
             "aaData": records}
 
     return data
