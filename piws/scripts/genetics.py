@@ -69,6 +69,7 @@ class Genetics(Base):
                             ]
                         },
                         "GenomicMeasure": {
+                            "identifier": u"toy_V1_genetic_Illumina_raw_json",
                             "label": u"toy_V1_genetic_Illumina_raw_json",
                             "type": u"raw",
                             "format": u"json"
@@ -187,12 +188,12 @@ class Genetics(Base):
         # Insert each genetic measure
         #######################################################################
 
-        # Information to create a progress bar
-        nb_of_measures = float(len(self.genetics))
-        cnt_measure = 1.
-
         # Add the data
         for timepoint, timepoint_genetics in self.genetics.iteritems():
+
+            # Information to create a progress bar
+            nb_of_measures = float(len(timepoint_genetics))
+            cnt_measure = 1.
 
             # Select a platform
             for tgenetic_item in timepoint_genetics:
@@ -200,7 +201,8 @@ class Genetics(Base):
                 # Print a progress bar
                 self._progress_bar(
                     cnt_measure / nb_of_measures,
-                    title="{0}(genetics)".format(timepoint),
+                    title="{0}(genetics)".format(
+                        tgenetic_item["Assessment"]["identifier"]),
                     bar_length=40)
                 cnt_measure += 1
 
@@ -340,7 +342,18 @@ class Genetics(Base):
         # snps
         if is_created:
             # > add relation with the snps
-            for rs_id in related_snps:
+            nb_of_snps = float(len(related_snps))
+            for cnt_snps, rs_id in enumerate(related_snps):
+
+                # Print a progress bar
+                if (cnt_snps % 100) == 0:
+                    print
+                    self._progress_bar(
+                        cnt_snps / nb_of_snps,
+                        title="{0}:{1}/{2}(snps)".format(
+                            rs_id, cnt_snps, nb_of_snps),
+                        bar_length=40)
+
                 # Check if this item has already been inserted
                 if rs_id in self.inserted_snps:
                     snp_eid = self.inserted_snps[rs_id]
@@ -355,7 +368,7 @@ class Genetics(Base):
                         rs_id=unicode(rs_id),
                         position=-9)
                     snp_eid = snp_entity.eid
-                    self.inserted_platforms[rs_id] = snp_eid
+                    self.inserted_snps[rs_id] = snp_eid
                 self._set_unique_relation(
                     platform_eid, "snps", snp_eid, check_unicity=False)
 

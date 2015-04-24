@@ -236,7 +236,7 @@ class Questionnaires(Base):
             # Print a progress bar
             self._progress_bar(
                 cnt_subject / nb_of_subjects,
-                title="{0}(quetionnaire)".format(subject_id),
+                title="{0}(questionnaires)".format(subject_id),
                 bar_length=40)
             cnt_subject += 1
 

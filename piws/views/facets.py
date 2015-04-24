@@ -11,6 +11,11 @@
 from cubicweb.web import facet
 from cubicweb.selectors import is_instance
 
+# Brainomics import
+from cubes.brainomics.views.facets import MeasureHandednessFacet
+from cubes.brainomics.views.facets import MeasureGenderFacet
+from cubes.brainomics.views.facets import MeasureAgeFacet
+
 
 ############################################################################
 # FACETS 
@@ -19,7 +24,7 @@ from cubicweb.selectors import is_instance
 class TimepointFacet(facet.RQLPathFacet):
     """ Filter on timepoint (form the 'Assessment' entity).
 
-    This filter can be applied is applied on 'Scan', 'ProcessingRun',
+    This filter is applied on 'Scan', 'ProcessingRun',
     'QuestionnaireRun' and 'GenomicMeasure' entities.
     """
     __regid__ = "timepoint-facet"
@@ -34,7 +39,7 @@ class TimepointFacet(facet.RQLPathFacet):
 class StudyFacet(facet.RQLPathFacet):
     """ Filter on study name (from the 'Study' entity).
 
-    This filter can be applied is applied on 'Scan', 'ProcessingRun',
+    This filter is applied on 'Scan', 'ProcessingRun',
     'QuestionnaireRun' and 'GenomicMeasure' entities.
     """
     __regid__ = "study-facet"
@@ -49,12 +54,11 @@ class StudyFacet(facet.RQLPathFacet):
 class SubjectFacet(facet.RQLPathFacet):
     """ Filter on subject code (from the 'Subject' entity).
 
-    This filter can be applied is applied on 'Scan', 'ProcessingRun',
+    This filter can is applied on 'Scan', 'ProcessingRun',
     'QuestionnaireRun' and 'GenomicMeasure' entities.
     """
     __regid__ = "subject-facet"
-    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun",
-                             "GenomicMeasure")
+    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
     path = ["X in_assessment A", "A subjects S", "S code_in_study C"]
     order = 3
     filter_variable = "C"
@@ -64,7 +68,7 @@ class SubjectFacet(facet.RQLPathFacet):
 class ScanFieldFacet(facet.RQLPathFacet):
     """ Filter the scan fields.
 
-    This filter can be applied is applied on 'Scan'.
+    This filter is applied on 'Scan'.
     """
     __regid__ = "scan-field-facet"
     __select__ = is_instance("Scan")
@@ -77,7 +81,7 @@ class ScanFieldFacet(facet.RQLPathFacet):
 class ScanFormatFacet(facet.RQLPathFacet):
     """ Filter the scan formats.
 
-    This filter can be applied is applied on 'Scan'.
+    This filter is applied on 'Scan'.
     """
     __regid__ = "scan-format-facet"
     __select__ = is_instance("Scan")
@@ -90,7 +94,7 @@ class ScanFormatFacet(facet.RQLPathFacet):
 class AssessmentTimepointFacet(facet.RQLPathFacet):
     """ Filter the assessment timepoints.
 
-    This filter can be applied is applied on 'Assessment'.
+    This filter is applied on 'Assessment'.
     """
     __regid__ = "assessment-timepoint-facet"
     __select__ = is_instance("Assessment")
@@ -103,7 +107,7 @@ class AssessmentTimepointFacet(facet.RQLPathFacet):
 class AssessmentSubjectFacet(facet.RQLPathFacet):
     """ Filter the assessment subjects.
 
-    This filter can be applied is applied on 'Assessment'.
+    This filter is applied on 'Assessment'.
     """
     __regid__ = "assessment-subject-facet"
     __select__ = is_instance("Assessment")
@@ -113,11 +117,28 @@ class AssessmentSubjectFacet(facet.RQLPathFacet):
     title = _("Subjects")
 
 
+class GenomicMeasureTypeFacet(facet.RQLPathFacet):
+    """ Filter the genomic measure types.
+
+    This filter is applied on 'GenomicMeasure'.
+    """
+    __regid__ = "genomicmeasure-type-facet"
+    __select__ = is_instance("GenomicMeasure")
+    path = ["X type T"]
+    order = 1
+    filter_variable = "T"
+    title = _("Type")
+
+
 ###############################################################################
 # Registration callback
 ###############################################################################
 
 def registration_callback(vreg):
+    vreg.unregister(MeasureHandednessFacet)
+    vreg.unregister(MeasureGenderFacet)
+    vreg.unregister(MeasureAgeFacet)
+    vreg.register(GenomicMeasureTypeFacet)
     vreg.register(TimepointFacet)
     vreg.register(StudyFacet)
     vreg.register(SubjectFacet)
