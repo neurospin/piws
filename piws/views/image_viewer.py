@@ -243,8 +243,13 @@ class ImageViewer(View):
 
         return html
 
-    def build_brainbrowser_tools(self):
+    def build_brainbrowser_tools(self, contrast=False, brightness=False):
         """ Define the default BrainBrowser tools.
+
+        Parameters
+        ----------
+        contrast, brightness: bool (optional, default False)
+            add extra controls (not recommended).
 
         Returns
         -------
@@ -263,6 +268,7 @@ class ImageViewer(View):
 
         # Define a tool to display the voxel and world coordinates
         html += "<div class='coords'>"
+        html += "<div class='control-container'>"
         html += ("<div class='control-heading' "
                  "id='voxel-coordinates-heading-{{VOLID}}'>")
         html += "Voxel Coordinates:"
@@ -282,25 +288,32 @@ class ImageViewer(View):
         html += "Z:<input id='world-z-{{VOLID}}' class='control-inputs'>"
         html += "</div>"
         html += "</div>"
-
-        # Define a tool to display the selected voxel intensity
-        html += "<div id='intensity-value-div-{{VOLID}}'>"
-        html += "<span class='control-heading' data-volume-id='{{VOLID}}'>"
-        html += "Value:"
-        html += "</span>"
-        html += ("<span id='intensity-value-{{VOLID}}' "
-                 "class='intensity-value'></span>")
         html += "</div>"
 
         # Define a tool to change the colormap
+        html += "<div class='control-container'>"
         html += "<div id='color-map-{{VOLID}}'>"
-        html += ("<span class='control-heading' "
-                 "id='color-map-heading-{{VOLID}}'>")
+        html += "<div class='control-heading'>"
+        html += "<span id='color-map-heading-{{VOLID}}'>"
         html += "Color Map:"
         html += "</span>"
         html += "</div>"
+        html += "</div>"
+
+        # Define a tool to display the selected voxel intensity
+        html += "<div id='intensity-value-div-{{VOLID}}'>"
+        html += "<div class='control-heading'>"
+        html += "<span data-volume-id='{{VOLID}}'>"
+        html += "Value:"
+        html += "</span>"
+        html += "</div>"
+        html += ("<span id='intensity-value-{{VOLID}}' "
+                 "class='intensity-value'></span>")
+        html += "</div>"
+        html += "</div>"
 
         # Define a tool to threshold the image
+        html += "<div class='control-container'>"
         html += "<div class='threshold-div' data-volume-id='{{VOLID}}'>"
         html += "<div class='control-heading'>"
         html += "Brightness/Contrast:"
@@ -315,29 +328,6 @@ class ImageViewer(View):
                  "id='threshold-slider-{{VOLID}}'></div>")
         html += "</div>"
 
-        # Define a tool to control the image contrast
-        if 0:
-            html += "<div class='contrast-div' data-volume-id='{{VOLID}}'>"
-            html += ("<span class='control-heading' "
-                     "id='contrast-heading{{VOLID}}'>Contrast (0.0 to 2.0):"
-                     "</span>")
-            html += ("<input class='control-inputs' value='1.0' "
-                     "id='contrast-val'/>")
-            html += ("<div id='contrast-slider' "
-                     "class='slider volume-viewer-contrast'></div>")
-            html += "</div>"
-
-        # Define a tool to control the image brightness
-        if 0:
-            html += "<div class='brightness-div' data-volume-id='{{VOLID}}'>"
-            html += ("<span class='control-heading' "
-                     "id='brightness-heading{{VOLID}}'>Brightness (-1 to 1):"
-                     "</span>")
-            html += "<input class='control-inputs' value='0' id='brightness-val'/>"
-            html += ("<div id='brightness-slider' "
-                     "class='slider volume-viewer-brightness'></div>")
-            html += "</div>"
-
         # Define a complete slicer tool
         html += ("<div id='slice-series-{{VOLID}}' "
                  "class='slice-series-div' data-volume-id='{{VOLID}}'>")
@@ -350,6 +340,34 @@ class ImageViewer(View):
         html += ("<span class='slice-series-button button' "
                  "data-axis='zspace'>Transverse</span>")
         html += "</div>"
+        html += "</div>"
+
+        # Define a tool to control the image contrast
+        if contrast:
+            html += "<div class='control-container'>"
+            html += "<div class='contrast-div' data-volume-id='{{VOLID}}'>"
+            html += ("<span class='control-heading' "
+                     "id='contrast-heading{{VOLID}}'>Contrast (0.0 to 2.0):"
+                     "</span>")
+            html += ("<input class='control-inputs' value='1.0' "
+                     "id='contrast-val'/>")
+            html += ("<div id='contrast-slider' "
+                     "class='slider volume-viewer-contrast'></div>")
+            html += "</div>"
+            html += "</div>"
+
+        # Define a tool to control the image brightness
+        if brightness:
+            html += "<div class='control-container'>"
+            html += "<div class='brightness-div' data-volume-id='{{VOLID}}'>"
+            html += ("<span class='control-heading' "
+                     "id='brightness-heading{{VOLID}}'>Brightness (-1 to 1):"
+                     "</span>")
+            html += "<input class='control-inputs' value='0' id='brightness-val'/>"
+            html += ("<div id='brightness-slider' "
+                     "class='slider volume-viewer-brightness'></div>")
+            html += "</div>"
+            html += "</div>"
 
         # End controls
         html += "</div>"

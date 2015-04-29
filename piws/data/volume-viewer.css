@@ -64,7 +64,7 @@ canvas.slice-display {
 
 .volume-controls {
   width: 235px;
-  height: 545px;
+  height: 250px;
 }
 
 #global-controls {
@@ -78,14 +78,20 @@ canvas.slice-display {
   padding: 10px 0 5px 0;
 }
 
+.control-container {
+  float: left;
+  padding: 5px 20px 5px 20px;
+}
+
 .control-heading {
   font-size: 14px;
   font-weight: bold;
+  padding: 20px 0px 5px 0px;
 }
 
-.control-heading:not(:first-child) {
-  margin-top: 12px;
-}
+/*.control-heading:not(:first-child) {
+  margin-top: 20px;
+}*/
 
 .control-inputs {
   border: none;
@@ -97,17 +103,17 @@ canvas.slice-display {
   -moz-box-shadow: 1px 1px 0px 0px #787878;
   -webkit-box-shadow: 1px 1px 0px 0px #787878;
   box-shadow: 1px 1px 0px 0px #787878;
-  width: 2em;
+  width: 40px;
 }
 
 .coords .control-inputs {
   margin-right: 0.6em;
-  width: 40px;
-  font-size: 10px;
+  width: 50px;
+  font-size: 12px;
 }
 
 .volume-viewer-threshold, .volume-viewer-blend {
-  width: 80%;
+  width: 65%;
   margin: auto;
 }
 
@@ -129,14 +135,18 @@ canvas.slice-display {
   height: 1em;
 }
 
+.threshold-div {
+  width: 320px;
+}
+
 .thresh-input-left {
   position: absolute;
-  left: 3px;
+  left: -10px;
 }
 
 .thresh-input-right {
   position: absolute;
-  right: 10px;
+  right: -5px;
 }
 
 .slice-series-button {
