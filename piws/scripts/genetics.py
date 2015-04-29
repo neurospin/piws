@@ -204,6 +204,7 @@ class Genetics(Base):
                     title="{0}(genetics)".format(
                         tgenetic_item["Assessment"]["identifier"]),
                     bar_length=40)
+                print
                 cnt_measure += 1
 
                 ###############################################################
@@ -347,7 +348,6 @@ class Genetics(Base):
 
                 # Print a progress bar
                 if (cnt_snps % 100) == 0:
-                    print
                     self._progress_bar(
                         cnt_snps / nb_of_snps,
                         title="{0}:{1}/{2}(snps)".format(
