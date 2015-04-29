@@ -243,11 +243,14 @@ class ImageViewer(View):
 
         return html
 
-    def build_brainbrowser_tools(self, contrast=False, brightness=False):
+    def build_brainbrowser_tools(self, time=True, contrast=False,
+                                 brightness=False):
         """ Define the default BrainBrowser tools.
 
         Parameters
         ----------
+        time: bool (optional, default False)
+            add control to display time serie images.
         contrast, brightness: bool (optional, default False)
             add extra controls (not recommended).
 
@@ -287,8 +290,20 @@ class ImageViewer(View):
         html += "Y:<input id='world-y-{{VOLID}}' class='control-inputs'>"
         html += "Z:<input id='world-z-{{VOLID}}' class='control-inputs'>"
         html += "</div>"
-        html += "</div>"
-        html += "</div>"
+
+        # Define a tool to control  different images in the volume
+        if time:
+            html += "<div id='time-{{VOLID}}' class='time-div' data-volume-id='{{VOLID}}' style='display:none'>"
+            html += "<div class='control-heading'>"
+            html += "<span>Time:</span>"
+            html += "</div>"
+            html += "<input class='control-inputs' value='0' id='time-val-{{VOLID}}'/>"
+            html += "<div class='slider volume-viewer-threshold' id='time-slider-{{VOLID}}'></div>"
+            html += "<input type='checkbox' class='button' id='play-{{VOLID}}'><label for='play-{{VOLID}}'>Play</label>"
+            html += "</div>"
+            html += "</div>"
+        else:
+            html += "</div>"
 
         # Define a tool to change the colormap
         html += "<div class='control-container'>"
@@ -462,7 +477,29 @@ def get_brainbrowser_image(self):
                 "start": float(header["qoffset_z"]),
                 "space_length": int(dim[3]),
                 "step": float(header["pixdim"][3]),
-                "direction_cosines": [float(x) for x in header["srow_z"][:3]]}
+                "direction_cosines": [float(x) for x in header["srow_z"][:3]]},
+        }
+    elif dim[0] == 4:
+        header = {
+            "order": order,
+            "xspace": {
+                "start": float(header["qoffset_x"]),
+                "space_length": int(dim[1]),
+                "step": float(header["pixdim"][1]),
+                "direction_cosines": [float(x) for x in header["srow_x"][:3]]},
+            "yspace": {
+                "start": float(header["qoffset_y"]),
+                "space_length": int(dim[2]),
+                "step": float(header["pixdim"][2]),
+                "direction_cosines": [float(x) for x in header["srow_y"][:3]]},
+            "zspace": {
+                "start": float(header["qoffset_z"]),
+                "space_length": int(dim[3]),
+                "step": float(header["pixdim"][3]),
+                "direction_cosines": [float(x) for x in header["srow_z"][:3]]},
+            "time":{
+                "start": 0,
+                "space_length": header["pixdim"][4]}
         }
     else:
         raise Exception("Only 3D images are currently supported!")
