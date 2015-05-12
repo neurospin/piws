@@ -17,6 +17,9 @@ from cubes.brainomics.views.outofcontext import AssessmentOutOfContextView
 from cubes.brainomics.views.outofcontext import QuestionnaireRunOutOfContextView
 from cubes.brainomics.views.outofcontext import SubjectOutOfContextView
 
+# PIWS import
+from components import AUTHORIZED_IMAGE_EXT
+
 
 ###############################################################################
 # Scans 
@@ -31,6 +34,17 @@ class NSScanOutOfContextView(EntityView):
         """
         # Get the scan entity
         entity = self.cw_rset.get_entity(row, col)
+
+        # Get the associated resources
+        efentries = entity.results_files[0].file_entries
+        imagefiles = [e.filepath for e in efentries
+                     if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
+        limagefiles = len(imagefiles)
+        if limagefiles > 0:
+            href = self._cw.build_url(
+                "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
+                __message=(u"Found '{0}' image(s) that can be "
+                            "displayed.".format(limagefiles)))
 
         # Get the subject/study related entities
         subject = entity.subject[0]
@@ -50,10 +64,18 @@ class NSScanOutOfContextView(EntityView):
         self.w(u'<div class="col-md-4"><h4>{0}</h4>'.format(entity.view("incontext")))
         self.w(u'Type <em>{0}</em> - Fromat <em>{1}</em></div>'.format(entity.type, entity.format))
         # > third element: the see more button
-        self.w(u'<div class="col-md-3">')
-        self.w(u'<button class="btn btn-danger" type="button" style="margin-top:8px" data-toggle="collapse" data-target="#info-%s">' % row)
+        self.w(u'<button class="btn btn-danger" type="button" '
+                'style="margin-top:8px" data-toggle="collapse" '
+                'data-target="#info-%s">' % row)
         self.w(u'See more')
-        self.w(u'</button></div>')
+        self.w(u'</button>')
+        # > fourth element: the show button
+        if limagefiles > 0:
+            self.w(u'<a href="{0}" class="btn btn-success" type="button" '
+                    'style="margin-top:8px">'.format(href))
+            self.w(u'Show')
+            self.w(u'</a>')
+
         # Close row item
         self.w(u'</div>')
 

@@ -38,13 +38,23 @@ class NSNavigationtBox(component.CtxComponent):
         # Test
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
-        ajaxcallback = "get_brainbrowser_image"
-        imagefile = "/home/ag239446/git/brainbrowser/examples/models/nifti.nii.gz"
+        imagefiles = [
+            "/home/ag239446/git/brainbrowser/examples/models/nifti.nii.gz",
+            "/home/ag239446/git/brainbrowser/examples/models/nifti2.nii.gz"
+        ]
         href = self._cw.build_url(
             "view", vid="brainbrowser-image-viewer",
-            imagefile=imagefile, ajaxcallback=ajaxcallback)
+            imagefiles=imagefiles)
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Test</a>')
+        w(u'Test 3D</a>')
+        w(u'</div></div><br/>')
+        w(u'<div class="btn-toolbar">')
+        w(u'<div class="btn-group-vertical btn-block">')
+        imagefiles = ["/home/ag239446/git/brainbrowser/examples/models/nifti2.nii.gz"]
+        href = self._cw.build_url(
+            "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles)
+        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+        w(u'Test 4D</a>')
         w(u'</div></div><br/>')
 
         # Subjects
@@ -221,6 +231,9 @@ class NSAssessmentStatistics(component.CtxComponent):
 # Image viewers
 ###############################################################################
 
+AUTHORIZED_IMAGE_EXT = [".nii", ".nii.gz"]
+
+
 class NSImageViewers(component.CtxComponent):
     """ Display a box containing links to image viewers.
     """
@@ -236,24 +249,17 @@ class NSImageViewers(component.CtxComponent):
         # 3D image viewer
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
-        ajaxcallback = "get_brainbrowser_image"
         efentries = self.cw_rset.get_entity(0, 0).results_files[0].file_entries
         imagefiles = [e.filepath for e in efentries
-                     if e.filepath.endswith((".nii.gz", ".nii"))]
+                     if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
         limagefiles = len(imagefiles)
         if limagefiles > 0:
-            if limagefiles == 1:
-                href = self._cw.build_url(
-                    "view", vid="brainbrowser-image-viewer",
-                    imagefile=imagefiles[0], ajaxcallback=ajaxcallback)
-            else:
-                href = self._cw.build_url(
-                    "view", vid="brainbrowser-image-viewer",
-                    imagefile=imagefiles[0], ajaxcallback=ajaxcallback,
-                    __message=(u"Found '{0}' images, for the moment consider "
-                                "the first only.".format(limagefiles)))               
+            href = self._cw.build_url(
+                "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
+                __message=(u"Found '{0}' image(s) that can be "
+                            "displayed.".format(limagefiles)))             
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'BrainBrowser (in test)</a>')
+        w(u'Triplanar</a>')
         w(u'</div></div><br/>')
 
 
