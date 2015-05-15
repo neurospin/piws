@@ -41,7 +41,6 @@ from cubes.genomics.schema import GenomicPlatform
 from cubes.genomics.schema import Snp
 
 
-
 ###############################################################################
 # Modification of the schema
 ###############################################################################
@@ -239,6 +238,7 @@ class can_read(RelationDefinition):
     subject = "CWGroup"
     object = "Assessment"
     cardinality = "*+"
+
 class can_update(RelationDefinition):
     subject = "CWGroup"
     object = "Assessment"
@@ -250,8 +250,6 @@ class in_assessment(RelationDefinition):
     object = "Assessment"
     cardinality = "1*"
     inlined = True
-
-
 
 # ENTITIES
 

@@ -11,9 +11,8 @@
 options = (
     ("questionnaire_map",
       {"type": "string",
-      "default": "",
-      "help": "the file containing the questionnaire questions labels.",
-      "group": "piws", "level": 0,
+       "default": "",
+       "help": "the file containing the questionnaire questions labels.",
+       "group": "piws", "level": 0,
       }),
 )
-
