@@ -49,7 +49,7 @@ def subject_parser(root, project_name):
     # Go through each subject
     for subject in subjects:
 
-        id_path = glob.glob(os.path.join(root, "*", subject, "questionnaires", 
+        id_path = glob.glob(os.path.join(root, "*", subject, "questionnaires",
                                          "ID.json"))[0]
         with open(id_path) as open_file:
             subject_info = json.load(open_file)
@@ -61,9 +61,9 @@ def subject_parser(root, project_name):
             }
 
     return unique_subjects
-    
 
-def scan_parser(root, project_name):  
+
+def scan_parser(root, project_name):
     """ Method to get the nifti scan elements.
 
     Special modalities:
@@ -107,7 +107,7 @@ def scan_parser(root, project_name):
             for item in glob.glob(os.path.join(root, timepoint, subject,
                                                "images", "*", "*")):
                 if os.path.isfile(item):
-                    dscans.setdefault(item.split(os.sep)[-2], []).append(item) 
+                    dscans.setdefault(item.split(os.sep)[-2], []).append(item)
 
             # If we have some scans
             if len(dscans) > 0:
@@ -188,18 +188,19 @@ def scan_parser(root, project_name):
                                     os.path.basename(fname).split(".")[0]),
                                 "absolute_path": True,
                                 "filepath": unicode(fname)
-                            })                          
-                            
+                            })
+
                         # Update the subject scan structure
-                        subj_scans["Scans"].append( {
+                        subj_scans["Scans"].append({
                             "Scan": scan_struct,
                             "TypeData": scantype_struct,
                             "FileSet": fset_struct,
-                            "ExternalResources": extfiles_item })
+                            "ExternalResources": extfiles_item})
 
                 scans[subject].append(subj_scans)
 
     return scans
+
 
 def questionnaire_parser(root, project_name):
     """ Method to get the questionnaires.
@@ -266,19 +267,19 @@ def questionnaire_parser(root, project_name):
                     # Define the questionnaire name
                     qname = os.path.splitext(
                         os.path.basename(questionnaire_fname))[0]
-                
+
                     # Load the questionnaire
                     with open(questionnaire_fname) as open_file:
-                        data = json.load(open_file)  
+                        data = json.load(open_file)
 
                     subj_questionnaires["Questionnaires"][qname] = data
-            
-                questionnaires[subject].append(subj_questionnaires)               
+
+                questionnaires[subject].append(subj_questionnaires)
 
     return questionnaires
 
 
-def genetic_parser(root, project_name):  
+def genetic_parser(root, project_name):
     """ Method to get the genetic measure elements.
 
     Parameters
@@ -309,7 +310,7 @@ def genetic_parser(root, project_name):
         dgenetics = []
         for item in glob.glob(os.path.join(root, timepoint, "genetic", "*.json")):
             if os.path.isfile(item):
-                dgenetics.append(item) 
+                dgenetics.append(item)
 
         # If we have some data
         if len(dgenetics) > 0:
@@ -364,8 +365,7 @@ def genetic_parser(root, project_name):
                     "absolute_path": True,
                     "filepath": unicode(genetic_path)
                 }]
-                       
-                    
+
                 # Update the subject scan structure
                 genetic_struct["GenomicMeasures"].append({
                     "GenomicMeasure": gmeasure_struct,
@@ -377,7 +377,6 @@ def genetic_parser(root, project_name):
         genetics[timepoint].append(genetic_struct)
 
     return genetics
-
 
 
 if __name__ == "__main__":

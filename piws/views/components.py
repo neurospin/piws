@@ -251,13 +251,13 @@ class NSImageViewers(component.CtxComponent):
         w(u'<div class="btn-group-vertical btn-block">')
         efentries = self.cw_rset.get_entity(0, 0).results_files[0].file_entries
         imagefiles = [e.filepath for e in efentries
-                     if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
+                      if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
         limagefiles = len(imagefiles)
         if limagefiles > 0:
             href = self._cw.build_url(
                 "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
                 __message=(u"Found '{0}' image(s) that can be "
-                            "displayed.".format(limagefiles)))             
+                            "displayed.".format(limagefiles)))
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Triplanar</a>')
         w(u'</div></div><br/>')

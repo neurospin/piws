@@ -34,7 +34,7 @@ nb_of_subjects = raw_input("Enter the number of subject for the demo [10, 50]:")
 nb_of_subjects = int(nb_of_subjects)
 if nb_of_subjects < 10 or nb_of_subjects > 50:
     raise ValueError("The number of subjects must be in range [10, 50].")
-    
+
 
 # Global variables
 SUBJECTS = ["subject{0}".format(cnt) for cnt in range(nb_of_subjects)]

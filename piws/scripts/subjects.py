@@ -35,7 +35,7 @@ class Subjects(Base):
             password.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
-        use_store: bool (optional, default True)    
+        use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
 
         Notes

@@ -27,4 +27,3 @@ set_property("ui.site-title", "PIWS")
 # Set cards
 from cubes.piws.migration.cards import create_or_update_static_cards
 create_or_update_static_cards(session)
-

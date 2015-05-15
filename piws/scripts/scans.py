@@ -43,7 +43,7 @@ class Scans(Base):
             set the update permission to the imported data.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
-        use_store: bool (optional, default True)    
+        use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
 
         Notes
@@ -60,7 +60,7 @@ class Scans(Base):
                     "Scans": [ {
                         "TypeData": {
                             "fov_y": 0, "fov_x": 0, "voxel_res_y": 2.0,
-                            "voxel_res_x": 2.0, "voxel_res_z": 2.0, 
+                            "voxel_res_x": 2.0, "voxel_res_z": 2.0,
                             "field": "3T", "tr": 2.5, "shape_y": 2,
                             "shape_x": 2, "shape_z": 2, "te": 0,
                             "type": u"MRIData"},
@@ -96,22 +96,22 @@ class Scans(Base):
         # Define the relations involved
         self.relations = (
             self.fileset_relations + self.assessment_relations + [
-            ("Scan", "study", "Study"),
-            ("Study", "scans", "Scan"),
-            ("Scan", "subject", "Subject"),
-            ("Subject", "scans", "Scan"),
-            ("Assessment", "scans", "Scan"),
-            ("Scan", "in_assessment", "Assessment"),
-            ("Scan", "has_data", "PETData"),
-            ("PETData", "in_assessment", "Assessment"),
-            ("Scan", "has_data", "FMRIData"),
-            ("FMRIData", "in_assessment", "Assessment"),
-            ("Scan", "has_data", "DMRIData"),
-            ("DMRIData", "in_assessment", "Assessment"),
-            ("Scan", "has_data", "MRIData"),
-            ("MRIData", "in_assessment", "Assessment"),
-            ("Scan", "score_values", "ScoreValue"),
-            ("ScoreValue", "in_assessment", "Assessment")]
+                ("Scan", "study", "Study"),
+                ("Study", "scans", "Scan"),
+                ("Scan", "subject", "Subject"),
+                ("Subject", "scans", "Scan"),
+                ("Assessment", "scans", "Scan"),
+                ("Scan", "in_assessment", "Assessment"),
+                ("Scan", "has_data", "PETData"),
+                ("PETData", "in_assessment", "Assessment"),
+                ("Scan", "has_data", "FMRIData"),
+                ("FMRIData", "in_assessment", "Assessment"),
+                ("Scan", "has_data", "DMRIData"),
+                ("DMRIData", "in_assessment", "Assessment"),
+                ("Scan", "has_data", "MRIData"),
+                ("MRIData", "in_assessment", "Assessment"),
+                ("Scan", "score_values", "ScoreValue"),
+                ("ScoreValue", "in_assessment", "Assessment")]
         )
         self.relations[0][0] = "Scan"
 
@@ -212,7 +212,7 @@ class Scans(Base):
             ###################################################################
 
             for subj_scans in list_subj_scans:
-        
+
                 ###############################################################
                 # Create the assessment
                 ###############################################################
@@ -288,7 +288,7 @@ class Scans(Base):
             self._set_unique_relation(
                 scan_eid, "in_assessment", assessment_eid, check_unicity=False,
                 subjtype="Scan")
-            
+
             # Add the file set attached to a scan entity
             self._import_file_set(fset_struct, extfiles, scan_eid, assessment_eid)
 

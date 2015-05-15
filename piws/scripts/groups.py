@@ -28,7 +28,7 @@ class Groups(Base):
             a cubicweb session.
         list_group_names: list of str (mandatory)
             the name of the different groups.
-        use_store: bool (optional, default True)    
+        use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
         """
         # Inheritance
@@ -45,7 +45,7 @@ class Groups(Base):
         """ Method that import the groups in CW.
 
         .. note::
-    
+
             This procedure create a 'CWGroup' entity for each input group
             name.
         """

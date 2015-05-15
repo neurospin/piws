@@ -28,13 +28,13 @@ class HighChartsBasicPieView(View):
     def rset_to_data(self, rset):
         """ Method that format the rset parameters for highcharts pie chart.
 
-        We only consider the first element of each resultset row to construct the 
+        We only consider the first element of each resultset row to construct the
         highcharts formated parameter.
 
         Parameters
         ----------
         rset: resultset (mandatory)
-            a  cw resultset
+            a cw resultset
 
         Returns
         -------
@@ -52,7 +52,7 @@ class HighChartsBasicPieView(View):
                 data[title] += 1.
             nb_of_elements += 1.
 
-        # Transform/convert (expect percents) the data       
+        # Transform/convert (expect percents) the data
         data = [[key, value / nb_of_elements * 100.]
                  for key, value in data.iteritems()]
 
@@ -63,7 +63,7 @@ class HighChartsBasicPieView(View):
         sdata += ']'
 
         return sdata
-        
+
     def call(self, rset=None, title="", **kwargs):
         """ Method that will create a basic pie chart from a cw resultset.
 
@@ -88,37 +88,37 @@ class HighChartsBasicPieView(View):
 
         # Add some js resources
         self._cw.add_js(
-            ("highcharts-4.0.4/js/highcharts.js", 
+            ("highcharts-4.0.4/js/highcharts.js",
              "highcharts-4.0.4/js/modules/exporting.js")
         )
 
         # Generate the script
         # > headers
-        self.w(u'<script type="text/javascript">' )
+        self.w(u'<script type="text/javascript">')
         self.w(u'$(function () { $("#hc_container").highcharts({')
         # > configure credit
         self.w(u'credits : {enabled : false}, ')
         # > configure chart
         self.w(u'chart: {plotBackgroundColor: null, plotBorderWidth: 1, '
-               'plotShadow: false}, ' )
+               'plotShadow: false}, ')
         # > configure title
         self.w(u'title: {{text: "{0}"}}, '.format(title))
         # > configure tooltip
         self.w(u'tooltip: {pointFormat: "{series.name}: '
                '<b>{point.percentage:.1f}%</b>" }, ')
         # > configure plot
-        self.w(u'plotOptions: {' )
+        self.w(u'plotOptions: {')
         self.w(u'pie: {allowPointSelect: true, cursor: "pointer", dataLabels: {'
                'enabled: true, format: "<b>{point.name}</b>: '
                '{point.percentage:.1f} %", style: {color: (Highcharts.theme && '
-               'Highcharts.theme.contrastTextColor) || "black"}}}' )
+               'Highcharts.theme.contrastTextColor) || "black"}}}')
         self.w(u'}, ')
         # > configure series
         self.w(u'series: [{{type: "pie", name: "Browser share", data: {0}}}] '.format(data))
         # > close headers
         self.w(u'}); ')
         self.w(u'}); ')
-        self.w(u'</script>' )
+        self.w(u'</script>')
 
         # Add a container in the body to display the pie chart
         self.w(u'<div id="hc_container" style="min-width: 310px; height: 400px; '
@@ -134,12 +134,12 @@ class HighChartsRelationSummaryView(View):
     """
     __regid__ = "highcharts-relation-summary-view"
     paginable = False
-    div_id = "highcharts-relation-summary-view"  
+    div_id = "highcharts-relation-summary-view"
 
     def rset_to_data(self, rset, relations, subject_attr, object_attr):
         """ Method that format the rset parameters for highcharts table view.
 
-        We only consider the first entity of each resultset row to construct the 
+        We only consider the first entity of each resultset row to construct the
         highcharts formated parameters.
         The object entities are related to the subject entities with the
         'relation' link.
@@ -181,10 +181,10 @@ class HighChartsRelationSummaryView(View):
                           for entity in object_entities]
 
             # Organize the data
-            if not col_name in data:
+            if col_name not in data:
                 data[col_name] = {}
             for line_name in line_names:
-                if not line_name in data[col_name]:
+                if line_name not in data[col_name]:
                     data[col_name][line_name] = 1
                 else:
                     data[col_name][line_name] += 1
@@ -225,8 +225,8 @@ class HighChartsRelationSummaryView(View):
         sdata["grid"] = "[" + ", ".join(sdata["grid"]) + "]"
 
         return sdata
-        
-    def call(self, relations=None, subject_attr=None, object_attr=None, 
+
+    def call(self, relations=None, subject_attr=None, object_attr=None,
              rset=None, title="", **kwargs):
         """ Method that will create a table view from a cw resultset.
 
@@ -280,7 +280,7 @@ class HighChartsRelationSummaryView(View):
                     "associated relations?")
             self.w(u'</div>')
             self.w(u'</div>')
-            return -1        
+            return -1
 
         # No data can be displayed
         if data == -1:
@@ -294,23 +294,22 @@ class HighChartsRelationSummaryView(View):
             self.w(u'</div>')
             self.w(u'</div>')
             return -1
-            
 
         # Add some js resources
         self._cw.add_js(
-            ("highcharts-4.0.4/js/highcharts.js", 
+            ("highcharts-4.0.4/js/highcharts.js",
              "highcharts-4.0.4/js/modules/heatmap.js",
              "highcharts-4.0.4/js/modules/exporting.js")
         )
 
         # Generate the script
         # > headers
-        self.w(u'<script type="text/javascript">' )
+        self.w(u'<script type="text/javascript">')
         self.w(u'$(function () { $("#hc_container").highcharts({')
         # > configure credit
         self.w(u'credits : {enabled : false}, ')
         # > configure chart
-        self.w(u'chart: {type: "heatmap", marginTop: 40, marginBottom: 40}, ' )
+        self.w(u'chart: {type: "heatmap", marginTop: 40, marginBottom: 40}, ')
         # > configure title
         self.w(u'title: {{text: "{0}"}}, '.format(title))
         # > configure axis
@@ -333,7 +332,7 @@ class HighChartsRelationSummaryView(View):
         # > close headers
         self.w(u'}); ')
         self.w(u'}); ')
-        self.w(u'</script>' )
+        self.w(u'</script>')
 
         # Add a container in the body to display the pie chart. Try to estimate
         # the cell size
@@ -360,7 +359,7 @@ class HighChartsBasicPlotView(View):
     def rset_to_hist(self, rset):
         """ Method that format the rset parameters for highcharts plot.
 
-        We only consider the first element of each resultset row to construct the 
+        We only consider the first element of each resultset row to construct the
         highcharts formated parameter.
 
         Parameters
@@ -395,7 +394,7 @@ class HighChartsBasicPlotView(View):
         }
 
         return sdata
-        
+
     def call(self, rset=None, title="", value_suffix="", is_hist=False,
              y_label="", data=None, tag="hc_container", **kwargs):
         """ Method that will create a basic plot from a cw resultset.
@@ -416,7 +415,7 @@ class HighChartsBasicPlotView(View):
         y_label: str (optional)
             the label of the y axis.
         data: dict (optional, default None)
-            the highcharts string representation of the data. If set, do not 
+            the highcharts string representation of the data. If set, do not
             generate the data from the rset, so the 'is_hist' option has no
             effect.
         tag: str (optional, default 'hc_container')
@@ -444,13 +443,13 @@ class HighChartsBasicPlotView(View):
 
         # Add some js resources
         self._cw.add_js(
-            ("highcharts-4.0.4/js/highcharts.js", 
+            ("highcharts-4.0.4/js/highcharts.js",
              "highcharts-4.0.4/js/modules/exporting.js")
         )
 
         # Generate the script
         # > headers
-        self.w(u'<script type="text/javascript">' )
+        self.w(u'<script type="text/javascript">')
         self.w(u'$(function () {{ $("#{0}").highcharts({{'.format(tag))
         # > configure credit
         self.w(u'credits : {enabled : false}, ')
@@ -469,7 +468,7 @@ class HighChartsBasicPlotView(View):
         # > close headers
         self.w(u'}); ')
         self.w(u'}); ')
-        self.w(u'</script>' )
+        self.w(u'</script>')
 
         # Add a container in the body to display the pie chart
         self.w(u'<div id="{0}" style="min-width: 310px; height: 400px; '

@@ -22,7 +22,7 @@ from components import AUTHORIZED_IMAGE_EXT
 
 
 ###############################################################################
-# Scans 
+# Scans
 ###############################################################################
 
 class NSScanOutOfContextView(EntityView):
@@ -51,7 +51,7 @@ class NSScanOutOfContextView(EntityView):
         study = entity.study[0]
 
         # Get the scan image url
-        image = u'<img alt="" src="%s">' %  self._cw.data_url(entity.symbol)
+        image = u'<img alt="" src="%s">' % self._cw.data_url(entity.symbol)
 
         # Create the div that will contain the list item
         self.w(u'<div class="ooview"><div class="well">')
@@ -121,7 +121,7 @@ class NSScanOutOfContextView(EntityView):
 
 
 ###############################################################################
-# Assessment 
+# Assessment
 ###############################################################################
 
 class NSAssessmentOutOfContextView(EntityView):
@@ -143,7 +143,7 @@ class NSAssessmentOutOfContextView(EntityView):
         run_items.extend(entity.uses)
 
         # Get the subject gender image url
-        image = u'<img alt="" src="%s">' %  self._cw.data_url(entity.symbol)
+        image = u'<img alt="" src="%s">' % self._cw.data_url(entity.symbol)
 
         # Create the div that will contain the list item
         self.w(u'<div class="ooview"><div class="well">')
@@ -189,7 +189,7 @@ class NSAssessmentOutOfContextView(EntityView):
 
 
 ###############################################################################
-# Subject 
+# Subject
 ###############################################################################
 
 class NSSubjectOutOfContextView(EntityView):
@@ -206,7 +206,7 @@ class NSSubjectOutOfContextView(EntityView):
         assessment_items = entity.concerned_by
 
         # Get the subject gender image url
-        image = u'<img alt="" src="%s">' %  self._cw.data_url(entity.symbol)
+        image = u'<img alt="" src="%s">' % self._cw.data_url(entity.symbol)
 
         # Create the div that will contain the list item
         self.w(u'<div class="ooview"><div class="well">')
@@ -266,7 +266,7 @@ class NSSubjectOutOfContextView(EntityView):
 
 
 ###############################################################################
-# ProcessingRun 
+# ProcessingRun
 ###############################################################################
 
 class NSProcessingRunOutOfContextView(EntityView):
@@ -284,7 +284,7 @@ class NSProcessingRunOutOfContextView(EntityView):
         subject = scan.concerns[0]
 
         # Get the subject gender image url
-        image = u'<img alt="" src="%s">' %  self._cw.data_url(entity.symbol)
+        image = u'<img alt="" src="%s">' % self._cw.data_url(entity.symbol)
 
         # Create the div that will contain the list item
         self.w(u'<div class="ooview"><div class="well">')
@@ -326,7 +326,7 @@ class NSProcessingRunOutOfContextView(EntityView):
 
 
 ###############################################################################
-# QuestionnaireRun 
+# QuestionnaireRun
 ###############################################################################
 
 class NSQuestionnaireRunOutOfContextView(EntityView):
@@ -344,7 +344,7 @@ class NSQuestionnaireRunOutOfContextView(EntityView):
         questionnaire = entity.instance_of[0]
 
         # Get the subject gender image url
-        image = u'<img alt="" src="%s">' %  self._cw.data_url(entity.symbol)
+        image = u'<img alt="" src="%s">' % self._cw.data_url(entity.symbol)
 
         # Create the div that will contain the list item
         self.w(u'<div class="ooview"><div class="well">')

@@ -89,7 +89,6 @@ class AutoSearch(View):
                     name="entity_selector", label="entity_selector",
                     required=True, choices=linked_entites)
                 form.append_field(entity_selector)
-                
 
         # Filter the entity attributes
         else:
@@ -117,13 +116,13 @@ class AutoSearch(View):
                         name=attrib.type, required=False,
                         label="{0} [{1}]".format(attrib.type, field_type))
                     form.append_field(filter_field)
-                     
+
         # Form processings
         try:
             posted = form.process_posted()
             #for field_name, field_value in posted.iteritems():
-            #    print field_name, field_value                
-            
+            #    print field_name, field_value
+
             # Redirection to the created CWUpload entity
             if "_filter" in kwargs:
 
@@ -146,7 +145,7 @@ class AutoSearch(View):
                             if cwobject.type == ename and cwsubject.type != ename:
                                 linked_entities.append("<{0}[{1}]".format(
                                     cwsubject.type, relation.type))
-                            
+
                 # Build the new entity selection url
                 autosearch_url = self._cw.build_url(
                     vid="auto-search", __message=u"Select a new entity.",

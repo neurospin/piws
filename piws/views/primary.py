@@ -18,4 +18,3 @@ def registration_callback(vreg):
     """ Update  primary views
     """
     vreg.register_and_replace(PrimaryView, BrainomicsPrimaryView)
-

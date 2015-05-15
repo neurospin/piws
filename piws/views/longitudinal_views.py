@@ -50,9 +50,9 @@ class QuestionnaireLongitudinalView(View):
 
             # Get the associated questionnaire/questions
             q_entity = qr_entity.instance_of[0]
-            if not q_entity.name in questionnaires:
+            if q_entity.name not in questionnaires:
                 questionnaires[q_entity.name] = dict(
-                    (entity.text, {}) 
+                    (entity.text, {})
                     for entity in q_entity.reverse_questionnaire)
 
             # Get the questionnaire run associated answers and fill the
@@ -67,7 +67,7 @@ class QuestionnaireLongitudinalView(View):
         for q_name, q_item in questionnaires.iteritems():
             for question_name, question_item in q_item.iteritems():
 
-                # Get the plot data 
+                # Get the plot data
                 data = sorted(question_item.items())
                 x = [str(p[0]) for p in data]
                 values = [p[1] for p in data]
@@ -77,7 +77,7 @@ class QuestionnaireLongitudinalView(View):
                     "x": "['" + "', '".join(x) + "']",
                     "grid": "[" + ", ".join(values) + "]"
                 }
-    
+
                 # Check if we are dealing with numbers
                 control_value = values[0].replace(".", "", 1)
                 if control_value.isdigit():
@@ -90,10 +90,3 @@ class QuestionnaireLongitudinalView(View):
 
                     # Increment the plot counter
                     nb_of_plots += 1
-
-
-            
-            
-
-
-
