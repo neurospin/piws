@@ -35,7 +35,7 @@ class Users(Base):
         users: dict (mandatory)
             the user names as keys and a dict with the group_names, login and
             password.
-        use_store: bool (optional, default True)    
+        use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
 
         Notes
@@ -106,7 +106,7 @@ class Users(Base):
             raise Exception("Can't insert users, no activated State entity "
                             "detected.")
         state_eid = rset[0][0]
-     
+
         # Go through the goup names
         nb_of_users = float(len(self.users))
         cnt_user = 1.
@@ -132,7 +132,7 @@ class Users(Base):
             # If the user is created, add relation with the State entity
             if is_created:
                 self._set_unique_relation(user_entity.eid,
-                        "in_state", state_eid, check_unicity=False)                
+                        "in_state", state_eid, check_unicity=False)
 
             # Go through group names
             for group_name in user_item["group_names"]:

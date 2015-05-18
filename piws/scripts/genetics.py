@@ -43,7 +43,7 @@ class Genetics(Base):
             set the update permission to the imported data.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
-        use_store: bool (optional, default True)    
+        use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
 
         Notes
@@ -111,16 +111,16 @@ class Genetics(Base):
 
         # Define the relations involved
         self.relations = (
-            self.fileset_relations +  self.assessment_relations + [
-            ("GenomicMeasure", "study", "Study"),
-            ("Study", "genomic_measures", "GenomicMeasure"),
-            ("GenomicMeasure", "subjects", "Subject"),
-            ("Subject", "genomic_measures", "GenomicMeasure"),
-            ("Assessment", "genomic_measures", "GenomicMeasure"),
-            ("GenomicMeasure", "in_assessment", "Assessment"),
-            ("GenomicMeasure", "platform", "GenomicPlatform"),
-            ("GenomicPlatform", "genomic_measures", "GenomicMeasure"),
-            ("GenomicPlatform", "snps", "Snp")]
+            self.fileset_relations + self.assessment_relations + [
+                ("GenomicMeasure", "study", "Study"),
+                ("Study", "genomic_measures", "GenomicMeasure"),
+                ("GenomicMeasure", "subjects", "Subject"),
+                ("Subject", "genomic_measures", "GenomicMeasure"),
+                ("Assessment", "genomic_measures", "GenomicMeasure"),
+                ("GenomicMeasure", "in_assessment", "Assessment"),
+                ("GenomicMeasure", "platform", "GenomicPlatform"),
+                ("GenomicPlatform", "genomic_measures", "GenomicMeasure"),
+                ("GenomicPlatform", "snps", "Snp")]
         )
         self.relations[0][0] = "GenomicMeasure"
 
@@ -216,7 +216,7 @@ class Genetics(Base):
                     platform_struct = tgenetic_measure["GenomicPlatform"]
                     related_subjects = platform_struct["related_subjects"]
                     for subject_id in related_subjects:
-                        if not subject_id in study_subjects:
+                        if subject_id not in study_subjects:
                             raise ValueError(
                                 "The subject '{0}' in not known by the "
                                 "database.".format(subject_id))
@@ -270,7 +270,7 @@ class Genetics(Base):
                     ############################################################
                     # Create the genomic measure
                     ############################################################
-                    
+
                     measure_struct = tgenetic_measure["GenomicMeasure"]
                     fset_struct = tgenetic_measure["FileSet"]
                     extfiles = tgenetic_measure["ExternalResources"]
@@ -282,8 +282,8 @@ class Genetics(Base):
                         related_subjects, study_subjects, study_eid,
                         assessment_eid, platform_eid):
         """ Create a genomic measure and its associated relations.
-        """  
-        # Create the measure      
+        """
+        # Create the measure
         measure_entity, is_created = self._get_or_create_unique_entity(
             rql=("Any X Where X is GenomicMeasure, X identifier "
                  "'{0}'".format(measure_struct["identifier"])),

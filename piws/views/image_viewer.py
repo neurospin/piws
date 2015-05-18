@@ -187,7 +187,7 @@ class ImageViewer(View):
         html += "data.forEach(function(slicedata, slice_cnt) {"
 
         # Decode the image in a function where a callback is called and
-        # and executed when the buffer is properly filled    
+        # and executed when the buffer is properly filled
         html += "var effect = function(slicedata, length, callback) {"
         html += "var img = new Image();"
         html += "img.onload = function() {"
@@ -219,7 +219,7 @@ class ImageViewer(View):
 
         # Load the image and define the callback
         html += "effect(slicedata, data.length, function(data, is_loaded) {"
-            
+
         # Test if all the slice have been loaded in the buffer
         html += "if (is_loaded) {"
 
@@ -477,7 +477,7 @@ class ImageViewer(View):
             html += self.build_cw_loader(imagefiles, cnt, multiview=False)
             html += "}"
             html += "}"
-        
+
         # Add out of range event
         html += "else {"
         html += "viewer.clearVolumes();"
@@ -796,8 +796,8 @@ def get_encoded_brainbrowser_image(self):
             img.save(openfile, format=dtype, quality=dquality)
             contents = openfile.getvalue()
             openfile.close()
-            encoded_data.append(base64.b64encode(contents))   
-       
+            encoded_data.append(base64.b64encode(contents))
+
     elif dim[0] == 4:
 
         # Build header
@@ -818,7 +818,7 @@ def get_encoded_brainbrowser_image(self):
                 "space_length": int(dim[3]),
                 "step": float(header["pixdim"][3]),
                 "direction_cosines": [float(x) for x in header["srow_z"][:3]]},
-            "time":{
+            "time": {
                 "start": 0,
                 "space_length": int(dim[4])}
         }
@@ -833,7 +833,7 @@ def get_encoded_brainbrowser_image(self):
                 img.save(openfile, format=dtype)
                 contents = openfile.getvalue()
                 openfile.close()
-                encoded_data.append(base64.b64encode(contents))  
+                encoded_data.append(base64.b64encode(contents))
     else:
         raise Exception("Only 3D or 3D + t images are currently supported!")
 
@@ -906,7 +906,7 @@ def get_brainbrowser_image(self):
                 "space_length": int(dim[3]),
                 "step": float(header["pixdim"][3]),
                 "direction_cosines": [float(x) for x in header["srow_z"][:3]]},
-            "time":{
+            "time": {
                 "start": 0,
                 "space_length": int(dim[4])}
         }

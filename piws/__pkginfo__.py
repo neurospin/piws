@@ -56,4 +56,3 @@ for dname in ('entities', 'views', 'sobjects', 'hooks', 'schema', 'data', 'wdoc'
         data_files.append([join(THIS_CUBE_DIR, dname), listdir(dname)])
 # Note: here, you'll need to add subdirectories if you want
 # them to be included in the debian package
-

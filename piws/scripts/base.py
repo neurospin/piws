@@ -50,7 +50,7 @@ class Base(object):
         ["ParentEntitiyName", "results_files", "FileSet"],
         ("FileSet", "in_assessment", "Assessment"),
         ("FileSet", "file_entries", "ExternalFile"),
-        ("ExternalFile", "in_assessment", "Assessment") 
+        ("ExternalFile", "in_assessment", "Assessment")
     ]
 
     def __init__(self, session, use_store=True):
@@ -62,7 +62,7 @@ class Base(object):
             a cubicweb session.
         list_group_names: list of str (mandatory)
             the name of the different groups
-        use_store: bool (optional, default True)    
+        use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
         """
         # CW parameters
@@ -85,7 +85,7 @@ class Base(object):
         """
         # Send the new entities to the db
         if self.use_store:
-            self.store.flush() 
+            self.store.flush()
 
     def import_data(self):
         """ Method that import the data in cw.
@@ -109,7 +109,7 @@ class Base(object):
         text_font: str (optional, default 'sans-serif')
             the font used to display the text in the final image.
         node_text_size: int (optional, default 12)
-            the text size.      
+            the text size.
         """
         # Create a graph
         graph = pgv.AGraph(strict=False, directed=True, rankdir="LR",
@@ -337,8 +337,8 @@ class Base(object):
                 if self.can_update:
                     self._set_unique_relation(
                         group_eid, "can_update", assessment_eid)
-    
-        return assessment_eid   
+
+        return assessment_eid
 
     def _import_file_set(self, fset_struct, extfiles, parent_eid,
                          assessment_eid):
@@ -369,8 +369,8 @@ class Base(object):
             # > add relation with the file set
             self._set_unique_relation(fset_entity.eid,
                 "file_entries", file_entity.eid,
-                check_unicity=False) 
+                check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(file_entity.eid,
                 "in_assessment", assessment_eid,
-                check_unicity=False, subjtype="ExternalFile")   
+                check_unicity=False, subjtype="ExternalFile")

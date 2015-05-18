@@ -15,7 +15,7 @@ from cubicweb.web.views.actions import PoweredByAction
 
 
 ###############################################################################
-# ACTIONS 
+# ACTIONS
 ###############################################################################
 
 class LicenseAction(Action):

@@ -43,7 +43,7 @@ class Questionnaires(Base):
             set the update permission to the imported data.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
-        use_store: bool (optional, default True)    
+        use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
 
         Notes
@@ -53,7 +53,7 @@ class Questionnaires(Base):
         ::
 
             questionnaires = {
-                "subject1": [ 
+                "subject1": [
                     {
                         "Questionnaires": {
                             "Personal": {u"mood": 5}
@@ -65,7 +65,7 @@ class Questionnaires(Base):
                             "identifier": u"toy_V1_subject1",
                             "timepoint": u"V1'"
                         }
-                    }, 
+                    },
                     {
                         "Questionnaires": {
                             "Personal": {u"mood": 5}
@@ -286,7 +286,6 @@ class Questionnaires(Base):
                         q_name, q_items, assessment_id, subject_id, subject_eid,
                         study_eid, assessment_eid, questionnaire_eids,
                         question_eids)
-
 
     def _create_questionnaire(self, questionnaire_name, q_items,
                               identifier_prefix, subject_id, subject_eid,

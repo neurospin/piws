@@ -162,7 +162,7 @@ class Samples(Base):
                                 "can_read", assessment_entity.eid)
                         if self.can_update:
                             self._set_unique_relation(group_entity.eid,
-                                "can_update", assessment_entity.eid) 
+                                "can_update", assessment_entity.eid)
 
                 ###############################################################
                 # Insert the patient samples in the db
@@ -170,7 +170,7 @@ class Samples(Base):
 
                 for sample_struct, extfile_struct in sample["BioSamples"]:
 
-                     # Create a bio sample
+                    # Create a bio sample
                     sample_entity, is_created = self._get_or_create_unique_entity(
                         rql=("Any X Where X is BioSample, X identifier "
                              "'{0}'".format(sample_struct["identifier"])),
@@ -204,7 +204,7 @@ class Samples(Base):
                             # > add relation with the bio sample
                             self._set_unique_relation(sample_entity.eid,
                                 "results_files", file_entity.eid,
-                                check_unicity=False) 
+                                check_unicity=False)
                             # > add relation with the assessment
                             self._set_unique_relation(file_entity.eid,
                                 "in_assessment", assessment_entity.eid,

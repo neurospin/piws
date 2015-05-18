@@ -18,7 +18,7 @@ from cubes.brainomics.views.facets import MeasureAgeFacet
 
 
 ############################################################################
-# FACETS 
+# FACETS
 ############################################################################
 
 class TimepointFacet(facet.RQLPathFacet):
