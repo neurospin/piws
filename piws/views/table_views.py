@@ -116,7 +116,7 @@ class JhugetableView(View):
         self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
         self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
         self._cw.add_js("datatables-1.10.5/extensions/TableTools/js/"
-                         "dataTables.tableTools.js")
+                        "dataTables.tableTools.js")
         self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
@@ -438,7 +438,7 @@ class JtableView(View):
         self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
         self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
         self._cw.add_js("datatables-1.10.5/extensions/TableTools/js/"
-                         "dataTables.tableTools.min.js")
+                        "dataTables.tableTools.min.js")
         self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
@@ -483,7 +483,7 @@ class JtableView(View):
         if "ID" not in elts_to_sort:
             hide_sort_indices.append(0)
         for cnt, label_text in enumerate(labels):
-            
+
             # >> select if we can sort this column
             if label_text[0] not in elts_to_sort:
                 hide_sort_indices.append(cnt + 1)
@@ -617,7 +617,7 @@ class JtableView(View):
         html += "{{ 'bSortable': false, 'aTargets': {0} }}".format(
             str(hide_sort_indices))
         html += "],"
-        
+
         # > set the ajax callback to fill dynamically the table
         html += "'sAjaxSource':'ajax?fname={0}',".format(ajaxcallback)
         html += "'fnServerParams': function (aoData) {"
