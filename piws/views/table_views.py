@@ -13,6 +13,7 @@ from collections import OrderedDict
 import json
 import os
 import copy
+import re
 
 # Cubicweb import
 from cubicweb.view import View
@@ -115,7 +116,7 @@ class JhugetableView(View):
         self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
         self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
         self._cw.add_js("datatables-1.10.5/extensions/TableTools/js/"
-                        "dataTables.tableTools.js")
+                         "dataTables.tableTools.js")
         self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
@@ -137,31 +138,32 @@ class JhugetableView(View):
                             "hugejtable")
 
         # Get the instance questionnaire map
-        qmapfile = self._cw.vreg.config.get("questionnaire_map", "")
-        if os.path.isfile(qmapfile):
-            with open(qmapfile) as openfile:
-                qmap = json.load(openfile)
+        qmap = self._cw.vreg.docmap
 
-            # Associate a tooltip to each label
-            tooltips = []
-            for label_text in labels:
-                if label_text in qmap:
-                    tooltips.append(qmap[label_text])
+        # Associate a tooltip to each label
+        tooltips = []
+        for label_text in labels:
+            if label_text in qmap:
+                matches = re.findall("<!--.*tooltip:.*-->", qmap[label_text])
+                if len(matches) == 1:
+                    match = matches[0][matches[0].index("tooltip:") + 8:-3]
+                    tooltips.append(match)
                 else:
                     tooltips.append("")
-
-        # Otherwise: no tooltip provided
-        else:
-            qmap = {}
-            tooltips = [""] * len(labels)
+            else:
+                tooltips.append("")
 
         # Table column headers
         headers = []
         for label_text in labels:
             if label_text in qmap:
+                tiphref = self._cw.build_url(
+                    "view", vid="piws-documentation",
+                    tooltip=qmap[label_text], _notemplate=True)
                 headers.append(
-                    {"sTitle": "<span class='fake-link'> {0} "
-                     "</span>".format(label_text)})
+                    {"sTitle": "<a href='{0}' target=_blank>"
+                     "<span class='fake-link'>{1} &#9735"
+                     "</span></a>".format(tiphref, label_text)})
             else:
                 headers.append({"sTitle": label_text})
 
@@ -436,7 +438,7 @@ class JtableView(View):
         self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
         self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
         self._cw.add_js("datatables-1.10.5/extensions/TableTools/js/"
-                        "dataTables.tableTools.min.js")
+                         "dataTables.tableTools.min.js")
         self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
@@ -457,27 +459,23 @@ class JtableView(View):
                             "jtable")
 
         # Get the instance questionnaire map
-        qmapfile = self._cw.vreg.config.get("questionnaire_map", "")
-        if os.path.isfile(qmapfile):
-            with open(qmapfile) as openfile:
-                qmap = json.load(openfile)
+        qmap = self._cw.vreg.docmap
 
-            # Associate a tooltip to each label
-            tooltips = [""]
-            for label_text in labels:
-                label_text = label_text[0]
-                if label_text in qmap:
-                    tooltips.append(qmap[label_text])
+        # Associate a tooltip to each label
+        tooltips = [""]
+        for label_text in labels:
+            label_text = label_text[0]
+            if label_text in qmap:
+                matches = re.findall("<!--.*tooltip:.*-->", qmap[label_text])
+                if len(matches) == 1:
+                    match = matches[0][matches[0].index("tooltip:") + 8:-3]
+                    tooltips.append(match)
                 else:
                     tooltips.append("")
-
-        # Otherwise: no tooltip provided
-        else:
-            qmap = {}
-            tooltips = [""] * (len(labels) + 1)
+            else:
+                tooltips.append("")
 
         # Generate the script
-
         # > table column headers and sort option
         headers = [{"sTitle": "ID"}]
         hide_sort_indices = []
@@ -485,7 +483,7 @@ class JtableView(View):
         if "ID" not in elts_to_sort:
             hide_sort_indices.append(0)
         for cnt, label_text in enumerate(labels):
-
+            
             # >> select if we can sort this column
             if label_text[0] not in elts_to_sort:
                 hide_sort_indices.append(cnt + 1)
@@ -494,11 +492,11 @@ class JtableView(View):
             label_list.append(label_cleaner(label_text[0]))
             if label_text[0] in qmap:
                 tiphref = self._cw.build_url(
-                    "view", vid="piws-documentation", tooltip=label_text[0],
-                    _notemplate=True)
+                    "view", vid="piws-documentation",
+                    tooltip=qmap[label_text[0]], _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
-                     "<span class='fake-link'>{1}"
+                     "<span class='fake-link'>{1} &#9735"
                      "</span></a>".format(tiphref, label_text[0])})
             else:
                 headers.append({"sTitle": label_text[0]})
@@ -619,7 +617,7 @@ class JtableView(View):
         html += "{{ 'bSortable': false, 'aTargets': {0} }}".format(
             str(hide_sort_indices))
         html += "],"
-
+        
         # > set the ajax callback to fill dynamically the table
         html += "'sAjaxSource':'ajax?fname={0}',".format(ajaxcallback)
         html += "'fnServerParams': function (aoData) {"

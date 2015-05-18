@@ -36,3 +36,4 @@ class CreateDocumentation(hook.Hook):
             self.repo.vreg.docmap = create_html_doc(doc_folder, data_url)
         else:
             self.repo.vreg.docmap = {}
+
