@@ -302,7 +302,7 @@ class JhugetableView(View):
         html += "var question_text = {0};".format(json.dumps(tooltips))
         html += "$('thead th').each(function(index, value){"
         html += "var sTitle = question_text[index];"
-        html += "this.setAttribute( 'title', sTitle );"
+        html += "this.setAttribute('title', sTitle);"
         html += "} );"
         html += "$( table.fnGetNodes() ).tooltip( {"
         html += "'delay': 0,"
@@ -493,9 +493,13 @@ class JtableView(View):
             # >> add this column to the table definition parameters
             label_list.append(label_cleaner(label_text[0]))
             if label_text[0] in qmap:
+                tiphref = self._cw.build_url(
+                    "view", vid="piws-documentation", tooltip=label_text[0],
+                    _notemplate=True)
                 headers.append(
-                    {"sTitle": "<span class='fake-link'> {0} "
-                     "</span>".format(label_text[0])})
+                    {"sTitle": "<a href='{0}' target=_blank>"
+                     "<span class='fake-link'>{1}"
+                     "</span></a>".format(tiphref, label_text[0])})
             else:
                 headers.append({"sTitle": label_text[0]})
 
@@ -651,7 +655,7 @@ class JtableView(View):
         html += "var question_text = {0};".format(json.dumps(tooltips))
         html += "$('thead th').each(function(index, value){"
         html += "var sTitle = question_text[index];"
-        html += "this.setAttribute( 'title', sTitle );"
+        html += "this.setAttribute('title', sTitle);"
         html += "} );"
         html += "$( table.fnGetNodes() ).tooltip( {"
         html += "'delay': 0,"

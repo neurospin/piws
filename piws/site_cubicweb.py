@@ -9,10 +9,18 @@
 
 
 options = (
-    ("questionnaire_map",
-      {"type": "string",
-       "default": "",
-       "help": "the file containing the questionnaire questions labels.",
-       "group": "piws", "level": 0,
-      }),
+    ("questionnaire_map", {
+        "type": "string",
+        "default": "",
+        "help": "the file containing the questionnaire questions labels.",
+        "group": "piws",
+        "level": 0,
+    }),
+    ("documentation_folder", {
+        "type": "string",
+        "default": "",
+        "help": "the folder containing the documentation of the project.",
+        "group": "piws",
+        "level": 1,
+    })
 )

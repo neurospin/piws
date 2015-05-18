@@ -46,6 +46,9 @@ class NSScanOutOfContextView(EntityView):
                 __message=(u"Found '{0}' image(s) that can be "
                             "displayed.".format(limagefiles)))
 
+        # Get the associated documentation if available
+        tooltip = self._cw.vreg.docmap.get(entity.label, None)
+
         # Get the subject/study related entities
         subject = entity.subject[0]
         study = entity.study[0]
@@ -66,14 +69,27 @@ class NSScanOutOfContextView(EntityView):
         # > third element: the see more button
         self.w(u'<button class="btn btn-danger" type="button" '
                 'style="margin-top:8px" data-toggle="collapse" '
-                'data-target="#info-%s">' % row)
+                'data-target="#info-{0}">'.format(row))
         self.w(u'See more')
         self.w(u'</button>')
         # > fourth element: the show button
         if limagefiles > 0:
-            self.w(u'<a href="{0}" class="btn btn-success" type="button" '
+            self.w(u'<a href="{0}" target=_blank class="btn btn-success" type="button" '
                     'style="margin-top:8px">'.format(href))
-            self.w(u'Show')
+            self.w(u'Show &#9735')
+            self.w(u'</a>')
+        # > fifth element: the doc button
+        if tooltip is not None:
+            tiphref = self._cw.build_url("view", vid="piws-documentation",
+                                         tooltip=tooltip, _notemplate=True)
+            self.w(u'<button href="{0}" class="btn btn-warning" type="button" '
+                    'style="margin-top:8px" data-toggle="collapse" '
+                    'data-target="#doc-{0}">'.format(row))
+            self.w(u'Doc')
+            self.w(u'</button>')
+            self.w(u'<a href="{0}" target=_blank class="btn btn-warning" type="button" '
+                    'style="margin-top:8px">'.format(tiphref))
+            self.w(u'&#9735')
             self.w(u'</a>')
 
         # Close row item
@@ -84,7 +100,7 @@ class NSScanOutOfContextView(EntityView):
 
         # Create a div that will be show or hide when the see more button is
         # clicked
-        self.w(u'<div id="info-%s" class="collapse">' % row)
+        self.w(u'<div id="info-{0}" class="collapse">'.format(row))
         self.w(u'<dl class="dl-horizontal">')
         # > image shape
         self.w(u'<dt>Image Shape (x)</dt><dd>{0}</dd>'.format(
@@ -114,6 +130,12 @@ class NSScanOutOfContextView(EntityView):
             subject.view("incontext")))
         self.w(u'<dt>Ralated study</dt><dd>{0}</dd>'.format(
             study.view("incontext")))
+        self.w(u'</div>')
+
+        # Create a div that will be show or hide when the doc button is
+        # clicked
+        self.w(u'<div id="doc-{0}" class="collapse">'.format(row))
+        self.w(unicode(tooltip))
         self.w(u'</div>')
 
         # Close list item
