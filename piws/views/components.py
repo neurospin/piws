@@ -13,6 +13,7 @@ from cubicweb.predicates import is_instance
 from cubicweb.predicates import nonempty_rset
 from cubicweb.predicates import anonymous_user
 from cubicweb.predicates import one_line_rset
+from cubicweb.predicates import match_view
 
 # Cubes import
 from cubes.brainomics.views.components import BrainomicsLinksCenters
@@ -263,9 +264,38 @@ class NSImageViewers(component.CtxComponent):
         w(u'</div></div><br/>')
 
 
+###############################################################################
+# Add documentation of all the questionnaires
+###############################################################################
+
+class AllQuestionnairesDocBox(component.CtxComponent):
+    """ Class that display the documentation associated to each questionnaire.
+    """
+    __regid__ = "doc-questionnaire-general"
+    __select__ = match_view("jtable-table")
+    context = "right"
+    order = 0
+    title = _("Documentation")
+
+    def render_body(self, w):
+        """ Display the documentation box.
+        """
+        tiphref = self._cw.build_url("view", vid="piws-documentation",
+                                     tooltip_name="Questionnaire_general_doc",
+                                     _notemplate=True)
+        w(u'<div class="btn-toolbar">')
+        w(u'<div class="btn-group-vertical btn-block">')
+        w(u'<a class="btn btn-warning" href="{0}" target=_blanck>'.format(
+            tiphref))
+        w(u'&#9735</a>')
+        w(u'</div></div><br/>')
+        
+
+
 def registration_callback(vreg):
 
     # Update components
+    vreg.register(AllQuestionnairesDocBox)
     vreg.register(NSNavigationtBox)
     vreg.register(NSSubjectStatistics)
     vreg.register(NSAssessmentStatistics)

@@ -24,11 +24,22 @@ class DisplayDocumentation(NullView):
         """
         super(DisplayDocumentation, self).__init__(*args, **kwargs)
 
-    def call(self, tooltip=None, **kwargs):
-        """
+    def call(self, tooltip=None, tooltip_name=None, **kwargs):
+        """ Create the documentation page.
+
+        Parameters
+        ----------
+        tooltip: str
+            a html formated string.
+        tooltip_name: str
+            the key of the item containing the html formated documentation.
         """
         # Get the parameters
-        tooltip = tooltip or self._cw.form.get("tooltip", "")
+        tooltip_name = tooltip_name or self._cw.form.get("tooltip_name", None)
+        if tooltip_name is not None:
+            tooltip = self._cw.vreg.docmap.get(tooltip_name, "")
+        else:
+            tooltip = tooltip or self._cw.form.get("tooltip", "")
 
         # Display documentation
         self.w(u"<!DOCTYPE html>")
