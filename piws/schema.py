@@ -54,6 +54,10 @@ QuestionnaireRun.add_relation(
 QuestionnaireRun.add_relation(
     String(maxsize=128, fulltextindexed=True), name="identifier")
 
+# Add label to ProcessingRun entity
+ProcessingRun.add_relation(
+    String(maxsize=64), name="label")
+
 # Add code_in_study to Subject entity
 Subject.add_relation(
     String(maxsize=64, fulltextindexed=True), name="code_in_study")
@@ -119,6 +123,9 @@ Scan.remove_relation(name="measure")
 Scan.add_relation(
     SubjectRelation("ScoreValue", cardinality="*1", inlined=False),
     name="score_values")
+Scan.add_relation(
+    SubjectRelation("ProcessingRun", cardinality="**", inlined=False),
+    name="processing_runs")
 
 # CENTER
 Center.remove_relation(name="holds")
@@ -148,6 +155,10 @@ Assessment.remove_relation(name="concerns")
 Assessment.add_relation(
     SubjectRelation("Subject", cardinality="**", inlined=False),
     name="subjects")
+Assessment.remove_relation(name="related_processing")
+Assessment.add_relation(
+    SubjectRelation("ProcessingRun", cardinality="**", inlined=False),
+    name="processing_runs")
 
 # STUDY
 Study.add_relation(
@@ -165,6 +176,9 @@ Study.add_relation(
 Study.add_relation(
     SubjectRelation("QuestionnaireRun", cardinality="*1", inlined=False),
     name="questionnaire_runs")
+Study.add_relation(
+    SubjectRelation("ProcessingRun", cardinality="*1", inlined=False),
+    name="processing_runs")
 
 # SUBJECT
 Subject.add_relation(
@@ -183,6 +197,9 @@ Subject.add_relation(
 Subject.add_relation(
     SubjectRelation("QuestionnaireRun", cardinality="*1", inlined=False),
     name="questionnaire_runs")
+Subject.add_relation(
+    SubjectRelation("ProcessingRun", cardinality="*1", inlined=False),
+    name="processing_runs")
 
 # QUESTIONNAIRE RUN
 QuestionnaireRun.add_relation(
@@ -216,6 +233,17 @@ GenomicMeasure.add_relation(
     name="subjects")
 GenomicMeasure.remove_relation(name="related_study")
 GenomicMeasure.add_relation(
+    SubjectRelation("Study", cardinality="1*", inlined=False),
+    name="study")
+GenomicMeasure.add_relation(
+    SubjectRelation("ProcessingRun", cardinality="**", inlined=False),
+    name="processing_runs")
+
+# ProcessingRun
+ProcessingRun.add_relation(
+    SubjectRelation("Subject", cardinality="**", inlined=False),
+    name="subjects")
+ProcessingRun.add_relation(
     SubjectRelation("Study", cardinality="1*", inlined=False),
     name="study")
 
