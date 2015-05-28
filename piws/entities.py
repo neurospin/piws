@@ -74,7 +74,7 @@ class Assessment(AnyEntity):
         """
         if self.scans or self.questionnaire_runs:
             return "images/questionnaire.png"
-        elif self.related_processing:
+        elif self.processing_runs:
             return "images/processing.png"
         elif self.genomic_measures:
             return "images/samples.png"

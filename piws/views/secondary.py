@@ -302,7 +302,7 @@ class NSProcessingRunOutOfContextView(EntityView):
         entity = self.cw_rset.get_entity(row, col)
 
         # Get the subject/study/center related entities
-        scan = entity.inputs[0]
+        #scan = entity.inputs[0]
         subject = scan.concerns[0]
 
         # Get the subject gender image url
