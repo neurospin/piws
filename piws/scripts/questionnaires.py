@@ -162,7 +162,8 @@ class Questionnaires(Base):
         #######################################################################
 
         rset = self.session.execute(
-            "Any S, C, I Where S is Subject, S code_in_study C, S identifier I")
+            "Any S, C, N Where S is Subject, S code_in_study C, S study E, "
+            "E name N")
         study_subjects = dict((row[1], row[0]) for row in rset
                               if row[2].startswith(self.project_name))
 
@@ -198,7 +199,7 @@ class Questionnaires(Base):
                      "'{0}'".format(qname)),
                 check_unicity=True,
                 entity_name = "Questionnaire",
-                identifier=unicode(qname),
+                identifier=unicode(self._md5_sum(qname)),
                 name=unicode(qname),
                 type=u"unknown")
             questionnaire_eids[qname] = questionnaire_entity.eid
@@ -206,7 +207,7 @@ class Questionnaires(Base):
 
             # Create corresponding questions
             for question_name in set(question_names):
-                question_id = qname + "_" + question_name
+                question_id = self._md5_sum(qname + "_" + question_name)
                 question_entity, _ = self._get_or_create_unique_entity(
                     rql=("Any X Where X is Question, X identifier "
                          "'{0}'".format(question_id)),
@@ -294,7 +295,7 @@ class Questionnaires(Base):
         """ Create a scans and its associated relations.
         """
         # Create a questionnaire run
-        qr_id = identifier_prefix + "_" + questionnaire_name
+        qr_id = self._md5_sum(identifier_prefix + "_" + questionnaire_name)
         qr_entity, is_created = self._get_or_create_unique_entity(
             rql=("Any X Where X is QuestionnaireRun, X identifier "
                  "'{0}'".format(qr_id)),
@@ -345,7 +346,8 @@ class Questionnaires(Base):
                     rql="",
                     check_unicity=False,
                     entity_name="OpenAnswer",
-                    identifier=unicode(qr_id + "_" + question_name),
+                    identifier=unicode(self._md5_sum(
+                        qr_id + "_" + question_name)),
                     value=unicode(answer))
                 # > add relation with the question
                 self._set_unique_relation(

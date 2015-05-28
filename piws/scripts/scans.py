@@ -154,7 +154,7 @@ class Scans(Base):
             rql=("Any X Where X is Center, X name "
                  "'{0}'".format(self.center_name)),
             entity_name="Center",
-            identifier=unicode(self.center_name),
+            identifier=unicode(self._md5_sum(self.center_name)),
             name=unicode(self.center_name))
         center_eid = center_entity.eid
         study_entity, _ = self._get_or_create_unique_entity(
@@ -170,7 +170,8 @@ class Scans(Base):
         #######################################################################
 
         rset = self.session.execute(
-            "Any S, C, I Where S is Subject, S code_in_study C, S identifier I")
+            "Any S, C, N Where S is Subject, S code_in_study C, S study E, "
+            "E name N")
         study_subjects = dict((row[1], row[0]) for row in rset
                               if row[2].startswith(self.project_name))
 
