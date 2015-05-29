@@ -239,6 +239,15 @@ class Processings(Base):
                     if processing_id in self.inserted_processings:
                         processing_eid = self.inserted_processings[processing_id]
 
+                        # Deal with multi subject analysis
+                        # > add relation with the subject
+                        self._set_unique_relation(
+                            processing_eid, "subjects", subject_eid,
+                            check_unicity=True)
+                        self._set_unique_relation(
+                            subject_eid, "processing_runs", processing_eid,
+                            check_unicity=True)
+
                     # Create the processing
                     else:
                         processing_eid = self._create_processing(
@@ -271,7 +280,7 @@ class Processings(Base):
                 study_eid, "processing_runs", processing_eid, check_unicity=False)
             # > add relation with the subject
             self._set_unique_relation(
-                processing_eid, "subject", subject_eid, check_unicity=False)
+                processing_eid, "subjects", subject_eid, check_unicity=False)
             self._set_unique_relation(
                 subject_eid, "processing_runs", processing_eid, check_unicity=False)
             # > add relation with the assessment
@@ -293,7 +302,7 @@ class Processings(Base):
 
             # Add the file set attached to a processing entity
             self._import_file_set(fset_struct, extfiles, processing_eid,
-                                  assessment_eid)
+                                  assessment_eid)            
 
         # Check if their is some scores attached to the current processing
         if scores is not None:
