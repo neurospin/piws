@@ -366,7 +366,7 @@ class JtableView(View):
 
     def call(self, rql_labels=None, labels=None, ajaxcallback=None,
              csvcallback=False, title="", elts_to_sort=None,
-             use_server=True, **kwargs):
+             use_server=True, tooltip=None, **kwargs):
         """ Method that will create a table.
 
         When left clicking on a row, the row is selected (highlighted) Click
@@ -407,7 +407,8 @@ class JtableView(View):
         for key in sorted(self._cw.form.keys()):
             if key not in self.mandatory_params:
                 kwargs[key] = self._cw.form[key]
-        title = title or self._cw.form.get("title", "")
+        title = title or self._cw.form.get("title", None)
+        tooltip = tooltip or self._cw.form.get("tooltip", "")
         rql_labels = rql_labels or self._cw.form.get("rql_labels", None)
         labels = labels or self._cw.form.get("labels", None)
         if labels is not None and not isinstance(labels, list):
@@ -668,7 +669,13 @@ class JtableView(View):
         html += "</script>"
 
         # > set a title
-        html += "<h1>{0}</h1>".format(title)
+        if tooltip is not None:
+            tiphref = self._cw.build_url(
+                "view", vid="piws-documentation", tooltip_name=tooltip,
+                _notemplate=True)
+            title = (u"<a class='btn btn-warning' href='{0}' target=_blanck>"
+                      "{1} &#9735;</a>".format(tiphref, title))
+        html += "<h1>{0}</h1>".format(title)       
 
         # > create a div for the in progress resource
         html += ("<div id='loadingmessage' style='display:none' "
