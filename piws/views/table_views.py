@@ -18,7 +18,6 @@ import re
 # Cubicweb import
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
-from cubicweb.web.views.csvexport import CSVMixIn
 
 
 ###############################################################################
@@ -822,7 +821,7 @@ def get_questionnaires_data(self):
     jtsort: str
         the sorting option to use.
     jtstartindex: int
-        the current index provided by jtable.
+        the current index provided by the datatable.
     jtpagesize: int
         the number of rows per page.
     column_to_filter: int
@@ -860,45 +859,45 @@ def get_questionnaires_data(self):
            "A timepoint T".format(jtsort))
     rset = self._cw.execute(rql)
 
-    # Filter the rset with the ID pattern
-    filtered_rset = []
-    nb_of_rows = len(set([item[0] for item in rset]))
-    for item in rset:
-        if id_pattern == "" or id_pattern.lower() in item[0].lower():
-            filtered_rset.append([item[0], item[1]])
-
-    # Set the appropriate range to access the data
-    # > if the user want to show all the results
-    if jtpagesize == -1 or jtpagesize > len(filtered_rset):
-        rset_range = range(len(filtered_rset))
-    # > otherwise
-    else:
-        rset_range = range(jtstartindex,
-                           min(jtstartindex + jtpagesize, len(filtered_rset)))
+    # Get the total number of rows (without filtering)
+    total_nb_of_rows = len(set([item[0] for item in rset]))
 
     # Create a structure to be able to sort by questionnaire name
     qstruct = OrderedDict()
-    for row_nb in rset_range:
-        item = filtered_rset[row_nb]
-        qstruct.setdefault(item[0], []).append(
-            label_cleaner(item[1]))
+    for item in rset:
+        qname = item[0]
+        timepoint = item[1]
+        # Filter the rset with the ID pattern
+        if id_pattern == "" or id_pattern.lower() in qname.lower():
+            qstruct.setdefault(qname, []).append(
+                label_cleaner(timepoint))
 
     # Open answer table parameters
     ajaxcallback = "get_open_answers_data"
     rql_labels = ("Any QUT ORDERBY QUT WHERE Q is Questionnaire, Q name '{0}', "
                   "Q questions QU, QU text QUT")
 
-    # Build the dict that will be dumped in the table
+    # Define start and stop display index for pagination
+    lower = jtstartindex
+    # If ALL results are selected
+    if jtpagesize == -1:
+        higher = total_nb_of_rows
+    else:
+        higher = min(jtstartindex+jtpagesize, len(qstruct))
+
+    # Build the list that will be dumped in the table
     records = []
-    for qname in qstruct.keys():
+    for item in qstruct.items()[lower:higher]:
 
-        # Start filling the tabel dataset
-        dstruct = [""] * len(labels)
-        dstruct[0] = qname
+        qname = item[0]
+        timepoints = item[1]
 
-        # Go through all decalred timepoints
-        for timepoint in qstruct[qname]:
+        # Build the current row
+        record = [qname] + [""] * (len(labels) -1)
 
+        # Start filling the table dataset
+        # Go through all declared timepoints
+        for timepoint in timepoints:
             # Construct the answer table view
             href = self._cw.build_url(
                 "view", vid="jtable-table",
@@ -906,15 +905,17 @@ def get_questionnaires_data(self):
                 ajaxcallback=ajaxcallback, title=qname,
                 qname=qname, timepoint=timepoint, elts_to_sort=["ID"],
                 csvcallback=True)
-            timepoint_index = labels.index(timepoint)
-            dstruct[timepoint_index] = "<a href='{0}'>link</a>".format(href)
-
-        # Store the tabel formated row
-        records.append(dstruct)
+            # Find the column index corresponding to this timepoint
+            timepoint_index = [label.lower() for label in labels]\
+                .index(timepoint.lower())
+            # Fill the cells with hyperlinks to the questionnaire view
+            record[timepoint_index] = "<a href='{0}'>link</a>".format(href)
+        # Store the table formatted row
+        records.append(record)
 
     # Table formatting
-    data = {"iTotalRecords": nb_of_rows,
-            "iTotalDisplayRecords": len(filtered_rset),
+    data = {"iTotalRecords": total_nb_of_rows,
+            "iTotalDisplayRecords": len(qstruct),
             "aaData": records}
 
     return data
