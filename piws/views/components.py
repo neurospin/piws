@@ -280,7 +280,7 @@ class RelationBox(component.CtxComponent):
 
     @property
     def domid(self):
-        return (super(RelationBox, self).domid + unicode(abs(id(self))) + 
+        return (super(RelationBox, self).domid + unicode(abs(id(self))) +
                 unicode(abs(id(self.cw_rset))))
 
     def render_title(self, w):
@@ -289,13 +289,11 @@ class RelationBox(component.CtxComponent):
     def render_body(self, w):
         defaultlimit = self._cw.property_value("navigation.related-limit")
         for entity in list(self.cw_rset.entities())[:(defaultlimit - 1)]:
-            print entity.view(self.context)
             w(u"<div>&#8594; " + entity.view(self.context) + u"</div>")
         if self.cw_rset.rowcount == defaultlimit:
             rql = self.cw_extra_kwargs["rql"]
             href = self._cw.build_url(rql=rql)
-            w(u"<br/><div><a href='{0}'>&#8634; see more</a></div>".format(href))
-        
+            w(u"<br/><div><a href='{0}'>&#8634; see more</a></div>".format(href))   
 
 
 def registration_callback(vreg):

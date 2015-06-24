@@ -38,8 +38,10 @@ class DisplayDocumentation(NullView):
         tooltip_name = tooltip_name or self._cw.form.get("tooltip_name", None)
         if tooltip_name is not None:
             tooltip = self._cw.vreg.docmap.get(tooltip_name, "")
+            page_title = tooltip_name
         else:
             tooltip = tooltip or self._cw.form.get("tooltip", "")
+            page_title = "Documentation"
 
         # Display documentation
         self.w(u"<!DOCTYPE html>")
@@ -47,7 +49,17 @@ class DisplayDocumentation(NullView):
         self.w(u"<head>")
         self.w(u"<meta http-equiv='content-type' content='text/html; charset=UTF-8'/>")
         self.w(u"<meta http-equiv='X-UA-Compatible' content='IE=8' />")
+        self.w(u'<link rel="stylesheet" type="text/css" href="{0}"/>'.format(
+            self._cw.data_url("doc.css")))
+        self.w(u'<title>{0}</title>'.format(page_title))
+        self.w(u'<link rel="icon" href="{0}" />'.format(
+            self._cw.data_url("favicon.ico")))
+        self.w(u"</head>")
+        self.w(u"<body>")
+        tooltip = tooltip.replace('class="document"', 'class="body"')
         self.w(unicode(tooltip))
+        self.w(u"</body>")
+        self.w(u"</html>")
 
 
 ###############################################################################

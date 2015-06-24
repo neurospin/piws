@@ -11,9 +11,9 @@
 from string import maketrans
 from collections import OrderedDict
 import json
-import os
-import copy
 import re
+import datetime
+import time
 
 # Cubicweb import
 from cubicweb.view import View
@@ -158,7 +158,7 @@ class JhugetableView(View):
             if label_text in qmap:
                 tiphref = self._cw.build_url(
                     "view", vid="piws-documentation",
-                    tooltip=qmap[label_text], _notemplate=True)
+                    tooltip_name=label_text, _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
                      "<span class='fake-link'>{1} &#9735"
@@ -215,7 +215,14 @@ class JhugetableView(View):
         html += ("a.href = 'data:application/csv;charset=utf-8,' "
                  "+ encodeURIComponent(csvString);")
         html += "a.target = '_blank';"
-        html += "a.download = 'datatable.csv';"
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
+        if "timepoint" in kwargs:
+            csv_file_name = "{0}_{1}_{2}.csv".format(
+                title, kwargs["timepoint"], st)
+        else:
+            csv_file_name = "{0}_{1}".format(title, st)
+        html += "a.download = '{0}';".format(csv_file_name)
 
         # > hide the processing message
         html += "document.body.appendChild(a);"
@@ -365,7 +372,7 @@ class JtableView(View):
 
     def call(self, rql_labels=None, labels=None, ajaxcallback=None,
              csvcallback=False, title="", elts_to_sort=None,
-             use_server=True, tooltip=None, **kwargs):
+             use_server=True, tooltip_name=None, **kwargs):
         """ Method that will create a table.
 
         When left clicking on a row, the row is selected (highlighted) Click
@@ -407,7 +414,7 @@ class JtableView(View):
             if key not in self.mandatory_params:
                 kwargs[key] = self._cw.form[key]
         title = title or self._cw.form.get("title", None)
-        tooltip = tooltip or self._cw.form.get("tooltip", "")
+        tooltip_name = tooltip_name or self._cw.form.get("tooltip_name", "")
         rql_labels = rql_labels or self._cw.form.get("rql_labels", None)
         labels = labels or self._cw.form.get("labels", None)
         if labels is not None and not isinstance(labels, list):
@@ -483,7 +490,7 @@ class JtableView(View):
         if "ID" not in elts_to_sort:
             hide_sort_indices.append(0)
         for cnt, label_text in enumerate(labels):
-            
+
             # >> select if we can sort this column
             if label_text[0] not in elts_to_sort:
                 hide_sort_indices.append(cnt + 1)
@@ -493,7 +500,7 @@ class JtableView(View):
             if label_text[0] in qmap:
                 tiphref = self._cw.build_url(
                     "view", vid="piws-documentation",
-                    tooltip=qmap[label_text[0]], _notemplate=True)
+                    tooltip_name=label_text[0], _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
                      "<span class='fake-link'>{1} &#9735"
@@ -554,7 +561,14 @@ class JtableView(View):
         html += ("a.href = 'data:application/csv;charset=utf-8,' "
                  "+ encodeURIComponent(csvString);")
         html += "a.target = '_blank';"
-        html += "a.download = 'datatable.csv';"
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
+        if "timepoint" in kwargs:
+            csv_file_name = "{0}_{1}_{2}.csv".format(
+                title, kwargs["timepoint"], st)
+        else:
+            csv_file_name = "{0}_{1}".format(title, st)
+        html += "a.download = '{0}';".format(csv_file_name)
 
         # > hide the processing message
         html += "document.body.appendChild(a);"
@@ -617,7 +631,7 @@ class JtableView(View):
         html += "{{ 'bSortable': false, 'aTargets': {0} }}".format(
             str(hide_sort_indices))
         html += "],"
-        
+
         # > set the ajax callback to fill dynamically the table
         html += "'sAjaxSource':'ajax?fname={0}',".format(ajaxcallback)
         html += "'fnServerParams': function (aoData) {"
@@ -668,13 +682,13 @@ class JtableView(View):
         html += "</script>"
 
         # > set a title
-        if tooltip is not None:
+        if tooltip_name is not None:
             tiphref = self._cw.build_url(
-                "view", vid="piws-documentation", tooltip_name=tooltip,
+                "view", vid="piws-documentation", tooltip_name=tooltip_name,
                 _notemplate=True)
             title = (u"<a class='btn btn-warning' href='{0}' target=_blanck>"
                       "{1} &#9735;</a>".format(tiphref, title))
-        html += "<h1>{0}</h1>".format(title)       
+        html += "<h1>{0}</h1>".format(title) 
 
         # > create a div for the in progress resource
         html += ("<div id='loadingmessage' style='display:none' "
@@ -902,14 +916,19 @@ def get_questionnaires_data(self):
             href = self._cw.build_url(
                 "view", vid="jtable-table",
                 rql_labels=rql_labels.format(qname),
-                ajaxcallback=ajaxcallback, title=qname,
+                ajaxcallback=ajaxcallback, title=qname, tooltip_name=qname,
                 qname=qname, timepoint=timepoint, elts_to_sort=["ID"],
                 csvcallback=True)
             # Find the column index corresponding to this timepoint
-            timepoint_index = [label.lower() for label in labels]\
-                .index(timepoint.lower())
+            timepoint_index = [label.lower() for label in labels].index(
+                timepoint.lower())
             # Fill the cells with hyperlinks to the questionnaire view
-            record[timepoint_index] = "<a href='{0}'>link</a>".format(href)
+            record[timepoint_index] = (
+                "<a href='{0}'>"
+                "<img src='data/images/blue-arrow.png' " 
+                "alt='Open questionnaire' width='20' " 
+                "height='20' border='0'></a>").format(href)
+
         # Store the table formatted row
         records.append(record)
 

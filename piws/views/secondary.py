@@ -42,7 +42,7 @@ class BaseOutOfContextView(EntityView):
 
         # Get the associated images
         imagefiles = []
-        if hasattr(entity, "results_files"):     
+        if hasattr(entity, "results_files"):
             for efentries in entity.results_files:
                 imagefiles.extend(
                     [e.filepath for e in efentries.file_entries
@@ -58,6 +58,7 @@ class BaseOutOfContextView(EntityView):
 
         # Get the associated documentation if available
         if hasattr(entity, "label"):
+            tooltip_name = entity.label
             tooltip = self._cw.vreg.docmap.get(entity.label, None)
         else:
             tooltip = None
@@ -82,7 +83,7 @@ class BaseOutOfContextView(EntityView):
         self.w(u"<div class='row'>")
         # > first element: the image
         self.w(u"<div class='col-md-2'><p class='text-center'>{0}</p>"
-                "</div>".format(image))
+               "</div>".format(image))
         # > second element: the entity description + link
         self.w(u"<div class='col-md-4'><h4>{0}</h4>".format(
             entity.view("incontext")))
@@ -91,27 +92,28 @@ class BaseOutOfContextView(EntityView):
         self.w(u"</div>")
         # > third element: the see more button
         self.w(u"<button class='btn btn-danger' type='button' "
-                "style='margin-top:8px' data-toggle='collapse' "
-                "data-target='#info-{0}'>".format(row))
+               "style='margin-top:8px' data-toggle='collapse' "
+               "data-target='#info-{0}'>".format(row))
         self.w(u"See more")
         self.w(u"</button>")
         # > fourth element: the show button
         if limagefiles > 0:
             self.w(u"<a href='{0}' target=_blank class='btn btn-success' "
-                    "type='button' style='margin-top:8px'>".format(href))
+                   "type='button' style='margin-top:8px'>".format(href))
             self.w(u"Show &#9735")
             self.w(u"</a>")
         # > fifth element: the doc button
         if tooltip is not None:
             tiphref = self._cw.build_url("view", vid="piws-documentation",
-                                         tooltip=tooltip, _notemplate=True)
+                                         tooltip_name=tooltip_name,
+                                         _notemplate=True)
             self.w(u"<button href='{0}' class='btn btn-warning' type='button' "
-                    "style='margin-top:8px' data-toggle='collapse' "
-                    "data-target='#doc-{0}'>".format(row))
+                   "style='margin-top:8px' data-toggle='collapse' "
+                   "data-target='#doc-{0}'>".format(row))
             self.w(u"Doc")
             self.w(u"</button>")
             self.w(u"<a href='{0}' target=_blank class='btn btn-warning' "
-                    "type='button' style='margin-top:8px'>".format(tiphref))
+                   "type='button' style='margin-top:8px'>".format(tiphref))
             self.w(u"&#9735")
             self.w(u"</a>")
 
@@ -126,7 +128,7 @@ class BaseOutOfContextView(EntityView):
         self.w(u"<div id='info-{0}' class='collapse'>".format(row))
         self.w(u"<dl class='dl-horizontal'>")
         for key, value in entity_desc.items():
-            self.w(u"<dt>{0}</dt><dd>{1}</dd>".format(key, value))            
+            self.w(u"<dt>{0}</dt><dd>{1}</dd>".format(key, value))         
         self.w(u"</div>")
 
         # Create a div that will be show or hide when the doc button is
@@ -209,7 +211,7 @@ class OutOfContextSubjectView(BaseOutOfContextView):
         desc["Gender"] = entity.gender
         desc["Handedness"] = entity.handedness
         desc["Related assessments"] = " - ".join(
-            ["<a href='{0}'>{1}</a>".format(item.absolute_url(), item.identifier) 
+            ["<a href='{0}'>{1}</a>".format(item.absolute_url(), item.identifier)
              for item in entity.assessments])
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
