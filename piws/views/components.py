@@ -101,7 +101,7 @@ class NSNavigationtBox(component.CtxComponent):
             "view", vid="jtable-table",
             rql_labels=rql_labels, ajaxcallback=ajaxcallback,
             title="All Questionnaires", elts_to_sort=["ID"],
-            tooltip="Questionnaire_general_doc")
+            tooltip_name="Questionnaire_general_doc")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Questionaires</a>')
         w(u'</div></div><br/>')

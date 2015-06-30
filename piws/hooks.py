@@ -31,7 +31,7 @@ class CreateDocumentation(hook.Hook):
         """
         # Get the data url
         with self.repo.internal_cnx() as cnx:
-            data_url = os.path.join(cnx.base_url(), "data")
+            data_url = os.path.join(cnx.base_url(), "data/")
 
         # Go to the virtualenv root folder
         #if "VIRTUAL_ENV" in os.environ:
