@@ -15,5 +15,5 @@ options = (
         "help": "the folder containing the documentation of the project.",
         "group": "piws",
         "level": 1,
-    })
+    }),
 )

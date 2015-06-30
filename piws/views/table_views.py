@@ -11,14 +11,13 @@
 from string import maketrans
 from collections import OrderedDict
 import json
-import os
-import copy
 import re
+import datetime
+import time
 
 # Cubicweb import
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
-from cubicweb.web.views.csvexport import CSVMixIn
 
 
 ###############################################################################
@@ -159,7 +158,7 @@ class JhugetableView(View):
             if label_text in qmap:
                 tiphref = self._cw.build_url(
                     "view", vid="piws-documentation",
-                    tooltip=qmap[label_text], _notemplate=True)
+                    tooltip_name=label_text, _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
                      "<span class='fake-link'>{1} &#9735"
@@ -216,7 +215,14 @@ class JhugetableView(View):
         html += ("a.href = 'data:application/csv;charset=utf-8,' "
                  "+ encodeURIComponent(csvString);")
         html += "a.target = '_blank';"
-        html += "a.download = 'datatable.csv';"
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
+        if "timepoint" in kwargs:
+            csv_file_name = "{0}_{1}_{2}.csv".format(
+                title, kwargs["timepoint"], st)
+        else:
+            csv_file_name = "{0}_{1}".format(title, st)
+        html += "a.download = '{0}';".format(csv_file_name)
 
         # > hide the processing message
         html += "document.body.appendChild(a);"
@@ -366,7 +372,7 @@ class JtableView(View):
 
     def call(self, rql_labels=None, labels=None, ajaxcallback=None,
              csvcallback=False, title="", elts_to_sort=None,
-             use_server=True, **kwargs):
+             use_server=True, tooltip_name=None, **kwargs):
         """ Method that will create a table.
 
         When left clicking on a row, the row is selected (highlighted) Click
@@ -407,7 +413,8 @@ class JtableView(View):
         for key in sorted(self._cw.form.keys()):
             if key not in self.mandatory_params:
                 kwargs[key] = self._cw.form[key]
-        title = title or self._cw.form.get("title", "")
+        title = title or self._cw.form.get("title", None)
+        tooltip_name = tooltip_name or self._cw.form.get("tooltip_name", "")
         rql_labels = rql_labels or self._cw.form.get("rql_labels", None)
         labels = labels or self._cw.form.get("labels", None)
         if labels is not None and not isinstance(labels, list):
@@ -493,7 +500,7 @@ class JtableView(View):
             if label_text[0] in qmap:
                 tiphref = self._cw.build_url(
                     "view", vid="piws-documentation",
-                    tooltip=qmap[label_text[0]], _notemplate=True)
+                    tooltip_name=label_text[0], _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
                      "<span class='fake-link'>{1} &#9735"
@@ -554,7 +561,14 @@ class JtableView(View):
         html += ("a.href = 'data:application/csv;charset=utf-8,' "
                  "+ encodeURIComponent(csvString);")
         html += "a.target = '_blank';"
-        html += "a.download = 'datatable.csv';"
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
+        if "timepoint" in kwargs:
+            csv_file_name = "{0}_{1}_{2}.csv".format(
+                title, kwargs["timepoint"], st)
+        else:
+            csv_file_name = "{0}_{1}".format(title, st)
+        html += "a.download = '{0}';".format(csv_file_name)
 
         # > hide the processing message
         html += "document.body.appendChild(a);"
@@ -668,7 +682,13 @@ class JtableView(View):
         html += "</script>"
 
         # > set a title
-        html += "<h1>{0}</h1>".format(title)
+        if tooltip_name is not None:
+            tiphref = self._cw.build_url(
+                "view", vid="piws-documentation", tooltip_name=tooltip_name,
+                _notemplate=True)
+            title = (u"<a class='btn btn-warning' href='{0}' target=_blanck>"
+                      "{1} &#9735;</a>".format(tiphref, title))
+        html += "<h1>{0}</h1>".format(title) 
 
         # > create a div for the in progress resource
         html += ("<div id='loadingmessage' style='display:none' "
@@ -815,7 +835,7 @@ def get_questionnaires_data(self):
     jtsort: str
         the sorting option to use.
     jtstartindex: int
-        the current index provided by jtable.
+        the current index provided by the datatable.
     jtpagesize: int
         the number of rows per page.
     column_to_filter: int
@@ -853,61 +873,68 @@ def get_questionnaires_data(self):
            "A timepoint T".format(jtsort))
     rset = self._cw.execute(rql)
 
-    # Filter the rset with the ID pattern
-    filtered_rset = []
-    nb_of_rows = len(set([item[0] for item in rset]))
-    for item in rset:
-        if id_pattern == "" or id_pattern.lower() in item[0].lower():
-            filtered_rset.append([item[0], item[1]])
-
-    # Set the appropriate range to access the data
-    # > if the user want to show all the results
-    if jtpagesize == -1 or jtpagesize > len(filtered_rset):
-        rset_range = range(len(filtered_rset))
-    # > otherwise
-    else:
-        rset_range = range(jtstartindex,
-                           min(jtstartindex + jtpagesize, len(filtered_rset)))
+    # Get the total number of rows (without filtering)
+    total_nb_of_rows = len(set([item[0] for item in rset]))
 
     # Create a structure to be able to sort by questionnaire name
     qstruct = OrderedDict()
-    for row_nb in rset_range:
-        item = filtered_rset[row_nb]
-        qstruct.setdefault(item[0], []).append(
-            label_cleaner(item[1]))
+    for item in rset:
+        qname = item[0]
+        timepoint = item[1]
+        # Filter the rset with the ID pattern
+        if id_pattern == "" or id_pattern.lower() in qname.lower():
+            qstruct.setdefault(qname, []).append(
+                label_cleaner(timepoint))
 
     # Open answer table parameters
     ajaxcallback = "get_open_answers_data"
     rql_labels = ("Any QUT ORDERBY QUT WHERE Q is Questionnaire, Q name '{0}', "
                   "Q questions QU, QU text QUT")
 
-    # Build the dict that will be dumped in the table
+    # Define start and stop display index for pagination
+    lower = jtstartindex
+    # If ALL results are selected
+    if jtpagesize == -1:
+        higher = total_nb_of_rows
+    else:
+        higher = min(jtstartindex+jtpagesize, len(qstruct))
+
+    # Build the list that will be dumped in the table
     records = []
-    for qname in qstruct.keys():
+    for item in qstruct.items()[lower:higher]:
 
-        # Start filling the tabel dataset
-        dstruct = [""] * len(labels)
-        dstruct[0] = qname
+        qname = item[0]
+        timepoints = item[1]
 
-        # Go through all decalred timepoints
-        for timepoint in qstruct[qname]:
+        # Build the current row
+        record = [qname] + [""] * (len(labels) -1)
 
+        # Start filling the table dataset
+        # Go through all declared timepoints
+        for timepoint in timepoints:
             # Construct the answer table view
             href = self._cw.build_url(
                 "view", vid="jtable-table",
                 rql_labels=rql_labels.format(qname),
-                ajaxcallback=ajaxcallback, title=qname,
+                ajaxcallback=ajaxcallback, title=qname, tooltip_name=qname,
                 qname=qname, timepoint=timepoint, elts_to_sort=["ID"],
                 csvcallback=True)
-            timepoint_index = labels.index(timepoint)
-            dstruct[timepoint_index] = "<a href='{0}'>link</a>".format(href)
+            # Find the column index corresponding to this timepoint
+            timepoint_index = [label.lower() for label in labels].index(
+                timepoint.lower())
+            # Fill the cells with hyperlinks to the questionnaire view
+            record[timepoint_index] = (
+                "<a href='{0}'>"
+                "<img src='data/images/blue-arrow.png' " 
+                "alt='Open questionnaire' width='20' " 
+                "height='20' border='0'></a>").format(href)
 
-        # Store the tabel formated row
-        records.append(dstruct)
+        # Store the table formatted row
+        records.append(record)
 
     # Table formatting
-    data = {"iTotalRecords": nb_of_rows,
-            "iTotalDisplayRecords": len(filtered_rset),
+    data = {"iTotalRecords": total_nb_of_rows,
+            "iTotalDisplayRecords": len(qstruct),
             "aaData": records}
 
     return data

@@ -83,7 +83,7 @@ def set_data_url(data_url, doc):
     """
     matches = re.findall("<img.*/>", doc)
     for imgtag in matches:
-        index = imgtag.index("src=") + 6
+        index = imgtag.index("src=") + 5
         newimgtag = imgtag[:index] + data_url + imgtag[index:]
-        doc.replace(imgtag, newimgtag)
+        doc = doc.replace(imgtag, newimgtag)
     return doc

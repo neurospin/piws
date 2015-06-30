@@ -7,6 +7,9 @@
 # for details.
 ##########################################################################
 
+# System import
+import os
+
 # CW import
 from cubicweb.server import hook
 
@@ -28,7 +31,11 @@ class CreateDocumentation(hook.Hook):
         """
         # Get the data url
         with self.repo.internal_cnx() as cnx:
-            data_url = cnx.base_url() + "/data/"
+            data_url = os.path.join(cnx.base_url(), "data/")
+
+        # Go to the virtualenv root folder
+        #if "VIRTUAL_ENV" in os.environ:
+        #    os.chdir(os.environ["VIRTUAL_ENV"])
 
         # Get the documentation
         doc_folder = self.repo.vreg.config["documentation_folder"]

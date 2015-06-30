@@ -172,7 +172,8 @@ class Genetics(Base):
         #######################################################################
 
         rset = self.session.execute(
-            "Any S, C, I Where S is Subject, S code_in_study C, S identifier I")
+            "Any S, C, N Where S is Subject, S code_in_study C, S study E, "
+            "E name N")
         study_subjects = dict((row[1], row[0]) for row in rset
                               if row[2].startswith(self.project_name))
 

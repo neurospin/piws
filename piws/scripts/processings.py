@@ -10,19 +10,18 @@
 # System import
 import os
 import sys
-import hashlib
 
 # Piws import
 from .base import Base
 
 
-class Scans(Base):
-    """ This class enables us to load the scan data to CW.
+class Processings(Base):
+    """ This class enables us to load the processing data to CW.
     """
-    def __init__(self, session, project_name, center_name, scans,
+    def __init__(self, session, project_name, center_name, processings,
                  can_read=True, can_update=True, data_filepath=None,
                  use_store=True):
-        """ Initialize the Scans class.
+        """ Initialize the Processings class.
 
         Parameters
         ----------
@@ -32,11 +31,11 @@ class Scans(Base):
             the name of the project.
         center_name: str (mandatory)
             the center name.
-        scans: dict of list of dict (mandatory)
-            the scan description: the first dictionary contains the subject
-            name as keys and then a list of dictionaries with four keys (Scans -
-            (Scan - TypeData - FileSet - ExternalResource - ScoreValues) -
-            Assessment) that contains the entities parameter decriptions.
+        processings: dict of list of dict (mandatory)
+            the processing description: the first dictionary contains the subject
+            name as keys and then a list of dictionaries with two keys (
+            Assessment - Processings) that contains the entities parameter
+            decriptions.
         can_read: bool (optional, default True)
             set the read permission to the imported data.
         can_update: bool (optional, default True)
@@ -48,41 +47,37 @@ class Scans(Base):
 
         Notes
         -----
-        Here is an axemple of the definiton of the 'scans' parameter:
+        Here is an axemple of the definiton of the 'processings' parameter:
 
         ::
 
-            scans = {
+            processings = {
                 "subjects1": [ {
                     "Assessment": {
-                        "age_of_subject": 27, "identifier": u"toy_V1_subject1",
+                        "identifier": u"toy_V1_subject1",
                         "timepoint": u"V1"},
-                    "Scans": [ {
-                        "TypeData": {
-                            "fov_y": 0, "fov_x": 0, "voxel_res_y": 2.0,
-                            "voxel_res_x": 2.0, "voxel_res_z": 2.0,
-                            "field": "3T", "tr": 2.5, "shape_y": 2,
-                            "shape_x": 2, "shape_z": 2, "te": 0,
-                            "type": u"MRIData"},
+                    "Processings": [ {
+                        "Inputs": ["Any X Where X is Scan"],
                         "ExternalResources": [ {
-                            "absolute_path": True, "name": u"t1",
-                            "identifier": u"toy_V1_subject1_t1_1",
+                            "absolute_path": True, "name": u"p1",
+                            "identifier": u"toy_V1_subject1_p1_1",
                             "filepath": u"/tmp/demo/V1/subject1/images/t1/t1.nii.gz"}],
                         "FileSet": {
-                            "identifier": u"toy_V1_subject1_t1", "name": u"T1"},
-                        "Scan": {
-                            "format": u"Nifti", "label": u"T1",
-                            "identifier": u"toy_V1_subject1_t1",
-                            "type": u"MRIData"}
+                            "identifier": u"toy_V1_subject1_p1", "name": u"p1"},
+                        "ProcessingRun": {
+                            "identifier": u"toy_V1_subject1_p1",
+                            "name": u"p1", "label": u"segmentation",
+                            "tool": u"spm", "version": u"8.1",
+                            "parameters": u"{'a': 1, 'r': 'mypath'}"}
                     }]
                 } ]
             }
         """
         # Inheritance
-        super(Scans, self).__init__(session, use_store)
+        super(Processings, self).__init__(session, use_store)
 
         # Class parameters
-        self.scans = scans
+        self.processings = processings
         self.data_filepath = data_filepath or ""
         self.project_name = project_name
         self.center_name = center_name
@@ -91,36 +86,28 @@ class Scans(Base):
 
         # Speed up parameters
         self.inserted_assessments = {}
-        self.inserted_scans = {}
+        self.inserted_processings = {}
 
         # Define the relations involved
         self.relations = (
             self.fileset_relations + self.assessment_relations + [
-                ("Scan", "study", "Study"),
-                ("Study", "scans", "Scan"),
-                ("Scan", "subject", "Subject"),
-                ("Subject", "scans", "Scan"),
-                ("Assessment", "scans", "Scan"),
-                ("Scan", "in_assessment", "Assessment"),
-                ("Scan", "has_data", "PETData"),
-                ("PETData", "in_assessment", "Assessment"),
-                ("Scan", "has_data", "FMRIData"),
-                ("FMRIData", "in_assessment", "Assessment"),
-                ("Scan", "has_data", "DMRIData"),
-                ("DMRIData", "in_assessment", "Assessment"),
-                ("Scan", "has_data", "MRIData"),
-                ("MRIData", "in_assessment", "Assessment"),
-                ("Scan", "score_values", "ScoreValue"),
+                ("ProcessingRun", "study", "Study"),
+                ("Study", "processing_runs", "ProcessingRun"),
+                ("ProcessingRun", "subject", "Subject"),
+                ("Subject", "processing_runs", "ProcessingRun"),
+                ("Assessment", "processing_runs", "ProcessingRun"),
+                ("ProcessingRun", "in_assessment", "Assessment"),
+                ("ProcessingRun", "score_values", "ScoreValue"),
                 ("ScoreValue", "in_assessment", "Assessment")]
         )
-        self.relations[0][0] = "Scan"
+        self.relations[0][0] = "ProcessingRun"
 
     ###########################################################################
     #   Public Methods
     ###########################################################################
 
     def import_data(self):
-        """ Method that import the scan data in the db.
+        """ Method that import the processing data in the db.
 
         .. note::
 
@@ -128,17 +115,10 @@ class Scans(Base):
 
             |
 
-            .. image:: ../schemas/scan.png
+            .. image:: ../schemas/processing.png
                 :width: 600px
                 :align: center
                 :alt: schema
-
-        .. warning::
-
-            In the 'scans' input structure, the 'TypeData' item contains a
-            special key 'type' corresponding to the data type. The associated
-            value is a string representing the entity name that must be in
-            ['PETData', 'FMRIData', 'DMRIData', 'MRIData'].
 
         .. warning::
 
@@ -184,17 +164,17 @@ class Scans(Base):
         groups = dict((row[1], row[0]) for row in rset)
 
         #######################################################################
-        # Start the scan insertion
+        # Start the processing insertion
         #######################################################################
 
         # Go through the data structure
-        nb_of_subjects = float(len(self.scans))
+        nb_of_subjects = float(len(self.processings))
         cnt_subject = 1.
-        for subject_id, list_subj_scans in self.scans.iteritems():
+        for subject_id, list_subj_processings in self.processings.iteritems():
 
             # Print a progress bar
             self._progress_bar(cnt_subject / nb_of_subjects,
-                               title="{0}(scans):".format(subject_id),
+                               title="{0}(processings):".format(subject_id),
                                bar_length=40)
             cnt_subject += 1.
 
@@ -209,22 +189,30 @@ class Scans(Base):
                                  "database.".format(subject_id))
 
             ###################################################################
-            # Insert all the subject scans
+            # Insert all the subject processings
             ###################################################################
 
-            for subj_scans in list_subj_scans:
+            for subj_processings in list_subj_processings:
 
                 ###############################################################
                 # Create the assessment
                 ###############################################################
 
                 # Get the assessment identifier
-                assessment_struct = subj_scans["Assessment"]
+                assessment_struct = subj_processings["Assessment"]
                 assessment_id = assessment_struct["identifier"]
 
                 # Check if this item has already been inserted
                 if assessment_id in self.inserted_assessments:
                     assessment_eid = self.inserted_assessments[assessment_id]
+
+                    # > add relation with the subject if not already set
+                    self._set_unique_relation(
+                        subject_eid, "assessments", assessment_eid,
+                        check_unicity=True)
+                    self._set_unique_relation(
+                        assessment_eid, "subjects", subject_eid,
+                        check_unicity=True, subjtype="Assessment")
 
                 # Create the assessment
                 else:
@@ -234,82 +222,89 @@ class Scans(Base):
                     self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################
-                # Go through the scans - processings - scores
+                # Go through the processings - scores
                 ###############################################################
 
-                for current_scan in subj_scans["Scans"]:
+                for current_processing in subj_processings["Processings"]:
 
-                    # Create the scan identifier
-                    scan_struct = current_scan["Scan"]
-                    scantype_struct = current_scan["TypeData"]
-                    fset_struct = current_scan["FileSet"]
-                    extfiles = current_scan["ExternalResources"]
-                    scores = current_scan.get("Scores", None)
-                    scan_id = scan_struct["identifier"]
+                    # Create the processing identifier
+                    processing_struct = current_processing["ProcessingRun"]
+                    processing_inputs = current_processing["Inputs"]
+                    fset_struct = current_processing["FileSet"]
+                    extfiles = current_processing["ExternalResources"]
+                    scores = current_processing.get("Scores", None)
+                    processing_id = processing_struct["identifier"]
 
                     # Check if this item has already been inserted
-                    if scan_id in self.inserted_scans:
-                        scan_eid = self.inserted_scans[scan_id]
+                    if processing_id in self.inserted_processings:
+                        processing_eid = self.inserted_processings[processing_id]
 
-                    # Create the scan
+                        # Deal with multi subject analysis
+                        # > add relation with the subject
+                        self._set_unique_relation(
+                            processing_eid, "subjects", subject_eid,
+                            check_unicity=True)
+                        self._set_unique_relation(
+                            subject_eid, "processing_runs", processing_eid,
+                            check_unicity=True)
+
+                    # Create the processing
                     else:
-                        scan_eid = self._create_scan(
-                            scan_struct, scantype_struct, fset_struct, extfiles,
-                            scores, subject_eid, study_eid, assessment_eid)
+                        processing_eid = self._create_processing(
+                            processing_struct, fset_struct, extfiles,
+                            scores, processing_inputs, subject_eid, study_eid,
+                            assessment_eid)
 
-    def _create_scan(self, scan_struct, scantype_struct, fset_struct, extfiles,
-                     scores, subject_eid, study_eid, assessment_eid):
-        """ Create a scans and its associated relations.
+    def _create_processing(self, processing_struct, fset_struct, extfiles,
+                           scores, processing_inputs, subject_eid, study_eid,
+                           assessment_eid):
+        """ Create a processing and its associated relations.
         """
-        # Create the scan
-        scan_id = scan_struct["identifier"]
-        scan_entity, is_created = self._get_or_create_unique_entity(
-            rql=("Any X Where X is Scan, X identifier '{0}'".format(scan_id)),
+        # Create the processing
+        processing_id = processing_struct["identifier"]
+        processing_entity, is_created = self._get_or_create_unique_entity(
+            rql=("Any X Where X is ProcessingRun, X identifier '{0}'".format(
+                processing_id)),
             check_unicity=True,
-            entity_name="Scan",
-            **scan_struct)
-        scan_eid = scan_entity.eid
-        self.inserted_scans[scan_id] = scan_eid
+            entity_name="ProcessingRun",
+            **processing_struct)
+        processing_eid = processing_entity.eid
+        self.inserted_processings[processing_id] = processing_eid
 
-        # If we just create the scan, specify and relate the entity
+        # If we just create the processing, relate the entity
         if is_created:
             # > add relation with the study
             self._set_unique_relation(
-                scan_eid, "study", study_eid, check_unicity=False)
+                processing_eid, "study", study_eid, check_unicity=False)
             self._set_unique_relation(
-                study_eid, "scans", scan_eid, check_unicity=False)
+                study_eid, "processing_runs", processing_eid, check_unicity=False)
             # > add relation with the subject
             self._set_unique_relation(
-                scan_eid, "subject", subject_eid, check_unicity=False)
+                processing_eid, "subjects", subject_eid, check_unicity=False)
             self._set_unique_relation(
-                subject_eid, "scans", scan_eid, check_unicity=False)
+                subject_eid, "processing_runs", processing_eid, check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
-                assessment_eid, "scans", scan_eid, check_unicity=False)
+                assessment_eid, "processing_runs", processing_eid, check_unicity=False)
             self._set_unique_relation(
-                scan_eid, "in_assessment", assessment_eid, check_unicity=False,
-                subjtype="Scan")
+                processing_eid, "in_assessment", assessment_eid, check_unicity=False,
+                subjtype="ProcessingRun")
+            # > add relation with the inputs
+            for rql in processing_inputs:
+                for item in self.session.execute(rql):
+                    input_eid = item[0]
+                    self._set_unique_relation(
+                        processing_eid, "inputs", input_eid,
+                        check_unicity=False)
+                    self._set_unique_relation(
+                        input_eid, "processing_runs", processing_eid,
+                        check_unicity=False)           
 
-            # Add the file set attached to a scan entity
-            self._import_file_set(fset_struct, extfiles, scan_eid, assessment_eid)
+            # Add the file set attached to a processing entity
+            self._import_file_set(fset_struct, extfiles, processing_eid,
+                                  assessment_eid)            
 
-            # Specialize the scan: set the data type
-            if "type" in scantype_struct:
-                dtype = scantype_struct.pop("type")
-                dtype_entity, _ = self._get_or_create_unique_entity(
-                    rql="",
-                    check_unicity=False,
-                    entity_name=dtype,
-                    **scantype_struct)
-                # > add relation with the scan
-                self._set_unique_relation(
-                    scan_eid, "has_data", dtype_entity.eid, check_unicity=False)
-                # > add relation with the assessment
-                self._set_unique_relation(
-                    dtype_entity.eid, "in_assessment", assessment_eid,
-                    check_unicity=False, subjtype=dtype)
-
-        # Check if their is some scores attached to the current scan
+        # Check if their is some scores attached to the current processing
         if scores is not None:
 
             # Go through all the scores attached to the scan
@@ -321,12 +316,12 @@ class Scans(Base):
                     check_unicity=False,
                     entity_name="ScoreValue",
                     **score_struct)
-                # > add relation with the scan
+                # > add relation with the processing
                 self._set_unique_relation(
-                    scan_eid, "score_values", score_entity.eid)
+                    processing_eid, "outputs", score_entity.eid)
                 # > add relation with the assessment
                 self._set_unique_relation(
                     score_entity.eid, "in_assessment", assessment_eid,
                     subjtype="ScoreValue")
 
-        return scan_eid
+        return processing_eid

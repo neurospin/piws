@@ -13,6 +13,8 @@ from cubicweb.predicates import is_instance
 from cubicweb.predicates import nonempty_rset
 from cubicweb.predicates import anonymous_user
 from cubicweb.predicates import one_line_rset
+from cubicweb.predicates import match_view
+from cubicweb.predicates import  match_kwargs
 
 # Cubes import
 from cubes.brainomics.views.components import BrainomicsLinksCenters
@@ -98,7 +100,8 @@ class NSNavigationtBox(component.CtxComponent):
         href = self._cw.build_url(
             "view", vid="jtable-table",
             rql_labels=rql_labels, ajaxcallback=ajaxcallback,
-            title="All Questionnaires", elts_to_sort=["ID"])
+            title="All Questionnaires", elts_to_sort=["ID"],
+            tooltip_name="Questionnaire_general_doc")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Questionaires</a>')
         w(u'</div></div><br/>')
@@ -263,9 +266,40 @@ class NSImageViewers(component.CtxComponent):
         w(u'</div></div><br/>')
 
 
+###############################################################################
+# Add a box to display entity relations
+###############################################################################
+
+class RelationBox(component.CtxComponent):
+    """ Helper view class to display a relation rset in a sidebox.
+    """
+    __select__ = nonempty_rset() & match_kwargs("title", "rql")
+    __regid__ = "relationbox"
+    cw_property_defs = {}
+    context = "incontext"
+
+    @property
+    def domid(self):
+        return (super(RelationBox, self).domid + unicode(abs(id(self))) +
+                unicode(abs(id(self.cw_rset))))
+
+    def render_title(self, w):
+        w(self.cw_extra_kwargs["title"])
+
+    def render_body(self, w):
+        defaultlimit = self._cw.property_value("navigation.related-limit")
+        for entity in list(self.cw_rset.entities())[:(defaultlimit - 1)]:
+            w(u"<div>&#8594; " + entity.view(self.context) + u"</div>")
+        if self.cw_rset.rowcount == defaultlimit:
+            rql = self.cw_extra_kwargs["rql"]
+            href = self._cw.build_url(rql=rql)
+            w(u"<br/><div><a href='{0}'>&#8634; see more</a></div>".format(href))   
+
+
 def registration_callback(vreg):
 
     # Update components
+    vreg.register(RelationBox)
     vreg.register(NSNavigationtBox)
     vreg.register(NSSubjectStatistics)
     vreg.register(NSAssessmentStatistics)

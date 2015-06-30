@@ -19,10 +19,12 @@ class QuestionnaireLongitudinalView(View):
     div_id = "questionnaire-longitudinal-measures"
 
     def call(self, rset=None, patient_id="", **kwargs):
-        """ Method that will create the subject longitudinal view.
+        """ Method that will create the subject longitudinal views.
 
         If no resultset are passed to this method, the current resultset is
         used.
+
+        Only digits answers are considered.
 
         Parameters
         ----------
@@ -38,6 +40,12 @@ class QuestionnaireLongitudinalView(View):
         # are in the firm dictionary
         patient_id = patient_id or self._cw.form.get("patient_id", "")
 
+        # Add some js resources
+        self._cw.add_js(
+            ("highcharts-4.0.4/js/highcharts.js",
+             "highcharts-4.0.4/js/modules/exporting.js")
+        )
+
         # Get the data from the result set
         questionnaires = {}
         for line_number in range(len(rset.rows)):
@@ -50,43 +58,92 @@ class QuestionnaireLongitudinalView(View):
 
             # Get the associated questionnaire/questions
             q_entity = qr_entity.instance_of[0]
-            if q_entity.name not in questionnaires:
+            if not q_entity.name in questionnaires:
                 questionnaires[q_entity.name] = dict(
-                    (entity.text, {})
-                    for entity in q_entity.reverse_questionnaire)
+                    (entity.text, {}) 
+                    for entity in q_entity.questions)
 
             # Get the questionnaire run associated answers and fill the
             # 'questionnaires' structure
-            answer_entities = qr_entity.reverse_questionnaire_run
+            answer_entities = qr_entity.open_answers
             for entity in answer_entities:
                 questionnaires[q_entity.name][entity.question[0].text][
                     timepoint] = entity.value
 
-        # Construct the questionnaires plots
-        nb_of_plots = 1
-        for q_name, q_item in questionnaires.iteritems():
-            for question_name, question_item in q_item.iteritems():
+        # Create a selector
+        html = "<select class='selectpicker' data-live-search='true'>"
+        html += "<option></option>"
+        for questionnaire_name, questions in questionnaires.iteritems():
+            html += "<optgroup label='{0}' data-icon='glyphicon-heart'>".format(
+                questionnaire_name)
+            for question_name, question_item in questions.iteritems():
 
-                # Get the plot data
+                # Get the plot data 
                 data = sorted(question_item.items())
-                x = [str(p[0]) for p in data]
                 values = [p[1] for p in data]
-
-                # Create the highcharts string representation of the data
-                sdata = {
-                    "x": "['" + "', '".join(x) + "']",
-                    "grid": "[" + ", ".join(values) + "]"
-                }
 
                 # Check if we are dealing with numbers
                 control_value = values[0].replace(".", "", 1)
                 if control_value.isdigit():
+                    html += "<option value='{0}'>{0}</option>".format(
+                        question_name)
+            html += "</optgroup>"
+        html += "</select>"
 
-                    # Generate the html code
-                    self.wview("highcharts-basic-plot", is_hist=False, data=sdata,
-                               tag="hc_container_{0}".format(nb_of_plots),
-                               title="{0}-{1}: {2}".format(
-                                    q_name, question_name, patient_id))
+        # Ceate a div to display the plots
+        html += ("<div id='longitudinal-plot' style='min-width: 310px; "
+                 "height: 400px; max-width: 600px; margin: 0 auto'></div>")
 
-                    # Increment the plot counter
-                    nb_of_plots += 1
+        # Convert the input data
+        html += "<script type='text/javascript'>"
+        html += "var jdata = {};"
+        for q_name, q_item in questionnaires.iteritems():
+            for question_name, question_item in q_item.iteritems():
+
+                # Get the plot data 
+                data = sorted(question_item.items())
+                values = [p[1] for p in data]
+
+                # Check if we are dealing with numbers
+                control_value = values[0].replace(".", "", 1)
+                if control_value.isdigit():
+                    html += "var sdata = {};"
+                    html += "sdata['x'] = [];".format(question_name)
+                    html += "sdata['grid'] = [];".format(question_name)
+                    html += "sdata['related_question'] = '{0}';".format(question_name)
+                    html += "sdata['related_questionnaire'] = '{0}';".format(q_name)
+                    for p in data:
+                        html += "sdata['x'].push('{0}');".format(p[0])
+                        html += "sdata['grid'].push({0});".format(p[1])
+                    html += "jdata['{0}'] = sdata;".format(question_name)
+
+        # Add an event when the selection change
+        html += "$(function() {"
+        html += "$('.selectpicker').on('change', function(){"
+        html += "var selected = $(this).find('option:selected').val();"
+        html += "if (selected != ''){"
+        html += "$('#longitudinal-plot').highcharts({"
+        html += "credits : {enabled : false}, "
+        html += ("title: {{text: jdata[selected]['related_questionnaire'] + "
+                 "'-' + jdata[selected]['related_question'] + "
+                 "': {0}'}},".format(patient_id))
+        html += "xAxis: {categories: jdata[selected]['x']},"
+        html += "yAxis: {title: {text: ''}},"
+        html += "legend: {layout: 'vertical', align: 'right', verticalAlign:" 
+        html += "'middle', borderWidth: 0},"
+        html += "series: [{name: 'longitudinal', data: jdata[selected]['grid']}]"
+        html += "});"
+        html += "}"
+        html += "});"
+        html += "});"
+        html += "</script>"
+
+        # Display the page content
+        self.w(unicode(html))
+
+
+            
+            
+
+
+
