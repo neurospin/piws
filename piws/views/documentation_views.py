@@ -18,6 +18,7 @@ class DisplayDocumentation(NullView):
     __regid__ = "piws-documentation"
     templatable = False
     div_id = "piws-documentation"
+    default_message = "Documentation has not been provided yet."
 
     def __init__(self, *args, **kwargs):
         """ Initialize the DisplayDocumentation class.
@@ -42,6 +43,10 @@ class DisplayDocumentation(NullView):
         else:
             tooltip = tooltip or self._cw.form.get("tooltip", "")
             page_title = "Documentation"
+
+        # Set a default message if documentation is empty
+        tooltip = tooltip or "<div class='body'>{0}</div>".format(
+            self.default_message)
 
         # Display documentation
         self.w(u"<!DOCTYPE html>")
