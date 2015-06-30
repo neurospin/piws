@@ -27,11 +27,11 @@ class PiwsPrimaryView(PrimaryView):
     def render_entity_attributes(self, entity):
         """ Renders all attributes and relations in the 'attributes' section. 
         """
-        # Get the entity associated documentation if available
+        # Get the entity associated documentation name if available
         if hasattr(entity, "label"):
-            tooltip = self._cw.vreg.docmap.get(entity.label, None)
+            tooltip_name = entity.label
         else:
-            tooltip = None
+            tooltip_name = None
 
         # Select only entity attributes
         display_attributes = []
@@ -48,9 +48,9 @@ class PiwsPrimaryView(PrimaryView):
             for rschema, role, dispctrl, value in display_attributes:
                 label = self._rel_label(entity, rschema, role, dispctrl)
                 self.render_attribute(label, value, table=True)
-            if tooltip is not None:
+            if tooltip_name is not None:
                 tiphref = self._cw.build_url("view", vid="piws-documentation",
-                                             tooltip=tooltip, _notemplate=True)
+                                             tooltip_name=tooltip_name, _notemplate=True)
                 tipbutton = (
                     "<a href='{0}' target=_blank class='btn btn-warning' "
                     "type='button'>Doc &#9735;</a>".format(
