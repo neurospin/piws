@@ -65,14 +65,27 @@ class PiwsPrimaryView(PrimaryView):
         boxesreg = self._cw.vreg["ctxcomponents"]
         defaultlimit = self._cw.property_value("navigation.related-limit")
         for rschema, tschemas, role, dispctrl in self._section_def(entity, "sideboxes"):
-            rql = "Any X WHERE E eid '{0}', E {1} X".format(
-                entity.eid, rschema.type)
-            rset = self._relation_rset(entity, rschema, role, dispctrl, 
+            if role == "subject":
+                rql = "Any X WHERE E eid '{0}', E {1} X".format(
+                    entity.eid, rschema.type)
+            else:
+                rql = "Any X WHERE E eid '{0}', X {1} E".format(
+                    entity.eid, rschema.type)
+            rset = self._relation_rset(entity, rschema, role, dispctrl,
                                        limit=defaultlimit)
             if not rset:
                 continue
-            label = self._rel_label(entity, rschema, role, dispctrl)
-            label = "associated " + label.replace("_", " ")
+
+            if role == "subject":
+                source_etype = entity.cw_etype
+                target_etype = getattr(entity, rschema.type)[0].cw_etype
+            else:
+                source_etype = getattr(entity, "reverse_" + rschema.type)[0].cw_etype
+                target_etype = entity.cw_etype
+
+            #label = self._rel_label(entity, rschema, role, dispctrl)
+            label = u"{0} &#8594; {1} ({2})".format(
+                source_etype, target_etype, rschema.type)
             box = boxesreg.select("relationbox", self._cw, rset=rset, rql=rql,
                                   title=label, dispctrl=dispctrl,
                                   context="incontext")

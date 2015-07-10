@@ -289,7 +289,7 @@ class RelationBox(component.CtxComponent):
     def render_body(self, w):
         defaultlimit = self._cw.property_value("navigation.related-limit")
         for entity in list(self.cw_rset.entities())[:(defaultlimit - 1)]:
-            w(u"<div>&#8594; " + entity.view(self.context) + u"</div>")
+            w(u"<div>&bull; " + entity.view(self.context) + u"</div>")
         if self.cw_rset.rowcount == defaultlimit:
             rql = self.cw_extra_kwargs["rql"]
             href = self._cw.build_url(rql=rql)
