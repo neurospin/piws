@@ -37,7 +37,7 @@ class PiwsPrimaryView(PrimaryView):
         display_attributes = []
         for rschema, _, role, dispctrl in self._section_def(entity, "attributes"):
             if rschema.final and rschema.type != "identifier":
-                value = entity.get(rschema.type)
+                value = entity.cw_attr_cache.get(rschema.type)
                 if value is not None and value != "":
                     display_attributes.append((rschema, role, dispctrl, value))
 
@@ -60,32 +60,56 @@ class PiwsPrimaryView(PrimaryView):
 
     def _prepare_side_boxes(self, entity):
         """ Create the right relation boxes to display.
+
+        In the case of 'FileSet' object, go directly to the associated
+        'FileEntires'.
         """
         sideboxes = []
         boxesreg = self._cw.vreg["ctxcomponents"]
         defaultlimit = self._cw.property_value("navigation.related-limit")
-        for rschema, tschemas, role, dispctrl in self._section_def(entity, "sideboxes"):
+        for rschema, tschemas, role, dispctrl in self._section_def(
+                entity, "sideboxes"):
+
+            # Construct rql depending on entity role
             if role == "subject":
                 rql = "Any X WHERE E eid '{0}', E {1} X".format(
                     entity.eid, rschema.type)
             else:
                 rql = "Any X WHERE E eid '{0}', X {1} E".format(
                     entity.eid, rschema.type)
+
+            # Get the current rset
             rset = self._relation_rset(entity, rschema, role, dispctrl,
                                        limit=defaultlimit)
             if not rset:
                 continue
 
+            # Construct the box label
             if role == "subject":
                 source_etype = entity.cw_etype
                 target_etype = getattr(entity, rschema.type)[0].cw_etype
             else:
                 source_etype = getattr(entity, "reverse_" + rschema.type)[0].cw_etype
                 target_etype = entity.cw_etype
+            label = (u"{0} <a class='btn btn-info' href='#' "
+                     "data-toggle='tooltip' title='{2}'>&#8594;</a> "
+                     "{1}".format(source_etype, target_etype, rschema.type))
 
-            #label = self._rel_label(entity, rschema, role, dispctrl)
-            label = u"{0} &#8594; {1} ({2})".format(
-                source_etype, target_etype, rschema.type)
+            # FileSet special case
+            if target_etype == "FileSet":
+                rql += ", X file_entries F"
+                pos = rql.find("X")
+                rql = rql[:pos] + "F" + rql[pos + 1:]
+                label += (
+                    u"<a class='btn btn-info' href='#' data-toggle='tooltip' "
+                    "title='file_entries'>&#8594;</a> ExternalFile")
+                inner_rset = []
+                for fs_entity in rset.entities():
+                    inner_rset.append(fs_entity.file_entries)
+                rset = inner_rset
+
+
+            # Construct the relation box
             box = boxesreg.select("relationbox", self._cw, rset=rset, rql=rql,
                                   title=label, dispctrl=dispctrl,
                                   context="incontext")
