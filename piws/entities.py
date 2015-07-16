@@ -29,10 +29,9 @@ class Scan(AnyEntity):
     def dc_title(self):
         """ Method the defined the scan entity title
         """
-        dtype = self.has_data[0]
-        return "{0} ({1}-{2}-{3})".format(
-            self.label, self.in_assessment[0].timepoint,
-            dtype.__class__.__name__, self.subject[0].code_in_study)
+        return "{0} of '{1}' (time '{2}')".format(
+            self.label, self.subject[0].code_in_study,
+            self.in_assessment[0].timepoint)
 
     @property
     def symbol(self):
@@ -55,17 +54,16 @@ class Assessment(AnyEntity):
     def dc_title(self):
         """ Method the defined the assessment entity title
         """
-        if self.scans and self.questionnaire_runs:
-            return "Scans - Questionnaire Run ({0}-{1})".format(
-                self.timepoint, self.subjects[0].code_in_study)
-        elif self.scans:
-            return "Scans ({0}-{1})".format(
-                self.timepoint, self.subjects[0].code_in_study)
-        elif self.questionnaire_runs:
-            return "Questionnaire Run ({0}-{1})".format(
-                self.timepoint, self.subjects[0].code_in_study)
-        else:
-            return "Genomic Measure ({0})".format(self.timepoint)
+        relations = []
+        if self.scans:
+            relations.append("Scans")
+        if self.questionnaire_runs:
+            relations.append("QuestionnaireRun")
+        if self.genomic_measures:
+            relations.append("GenomicMeasure")
+        return "Assessment of '{0}' (time '{1}' - type '{2}')".format(
+            self.subjects[0].code_in_study, self.timepoint,
+            "/".join(relations))
 
     @property
     def symbol(self):
@@ -86,7 +84,7 @@ class Subject(AnyEntity):
     def dc_title(self):
         """ Method the defined the subject entity title
         """
-        return "{0}".format(self.code_in_study)
+        return "Subject '{0}'".format(self.code_in_study)
 
     @property
     def symbol(self):
@@ -107,7 +105,8 @@ class QuestionnaireRun(AnyEntity):
     def dc_title(self):
         """ Method the defined the questionnaire run entity title
         """
-        return "{0}".format(self.user_ident.replace("_", " - "))
+        return "QuestionnaireRun of '{0}'".format(
+            self.user_ident.replace("_", " - "))
 
     @property
     def symbol(self):
@@ -123,7 +122,9 @@ class ProcessingRun(AnyEntity):
     def dc_title(self):
         """ Method the defined the processing run entity title
         """
-        return "{0}-{1}".format(self.name, self.tool)
+        return ("ProcessingRun '{0}' (time '{1}'- '{2}' related "
+                "subjects)".format(self.name, self.in_assessment[0].timepoint,
+                                   len(self.subjects)))
 
     @property
     def symbol(self):
@@ -139,12 +140,13 @@ class GenomicMeasure(AnyEntity):
     def dc_title(self):
         """ Method the defined the processing run entity title
         """
-        return "Genomic Measure ({0}-{1})".format(
-            self.in_assessment[0].timepoint, self.type)
+        return ("GenomicMeasure '{0}' (time '{1}' - '{2}' related "
+                "subjects)".format(self.type, self.in_assessment[0].timepoint,
+                                   len(self.subjects)))
 
     @property
     def symbol(self):
         """ This property will return a symbol cooresponding to the processing
         run type
         """
-        return "images/samples.png"
+        return "images/gchip.png"
