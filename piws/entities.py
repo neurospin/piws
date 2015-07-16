@@ -149,4 +149,4 @@ class GenomicMeasure(AnyEntity):
         """ This property will return a symbol cooresponding to the processing
         run type
         """
-        return "images/genetics.png"
+        return "images/gchip.png"
