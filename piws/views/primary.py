@@ -23,6 +23,7 @@ class PiwsPrimaryView(PrimaryView):
     rsection = None
     display_ctrl = None
     main_related_section = True
+    allowed_relations = ["subject"]
 
     def render_entity_attributes(self, entity):
         """ Renders all attributes and relations in the 'attributes' section. 
@@ -69,6 +70,10 @@ class PiwsPrimaryView(PrimaryView):
         defaultlimit = self._cw.property_value("navigation.related-limit")
         for rschema, tschemas, role, dispctrl in self._section_def(
                 entity, "sideboxes"):
+
+            # Filter relation box to display
+            if role not in self.allowed_relations:
+                continue
 
             # Construct rql depending on entity role
             if role == "subject":
