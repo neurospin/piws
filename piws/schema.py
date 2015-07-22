@@ -45,6 +45,28 @@ from cubes.genomics.schema import Snp
 # Modification of the schema
 ###############################################################################
 
+# It seems it's the only way to remove inlined relations
+def post_build_callback(schema):
+    # Remove inlined relations
+    schema.del_relation_def('Answer', 'question', 'Question')
+    # Add relation container with inlined=False
+    schema.add_relation_type(RelationType('question', inlined=False))
+    # Add again the deleted relation
+    schema.add_relation_def(
+        RelationDefinition(subject='Answer',
+                           name='question',
+                           object='Question',
+                           cardinality='1*',
+                           composite='object')
+    )
+    # Add a new relation
+    schema.add_relation_def(
+        RelationDefinition(subject='OpenAnswer',
+                           name='question',
+                           object='Question',
+                           cardinality='1*')
+    )
+
 # ATTRIBUTES
 
 # Add label to QuestionnaireRun entity
@@ -285,7 +307,6 @@ class in_assessment(RelationDefinition):
 class OpenAnswer(EntityType):
     value = String(required=True)
     identifier = String(maxsize=64, indexed=True, unique=True)
-    question = SubjectRelation("Question", cardinality="1*", inlined=True)
     questionnaire_run = SubjectRelation("QuestionnaireRun", cardinality="1*",
                                         inlined=True)
 
@@ -303,7 +324,7 @@ class FMRIData(EntityType):
     te = Float()
     field = String(maxsize=10, indexed=True)
 Scan.add_relation(SubjectRelation("FMRIData", cardinality='?1',
-                  composite="subject", inlined=True), name="has_data")
+                                  composite="subject", inlined=True), name="has_data")
 
 
 ###############################################################################
