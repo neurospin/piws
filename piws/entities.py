@@ -140,9 +140,8 @@ class GenomicMeasure(AnyEntity):
     def dc_title(self):
         """ Method the defined the processing run entity title
         """
-        return ("GenomicMeasure '{0}' (time '{1}' - '{2}' related "
-                "subjects)".format(self.type, self.in_assessment[0].timepoint,
-                                   len(self.subjects)))
+        return ("'{0}' (time '{1}' - '{2}' related subjects)".format(
+            self.label, self.in_assessment[0].timepoint, len(self.subjects)))
 
     @property
     def symbol(self):
