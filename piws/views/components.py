@@ -38,26 +38,27 @@ class NSNavigationtBox(component.CtxComponent):
         """ Create the diifferent item of the navigation box
         """
         # Test
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        imagefiles = [
-            "/home/ag239446/git/brainbrowser/examples/models/nifti.nii.gz",
-            "/home/ag239446/git/brainbrowser/examples/models/nifti2.nii.gz"
-        ]
-        href = self._cw.build_url(
-            "view", vid="brainbrowser-image-viewer",
-            imagefiles=imagefiles)
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Test 3D</a>')
-        w(u'</div></div><br/>')
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        imagefiles = ["/home/ag239446/git/brainbrowser/examples/models/nifti2.nii.gz"]
-        href = self._cw.build_url(
-            "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles)
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Test 4D</a>')
-        w(u'</div></div><br/>')
+        if 0:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            imagefiles = [
+                "/home/ag239446/git/brainbrowser/examples/models/nifti.nii.gz",
+                "/home/ag239446/git/brainbrowser/examples/models/nifti2.nii.gz"
+            ]
+            href = self._cw.build_url(
+                "view", vid="brainbrowser-image-viewer",
+                imagefiles=imagefiles)
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'Test 3D</a>')
+            w(u'</div></div><br/>')
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            imagefiles = ["/home/ag239446/git/brainbrowser/examples/models/nifti2.nii.gz"]
+            href = self._cw.build_url(
+                "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles)
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'Test 4D</a>')
+            w(u'</div></div><br/>')
 
         # Subjects
         w(u'<div class="btn-toolbar">')
