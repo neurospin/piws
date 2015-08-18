@@ -25,7 +25,7 @@ class Users(Base):
     """ This class enables us to add new users in CW and associate this user to
     one or multiple groups.
     """
-    def __init__(self, session, users, use_store=True):
+    def __init__(self, session, users):
         """ Initialize the Users class.
 
         Parameters
@@ -35,8 +35,6 @@ class Users(Base):
         users: dict (mandatory)
             the user names as keys and a dict with the group_names, login and
             password.
-        use_store: bool (optional, default True)
-            if True use an SQLGenObjectStore, otherwise the session.
 
         Notes
         -----
@@ -63,7 +61,7 @@ class Users(Base):
             }
         """
         # Inheritance
-        super(Users, self).__init__(session, use_store)
+        super(Users, self).__init__(session, False)
 
         # Class parameters
         self.users = users

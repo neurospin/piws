@@ -208,13 +208,20 @@ class Base(object):
 
             # The request returns some data -> do nothing
             if rset.rowcount == 0:
-                self.relate_method(source_eid, relation_name, detination_eid,
-                                   subjtype=subjtype)
+                if self.use_store:
+                    self.relate_method(source_eid, relation_name,
+                                       detination_eid, subjtype=subjtype)
+                else:
+                    self.relate_method(source_eid, relation_name,
+                                       detination_eid)
 
         # Without unicity constrain
         else:
-            self.relate_method(source_eid, relation_name, detination_eid,
-                               subjtype=subjtype)
+            if self.use_store:
+                self.relate_method(source_eid, relation_name, detination_eid,
+                                   subjtype=subjtype)
+            else:
+                self.relate_method(source_eid, relation_name, detination_eid)
 
     def _get_or_create_unique_entity(self, rql, entity_name, check_unicity=True,
                                      *args, **kwargs):

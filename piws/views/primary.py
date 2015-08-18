@@ -25,6 +25,11 @@ class PiwsPrimaryView(PrimaryView):
     main_related_section = True
     allowed_relations = ["subject"]
 
+    def summary(self, entity):
+        """ Add method for 3.20 compatibility.
+        """
+        return
+
     def render_entity_attributes(self, entity):
         """ Renders all attributes and relations in the 'attributes' section. 
         """

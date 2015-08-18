@@ -9,6 +9,7 @@
 
 # Cubicweb import
 from yams.buildobjs import SubjectRelation
+from yams.buildobjs import RelationType
 from yams.buildobjs import EntityType
 from yams.buildobjs import String
 from yams.buildobjs import Float
