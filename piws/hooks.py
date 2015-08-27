@@ -43,3 +43,45 @@ class CreateDocumentation(hook.Hook):
             self.repo.vreg.docmap = create_html_doc(doc_folder, data_url)
         else:
             self.repo.vreg.docmap = {}
+
+class RemoveUserStatusHook(hook.Hook):
+    __regid__ = "piws.remove_userstatus"
+    __select__ = hook.Hook.__select__
+    events = ('server_startup', 'server_maintenance')
+
+    def __call__(self):
+
+        show_user_status = self.repo.vreg.config.get("show_user_status", 'yes')
+
+        if show_user_status not in ['yes', 'no']:
+            raise Exception('Only :yes or :no values are allowed for '
+                            'all-in-one.conf property :show_user_status.')
+
+        with self.repo.internal_cnx() as cnx:
+
+            if 'ctxcomponents' in cnx.vreg:
+
+                cw_properties_list = [
+                    {'pkey': u'ctxcomponents.userstatus.visible',
+                     'value': u"'1'"},
+                    {'pkey': u'ctxcomponents.userstatus.order',
+                     'value': u'5'},
+                    {'pkey': u'ctxcomponents.userstatus.context',
+                     'value': u'header-right'}
+                ]
+
+                if show_user_status == 'no':
+                    cw_properties_list[0]['value'] = 'NULL'
+
+                for item in cw_properties_list:
+                    cnx.execute(u"DELETE Any X WHERE X is CWProperty, "
+                                u"X pkey '%(pkey)s'" % item)
+
+                cnx.execute(u"INSERT CWProperty X: X value %(value)s, "
+                            u"X pkey '%(pkey)s'" % cw_properties_list[0])
+                cnx.execute(u"INSERT CWProperty X: X value '%(value)s', "
+                            u"X pkey '%(pkey)s'" % cw_properties_list[1])
+                cnx.execute(u"INSERT CWProperty X: X value '%(value)s', "
+                            u"X pkey '%(pkey)s'" % cw_properties_list[2])
+
+                cnx.commit()

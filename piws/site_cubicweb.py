@@ -16,4 +16,11 @@ options = (
         "group": "piws",
         "level": 1,
     }),
+    ("show_user_status", {
+        "type": "string",
+        "default": "yes",
+        "help": "Show or not the user status link on the website.",
+        "group": "piws",
+        "level": 1,
+    }),
 )
