@@ -50,16 +50,13 @@ class RemoveUserStatusHook(hook.Hook):
     events = ('server_startup', 'server_maintenance')
 
     def __call__(self):
-    
-        show_user_status = self.repo.vreg.config["show_user_status"]
 
-        if show_user_status:
-            if show_user_status not in ['yes', 'no']:
-                raise Exception('Only :yes or :no values are allowed for '
-                                'all-in-one.conf property :show_user_status.')
-        else:
-            show_user_status = 'yes'
-        
+        show_user_status = self.repo.vreg.config.get("show_user_status", 'yes')
+
+        if show_user_status not in ['yes', 'no']:
+            raise Exception('Only :yes or :no values are allowed for '
+                            'all-in-one.conf property :show_user_status.')
+
         with self.repo.internal_cnx() as cnx:
 
             if 'ctxcomponents' in cnx.vreg:
