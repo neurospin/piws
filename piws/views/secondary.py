@@ -85,10 +85,13 @@ class BaseOutOfContextView(EntityView):
         self.w(u"<div class='col-md-2'><p class='text-center'>{0}</p>"
                "</div>".format(image))
         # > second element: the entity description + link
-        self.w(u"<div class='col-md-4'><h4>{0}</h4>".format(
+        self.w(u"<div class='col-md-6'><h4>{0}</h4>".format(
             entity.view("incontext")))
-        self.w(u"Study <em>{0}</em> - Number of subjects <em>{1}</em>".format(
-            study.name, nbsubjects))
+        entity_desc = u"Study <em>{0}</em>".format(study.name)
+        if nbsubjects != 1:
+            entity_desc += u" - Number of subjects <em>{0}</em>".format(
+                nbsubjects)
+        self.w(entity_desc)
         self.w(u"</div>")
         # > third element: the see more button
         self.w(u"<button class='btn btn-danger' type='button' "
