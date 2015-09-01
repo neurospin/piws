@@ -36,7 +36,9 @@ div.DTFC_LeftBodyLiner {
     z-index: 999;
 }
 
-
+.toolbar {
+    float: right;
+}
 
 [class*="span"] {
     float: left;

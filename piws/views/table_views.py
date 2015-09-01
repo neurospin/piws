@@ -1,3 +1,4 @@
+# coding: utf-8
 #! /usr/bin/env python
 ##########################################################################
 # NSAp - Copyright (C) CEA, 2013
@@ -101,8 +102,6 @@ class JhugetableView(View):
 
         # Add css resources
         self._cw.add_css("datatables-1.10.5/media/css/jquery.dataTables.min.css")
-        self._cw.add_css("datatables-1.10.5/extensions/TableTools/css/"
-                         "dataTables.tableTools.css")
         self._cw.add_css("datatables-1.10.5/extensions/FixedColumns/css/"
                          "dataTables.fixedColumns.css")
         self._cw.add_css("datatables-1.10.5/extensions/Scroller/css/"
@@ -114,8 +113,6 @@ class JhugetableView(View):
         # Add js resources
         self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
         self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
-        self._cw.add_js("datatables-1.10.5/extensions/TableTools/js/"
-                        "dataTables.tableTools.js")
         self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
@@ -123,10 +120,6 @@ class JhugetableView(View):
                         "dataTables.scroller.js")
         self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
                         localfile=False)
-
-        # Add swf resources
-        swf_export = self._cw.data_url("datatables-1.10.5/extensions/"
-                                       "TableTools/swf/copy_csv_xls_pdf.swf")
 
         # Get table meta information
         if rql_labels is not None:
@@ -161,10 +154,22 @@ class JhugetableView(View):
                     tooltip_name=label_text, _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
-                     "<span class='fake-link'>{1} &#9735"
-                     "</span></a>".format(tiphref, label_text)})
+                               "<span class='fake-link'>{1} &#9735"
+                               "</span></a>".format(tiphref, label_text)})
             else:
                 headers.append({"sTitle": label_text})
+
+        post_data = kwargs
+        if 'sSortDir_0' not in post_data:
+            post_data['sSortDir_0'] = 'ASC'
+        if 'iDisplayStart' not in post_data:
+            post_data['iDisplayStart'] = '0'
+        if 'iDisplayLength' not in post_data:
+            post_data['iDisplayLength'] = '-1'
+        if 'sSearch' not in post_data:
+            post_data['sSearch'] = ''
+        if 'labels' not in post_data:
+            post_data['labels'] = '{0}'.format(json.dumps(labels))
 
         # Generate the script
         html = "<script type='text/javascript'> "
@@ -177,7 +182,7 @@ class JhugetableView(View):
         html += "url: 'ajax?fname={0}', ".format(ajaxcallback)
         html += "type: 'POST', "
         html += "dataType: 'json', "
-        html += "data: {0}".format(json.dumps(kwargs))
+        html += "data: {0}".format(json.dumps(post_data))
         html += "});"
 
         # > start post: when data are loaded, hide the processing message
@@ -186,55 +191,6 @@ class JhugetableView(View):
 
         # > global variable with the data
         html += "var jdata = p['aaData'];"
-
-        # > create a new csv download button
-        html += "$.fn.dataTable.TableTools.buttons.download = $.extend("
-        html += "true,"
-        html += "{},"
-        html += "$.fn.dataTable.TableTools.buttonBase,"
-        html += "{"
-        html += "'sButtonText': 'Download',"
-        html += "'sUrl': '',"
-        html += "'sType': 'POST',"
-
-        # > define what happened when clicking the download button
-        html += "'fnClick': function( button, config ) {"
-
-        # > display a processing message
-        html += "$('#loadingmessage').show();"
-
-        html += "var csvRows = [{0}.join(';')];".format(json.dumps(labels))
-        html += "csvRows.push({0}.join(';'));".format(json.dumps(tooltips))
-        html += "for(var i=0, l=jdata.length; i<l; ++i){"
-        html += "csvRows.push(jdata[i].join(';'));"
-        html += "}"
-
-        # > create a download link
-        html += "var csvString = csvRows.join('\\r\\n');"
-        html += "var a = document.createElement('a');"
-        html += ("a.href = 'data:application/csv;charset=utf-8,' "
-                 "+ encodeURIComponent(csvString);")
-        html += "a.target = '_blank';"
-        ts = time.time()
-        st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
-        if "timepoint" in kwargs:
-            csv_file_name = "{0}_{1}_{2}.csv".format(
-                title, kwargs["timepoint"], st)
-        else:
-            csv_file_name = "{0}_{1}".format(title, st)
-        html += "a.download = '{0}';".format(csv_file_name)
-
-        # > hide the processing message
-        html += "document.body.appendChild(a);"
-        html += "a.click();"
-        html += "$('#loadingmessage').hide();"
-
-        # > end click
-        html += "}"
-        # > end button base
-        html += "}"
-        # > end button
-        html += ");"
 
         # > create the table
         html += "var table = $('#the_table').dataTable( { "
@@ -248,26 +204,19 @@ class JhugetableView(View):
         html += "scrollCollapse: true,"
         html += "aoColumns: {0}, ".format(json.dumps(headers))
         if use_scroller:
-            html += "dom: 'T<\"clear\">frtiS', "
+            if csvcallback:
+                html += "dom: 'T<\"clear\"><\"toolbar\">frtiS', "
+            else:
+                html += "dom: 'T<\"clear\">frtiS', "
             html += "scroller: {loadingIndicator: true}, "
         else:
-            html += "dom: 'T<\"clear\">lfrtip', "
+            if csvcallback:
+                html += "dom: 'T<\"clear\">l<\"toolbar\">frtip', "
+            else:
+                html += "dom: 'T<\"clear\">lfrtip', "
             html += "lengthMenu: [ [25, 50, 100, 200], [25, 50, 100, 200] ],"
             html += "pagingType: 'full_numbers',"
             html += "bProcessing: true, "
-
-        buttons = "'copy'"
-        if csvcallback:
-            # >> create a custom button to download all the table
-            export_button = (
-                "{'sExtends': 'download', 'sButtonText': 'CSV - All results'}")
-            buttons += ", {0}".format(export_button)
-
-        # > display the export buttons
-        html += ("'tableTools': {{ "
-                 "'sRowSelect': 'multi', "
-                 "'sSwfPath': '{0}', "
-                 "'aButtons': [{1}] }}, ".format(swf_export, buttons))
 
         # > build the inner ajax call
         html += "ajax: function ( data, callback, settings ) {"
@@ -317,6 +266,52 @@ class JhugetableView(View):
         html += "'track': true,"
         html += "'fade': 250"
         html += "} );"
+
+        if csvcallback:
+
+            # > create a new csv download button
+            csv_button_html = (u'<p><a class="btn btn-default" role="button" '
+                               u'id="csv_button">CSV Export »</a></p>')
+            html += u"$('div.toolbar').html('{0}');".format(csv_button_html)
+
+            # > center the search-bar
+            html += ("$('#the_table_filter').css({'float': 'none', "
+                     "'text-align': 'center'});")
+
+            # > assign ajax callback to csv button : start function click
+            html +="$( '#csv_button' ).click(function() {"
+            # # > display a processing message
+            html += "$('#loadingmessage').show();"
+            #
+            html += "headers = {0};".format(json.dumps(labels))
+            html += "var csvRows = [headers.join(';')];"
+            html += "csvRows.push({0}.join(';'));".format(json.dumps(tooltips))
+            html += "for(var i=0, l=jdata.length; i<l; ++i){"
+            html += "csvRows.push(jdata[i].join(';'));"
+            html += "}"
+
+            # > create a download link
+            html += "var csvString = csvRows.join('\\r\\n');"
+            html += "var a = document.createElement('a');"
+            html += ("a.href = 'data:application/csv;charset=utf-8,' "
+                     "+ encodeURIComponent(csvString);")
+            html += "a.target = '_blank';"
+            ts = time.time()
+            st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
+            if "timepoint" in kwargs:
+                csv_file_name = "{0}_{1}_{2}.csv".format(
+                    title, kwargs["timepoint"], st)
+            else:
+                csv_file_name = "{0}_{1}".format(title, st)
+            html += "a.download = '{0}';".format(csv_file_name)
+
+            # > hide the processing message
+            html += "document.body.appendChild(a);"
+            html += "a.click();"
+            html += "$('#loadingmessage').hide();"
+
+            # > end fct click
+            html += "});"
 
         # > post done
         html += "});"
@@ -433,8 +428,6 @@ class JtableView(View):
 
         # Add css resources
         self._cw.add_css("datatables-1.10.5/media/css/jquery.dataTables.min.css")
-        self._cw.add_css("datatables-1.10.5/extensions/TableTools/css/"
-                         "dataTables.tableTools.min.css")
         self._cw.add_css("datatables-1.10.5/extensions/FixedColumns/css/"
                          "dataTables.fixedColumns.css")
         self._cw.add_css(
@@ -444,17 +437,11 @@ class JtableView(View):
         # Add js resources
         self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
         self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
-        self._cw.add_js("datatables-1.10.5/extensions/TableTools/js/"
-                        "dataTables.tableTools.min.js")
         self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
         self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
                         localfile=False)
-
-        # Add swf resources
-        swf_export = self._cw.data_url("datatables-1.10.5/extensions/"
-                                       "TableTools/swf/copy_csv_xls.swf")
 
         # Get table meta information
         if rql_labels is not None:
@@ -503,91 +490,14 @@ class JtableView(View):
                     tooltip_name=label_text[0], _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
-                     "<span class='fake-link'>{1} &#9735"
-                     "</span></a>".format(tiphref, label_text[0])})
+                               "<span class='fake-link'>{1} &#9735"
+                               "</span></a>".format(tiphref, label_text[0])})
             else:
                 headers.append({"sTitle": label_text[0]})
 
         # > begin the script
         html = "<script type='text/javascript'> "
         html += "$(document).ready(function() {"
-
-        # > create a new csv download button
-        html += "$.fn.dataTable.TableTools.buttons.download = $.extend("
-        html += "true,"
-        html += "{},"
-        html += "$.fn.dataTable.TableTools.buttonBase,"
-        html += "{"
-        html += "'sButtonText': 'Download',"
-        html += "'sUrl': '',"
-        html += "'sType': 'POST',"
-
-        # > define what happened when clicking the download button
-        html += "'fnClick': function( button, config ) {"
-
-        # > display a processing message
-        html += "$('#loadingmessage').show();"
-
-        # > get information from the data table
-        html += "var dt = new $.fn.dataTable.Api( this.s.dt );"
-        html += "var postData = dt.ajax.params() || {};"
-
-        # > set options to retrieve all the full result set from the ajax
-        # callback
-        html += "postData.iDisplayStart = 0;"
-        html += "postData.iDisplayLength = -1;"
-        html += "postData.sSearch = '';"
-
-        # > execute the ajax callback
-        html += "var post = $.ajax({"
-        html += "url: config.sUrl,"
-        html += "type: config.sType,"
-        html += "data: postData"
-        html += "});"
-
-        # > the ajax callback is done, get the result set
-        html += "post.done(function(p){"
-        html += "var jdata = p.aaData;"
-        html += "headers = JSON.parse(postData.labels);"
-        html += "var csvRows = [headers.join(';')];"
-        html += "csvRows.push({0}.join(';'));".format(json.dumps(tooltips))
-        html += "for(var i=0, l=jdata.length; i<l; ++i){"
-        html += "csvRows.push(jdata[i].join(';'));"
-        html += "}"
-
-        # > create a download link
-        html += "var csvString = csvRows.join('\\r\\n');"
-        html += "var a = document.createElement('a');"
-        html += ("a.href = 'data:application/csv;charset=utf-8,' "
-                 "+ encodeURIComponent(csvString);")
-        html += "a.target = '_blank';"
-        ts = time.time()
-        st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
-        if "timepoint" in kwargs:
-            csv_file_name = "{0}_{1}_{2}.csv".format(
-                title, kwargs["timepoint"], st)
-        else:
-            csv_file_name = "{0}_{1}".format(title, st)
-        html += "a.download = '{0}';".format(csv_file_name)
-
-        # > hide the processing message
-        html += "document.body.appendChild(a);"
-        html += "a.click();"
-        html += "$('#loadingmessage').hide();"
-        html += "});"
-
-        # > if the ajax callback failed display an alert
-        html += "post.fail(function(){"
-        html += "$('#loadingmessage').hide();"
-        html += "alert('Error : Download Failed!');"
-        html += "});"
-
-        # > end fct click
-        html += "}"
-        # > end button
-        html += "}"
-        # > end button
-        html += ");"
 
         # > create the table
         html += "var table = $('#the_table').dataTable( { "
@@ -597,31 +507,19 @@ class JtableView(View):
         html += "'scrollY': '600px',"
         html += "'scrollCollapse': true,"
         html += "'sPaginationType': 'bootstrap',"
-        html += "'dom': 'T<\"clear\">lfrtip',"
+        if csvcallback:
+            html += "'dom': 'T<\"clear\">l<\"toolbar\">frtip',"
+        else:
+            html += "'dom': 'T<\"clear\">lfrtip',"
         html += "'lengthMenu': [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ],"
         html += "'sServerMethod': 'POST',"
-        html += "'oLanguage': {'sSearch': 'ID'},"
+        html += "'oLanguage': {'sSearch': 'ID search'},"
         html += "'pagingType': 'full_numbers',"
         html += "'bProcessing': true,"
         if use_server:
             html += "'bServerSide': true,"
         else:
             html += "'bServerSide': false,"
-
-        # > export csv options
-        buttons = "'copy'"
-        if csvcallback:
-            # >> create a custom button to download all the table
-            export_button = (
-                "{{'sExtends': 'download', 'sButtonText': 'CSV - All results', "
-                "'sUrl':'ajax?fname={0}'}}").format(ajaxcallback)
-            buttons += ", {0}".format(export_button)
-
-        # > display the export buttons
-        html += ("'tableTools': {{ "
-                 "'sRowSelect': 'multi', "
-                 "'sSwfPath': '{0}', "
-                 "'aButtons': [{1}] }}, ".format(swf_export, buttons))
 
         # > set table header
         html += "'aoColumns': {0},".format(json.dumps(headers))
@@ -675,6 +573,79 @@ class JtableView(View):
         html += "'fade': 250"
         html += "} );"
 
+        if csvcallback:
+
+            # > create a new csv download button
+            csv_button_html = (u'<p><a class="btn btn-default" role="button" '
+                               u'id="csv_button">CSV Export »</a></p>')
+            html += u"$('div.toolbar').html('{0}');".format(csv_button_html)
+
+            # > center the search-bar
+            html += ("$('#the_table_filter').css({'float': 'none', "
+                     "'text-align': 'center'});")
+
+            # > assign ajax callback to csv button : start function click
+            html +="$( '#csv_button' ).click(function() {"
+            # # > display a processing message
+            html += "$('#loadingmessage').show();"
+            #
+            # # > get information from the data table
+            html += "var dt = new $.fn.dataTable.Api( table );"
+            html += "var postData = dt.ajax.params() || {};"
+
+            # > set options to retrieve all the full result set from the ajax
+            # callback
+            html += "postData.iDisplayStart = 0;"
+            html += "postData.iDisplayLength = -1;"
+            html += "postData.sSearch = '';"
+
+            # > execute the ajax callback
+            html += "var post = $.ajax({"
+            html += "url: dt.ajax.url(),"
+            html += "type: 'POST',"
+            html += "data: postData"
+            html += "});"
+
+            # > the ajax callback is done, get the result set
+            html += "post.done(function(p){"
+            html += "var jdata = p.aaData;"
+            html += "headers = JSON.parse(postData.labels);"
+            html += "var csvRows = [headers.join(';')];"
+            html += "csvRows.push({0}.join(';'));".format(json.dumps(tooltips))
+            html += "for(var i=0, l=jdata.length; i<l; ++i){"
+            html += "csvRows.push(jdata[i].join(';'));"
+            html += "}"
+
+            # > create a download link
+            html += "var csvString = csvRows.join('\\r\\n');"
+            html += "var a = document.createElement('a');"
+            html += ("a.href = 'data:application/csv;charset=utf-8,' "
+                     "+ encodeURIComponent(csvString);")
+            html += "a.target = '_blank';"
+            ts = time.time()
+            st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
+            if "timepoint" in kwargs:
+                csv_file_name = "{0}_{1}_{2}.csv".format(
+                    title, kwargs["timepoint"], st)
+            else:
+                csv_file_name = "{0}_{1}".format(title, st)
+            html += "a.download = '{0}';".format(csv_file_name)
+
+            # > hide the processing message
+            html += "document.body.appendChild(a);"
+            html += "a.click();"
+            html += "$('#loadingmessage').hide();"
+            html += "});"
+
+            # > if the ajax callback failed display an alert
+            html += "post.fail(function(){"
+            html += "$('#loadingmessage').hide();"
+            html += "alert('Error : Download Failed!');"
+            html += "});"
+
+            # > end fct click
+            html += "});"
+
         # > close script
         html += "} );"
 
@@ -687,8 +658,8 @@ class JtableView(View):
                 "view", vid="piws-documentation", tooltip_name=tooltip_name,
                 _notemplate=True)
             title = (u"<a class='btn btn-warning' href='{0}' target=_blanck>"
-                      "{1} &#9735;</a>".format(tiphref, title))
-        html += "<h1>{0}</h1>".format(title) 
+                     "{1} &#9735;</a>".format(tiphref, title))
+        html += "<h1>{0}</h1>".format(title)
 
         # > create a div for the in progress resource
         html += ("<div id='loadingmessage' style='display:none' "
@@ -925,8 +896,8 @@ def get_questionnaires_data(self):
             # Fill the cells with hyperlinks to the questionnaire view
             record[timepoint_index] = (
                 "<a href='{0}'>"
-                "<img src='data/images/blue-arrow.png' " 
-                "alt='Open questionnaire' width='20' " 
+                "<img src='data/images/blue-arrow.png' "
+                "alt='Open questionnaire' width='20' "
                 "height='20' border='0'></a>").format(href)
 
         # Store the table formatted row
