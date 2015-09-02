@@ -42,13 +42,14 @@ class BaseOutOfContextView(EntityView):
 
         # Get the associated images
         imagefiles = []
-        if hasattr(entity, "results_files"):
-            # TODO: deal with 4d images
-            if entity.label not in ["EPI", "DTI"]:
-                for efentries in entity.results_files:
-                    imagefiles.extend(
-                        [e.filepath for e in efentries.file_entries
-                         if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))])
+        if entity.cw_etype == 'Scan':
+            if hasattr(entity, "results_files"):
+                # TODO: deal with 4d images
+                if entity.label not in ["EPI", "DTI"]:
+                    for efentries in entity.results_files:
+                        imagefiles.extend(
+                            [e.filepath for e in efentries.file_entries
+                             if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))])
 
         # Create a viewer if some images has been detected
         limagefiles = len(imagefiles)
@@ -90,7 +91,7 @@ class BaseOutOfContextView(EntityView):
         self.w(u"<div class='col-md-6'><h4>{0}</h4>".format(
             entity.view("incontext")))
         entity_desc = u"Study <em>{0}</em>".format(study.name)
-        if nbsubjects != 1:
+        if nbsubjects not in [1, 'nc']:
             entity_desc += u" - Number of subjects <em>{0}</em>".format(
                 nbsubjects)
         self.w(entity_desc)
@@ -215,8 +216,8 @@ class OutOfContextSubjectView(BaseOutOfContextView):
         desc = {}
         desc["Gender"] = entity.gender
         desc["Handedness"] = entity.handedness
-        desc["Related assessments"] = " - ".join(
-            ["<a href='{0}'>{1}</a>".format(item.absolute_url(), item.identifier)
+        desc["Related assessments"] = "".join(
+            ["<li><a href='{0}'>{1}</a></li>".format(item.absolute_url(), item.identifier)
              for item in entity.assessments])
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
