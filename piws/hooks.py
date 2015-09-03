@@ -35,7 +35,9 @@ class ServerStartupHook(hook.Hook):
                 for egroup in rset.entities():
                     if egroup.name in ["guests", "managers", "users", "owners"]:
                         continue
-                    self.repo._extid_cache[ldap_base_dn] = egroup.eid
+                    self.repo._extid_cache['cn={0},{1}'.format(
+                        egroup.name, ldap_base_dn)] = egroup.eid
+
 
 class CreateDocumentation(hook.Hook):
     """ On startup create the documentation.
@@ -63,6 +65,7 @@ class CreateDocumentation(hook.Hook):
             self.repo.vreg.docmap = create_html_doc(doc_folder, data_url)
         else:
             self.repo.vreg.docmap = {}
+
 
 class RemoveUserStatusHook(hook.Hook):
     __regid__ = "piws.remove_userstatus"
