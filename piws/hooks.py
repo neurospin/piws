@@ -17,6 +17,26 @@ from cubicweb.server import hook
 from cubes.piws.docgen.rst2html import create_html_doc
 
 
+class ServerStartupHook(hook.Hook):
+    """
+        Update repository cache with groups from indexation to ease LDAP
+        synchronisation
+    """
+    __regid__ = 'piws.update_cache_hook'
+    events = ('server_startup', 'server_maintenance')
+
+    def __call__(self):
+        # get ldap base dn
+        ldap_base_dn = self.repo.vreg.config.get("ldap_base_dn", None)
+        # update repository cache
+        if ldap_base_dn is not None:
+            with self.repo.internal_cnx() as cnx:
+                rset = cnx.execute("Any X WHERE X is CWGroup")
+                for egroup in rset.entities():
+                    if egroup.name in ["guests", "managers", "users", "owners"]:
+                        continue
+                    self.repo._extid_cache[ldap_base_dn] = egroup.eid
+
 class CreateDocumentation(hook.Hook):
     """ On startup create the documentation.
     """

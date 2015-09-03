@@ -23,4 +23,11 @@ options = (
         "group": "piws",
         "level": 1,
     }),
+    ("ldap_base_dn", {
+        "type": "string",
+        "default": "",
+        "help": "LDAP base dn for synchronisation",
+        "group": "piws",
+        "level": 1,
+    }),
 )
