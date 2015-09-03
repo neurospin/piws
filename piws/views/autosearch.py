@@ -93,7 +93,6 @@ class AutoSearch(View):
         # Filter the entity attributes
         else:
             ename = self.split_entity_field(kwargs["_entity"][0])[0]
-            print ename
             eattributes = entities[ename]["subject_attributes"]
             for attrib in eattributes:
 
@@ -169,7 +168,6 @@ class AutoSearch(View):
     def split_entity_field(self, efield):
         """ The expected synthax is (><)entity_name[relation_name]
         """
-        print efield
         if efield[0] in [">", "<"]:
             ename, rname = efield[1: -1].split("[")
             if efield[0] == ">":
