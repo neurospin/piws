@@ -139,6 +139,12 @@ class ImageViewer(View):
         # Set the cw brainbrowser image loader
         html += self.build_cw_loader(imagefiles, 0, True)
 
+        html += '<strong>BrainBrowser&#169; visualisation tool :</strong>'
+        html += '<dl class="dl-horizontal">'
+        html += '<dt>Lead Developer</dt><dd>Tarek Sherif</dd>'
+        html += '<dt>Full credits</dt><dd><a href="https://brainbrowser.cbrain.mcgill.ca/">BrainBrowser Website</a></dd>'
+        html += '</dl>'
+
         # Creat the corresponding html page
         self.w(unicode(html))
 
