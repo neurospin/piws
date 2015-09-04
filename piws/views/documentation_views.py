@@ -45,8 +45,19 @@ class DisplayDocumentation(NullView):
             page_title = "Documentation"
 
         # Set a default message if documentation is empty
-        tooltip = tooltip or "<div class='body'>{0}</div>".format(
-            self.default_message)
+        if tooltip:
+            tooltip = tooltip
+            add_css = '<link rel="stylesheet" type="text/css" href="{0}"/>'\
+                .format(self._cw.data_url("doc.css"))
+        else:
+            image_url = self._cw.data_url("images/error.png")
+            error_html = '<div style="align: left; text-align:center;">'
+            error_html += '<img src="{0}"/>'.format(image_url)
+            error_html += '<div class="caption"><font size="7">{0}</font></div>'\
+                .format(self.default_message)
+            error_html += '</div>'
+            tooltip = "<div class='body'>{0}</div>".format(error_html)
+            add_css = ''
 
         # Display documentation
         self.w(u"<!DOCTYPE html>")
@@ -54,8 +65,7 @@ class DisplayDocumentation(NullView):
         self.w(u"<head>")
         self.w(u"<meta http-equiv='content-type' content='text/html; charset=UTF-8'/>")
         self.w(u"<meta http-equiv='X-UA-Compatible' content='IE=8' />")
-        self.w(u'<link rel="stylesheet" type="text/css" href="{0}"/>'.format(
-            self._cw.data_url("doc.css")))
+        self.w(u'{0}'.format(add_css))
         self.w(u'<title>{0}</title>'.format(page_title))
         self.w(u'<link rel="icon" href="{0}" />'.format(
             self._cw.data_url("favicon.ico")))
