@@ -121,7 +121,8 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'<div class="btn-group-vertical btn-block">')
         href = self._cw.build_url(rql="Any S Where S is CWSearch")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'My searches</a>')
+        w(u'<span class="glyphicon glyphicon-shopping-cart" '
+          u'style="width: 25px;"></span>My cart</a>')
         w(u'</div></div><br/>')
 
         # CWUpload
@@ -295,10 +296,10 @@ class RelationBox(component.CtxComponent):
             rset = self.cw_rset[0]
         for entity in rset[:(defaultlimit - 1)]:
             w(u"<div>&bull; " + entity.view(self.context) + u"</div>")
-        if len(rset) == defaultlimit:
-            rql = self.cw_extra_kwargs["rql"]
-            href = self._cw.build_url(rql=rql)
-            w(u"<br/><div><a href='{0}'>&#8634; see more</a></div>".format(href))   
+        # if len(rset) == defaultlimit:
+        rql = self.cw_extra_kwargs["rql"]
+        href = self._cw.build_url(rql=rql)
+        w(u"<br/><div><a href='{0}'>&#8634; see more</a></div>".format(href))
 
 
 def registration_callback(vreg):
