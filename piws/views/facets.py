@@ -23,6 +23,7 @@ from cubes.brainomics.views.facets import MeasureAgeFacet
 
 FacetFilterMixIn._generate_form = FacetFilterMixIn.generate_form
 
+
 def generate_form(self, w, rset, divid, vid, vidargs=None, mainvar=None,
                   paginate=False, cssclass='', hiddens=None, **kwargs):
 
@@ -45,6 +46,7 @@ def generate_form(self, w, rset, divid, vid, vidargs=None, mainvar=None,
         w(u'{0}'.format(html))
 
 FacetFilterMixIn.generate_form = generate_form
+
 
 ############################################################################
 # FACETS

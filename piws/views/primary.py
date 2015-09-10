@@ -31,7 +31,7 @@ class PiwsPrimaryView(PrimaryView):
         return
 
     def render_entity_attributes(self, entity):
-        """ Renders all attributes and relations in the 'attributes' section. 
+        """ Renders all attributes and relations in the 'attributes' section.
         """
         # Get the entity associated documentation name if available
         if hasattr(entity, "label"):
@@ -117,7 +117,6 @@ class PiwsPrimaryView(PrimaryView):
                 for fs_entity in rset.entities():
                     inner_rset.append(fs_entity.file_entries)
                 rset = inner_rset
-
 
             # Construct the relation box
             box = boxesreg.select("relationbox", self._cw, rset=rset, rql=rql,

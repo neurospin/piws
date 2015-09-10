@@ -60,7 +60,7 @@ class QuestionnaireLongitudinalView(View):
             q_entity = qr_entity.instance_of[0]
             if not q_entity.name in questionnaires:
                 questionnaires[q_entity.name] = dict(
-                    (entity.text, {}) 
+                    (entity.text, {})
                     for entity in q_entity.questions)
 
             # Get the questionnaire run associated answers and fill the
@@ -78,7 +78,7 @@ class QuestionnaireLongitudinalView(View):
                 questionnaire_name)
             for question_name, question_item in questions.iteritems():
 
-                # Get the plot data 
+                # Get the plot data
                 data = sorted(question_item.items())
                 values = [p[1] for p in data]
 
@@ -100,7 +100,7 @@ class QuestionnaireLongitudinalView(View):
         for q_name, q_item in questionnaires.iteritems():
             for question_name, question_item in q_item.iteritems():
 
-                # Get the plot data 
+                # Get the plot data
                 data = sorted(question_item.items())
                 values = [p[1] for p in data]
 
@@ -129,7 +129,7 @@ class QuestionnaireLongitudinalView(View):
                  "': {0}'}},".format(patient_id))
         html += "xAxis: {categories: jdata[selected]['x']},"
         html += "yAxis: {title: {text: ''}},"
-        html += "legend: {layout: 'vertical', align: 'right', verticalAlign:" 
+        html += "legend: {layout: 'vertical', align: 'right', verticalAlign:"
         html += "'middle', borderWidth: 0},"
         html += "series: [{name: 'longitudinal', data: jdata[selected]['grid']}]"
         html += "});"
@@ -140,10 +140,3 @@ class QuestionnaireLongitudinalView(View):
 
         # Display the page content
         self.w(unicode(html))
-
-
-            
-            
-
-
-

@@ -765,7 +765,7 @@ def get_encoded_brainbrowser_image(self):
     header = im.get_header()
     try:
         data = im.get_data()
-    except:        
+    except:
         im = nifti.NiftiImage(imagefile)
         data = im.getDataArray().T
 
@@ -874,7 +874,7 @@ def get_brainbrowser_image(self):
     header = im.get_header()
     try:
         data = im.get_data()
-    except:        
+    except:
         im = nifti.NiftiImage(imagefile)
         data = im.getDataArray().T
 

@@ -19,6 +19,7 @@ from cubicweb.web import Redirect
 
 #rschema = form._cw.vreg.schema['done_in'].rdef('Ticket', 'Version')
 
+
 class AutoSearchForm(FieldsForm):
     """ The authorized form fields are defined in the global parameter
     'DECLARED_FIELDS' that can be found in the

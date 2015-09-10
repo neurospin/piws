@@ -134,7 +134,7 @@ class BaseOutOfContextView(EntityView):
         self.w(u"<div id='info-{0}' class='collapse'>".format(row))
         self.w(u"<dl class='dl-horizontal'>")
         for key, value in entity_desc.items():
-            self.w(u"<dt>{0}</dt><dd>{1}</dd>".format(key, value))         
+            self.w(u"<dt>{0}</dt><dd>{1}</dd>".format(key, value))
         self.w(u"</div>")
 
         # Create a div that will be show or hide when the doc button is
@@ -322,4 +322,3 @@ def registration_callback(vreg):
         OutOfContextAssessmentView, AssessmentOutOfContextView)
     vreg.register_and_replace(
         OutOfContextQuestionnaireRunView, QuestionnaireRunOutOfContextView)
-

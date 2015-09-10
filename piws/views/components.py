@@ -14,7 +14,7 @@ from cubicweb.predicates import nonempty_rset
 from cubicweb.predicates import anonymous_user
 from cubicweb.predicates import one_line_rset
 from cubicweb.predicates import match_view
-from cubicweb.predicates import  match_kwargs
+from cubicweb.predicates import match_kwargs
 
 # Cubes import
 from cubes.brainomics.views.components import BrainomicsLinksCenters

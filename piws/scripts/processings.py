@@ -298,11 +298,11 @@ class Processings(Base):
                         check_unicity=False)
                     self._set_unique_relation(
                         input_eid, "processing_runs", processing_eid,
-                        check_unicity=False)           
+                        check_unicity=False)
 
             # Add the file set attached to a processing entity
             self._import_file_set(fset_struct, extfiles, processing_eid,
-                                  assessment_eid)            
+                                  assessment_eid)
 
         # Check if their is some scores attached to the current processing
         if scores is not None:
