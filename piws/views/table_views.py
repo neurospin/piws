@@ -279,7 +279,7 @@ class JhugetableView(View):
                      "'text-align': 'center'});")
 
             # > assign ajax callback to csv button : start function click
-            html +="$( '#csv_button' ).click(function() {"
+            html += "$( '#csv_button' ).click(function() {"
             # # > display a processing message
             html += "$('#loadingmessage').show();"
             #
@@ -585,7 +585,7 @@ class JtableView(View):
                      "'text-align': 'center'});")
 
             # > assign ajax callback to csv button : start function click
-            html +="$( '#csv_button' ).click(function() {"
+            html += "$( '#csv_button' ).click(function() {"
             # # > display a processing message
             html += "$('#loadingmessage').show();"
             #
@@ -878,7 +878,7 @@ def get_questionnaires_data(self):
         timepoints = item[1]
 
         # Build the current row
-        record = [qname] + [""] * (len(labels) -1)
+        record = [qname] + [""] * (len(labels) - 1)
 
         # Start filling the table dataset
         # Go through all declared timepoints

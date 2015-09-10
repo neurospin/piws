@@ -40,6 +40,7 @@ from glob import glob
 
 THIS_CUBE_DIR = join('share', 'cubicweb', 'cubes', modname)
 
+
 def listdir(dirpath):
     return [join(dirpath, fname) for fname in _listdir(dirpath)
             if fname[0] != '.' and not fname.endswith('.pyc')

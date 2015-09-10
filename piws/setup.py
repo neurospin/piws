@@ -41,7 +41,7 @@ from distutils.command import install_data
 
 # import required features
 from __pkginfo__ import modname, version, license, description, web, \
-     author, author_email, classifiers
+    author, author_email, classifiers
 
 if exists('README'):
     long_description = file('README').read()
@@ -155,6 +155,7 @@ if USE_SETUPTOOLS:
         # monkey patch: Crack SandboxViolation verification
         from setuptools.sandbox import DirectorySandbox as DS
         old_ok = DS._ok
+
         def _ok(self, path):
             """Return True if ``path`` can be written during installation."""
             out = old_ok(self, path)  # here for side effect from setuptools
@@ -166,6 +167,7 @@ if USE_SETUPTOOLS:
         DS._ok = _ok
     except ImportError:
         pass
+
 
 def install(**kwargs):
     """setup entry point"""

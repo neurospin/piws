@@ -27,7 +27,7 @@ class Scan(AnyEntity):
     __regid__ = "Scan"
 
     def dc_title(self):
-        """ Method the defined the scan entity title
+        """Define the scan entity title.
         """
         return "{0} of '{1}' (time '{2}')".format(
             self.label, self.subject[0].code_in_study,
@@ -35,8 +35,7 @@ class Scan(AnyEntity):
 
     @property
     def symbol(self):
-        """ This property will return a symbol cooresponding to the scan
-        type
+        """Return a symbol corresponding to the scan type.
         """
         dtype = self.has_data[0]
         if dtype.__class__.__name__ == "DMRIData":
@@ -52,7 +51,7 @@ class Assessment(AnyEntity):
     container_config = ASSESSMENT_CONTAINER
 
     def dc_title(self):
-        """ Method the defined the assessment entity title
+        """Define the assessment entity title.
         """
         relations = []
         if self.scans:
@@ -67,8 +66,7 @@ class Assessment(AnyEntity):
 
     @property
     def symbol(self):
-        """ This property will return a symbol cooresponding to the scan
-        type
+        """Return a symbol corresponding to the assessment type.
         """
         if self.scans or self.questionnaire_runs:
             return "images/questionnaire.png"
@@ -82,14 +80,13 @@ class Subject(AnyEntity):
     __regid__ = "Subject"
 
     def dc_title(self):
-        """ Method the defined the subject entity title
+        """Define the subject entity title.
         """
         return "Subject '{0}'".format(self.code_in_study)
 
     @property
     def symbol(self):
-        """ This property will return a symbol cooresponding to the subject
-        gender
+        """Return a symbol corresponding to the subject gender.
         """
         if self.gender == "male":
             return "images/male.png"
@@ -103,15 +100,14 @@ class QuestionnaireRun(AnyEntity):
     __regid__ = "QuestionnaireRun"
 
     def dc_title(self):
-        """ Method the defined the questionnaire run entity title
+        """Define the questionnaire run entity title.
         """
         return "QuestionnaireRun of '{0}'".format(
             self.user_ident.replace("_", " - "))
 
     @property
     def symbol(self):
-        """ This property will return a symbol cooresponding to the questionnaire
-        run type
+        """Return a symbol corresponding to the questionnaire run type.
         """
         return "images/questionnaire.png"
 
@@ -120,7 +116,7 @@ class ProcessingRun(AnyEntity):
     __regid__ = "ProcessingRun"
 
     def dc_title(self):
-        """ Method the defined the processing run entity title
+        """Define the processing run entity title.
         """
         return ("ProcessingRun '{0}' (time '{1}'- '{2}' related "
                 "subjects)".format(self.name, self.in_assessment[0].timepoint,
@@ -128,8 +124,7 @@ class ProcessingRun(AnyEntity):
 
     @property
     def symbol(self):
-        """ This property will return a symbol cooresponding to the processing
-        run type
+        """Return a symbol corresponding to the processing run type.
         """
         return "images/processing.png"
 
@@ -138,14 +133,13 @@ class GenomicMeasure(AnyEntity):
     __regid__ = "GenomicMeasure"
 
     def dc_title(self):
-        """ Method the defined the processing run entity title
+        """Define the genomic measure run entity title.
         """
-        return ("'{0}' (time '{1}' - '{2}' related subjects)".format(
+        return ("'{0}' (time '{1}' - {2} related subjects)".format(
             self.label, self.in_assessment[0].timepoint, len(self.subjects)))
 
     @property
     def symbol(self):
-        """ This property will return a symbol cooresponding to the processing
-        run type
+        """Return a symbol corresponding to the genomic measure type.
         """
         return "images/gchip.png"
