@@ -104,7 +104,7 @@ class NSNavigationtBox(component.CtxComponent):
             title="All Questionnaires", elts_to_sort=["ID"],
             tooltip_name="Questionnaire_general_doc")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Questionaires</a>')
+        w(u'Questionnaires</a>')
         w(u'</div></div><br/>')
 
         # GenomicMeasures
