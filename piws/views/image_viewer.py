@@ -9,7 +9,6 @@
 
 # System import
 import nibabel
-import nifti
 import os
 import numpy
 import json
@@ -763,11 +762,7 @@ def get_encoded_brainbrowser_image(self):
     # Load the image
     im = nibabel.load(imagefile)
     header = im.get_header()
-    try:
-        data = im.get_data()
-    except:
-        im = nifti.NiftiImage(imagefile)
-        data = im.getDataArray().T
+    data = im.get_data()
 
     # Change the dynamic of the image intensities
     data = numpy.cast[numpy.uint8](
@@ -872,11 +867,7 @@ def get_brainbrowser_image(self):
     # Load the image
     im = nibabel.load(imagefile)
     header = im.get_header()
-    try:
-        data = im.get_data()
-    except:
-        im = nifti.NiftiImage(imagefile)
-        data = im.getDataArray().T
+    data = im.get_data()
 
     # Change the dynamic of the image intensities
     data = numpy.cast[numpy.uint16](
