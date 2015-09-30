@@ -48,7 +48,7 @@ class NSPoweredByAction(Action):
     title = _("&#169 2014, Neurospin Analysis Platform developers")
 
     def url(self):
-        return "http://www-centre-saclay.cea.fr/fr/NeuroSpin"
+        return "http://i2bm.cea.fr/dsv/i2bm/NeuroSpin"
 
 
 def registration_callback(vreg):
