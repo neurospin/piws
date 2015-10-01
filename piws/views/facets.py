@@ -64,7 +64,7 @@ class TimepointFacet(facet.RQLPathFacet):
     path = ["X in_assessment A", "A timepoint T"]
     order = 1
     filter_variable = "T"
-    title = _("Time points")
+    title = _("Time Points")
 
 
 class StudyFacet(facet.RQLPathFacet):
@@ -132,7 +132,7 @@ class AssessmentTimepointFacet(facet.RQLPathFacet):
     path = ["X timepoint T"]
     order = 1
     filter_variable = "T"
-    title = _("Time points")
+    title = _("Time Points")
 
 
 class AssessmentSubjectFacet(facet.RQLPathFacet):
