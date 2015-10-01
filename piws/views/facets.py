@@ -53,7 +53,7 @@ FacetFilterMixIn.generate_form = generate_form
 ############################################################################
 
 class TimepointFacet(facet.RQLPathFacet):
-    """ Filter on timepoint (form the 'Assessment' entity).
+    """ Filter on time point (form the 'Assessment' entity).
 
     This filter is applied on 'Scan', 'ProcessingRun',
     'QuestionnaireRun' and 'GenomicMeasure' entities.
@@ -64,7 +64,7 @@ class TimepointFacet(facet.RQLPathFacet):
     path = ["X in_assessment A", "A timepoint T"]
     order = 1
     filter_variable = "T"
-    title = _("Timepoints")
+    title = _("Time points")
 
 
 class StudyFacet(facet.RQLPathFacet):
@@ -132,7 +132,7 @@ class AssessmentTimepointFacet(facet.RQLPathFacet):
     path = ["X timepoint T"]
     order = 1
     filter_variable = "T"
-    title = _("Timepoints")
+    title = _("Time points")
 
 
 class AssessmentSubjectFacet(facet.RQLPathFacet):
