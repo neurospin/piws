@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 ##########################################################################
 # NSAp - Copyright (C) CEA, 2013
 # Distributed under the terms of the CeCILL-B license, as published by
@@ -20,7 +19,7 @@ class Processings(Base):
     """
     def __init__(self, session, project_name, center_name, processings,
                  can_read=True, can_update=True, data_filepath=None,
-                 use_store=True):
+                 use_store=True, piws_security_model=True):
         """ Initialize the Processings class.
 
         Parameters
@@ -44,6 +43,8 @@ class Processings(Base):
             the path to folder containing the current study dataset.
         use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
+        piws_security_model: bool (optional, default True)
+            if True use the security model specific to PIWS.
 
         Notes
         -----
@@ -83,6 +84,7 @@ class Processings(Base):
         self.center_name = center_name
         self.can_read = can_read
         self.can_update = can_update
+        self.piws_security_model = piws_security_model
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -218,7 +220,7 @@ class Processings(Base):
                 else:
                     assessment_eid = self._create_assessment(
                         assessment_struct, subject_eid, study_eid, center_eid,
-                        groups)
+                        groups, self.piws_security_model)
                     self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################

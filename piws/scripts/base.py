@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 ##########################################################################
 # NSAp - Copyright (C) CEA, 2013
 # Distributed under the terms of the CeCILL-B license, as published by
@@ -273,7 +272,7 @@ class Base(object):
         return entity, is_created
 
     def _create_assessment(self, assessment_struct, subject_eids, study_eid,
-                           center_eid, groups):
+                           center_eid, groups, piws_security_model=True):
         """ Create an assessment and its associated relations.
 
         The groups that can access the 'in_assessment' linked entities are
@@ -324,27 +323,39 @@ class Base(object):
 
             # Set the permissions
             # Create/get the related assessment groups
-            assessment_id = assessment_id.split("_")
-            related_groups = [
-                assessment_id[0],
-                "_".join(assessment_id[:2])
-            ]
-            for group_name in related_groups:
+            if piws_security_model:
+                assessment_id = assessment_id.split("_")
+                related_groups = [
+                    assessment_id[0],
+                    "_".join(assessment_id[:2])
+                ]
+                for group_name in related_groups:
 
-                # Check the group is created
-                if group_name in groups:
+                    # Check the group is created
+                    if group_name in groups:
+                        group_eid = groups[group_name]
+                    else:
+                        raise ValueError(
+                            "Please create first the group '{0}'.".format(group_name))
+
+                    # > add relation with group
+                    if self.can_read:
+                        self._set_unique_relation(
+                            group_eid, "can_read", assessment_eid)
+                    if self.can_update:
+                        self._set_unique_relation(
+                            group_eid, "can_update", assessment_eid)
+            else:
+                for group_name in ('users', 'guests'):
                     group_eid = groups[group_name]
-                else:
-                    raise ValueError(
-                        "Please create first the group '{0}'.".format(group_name))
 
-                # > add relation with group
-                if self.can_read:
-                    self._set_unique_relation(
-                        group_eid, "can_read", assessment_eid)
-                if self.can_update:
-                    self._set_unique_relation(
-                        group_eid, "can_update", assessment_eid)
+                    # > add relation with group
+                    if self.can_read:
+                        self._set_unique_relation(
+                            group_eid, "can_read", assessment_eid)
+                    if self.can_update:
+                        self._set_unique_relation(
+                            group_eid, "can_update", assessment_eid)
 
         return assessment_eid
 
