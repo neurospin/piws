@@ -15,11 +15,11 @@ import hashlib
 from .base import Base
 
 
-class Groups(Base):
-    """ This class enables us to add new goups in CW.
+class CWGroups(Base):
+    """ This class enables us to add new user groups in CW.
     """
     def __init__(self, session, list_group_names, use_store=True):
-        """ Initialize the Groups class.
+        """ Initialize the CWGroups class.
 
         Parameters
         ----------
@@ -31,7 +31,7 @@ class Groups(Base):
             if True use an SQLGenObjectStore, otherwise the session.
         """
         # Inheritance
-        super(Groups, self).__init__(session, use_store)
+        super(CWGroups, self).__init__(session, use_store)
 
         # Class parameters
         self.list_group_names = list_group_names

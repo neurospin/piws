@@ -20,12 +20,12 @@ from cubicweb.server.utils import crypt_password
 from .base import Base
 
 
-class Users(Base):
+class CWUsers(Base):
     """ This class enables us to add new users in CW and associate this user to
     one or multiple groups.
     """
     def __init__(self, session, users):
-        """ Initialize the Users class.
+        """ Initialize the CWUsers class.
 
         Parameters
         ----------
@@ -60,7 +60,7 @@ class Users(Base):
             }
         """
         # Inheritance
-        super(Users, self).__init__(session, False)
+        super(CWUsers, self).__init__(session, False)
 
         # Class parameters
         self.users = users
