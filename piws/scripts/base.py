@@ -11,7 +11,6 @@
 import os
 import sys
 import hashlib
-import pygraphviz as pgv
 
 # Cubicweb import
 from cubicweb.dataimport import SQLGenObjectStore
@@ -111,9 +110,11 @@ class Base(object):
         node_text_size: int (optional, default 12)
             the text size.
         """
+        import pygraphviz
+
         # Create a graph
-        graph = pgv.AGraph(strict=False, directed=True, rankdir="LR",
-                           overlap=False)
+        graph = pygraphviz.AGraph(strict=False, directed=True,
+                                  rankdir="LR", overlap=False)
 
         # Get all the entity names involved
         entities = set()
