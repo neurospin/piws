@@ -1,8 +1,4 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# copyright 2014 nsap, all rights reserved.
-# contact http://www.logilab.fr -- mailto:antoine.grigis@cea.fr
-#
 ##########################################################################
 # NSAp - Copyright (C) CEA, 2013
 # Distributed under the terms of the CeCILL-B license, as published by
