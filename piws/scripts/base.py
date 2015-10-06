@@ -279,7 +279,7 @@ class Base(object):
         The groups that can access the 'in_assessment' linked entities are
         generated dynamically from the assessment identifiers:
 
-            * we '_' split the string and create a group with the first retuned
+            * we '_' split the string and create a group with the first returned
               item and the concatenation of the two first items.
             * the permissions 'can_read', 'can_update' relate the assessments
               with the corresponding groups.
