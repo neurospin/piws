@@ -56,7 +56,7 @@ class BaseOutOfContextView(EntityView):
         if limagefiles > 0:
             href = self._cw.build_url(
                 "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
-                __message=(u"Found '{0}' image(s) that can be "
+                __message=(u"Found {0} image(s) that can be "
                             "displayed.".format(limagefiles)))
 
         # Get the associated documentation if available
