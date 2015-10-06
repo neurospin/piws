@@ -66,3 +66,5 @@ class Groups(Base):
                 check_unicity=True,
                 entity_name="CWGroup",
                 name=unicode(goup_name))
+
+        print  # new line after last progress bar update
