@@ -207,7 +207,6 @@ class Genetics(Base):
                     title="{0}(genetics)".format(
                         tgenetic_item["Assessment"]["identifier"]),
                     bar_length=40)
-                print
                 cnt_measure += 1
 
                 ###############################################################
@@ -275,8 +274,8 @@ class Genetics(Base):
                     ############################################################
 
                     measure_struct = tgenetic_measure["GenomicMeasure"]
-                    fset_struct = tgenetic_measure["FileSet"]
-                    extfiles = tgenetic_measure["ExternalResources"]
+                    fset_struct = tgenetic_measure["FileSet"] if "FileSet" in tgenetic_measure else None  ### FIXME
+                    extfiles = tgenetic_measure["ExternalResources"] if "ExternalResources" in tgenetic_measure else None  ### FIXME
                     measure_eid = self._create_measure(
                         measure_struct, fset_struct, extfiles, related_subjects,
                         study_subjects, study_eid, assessment_eid, platform_eid)
@@ -324,9 +323,10 @@ class Genetics(Base):
                 platform_eid, "genomic_measures", measure_eid,
                 check_unicity=False)
 
-            # Add the file set attached to a scan entity
-            self._import_file_set(fset_struct, extfiles, measure_eid,
-                                  assessment_eid)
+            # Add the file set attached to this Genetics entity
+            if fset_struct:
+                self._import_file_set(fset_struct, extfiles, measure_eid,
+                                      assessment_eid)
 
         return measure_eid
 
