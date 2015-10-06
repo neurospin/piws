@@ -169,8 +169,8 @@ class OutOfContextScanView(BaseOutOfContextView):
         desc["Repetition time"] = dtype_entity.tr
         desc["Echo time"] = dtype_entity.te
         desc["Scanner field"] = dtype_entity.field
-        #desc["Ralated subject"] = subject.view("incontext")
-        desc["Ralated study"] = study.view("incontext")
+        #desc["Related subject"] = subject.view("incontext")
+        desc["Related study"] = study.view("incontext")
         return desc
 
 
