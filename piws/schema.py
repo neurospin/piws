@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 ##########################################################################
 # NSAp - Copyright (C) CEA, 2013
 # Distributed under the terms of the CeCILL-B license, as published by
@@ -321,7 +320,7 @@ class FMRIData(EntityType):
     voxel_res_z = Float(required=True)
     fov_x = Float()
     fov_y = Float()
-    tr = Float(required=True)
+    tr = Float()  # add required=True in next major revision
     te = Float()
     field = String(maxsize=10, indexed=True)
 Scan.add_relation(SubjectRelation("FMRIData", cardinality='?1',

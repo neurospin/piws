@@ -1,8 +1,4 @@
-#! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# copyright 2014 nsap, all rights reserved.
-# contact http://www.logilab.fr -- mailto:antoine.grigis@cea.fr
-#
 ##########################################################################
 # NSAp - Copyright (C) CEA, 2013
 # Distributed under the terms of the CeCILL-B license, as published by
@@ -118,9 +114,8 @@ class ProcessingRun(AnyEntity):
     def dc_title(self):
         """Define the processing run entity title.
         """
-        return ("ProcessingRun '{0}' (time '{1}'- '{2}' related "
-                "subjects)".format(self.name, self.in_assessment[0].timepoint,
-                                   len(self.subjects)))
+        return ("ProcessingRun '{0}' (time '{1}')".format(self.name,
+                self.in_assessment[0].timepoint))
 
     @property
     def symbol(self):
@@ -135,8 +130,8 @@ class GenomicMeasure(AnyEntity):
     def dc_title(self):
         """Define the genomic measure run entity title.
         """
-        return ("'{0}' (time '{1}' - {2} related subjects)".format(
-            self.label, self.in_assessment[0].timepoint, len(self.subjects)))
+        return ("'{0}' (time '{1}')".format(self.label,
+                self.in_assessment[0].timepoint))
 
     @property
     def symbol(self):
