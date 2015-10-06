@@ -259,6 +259,8 @@ class Scans(Base):
                             scan_struct, scantype_struct, fset_struct, extfiles,
                             scores, subject_eid, study_eid, assessment_eid)
 
+        print  # new line after last progress bar update
+
     def _create_scan(self, scan_struct, scantype_struct, fset_struct, extfiles,
                      scores, subject_eid, study_eid, assessment_eid):
         """ Create a scans and its associated relations.

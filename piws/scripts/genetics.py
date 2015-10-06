@@ -280,6 +280,8 @@ class Genetics(Base):
                         measure_struct, fset_struct, extfiles, related_subjects,
                         study_subjects, study_eid, assessment_eid, platform_eid)
 
+        print  # new line after last progress bar update
+
     def _create_measure(self, measure_struct, fset_struct, extfiles,
                         related_subjects, study_subjects, study_eid,
                         assessment_eid, platform_eid):

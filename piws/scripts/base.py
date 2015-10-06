@@ -83,7 +83,6 @@ class Base(object):
         """
         # Send the new entities to the db
         if self.use_store:
-            print
             self.store.flush()
 
     def import_data(self):
