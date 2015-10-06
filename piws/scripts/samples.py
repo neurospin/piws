@@ -209,3 +209,5 @@ class Samples(Base):
                             self._set_unique_relation(file_entity.eid,
                                 "in_assessment", assessment_entity.eid,
                                 check_unicity=False)
+
+        print  # new line after last progress bar update

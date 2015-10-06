@@ -45,10 +45,10 @@ class NSPoweredByAction(Action):
     __select__ = yes()
     category = "footer"
     order = 3
-    title = _("&#169 2014, Neurospin Analysis Platform developers")
+    title = _("Copyright &#169; 2014-2015 CEA")
 
     def url(self):
-        return "http://www-centre-saclay.cea.fr/fr/NeuroSpin"
+        return "http://i2bm.cea.fr/dsv/i2bm/NeuroSpin"
 
 
 def registration_callback(vreg):

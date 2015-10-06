@@ -326,7 +326,7 @@ class HighChartsRelationSummaryView(View):
                 '"</b> items <br><b>" + this.series.yAxis.categories['
                 'this.point.y] + "</b>";}}}}, '.format(", ".join(relations)))
         # > configure series
-        self.w(u'series: [{{name: "Number of item per timepoint", borderWidth: 1, '
+        self.w(u'series: [{{name: "Number of items per timepoint", borderWidth: 1, '
                 'data: {0}, dataLabels: {{enabled: true, color: "black", style: '
                 '{{textShadow: "none", HcTextStroke: null}}}}}}]'.format(data["grid"]))
         # > close headers

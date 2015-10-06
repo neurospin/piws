@@ -68,7 +68,7 @@ class PiwsPrimaryView(PrimaryView):
         """ Create the right relation boxes to display.
 
         In the case of 'FileSet' object, go directly to the associated
-        'FileEntires'.
+        'FileEntries'.
         """
         sideboxes = []
         boxesreg = self._cw.vreg["ctxcomponents"]

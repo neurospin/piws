@@ -7,3 +7,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 
+msgid "Assessment_plural"
+msgstr "Assessments"
+
+msgid "GenomicMeasure_plural"
+msgstr "Genomic measures"
+
+msgid "Scan_plural"
+msgstr "Images"
+
+msgid "ProcessingRun_plural"
+msgstr "Processed data"
+
+msgid "Subject_plural"
+msgstr "Subjects"
+
