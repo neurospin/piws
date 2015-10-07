@@ -9,8 +9,7 @@
 ##########################################################################
 
 # System import
-from string import maketrans
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import json
 import re
 import datetime
@@ -19,6 +18,8 @@ import time
 # Cubicweb import
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
+from cubicweb.web.views.csvexport import CSVMixIn
+from logilab.common.registry import yes
 
 
 ###############################################################################
@@ -476,14 +477,14 @@ class JtableView(View):
         label_list = ["ID"]
         if "ID" not in elts_to_sort:
             hide_sort_indices.append(0)
-        for cnt, label_text in enumerate(labels):
+        for cnt, label_text in enumerate(sorted(labels)):
 
             # >> select if we can sort this column
             if label_text[0] not in elts_to_sort:
                 hide_sort_indices.append(cnt + 1)
 
             # >> add this column to the table definition parameters
-            label_list.append(label_cleaner(label_text[0]))
+            label_list.append(label_text[0])
             if label_text[0] in qmap:
                 tiphref = self._cw.build_url(
                     "view", vid="piws-documentation",
@@ -511,7 +512,7 @@ class JtableView(View):
             html += "'dom': 'T<\"clear\">l<\"toolbar\">frtip',"
         else:
             html += "'dom': 'T<\"clear\">lfrtip',"
-        html += "'lengthMenu': [ [10, 25, 50, 100, -1], [10, 25, 50, 100, 'All'] ],"
+        html += "'lengthMenu': [ [10, 25, 50, 100], [10, 25, 50, 100] ],"
         html += "'sServerMethod': 'POST',"
         html += "'oLanguage': {'sSearch': 'ID search'},"
         html += "'pagingType': 'full_numbers',"
@@ -584,61 +585,47 @@ class JtableView(View):
             html += ("$('#the_table_filter').css({'float': 'none', "
                      "'text-align': 'center'});")
 
-            # > assign ajax callback to csv button : start function click
-            html += "$( '#csv_button' ).click(function() {"
-            # # > display a processing message
-            html += "$('#loadingmessage').show();"
-            #
-            # # > get information from the data table
-            html += "var dt = new $.fn.dataTable.Api( table );"
-            html += "var postData = dt.ajax.params() || {};"
-
             # > set options to retrieve all the full result set from the ajax
             # callback
-            html += "postData.iDisplayStart = 0;"
-            html += "postData.iDisplayLength = -1;"
-            html += "postData.sSearch = '';"
+            post_data = {'qname': kwargs['qname'],
+                         'timepoint': kwargs['timepoint'],
+                         'labels': json.dumps(label_list)}
+
+            # > set csv file name
+            timestamp = time.strftime("%Y-%m-%d_%H:%M:%S")
+            filename_items = [title, kwargs.get("timepoint", ""), timestamp]
+            filename = "_".join([x for x in filename_items if x])
+
+            # > assign ajax callback to csv button : start function click
+            html += "$('#csv_button').click(function() {"
+
+            # > display a processing message
+            html += "$('#loadingmessage').show();"
 
             # > execute the ajax callback
-            html += "var post = $.ajax({"
-            html += "url: dt.ajax.url(),"
-            html += "type: 'POST',"
-            html += "data: postData"
+            html += "var request = $.ajax({"
+            html += "url: 'view?vid=piwscsvexport',"
+            html += "method: 'POST',"
+            html += "data: {0},".format(json.dumps(post_data))
+            html += "dataType: 'html'"
             html += "});"
 
             # > the ajax callback is done, get the result set
-            html += "post.done(function(p){"
-            html += "var jdata = p.aaData;"
-            html += "headers = JSON.parse(postData.labels);"
-            html += "var csvRows = [headers.join(';')];"
-            html += "csvRows.push({0}.join(';'));".format(json.dumps(tooltips))
-            html += "for(var i=0, l=jdata.length; i<l; ++i){"
-            html += "csvRows.push(jdata[i].join(';'));"
-            html += "}"
-
+            html += "request.done(function( result ) {"
             # > create a download link
-            html += "var csvString = csvRows.join('\\r\\n');"
-            html += "var a = document.createElement('a');"
-            html += ("a.href = 'data:application/csv;charset=utf-8,' "
-                     "+ encodeURIComponent(csvString);")
-            html += "a.target = '_blank';"
-            ts = time.time()
-            st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
-            if "timepoint" in kwargs:
-                csv_file_name = "{0}_{1}_{2}.csv".format(
-                    title, kwargs["timepoint"], st)
-            else:
-                csv_file_name = "{0}_{1}".format(title, st)
-            html += "a.download = '{0}';".format(csv_file_name)
-
-            # > hide the processing message
+            html += "var a = window.document.createElement('a');"
+            html += ("a.href = window.URL.createObjectURL(new Blob([result], "
+                     "{type: 'text/csv'}));")
+            html += "a.download = '{0}.csv';".format(filename)
             html += "document.body.appendChild(a);"
             html += "a.click();"
+            html += "document.body.removeChild(a);"
+            # > hide the processing message
             html += "$('#loadingmessage').hide();"
             html += "});"
 
             # > if the ajax callback failed display an alert
-            html += "post.fail(function(){"
+            html += "request.fail(function(){"
             html += "$('#loadingmessage').hide();"
             html += "alert('Error : Download Failed!');"
             html += "});"
@@ -673,34 +660,6 @@ class JtableView(View):
 
         # Creat the corrsponding html page
         self.w(unicode(html))
-
-
-###############################################################################
-# Define a function that clean a string
-###############################################################################
-
-_ILLEGAL_CHARACTERS = "\\/:*%.()?\"'<>| \t\r\n\0"
-_CLEANUP_TABLE = maketrans(_ILLEGAL_CHARACTERS, "_" * len(_ILLEGAL_CHARACTERS))
-
-
-def label_cleaner(string_label):
-    """ Get rid of illegal characters.
-
-    Replace characters that are illegal in jtable labels.
-    - Windows reserved characters
-    - spaces, tab, newline and null character
-
-    Parameters
-    ----------
-    string_label: str
-        string to cleanup.
-
-    Returns
-    -------
-    cleaned_label: str
-        string with illegal characters replaced.
-    """
-    return str(string_label).translate(_CLEANUP_TABLE)
 
 
 ###############################################################################
@@ -770,10 +729,8 @@ def get_open_answers_data(self):
     # Get the answers of the desired subset of subjects
     records = []
     for row_nb in rset_range:
-
-        # Start filling the tabel dataset
-        dstruct = [""] * len(labels)
-        dstruct[0] = filtered_rset[row_nb][0]
+        user_data = OrderedDict.fromkeys(labels, '')
+        user_data['ID'] = filtered_rset[row_nb][0]
 
         # Execute an rql to get the subject answers
         questionnaire_run_eid = filtered_rset[row_nb][1]
@@ -783,11 +740,10 @@ def get_open_answers_data(self):
 
         # Go through all answers
         for qname, answer in answer_rset:
-            answer_index = labels.index(label_cleaner(qname))
-            dstruct[answer_index] = answer
+            user_data[qname] = answer
 
         # Store the tabel formated row
-        records.append(dstruct)
+        records.append(user_data.values())
 
     # Table formatting
     data = {"iTotalRecords": rset.rowcount,
@@ -795,6 +751,38 @@ def get_open_answers_data(self):
             "aaData": records}
 
     return data
+
+
+class PiwsCSVView(CSVMixIn, View):
+    """dumps questionnaires in CSV"""
+    __regid__ = 'piwscsvexport'
+    __select__ = yes()
+    title = _('piws csv export')
+
+    def call(self):
+
+        qname = self._cw.form['qname']
+        timepoint = self._cw.form['timepoint']
+        labels = json.loads(self._cw.form['labels'])
+
+        rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
+               "S questionnaire_runs QR, QR instance_of QU, QU name '{0}', "
+               "QR open_answers O, O value OV, O in_assessment A, "
+               "A timepoint '{1}', O question Q, Q text QT".format(qname,
+                                                                   timepoint)
+               )
+        rset = self._cw.execute(rql)
+
+        table = defaultdict(lambda: OrderedDict.fromkeys(labels, ''))
+        for item in rset:
+            table[item[0]][item[1]] = item[2]
+        for id, data in table.iteritems():
+            table[id]["ID"] = id
+
+        writer = self.csvwriter()
+        writer.writerow(labels)
+        for psc2, data in iter(sorted(table.iteritems())):
+            writer.writerow(data.values())
 
 
 @ajaxfunc(output_type="json")
@@ -854,8 +842,7 @@ def get_questionnaires_data(self):
         timepoint = item[1]
         # Filter the rset with the ID pattern
         if id_pattern == "" or id_pattern.lower() in qname.lower():
-            qstruct.setdefault(qname, []).append(
-                label_cleaner(timepoint))
+            qstruct.setdefault(qname, []).append(timepoint)
 
     # Open answer table parameters
     ajaxcallback = "get_open_answers_data"
@@ -920,3 +907,4 @@ def registration_callback(vreg):
     vreg.register(JhugetableView)
     vreg.register(get_open_answers_data)
     vreg.register(get_questionnaires_data)
+    vreg.register(PiwsCSVView)
