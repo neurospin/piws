@@ -17,7 +17,7 @@ from .base import Base
 
 
 class CWGroups(Base):
-    """ This class enables us to add new goups in CW.
+    """ This class enables us to add new user groups in CW.
     """
     def __init__(self, session, list_group_names, use_store=True):
         """ Initialize the CWGroups class.
