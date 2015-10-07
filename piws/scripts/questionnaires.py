@@ -288,6 +288,8 @@ class Questionnaires(Base):
                         study_eid, assessment_eid, questionnaire_eids,
                         question_eids)
 
+        print  # new line after last progress bar update
+
     def _create_questionnaire(self, questionnaire_name, q_items,
                               identifier_prefix, subject_id, subject_eid,
                               study_eid, assessment_eid, questionnaire_eids,

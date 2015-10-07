@@ -57,7 +57,7 @@ class QuestionnaireLongitudinalView(View):
 
             # Get the associated questionnaire/questions
             q_entity = qr_entity.instance_of[0]
-            if not q_entity.name in questionnaires:
+            if q_entity.name not in questionnaires:
                 questionnaires[q_entity.name] = dict(
                     (entity.text, {})
                     for entity in q_entity.questions)

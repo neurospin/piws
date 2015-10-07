@@ -11,7 +11,6 @@
 import os
 import sys
 import hashlib
-import pygraphviz as pgv
 
 # Cubicweb import
 from cubicweb.dataimport import SQLGenObjectStore
@@ -111,9 +110,11 @@ class Base(object):
         node_text_size: int (optional, default 12)
             the text size.
         """
+        import pygraphviz
+
         # Create a graph
-        graph = pgv.AGraph(strict=False, directed=True, rankdir="LR",
-                           overlap=False)
+        graph = pygraphviz.AGraph(strict=False, directed=True,
+                                  rankdir="LR", overlap=False)
 
         # Get all the entity names involved
         entities = set()
@@ -278,7 +279,7 @@ class Base(object):
         The groups that can access the 'in_assessment' linked entities are
         generated dynamically from the assessment identifiers:
 
-            * we '_' split the string and create a group with the first retuned
+            * we '_' split the string and create a group with the first returned
               item and the concatenation of the two first items.
             * the permissions 'can_read', 'can_update' relate the assessments
               with the corresponding groups.

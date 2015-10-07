@@ -67,7 +67,7 @@ class PiwsPrimaryView(PrimaryView):
         """ Create the right relation boxes to display.
 
         In the case of 'FileSet' object, go directly to the associated
-        'FileEntires'.
+        'FileEntries'.
         """
         sideboxes = []
         boxesreg = self._cw.vreg["ctxcomponents"]
@@ -78,14 +78,6 @@ class PiwsPrimaryView(PrimaryView):
             # Filter relation box to display
             if role not in self.allowed_relations:
                 continue
-
-            # Construct rql depending on entity role
-            if role == "subject":
-                rql = "Any X WHERE E eid '{0}', E {1} X".format(
-                    entity.eid, rschema.type)
-            else:
-                rql = "Any X WHERE E eid '{0}', X {1} E".format(
-                    entity.eid, rschema.type)
 
             # Get the current rset
             rset = self._relation_rset(entity, rschema, role, dispctrl,
@@ -103,6 +95,14 @@ class PiwsPrimaryView(PrimaryView):
             label = (u"{0} <a class='btn btn-info disabled' href='#' "
                      "data-toggle='tooltip' title='{2}'>&#8594;</a> "
                      "{1}".format(source_etype, target_etype, rschema.type))
+
+            # Construct rql depending on entity role
+            if role == "subject":
+                rql = "Any X WHERE X is {0}, E eid '{1}', E {2} X".format(target_etype,
+                    entity.eid, rschema.type)
+            else:
+                rql = "Any X WHERE X is {0}, E eid '{1}', X {2} E".format(target_etype,
+                    entity.eid, rschema.type)
 
             # FileSet special case
             if target_etype == "FileSet":
