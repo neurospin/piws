@@ -20,11 +20,31 @@ from cubicweb.predicates import match_kwargs
 from cubes.brainomics.views.components import BrainomicsLinksCenters
 from cubes.brainomics.views.components import BrainomicsEditBox
 from cubes.brainomics.views.components import BrainomicsDownloadBox
-
+from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
 
 ###############################################################################
 # Navigation Box
 ###############################################################################
+
+
+class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
+    """
+    Overrride bootstrap user-status component.
+    In all-in-one.conf:
+    If show-user-status=1 : activated (default: bootstrap component).
+    If show-user-status=0 : deactivated.
+    If show-user-status=1 and apache-cleanup-session-time is specified:
+    diplay a logout button next to the search field.
+    """
+    def render(self, w):
+        config = self._cw.vreg.config
+        if config.get("show_user_status", None) == 'no':
+            w(u'')
+        elif config.get('apache-cleanup-session-time', None) is not None:
+            w(u'<button type="button">Logout</button>')
+        else:
+            super(PiwsAuthenticatedUserStatus, self).render(w)
+
 
 class NSNavigationtBox(component.CtxComponent):
     """ Display a box containing navigation shortcuts.
@@ -305,6 +325,8 @@ class RelationBox(component.CtxComponent):
 def registration_callback(vreg):
 
     # Update components
+    vreg.register_and_replace(PiwsAuthenticatedUserStatus,
+                              BSAuthenticatedUserStatus)
     vreg.register(RelationBox)
     vreg.register(NSNavigationtBox)
     vreg.register(NSSubjectStatistics)
