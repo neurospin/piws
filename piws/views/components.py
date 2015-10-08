@@ -28,7 +28,14 @@ from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
 
 
 class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
-
+    """
+    Overrride bootstrap user-status component.
+    In all-in-one.conf:
+    If show-user-status=1 : activated (default: bootstrap component).
+    If show-user-status=0 : deactivated.
+    If show-user-status=1 and apache-cleanup-session-time is specified:
+    diplay a logout button next to the search field.
+    """
     def render(self, w):
         config = self._cw.vreg.config
         if config.get("show_user_status", None) == 'no':
