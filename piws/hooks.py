@@ -68,49 +68,6 @@ class CreateDocumentation(hook.Hook):
             self.repo.vreg.docmap = {}
 
 
-class RemoveUserStatusHook(hook.Hook):
-    __regid__ = "piws.remove_userstatus"
-    __select__ = hook.Hook.__select__
-    events = ('server_startup', 'server_maintenance')
-
-    def __call__(self):
-
-        show_user_status = self.repo.vreg.config.get("show_user_status", 'yes')
-
-        if show_user_status not in ['yes', 'no']:
-            raise Exception('Only :yes or :no values are allowed for '
-                            'all-in-one.conf property :show_user_status.')
-
-        with self.repo.internal_cnx() as cnx:
-
-            if 'ctxcomponents' in cnx.vreg:
-
-                cw_properties_list = [
-                    {'pkey': u'ctxcomponents.userstatus.visible',
-                     'value': u"'1'"},
-                    {'pkey': u'ctxcomponents.userstatus.order',
-                     'value': u'5'},
-                    {'pkey': u'ctxcomponents.userstatus.context',
-                     'value': u'header-right'}
-                ]
-
-                if show_user_status == 'no':
-                    cw_properties_list[0]['value'] = 'NULL'
-
-                for item in cw_properties_list:
-                    cnx.execute(u"DELETE Any X WHERE X is CWProperty, "
-                                u"X pkey '%(pkey)s'" % item)
-
-                cnx.execute(u"INSERT CWProperty X: X value %(value)s, "
-                            u"X pkey '%(pkey)s'" % cw_properties_list[0])
-                cnx.execute(u"INSERT CWProperty X: X value '%(value)s', "
-                            u"X pkey '%(pkey)s'" % cw_properties_list[1])
-                cnx.execute(u"INSERT CWProperty X: X value '%(value)s', "
-                            u"X pkey '%(pkey)s'" % cw_properties_list[2])
-
-                cnx.commit()
-
-
 def piws_clean_sessions(self):
     """tags sessions not used since an amount of time specified in the
     configuration
@@ -132,32 +89,37 @@ def piws_clean_sessions(self):
     return nbclosed
 
 
-class PiwsAddLoopingTaskHook(hook.Hook):
+class PiwsApacheDeauthenticationHook(hook.Hook):
     """
         Add piws_clean_sessions to server looping tasks
     """
-    __regid__ = 'piws.add_looping_task'
+    __regid__ = 'piws.apache_deauthentication'
     events = ('server_startup', 'server_maintenance')
 
     def __call__(self):
         """
-        * register session clean up task.
+        Register session clean up task.
+        Adapted from cubicweb.server.repository @ _prepare_startup
         """
-        if self.repo.config.get('enable-apache-deauth', 'no') == 'yes':
-            if not (self.repo.config.creating or self.repo.config.repairing
-                    or self.repo.config.quick_start):
+        if not (self.repo.config.creating or self.repo.config.repairing
+                or self.repo.config.quick_start):
+            piws_cleanup_session_time = self.repo.config.get(
+                'apache-cleanup-session-time', None)
+            if piws_cleanup_session_time is not None:
+                assert piws_cleanup_session_time > 0
+                self.repo.piws_cleanup_session_time = piws_cleanup_session_time
                 self.repo._piws_expired_sessionids = set()
                 self.repo.piws_clean_sessions = types.MethodType(
                     piws_clean_sessions, self.repo)
-                # register a task to cleanup expired session
-                self.repo.piws_cleanup_session_time = self.repo.config. \
-                    get('apache-cleanup-session-time', 60 * 60 * 24)
-                assert self.repo.piws_cleanup_session_time > 0
+                # Arbitrary define the period to clean sessions as a third
+                # of the specified cleanup time T. This implies a maximum
+                # uncertainty in each session expiration of T/3.
+                # If T > 3h we arbitrary fix this period to 1h.
                 cleanup_session_interval = min(60*60,
                                                self.repo.
                                                piws_cleanup_session_time / 3)
-                assert self.repo._tasks_manager is not None, \
-                    "This Repository is not intended to be used as a server"
-                self.repo._tasks_manager. \
-                    add_looping_task(cleanup_session_interval,
-                                     self.repo.piws_clean_sessions)
+                assert (self.repo._tasks_manager is not None,
+                        "This Repository is not intended "
+                        "to be used as a server")
+                self.repo._tasks_manager.add_looping_task(
+                    cleanup_session_interval, self.repo.piws_clean_sessions)

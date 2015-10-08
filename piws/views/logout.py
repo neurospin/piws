@@ -1,3 +1,13 @@
+#! /usr/bin/env python
+##########################################################################
+# NSAp - Copyright (C) CEA, 2013
+# Distributed under the terms of the CeCILL-B license, as published by
+# the CEA-CNRS-INRIA. Refer to the LICENSE file or to
+# http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html
+# for details.
+##########################################################################
+
+# Cubicweb import
 from cubicweb.web.views.sessions import InMemoryRepositorySessionManager
 from cubicweb.web import LogOut, DirectResponse, Redirect
 from cubicweb.etwist.http import HTTPResponse
@@ -7,7 +17,10 @@ from cubes.trustedauth.views import LogoutController
 
 class PiwsLogoutController(Controller):
     """
-    /logout controller.
+    Override the default logout controller (<base url>/logout).
+    If the user wants to logout, adds its sessionid in the expired session list.
+    Then redirects the user to an inside page (e.g. the welcome page) to trigger
+    the deauthentication mechanism from PiwsInMemoryRepositorySessionManager.
     """
     __regid__ = 'logout'
 
@@ -22,24 +35,30 @@ class PiwsLogoutController(Controller):
 class PiwsUnloadController(Controller):
     """
     Restricted javascript access controller called just before redirection
-    to account manager url in order to destroy session.
+    to external url in order to destroy session.
     """
     __regid__ = 'piws-unload'
 
     def publish(self, rset=None):
         req = self._cw
-        if req._headers_in.\
-                getRawHeaders('x-requested-with') == ['XMLHttpRequest']:
+        if (req._headers_in.getRawHeaders(
+                'x-requested-with') == ['XMLHttpRequest']):
             session_handler = self.appli.session_handler
             session_handler.session_manager.close_session(req.session)
             req.remove_cookie(session_handler.session_cookie(req))
+            # Will raise a proper AuthenticationError
             raise LogOut()
+        else:
+            # Redirect unauthorised attempts to close the session to the logout
+            # controller
+            raise Redirect(self._cw.base_url() + 'logout')
 
 
 class PiwsInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
     """
-    Called on any http request to get user's session. If session has expired,
-     sends a direct http response to logout the user.
+    Called on any http request to get user's session before its execution.
+    If session has expired, sends a direct http response to short the request
+    processing and logout the user.
     """
 
     def __init__(self, *args, **kwargs):
@@ -51,8 +70,8 @@ class PiwsInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
         self.deauth_html += "<head>"
         self.deauth_html += "<meta charset='utf-8'>"
         self.deauth_html += "<title>Loading</title>"
-        self.deauth_html += "<script src='//code.jquery.com/" \
-                            "jquery-1.11.3.min.js'></script>"
+        self.deauth_html += ("<script src='//code.jquery.com/"
+                             "jquery-1.11.3.min.js'></script>")
         self.deauth_html += "</head>"
         self.deauth_html += "<body>"
         self.deauth_html += "<script>"
@@ -71,12 +90,12 @@ class PiwsInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
         self.deauth_html += "});"
         self.deauth_html += "});"
         self.deauth_html += "window.location.replace('{0}');".format(
-            self.repo.config['account-manager-url'])
+            self.repo.config['deauthentication-redirection-url'])
         self.deauth_html += "});"
         self.deauth_html += "</script>"
         self.deauth_html += "<noscript>"
-        self.deauth_html += "Javascript is not activated. Please activate " \
-                            "javascript and restart your web-browser."
+        self.deauth_html += ("Javascript is not activated. Please activate "
+                             "javascript and restart your web-browser.")
         self.deauth_html += "</noscript>"
         self.deauth_html += "</body>"
         self.deauth_html += "</html>"
@@ -84,6 +103,8 @@ class PiwsInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
     def get_session(self, req, sessionid):
         if sessionid in self.repo._piws_expired_sessionids:
             logout_url = req.base_url() + 'piws-unload'
+            # Allow access to piws-unload controller only to destroy session
+            # (last step of deauthentication).
             if req.url() != logout_url:
                 response = HTTPResponse(code=req.status_out,
                                         headers=req.headers_out,
@@ -98,7 +119,7 @@ def registration_callback(vreg):
     """
     Update registry.
     """
-    if vreg.config.get('enable-apache-deauth', 'no') == 'yes':
+    if vreg.config.get('apache-cleanup-session-time', None) is not None:
         vreg.register_and_replace(PiwsInMemoryRepositorySessionManager,
                                   InMemoryRepositorySessionManager)
         vreg.register_and_replace(PiwsLogoutController, LogoutController)
