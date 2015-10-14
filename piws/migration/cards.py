@@ -18,6 +18,7 @@ HTMLS = {
     u"index": open(osp.join(HERE, "static_pages/index.html")).read().decode("utf8"),
     u"license": open(osp.join(HERE, "static_pages/license.html")).read().decode("utf8"),
     u"legal": open(osp.join(HERE, "static_pages/legal.html")).read().decode("utf8")
+    u"poweredby": open(osp.join(HERE, "static_pages/piws.html")).read().decode("utf8")
 }
 
 
