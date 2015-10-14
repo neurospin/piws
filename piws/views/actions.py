@@ -17,45 +17,22 @@ from cubicweb.web.views.actions import PoweredByAction
 # ACTIONS
 ###############################################################################
 
-class LicenseAction(Action):
-    __regid__ = "license"
-    __select__ = yes()
-    category = "footer"
-    order = 1
-    title = _("License")
-
-    def url(self):
-        return self._cw.build_url("license")
-
-
-class LegalAction(Action):
-    __regid__ = "legal"
-    __select__ = yes()
-    category = "footer"
-    order = 2
-    title = _("Legal")
-
-    def url(self):
-        return self._cw.build_url("legal")
-
-
-class NSPoweredByAction(Action):
+class PoweredByAction(Action):
     __regid__ = "poweredby"
     __select__ = yes()
+
     category = "footer"
     order = 3
-    title = _("Copyright &#169; 2014-2015 CEA")
+    title = _("Powered by PIWS")
 
     def url(self):
-        return "http://i2bm.cea.fr/dsv/i2bm/NeuroSpin"
+        return self._cw.build_url("piws")
 
 
 def registration_callback(vreg):
 
     # Update the footer
-    vreg.register(LegalAction)
-    vreg.register(LicenseAction)
-    vreg.register(NSPoweredByAction)
+    vreg.register(PoweredByPIWSAction)
     vreg.unregister(HelpAction)
     vreg.unregister(AboutAction)
     vreg.unregister(PoweredByAction)
