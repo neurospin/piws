@@ -105,7 +105,7 @@ class BaseOutOfContextView(EntityView):
         if limagefiles > 0:
             self.w(u"<a href='{0}' target=_blank class='btn btn-success' "
                    "type='button' style='margin-top:8px'>".format(href))
-            self.w(u"Show &#9735")
+            self.w(u"Show &#9735;")
             self.w(u"</a>")
         # > fifth element: the doc button
         if tooltip is not None:
