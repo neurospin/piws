@@ -153,7 +153,7 @@ class JhugetableView(View):
                     tooltip_name=label_text, _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
-                               "<span class='fake-link'>{1} &#9735"
+                               "<span class='fake-link'>{1} &#9735;"
                                "</span></a>".format(tiphref, label_text)})
             else:
                 headers.append({"sTitle": label_text})
@@ -489,7 +489,7 @@ class JtableView(View):
                     tooltip_name=label_text[0], _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
-                               "<span class='fake-link'>{1} &#9735"
+                               "<span class='fake-link'>{1} &#9735;"
                                "</span></a>".format(tiphref, label_text[0])})
             else:
                 headers.append({"sTitle": label_text[0]})
