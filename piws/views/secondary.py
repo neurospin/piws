@@ -119,7 +119,7 @@ class BaseOutOfContextView(EntityView):
             self.w(u"</button>")
             self.w(u"<a href='{0}' target=_blank class='btn btn-warning' "
                    "type='button' style='margin-top:8px'>".format(tiphref))
-            self.w(u"&#9735")
+            self.w(u"&#9735;")
             self.w(u"</a>")
 
         # Close row item
