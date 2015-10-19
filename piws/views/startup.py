@@ -47,8 +47,8 @@ class NSCardView(PrimaryView):
         resources = {
             "demo-url": "http://mart.intra.cea.fr/senior/",
             "license-url": self._cw.build_url("license"),
-            "connect-image": self._cw.data_url("images/connect.jpg"),
-            "database-image": self._cw.data_url("images/database.jpg"),
+            "connect-image": self._cw.data_url("images/dreamstime_s_33211444.jpg"),
+            "database-image": self._cw.data_url("images/dreamstime_s_32994616.jpg"),
             "nsap-image": self._cw.data_url("images/nsap.png"),
             "nsap-url": "https://bioproj.extra.cea.fr/redmine/projects/nsap",
         }
