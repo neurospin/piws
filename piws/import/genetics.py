@@ -21,7 +21,7 @@ class Genetics(Base):
     """
     def __init__(self, session, project_name, center_name, genetics,
                  can_read=True, can_update=True, data_filepath=None,
-                 use_store=True):
+                 use_store=True, piws_security_model=True):
         """ Initialize the Genetics class.
 
         Parameters
