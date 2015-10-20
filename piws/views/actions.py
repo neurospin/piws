@@ -17,7 +17,7 @@ from cubicweb.web.views.actions import PoweredByAction
 # ACTIONS
 ###############################################################################
 
-class PoweredByAction(Action):
+class PoweredByPIWSAction(Action):
     __regid__ = "poweredby"
     __select__ = yes()
 
