@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 ##########################################################################
 # NSAp - Copyright (C) CEA, 2013
 # Distributed under the terms of the CeCILL-B license, as published by
@@ -221,7 +220,7 @@ class Processings(Base):
                 else:
                     assessment_eid = self._create_assessment(
                         assessment_struct, subject_eid, study_eid, center_eid,
-                        groups)
+                        groups, self.piws_security_model)
                     self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################
