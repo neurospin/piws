@@ -13,11 +13,11 @@ distname = 'cubicweb-piws'
 numversion = (0, 1, 0)
 version = '.'.join(str(num) for num in numversion)
 
-license = 'LGPL'
+license = 'CeCILL-B'
 author = 'nsap'
 author_email = 'antoine.grigis@cea.fr'
 description = 'piws'
-web = 'http://www.cubicweb.org/project/%s' % distname
+web = 'https://github.com/neurospin/piws'
 
 __depends__ = {
     'cubicweb': '>= 3.19.0',
