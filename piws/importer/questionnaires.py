@@ -45,6 +45,8 @@ class Questionnaires(Base):
             the path to folder containing the current study dataset.
         use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
+        piws_security_model: bool (optional, default True)
+            if True apply the PIWS security model.
 
         Notes
         -----
@@ -82,7 +84,8 @@ class Questionnaires(Base):
             }
         """
         # Inheritance
-        super(Questionnaires, self).__init__(session, use_store)
+        super(Questionnaires, self).__init__(session, use_store,
+                                             piws_security_model)
 
         # Parse the file system
         self.questionnaires = questionnaires

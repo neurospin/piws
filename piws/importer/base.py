@@ -52,7 +52,7 @@ class Base(object):
         ("ExternalFile", "in_assessment", "Assessment")
     ]
 
-    def __init__(self, session, use_store=True):
+    def __init__(self, session, use_store=True, piws_security_model=True):
         """ Initialize the SeniorData class.
 
         Parameters
@@ -63,6 +63,8 @@ class Base(object):
             the name of the different groups
         use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
+        piws_security_model: bool (optional, default True)
+            if True apply the PIWS security model.
         """
         # CW parameters
         self.use_store = use_store
@@ -74,6 +76,7 @@ class Base(object):
         else:
             self.relate_method = self.session.add_relation
             self.create_entity_method = self.session.create_entity
+        self.piws_security_model = piws_security_model
 
     ###########################################################################
     #   Public Methods

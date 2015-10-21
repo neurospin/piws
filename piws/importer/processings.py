@@ -44,6 +44,8 @@ class Processings(Base):
             the path to folder containing the current study dataset.
         use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
+        piws_security_model: bool (optional, default True)
+            if True apply the PIWS security model.
 
         Notes
         -----
@@ -74,7 +76,8 @@ class Processings(Base):
             }
         """
         # Inheritance
-        super(Processings, self).__init__(session, use_store)
+        super(Processings, self).__init__(session, use_store,
+                                          piws_security_model)
 
         # Class parameters
         self.processings = processings
