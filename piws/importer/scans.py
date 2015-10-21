@@ -45,6 +45,8 @@ class Scans(Base):
             the path to folder containing the current study dataset.
         use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
+        piws_security_model: bool (optional, default True)
+            if True apply the PIWS security model.
 
         Notes
         -----
@@ -79,7 +81,7 @@ class Scans(Base):
             }
         """
         # Inheritance
-        super(Scans, self).__init__(session, use_store)
+        super(Scans, self).__init__(session, use_store, piws_security_model)
 
         # Class parameters
         self.scans = scans
