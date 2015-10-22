@@ -325,7 +325,7 @@ class Genetics(Base):
                 platform_eid, "genomic_measures", measure_eid,
                 check_unicity=False)
 
-            # Add the file set attached to a scan entity
+            # Add the file set attached to a genomic measure
             self._import_file_set(fset_struct, extfiles, measure_eid,
                                   assessment_eid)
 
