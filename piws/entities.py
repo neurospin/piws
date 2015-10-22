@@ -25,7 +25,7 @@ class Scan(AnyEntity):
     def dc_title(self):
         """Define the scan entity title.
         """
-        return "{0} of {1} (time '{2}')".format(
+        return "{0} of {1} (time {2})".format(
             self.label, self.subject[0].code_in_study,
             self.in_assessment[0].timepoint)
 
@@ -56,7 +56,7 @@ class Assessment(AnyEntity):
             relations.append("QuestionnaireRun")
         if self.genomic_measures:
             relations.append("GenomicMeasure")
-        return "Assessment of {0} (time '{1}' - type '{2}')".format(
+        return "Assessment of {0} (time {1} - type {2})".format(
             self.subjects[0].code_in_study, self.timepoint,
             "/".join(relations))
 
@@ -78,7 +78,7 @@ class Subject(AnyEntity):
     def dc_title(self):
         """Define the subject entity title.
         """
-        return "Subject '{0}'".format(self.code_in_study)
+        return "Subject {0}".format(self.code_in_study)
 
     @property
     def symbol(self):
@@ -114,7 +114,7 @@ class ProcessingRun(AnyEntity):
     def dc_title(self):
         """Define the processing run entity title.
         """
-        return ("ProcessingRun '{0}' (time '{1}')".format(self.name,
+        return ("ProcessingRun {0} (time {1})".format(self.name,
                 self.in_assessment[0].timepoint))
 
     @property
@@ -130,7 +130,7 @@ class GenomicMeasure(AnyEntity):
     def dc_title(self):
         """Define the genomic measure run entity title.
         """
-        return ("'{0}' (time '{1}')".format(self.label,
+        return ("{0} (time {1})".format(self.label,
                 self.in_assessment[0].timepoint))
 
     @property
