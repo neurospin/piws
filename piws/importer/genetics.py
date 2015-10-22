@@ -274,8 +274,8 @@ class Genetics(Base):
                     ############################################################
 
                     measure_struct = tgenetic_measure["GenomicMeasure"]
-                    fset_struct = tgenetic_measure["FileSet"]
-                    extfiles = tgenetic_measure["ExternalResources"]
+                    fset_struct = tgenetic_measure.get("FileSet", None)
+                    extfiles = tgenetic_measure.get("ExternalResources", None)
                     measure_eid = self._create_measure(
                         measure_struct, fset_struct, extfiles, related_subjects,
                         study_subjects, study_eid, assessment_eid, platform_eid)
@@ -326,8 +326,9 @@ class Genetics(Base):
                 check_unicity=False)
 
             # Add the file set attached to a genomic measure
-            self._import_file_set(fset_struct, extfiles, measure_eid,
-                                  assessment_eid)
+            if fset_struct:
+                self._import_file_set(fset_struct, extfiles, measure_eid,
+                                      assessment_eid)
 
         return measure_eid
 
