@@ -9,9 +9,14 @@
 # System import
 import os
 import types
+import smtplib
+import time
+import json
+from email.mime.text import MIMEText
 
 # CW import
 from cubicweb.server import hook
+from cubicweb.predicates import is_instance
 
 # PIWS import
 from cubes.piws.docgen.rst2html import create_html_doc
@@ -117,8 +122,67 @@ class PiwsApacheDeauthenticationHook(hook.Hook):
                 cleanup_session_interval = min(60*60,
                                                self.repo.
                                                piws_cleanup_session_time / 3)
-                assert (self.repo._tasks_manager is not None,
-                        "This Repository is not intended "
-                        "to be used as a server")
+                assert self.repo._tasks_manager is not None, \
+                    "This Repository is not intended to be used as a server"
                 self.repo._tasks_manager.add_looping_task(
                     cleanup_session_interval, self.repo.piws_clean_sessions)
+
+
+class PiwsCWUsersWatcher(hook.Hook):
+    """
+        Sends an email message on CWUser creation/deletion, using all-in-one
+        parameters of the [MAIL] section.
+    """
+    __regid__ = 'piws.cwusers_watcher'
+    __select__ = hook.Hook.__select__ & is_instance('CWUser')
+    events = ('after_add_entity', 'before_delete_entity')
+
+    def sendmail(self, sender_name, sender_email, recipients_list, subject,
+                 body, smtp_host, smtp_port):
+        """
+        Sends an email
+
+        Parameters
+        ----------
+        sender_name: string (mandatory)
+            The sender name (ie the database name)
+        sender_email: string (mandatory)
+            The sender email address
+        recipients_list: list of str (mandatory)
+            List of the recipients emails addresses
+        subject: string (mandatory)
+            The email subject
+        body: string (mandatory)
+            The email body
+        smtp_host: string (mandatory)
+            The SMTP server address
+        smtp_port: int (mandatory)
+            The SMTP server port
+        """
+        msg = MIMEText(body)
+        msg['Subject'] = "[CubicWeb] {0} : {1}".format(sender_name, subject)
+        msg['To'] = ", ".join(recipients_list)
+        s = smtplib.SMTP(smtp_host, smtp_port)
+        s.sendmail(sender_email, recipients_list, msg.as_string())
+        s.quit()
+
+    def __call__(self):
+        config = self._cw.vreg.config
+        if not (config.creating or config.repairing or config.quick_start):
+            if config.get('enable-cwusers-watcher') == 'yes':
+                user_login = self.entity.login
+                if self.event == 'after_add_entity':
+                    creation_date = self.entity.creation_date.strftime(
+                        '%d %b %Y - %H:%M:%S')
+                    email_subject = "New user {0}".format(user_login)
+                    email_body = "Creation date: {0}\n".format(creation_date)
+                    email_body += "Login: {0}".format(user_login)
+                else:
+                    email_subject = "Deleted user {0}".format(user_login)
+                    email_body = "Deletion date: {0}\n".format(
+                        time.strftime('%d %b %Y - %H:%M:%S'))
+                    email_body += "Login: {0}".format(user_login)
+                self.sendmail(config['sender-name'], config['sender-addr'],
+                              config['supervising-addrs'], email_subject,
+                              email_body, config['smtp-host'],
+                              config['smtp-port'])

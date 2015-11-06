@@ -44,4 +44,11 @@ options = (
       'group': 'piws',
       'level': 1,
       }),
+    ("enable-cwusers-watcher", {
+        "type": "string",
+        "default": None,
+        "help": "Enable CWUsers watcher with email report.",
+        "group": "piws",
+        "level": 1,
+    }),
 )
