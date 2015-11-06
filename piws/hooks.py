@@ -169,7 +169,7 @@ class PiwsCWUsersWatcher(hook.Hook):
     def __call__(self):
         config = self._cw.vreg.config
         if not (config.creating or config.repairing or config.quick_start):
-            if config.get('enable-cwusers-watcher') == 'yes':
+            if config.get('enable-cwusers-watcher', None) == 'yes':
                 user_login = self.entity.login
                 if self.event == 'after_add_entity':
                     creation_date = self.entity.creation_date.strftime(
