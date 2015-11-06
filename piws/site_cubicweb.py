@@ -47,7 +47,7 @@ options = (
     ("enable-cwusers-watcher", {
         "type": "string",
         "default": None,
-        "help": "Enable CWUsers watcher with email report.",
+        "help": "Enable CWUsers watcher with email notification.",
         "group": "piws",
         "level": 1,
     }),
