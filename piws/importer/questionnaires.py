@@ -10,6 +10,10 @@
 import os
 import sys
 import hashlib
+import json
+
+# CubicWeb import
+from cubicweb import Binary
 
 # Piws import
 from .base import Base
@@ -20,7 +24,8 @@ class Questionnaires(Base):
     """
     def __init__(self, session, project_name, center_name, questionnaires,
                  can_read=True, can_update=True, data_filepath=None,
-                 use_store=True, piws_security_model=True):
+                 use_store=True, piws_security_model=True,
+                 use_openanswer=False):
         """ Initialize the 'Questionnaires' class.
 
         Parameters
@@ -46,6 +51,9 @@ class Questionnaires(Base):
             if True use an SQLGenObjectStore, otherwise the session.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
+        use_openanswer : bool (optional, default False)
+            if True insert questionnaires using the OpenAnswer entity,
+            else using the File entity.
 
         Notes
         -----
@@ -85,6 +93,9 @@ class Questionnaires(Base):
         # Inheritance
         super(Questionnaires, self).__init__(session, use_store,
                                              piws_security_model)
+
+        # Define QuestionnaireRuns insertion strategy
+        self.use_openanswer = use_openanswer
 
         # Parse the file system
         self.questionnaires = questionnaires
@@ -338,38 +349,50 @@ class Questionnaires(Base):
                 subject_eid, "questionnaire_runs", qr_entity.eid,
                 check_unicity=False)
 
-            # Go through all answers
-            for question_name, answer in q_items.iteritems():
+            if self.use_openanswer:
+                # Go through all answers
+                for question_name, answer in q_items.iteritems():
 
-                # Get the question entity
-                question_eid = question_eids[questionnaire_name][
-                    question_name]
+                    # Get the question entity
+                    question_eid = question_eids[questionnaire_name][
+                        question_name]
 
-                # Create an open answer
-                answer_entity, _ = self._get_or_create_unique_entity(
+                    # Create an open answer
+                    answer_entity, _ = self._get_or_create_unique_entity(
+                        rql="",
+                        check_unicity=False,
+                        entity_name="OpenAnswer",
+                        identifier=unicode(self._md5_sum(
+                            qr_id + "_" + question_name)),
+                        value=unicode(answer))
+                    # > add relation with the question
+                    self._set_unique_relation(
+                        answer_entity.eid, "question", question_eid,
+                        check_unicity=False, subjtype="OpenAnswer")
+                    self._set_unique_relation(
+                        question_eid, "open_answers", answer_entity.eid,
+                        check_unicity=False)
+                    # > add relation with the questionnaire run
+                    self._set_unique_relation(
+                        answer_entity.eid, "questionnaire_run", qr_entity.eid,
+                        check_unicity=False, subjtype="OpenAnswer")
+                    self._set_unique_relation(
+                        qr_entity.eid, "open_answers", answer_entity.eid,
+                        check_unicity=False)
+                    # > add relation with the assessment
+                    self._set_unique_relation(
+                        answer_entity.eid, "in_assessment", assessment_eid,
+                        check_unicity=False, subjtype="OpenAnswer")
+            else:
+                f_entity, _ = self._get_or_create_unique_entity(
                     rql="",
-                    check_unicity=False,
-                    entity_name="OpenAnswer",
-                    identifier=unicode(self._md5_sum(
-                        qr_id + "_" + question_name)),
-                    value=unicode(answer))
-                # > add relation with the question
-                self._set_unique_relation(
-                    answer_entity.eid, "question", question_eid,
-                    check_unicity=False, subjtype="OpenAnswer")
-                self._set_unique_relation(
-                    question_eid, "open_answers", answer_entity.eid,
+                    entity_name="File",
+                    data=Binary(json.dumps(q_items)),
+                    data_format=u"text/json",
+                    data_name=u"result.json",
                     check_unicity=False)
-                # > add relation with the questionnaire run
                 self._set_unique_relation(
-                    answer_entity.eid, "questionnaire_run", qr_entity.eid,
-                    check_unicity=False, subjtype="OpenAnswer")
-                self._set_unique_relation(
-                    qr_entity.eid, "open_answers", answer_entity.eid,
-                    check_unicity=False)
-                # > add relation with the assessment
-                self._set_unique_relation(
-                    answer_entity.eid, "in_assessment", assessment_eid,
-                    check_unicity=False, subjtype="OpenAnswer")
+                    qr_entity.eid, "result", f_entity.eid,
+                    check_unicity=False, subjtype="QuestionnaireRun")
 
         return qr_entity.eid

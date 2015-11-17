@@ -235,6 +235,10 @@ QuestionnaireRun.remove_relation(name="concerns")
 QuestionnaireRun.add_relation(
     SubjectRelation("Subject", cardinality="1*", inlined=False),
     name="subject")
+QuestionnaireRun.add_relation(
+    SubjectRelation("File", cardinality="1?", inlined=True,
+                    composite="subject"),
+    name="result")
 
 # QUESTION
 Question.add_relation(
@@ -284,10 +288,13 @@ Snp.add_relation(
     name="platforms")
 
 # CWGROUP
+
+
 class can_read(RelationDefinition):
     subject = "CWGroup"
     object = "Assessment"
     cardinality = "*+"
+
 
 class can_update(RelationDefinition):
     subject = "CWGroup"
@@ -295,6 +302,8 @@ class can_update(RelationDefinition):
     cardinality = "*+"
 
 # RIGHTS
+
+
 class in_assessment(RelationDefinition):
     subject = ("ProcessingRun", "ExternalFile")
     object = "Assessment"
@@ -304,6 +313,8 @@ class in_assessment(RelationDefinition):
 # ENTITIES
 
 # OPENANSWER
+
+
 class OpenAnswer(EntityType):
     value = String(required=True)
     identifier = String(maxsize=64, indexed=True, unique=True)
@@ -311,6 +322,8 @@ class OpenAnswer(EntityType):
                                         inlined=True)
 
 # FMRIDATA
+
+
 class FMRIData(EntityType):
     shape_x = Float()
     shape_y = Float()
