@@ -11,8 +11,9 @@
 from collections import OrderedDict, defaultdict
 import json
 import re
-import datetime
 import time
+import csv
+from StringIO import StringIO
 
 # Cubicweb import
 from cubicweb.view import View
@@ -22,118 +23,132 @@ from logilab.common.registry import yes
 
 
 ###############################################################################
-# Jtable
+# Datatables
 ###############################################################################
 
-class JhugetableView(View):
-    """ Create a table view with Jtable.
+class FileAnswerTableView(View):
+    """ QuestionnaireRuns table view specific to the QuestionnaireRun (1?) File
+        schema.
+    """
+    __regid__ = 'file.answer.table'
+
+    def call(self):
+        """Get all the questionnaire runs and associated subjects"""
+
+        # Retrieve form parameters from the url built by the ajax callback
+        # get_questionnaires_data
+        qname = self._cw.form['qname']
+        csv_export = self._cw.form['csv_export']
+        title = self._cw.form['title']
+        timepoint = self._cw.form['timepoint']
+        tooltip_name = self._cw.form['tooltip_name']
+        elts_to_sort = self._cw.form['elts_to_sort']
+
+        # Execute the rql to get all subjects QuestionnaireRuns
+        rql = ("Any ID, D ORDERBY ID ASC WHERE QR is QuestionnaireRun, "
+               "QR instance_of Q, Q name '{0}', QR in_assessment A, "
+               "A timepoint '{1}', QR result F, F data D, QR subject S, "
+               "S code_in_study ID".format(qname, timepoint))
+        rset = self._cw.execute(rql)
+
+        # Load the dicts {question: answer, ..} per subject
+        loaded_rset = [(sid, json.loads(sdata.getvalue()))
+                       for sid, sdata in rset]
+
+        # Get the table labels (ie headers) that corresponds to the questions
+        labels = set()
+        for sid, sdata in loaded_rset:
+            labels |= set(sdata.keys())
+        labels = sorted(labels)
+
+        # Construct all table rows
+        records = []
+        for sid, sdata in loaded_rset:
+            record = [sid]
+            for label in labels:
+                try:
+                    record.append(sdata[label])
+                except KeyError:
+                    record.append("")
+            records.append(record)
+
+        # Call JhugetableView for html generation of the table
+        self.wview('jtable-hugetable-clientside', None, 'null', labels=labels,
+                   records=records, csv_export=csv_export, title=title,
+                   timepoint=timepoint, elts_to_sort=elts_to_sort,
+                   tooltip_name=tooltip_name, use_scroller=False)
+
+
+class JHugetableView(View):
+    """ Create a table view with DataTables.
     """
     __regid__ = "jtable-hugetable-clientside"
     paginable = False
     div_id = "jhugetable-table"
 
-    mandatory_params = ["vid", "rql_labels", "ajaxcallback", "labels",
-                        "title", "csvcallback"]
-
-    def __init__(self, *args, **kwargs):
-        """ Initialize the JtableView class.
-
-        If you want to construct the table manually in your view pass the
-        parent view in the 'parent_view' attribute.
-        """
-        super(JhugetableView, self).__init__(*args, **kwargs)
-        if "parent_view" in kwargs:
-            self._cw = kwargs["parent_view"]._cw
-            self.w = kwargs["parent_view"].w
-
-    def call(self, rql_labels=None, labels=None, ajaxcallback=None,
-             title="", csvcallback=False, use_scroller=False, **kwargs):
-        """ Method that will create a table for huge datasets (million of
-        entries).
+    def call(self, labels, records, csv_export=True, title="", timepoint="",
+             elts_to_sort=None, tooltip_name=None, use_scroller=False):
+        """ Method that will create a table with client-side processing only.
+         It is useful for huge datasets (million of entries).
 
         An Ajax call is emulated within the JavaScript so this function is
         client side only.
 
-        When left clicking on a row, the row is selected (highlighted) Click
-        again on this row to deselect it.
-
-        1) Extra parameters will be passed to the Ajax callback that is called
-        one time
-
-        2) Column labels must not contain space ' ' and they need to be
-        replaced: use the 'label_cleaner' function.
-
-        3) A special 'ID' column must be specified in the Ajax callback that
-        contains the row string description.
+        A special 'ID' label will be added to the given labels to provide the
+        row string description. Thus the first column of the records array must
+        contain the corresponding 'ID' values.
 
         Parameters
         ----------
-        rql_labels: string (rql_labels)
-            a rql that will be executed to get the columns labels.
-        labels: list of string (xor rql_labels)
+        labels: list of string
             the columns labels.
-        ajaxcallback: @func (mandatory)
-            a function thaty will be called by jtable to create dynamically the
-            data to display: do not foget the decorator @ajaxfunc.
+        records: list of list
+            the table data.
+        csv_export: bool (optional)
+            if True an export button will be available.
         title: string (optional, default '')
             the title of the table.
-        csvcallback: bool (optional)
-            if True an export button will be available.
+        timepoint: string (optional, default '')
+            the timepoint.
+        elts_to_sort: list (optional, default [])
+            labels of the columns to be sorted
+        tooltip_name: string (optional, default '')
+            the piws documentation tooltip name.
         use_scroller: bool (optional default False)
             if True do not use pagination.
         """
-        # Get the parameters
-        for key in sorted(self._cw.form.keys()):
-            if key not in self.mandatory_params:
-                kwargs[key] = self._cw.form[key]
-        title = title or self._cw.form.get("title", "")
-        rql_labels = rql_labels or self._cw.form.get("rql_labels", None)
-        labels = labels or self._cw.form.get("labels", None)
-        if labels is not None and not isinstance(labels, list):
-            labels = [labels]
-        ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
-        if self._cw.form.get("csvcallback", None) is not None:
-            csvcallback = self._cw.form.get("csvcallback")
-        if "use_scroller" in self._cw.form:
-            use_scroller = eval(self._cw.form.get("use_scroller"))
 
-        # Get the path to the in progress resource
-        wait_image_url = self._cw.data_url("images/please_wait.gif")
+        if elts_to_sort is None:
+            elts_to_sort = []
 
         # Add css resources
-        self._cw.add_css("datatables-1.10.5/media/css/jquery.dataTables.min.css")
-        self._cw.add_css("datatables-1.10.5/extensions/FixedColumns/css/"
-                         "dataTables.fixedColumns.css")
-        self._cw.add_css("datatables-1.10.5/extensions/Scroller/css/"
-                         "dataTables.scroller.css")
         self._cw.add_css(
-            "https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css",
-            localfile=False)
+            "DataTables-1.10.10/media/css/jquery.dataTables.min.css")
+        self._cw.add_css("DataTables-1.10.10/extensions/FixedColumns/css/"
+                         "fixedColumns.dataTables.min.css")
+        self._cw.add_css("DataTables-1.10.10/extensions/Scroller/css/"
+                         "scroller.dataTables.min.css")
+        self._cw.add_css(
+            ("https://code.jquery.com/ui/1.11.4/themes/smoothness/"
+             "jquery-ui.css"), localfile=False)
 
         # Add js resources
-        self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
-        self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
-        self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
+        self._cw.add_js("DataTables-1.10.10/media/js/jquery.js")
+        self._cw.add_js("DataTables-1.10.10/media/js/jquery.dataTables.min.js")
+        self._cw.add_js("DataTables-1.10.10/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
-        self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
-        self._cw.add_js("datatables-1.10.5/extensions/Scroller/js/"
-                        "dataTables.scroller.js")
+        self._cw.add_js("DataTables-1.10.10/extensions/Scroller/js/"
+                        "dataTables.scroller.min.js")
+        self._cw.add_js("http://cdn.datatables.net/plug-ins/1.10.10/api/"
+                        "fnSetFilteringDelay.js", localfile=False)
         self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
                         localfile=False)
-
-        # Get table meta information
-        if rql_labels is not None:
-            labels = [item[0] for item in self._cw.execute(rql_labels)]
-            labels.insert(0, u"ID")
-        if labels is None:
-            raise Exception("No labels can be selected while creating the "
-                            "hugejtable")
 
         # Get the instance questionnaire map
         qmap = self._cw.vreg.docmap
 
         # Associate a tooltip to each label
-        tooltips = []
+        tooltips = [""]
         for label_text in labels:
             if label_text in qmap:
                 matches = re.findall("<!--.*tooltip:.*-->", qmap[label_text])
@@ -145,9 +160,17 @@ class JhugetableView(View):
             else:
                 tooltips.append("")
 
-        # Table column headers
-        headers = []
-        for label_text in labels:
+        # Generate the script
+        # > table column headers and sort option
+        headers = [{"sTitle": "ID"}]
+        hide_sort_indices = []
+        if "ID" not in elts_to_sort:
+            hide_sort_indices.append(0)
+        for cnt, label_text in enumerate(labels):
+            # >> select if we can sort this column
+            if label_text not in elts_to_sort:
+                hide_sort_indices.append(cnt + 1)
+            # >> add this column to the table definition parameters
             if label_text in qmap:
                 tiphref = self._cw.build_url(
                     "view", vid="piws-documentation",
@@ -159,101 +182,121 @@ class JhugetableView(View):
             else:
                 headers.append({"sTitle": label_text})
 
-        post_data = kwargs
-        if 'sSortDir_0' not in post_data:
-            post_data['sSortDir_0'] = 'ASC'
-        if 'iDisplayStart' not in post_data:
-            post_data['iDisplayStart'] = '0'
-        if 'iDisplayLength' not in post_data:
-            post_data['iDisplayLength'] = '-1'
-        if 'sSearch' not in post_data:
-            post_data['sSearch'] = ''
-        if 'labels' not in post_data:
-            post_data['labels'] = '{0}'.format(json.dumps(labels))
-
-        # Generate the script
+        # > begin the script
         html = "<script type='text/javascript'> "
         html += "$(document).ready(function() {"
-
-        # > call the ajax callback to get the data and display a processing
-        # > message
-        html += "$('#loadingmessage').show();"
-        html += "var post = $.ajax({"
-        html += "url: 'ajax?fname={0}', ".format(ajaxcallback)
-        html += "type: 'POST', "
-        html += "dataType: 'json', "
-        html += "data: {0}".format(json.dumps(post_data))
-        html += "});"
-
-        # > start post: when data are loaded, hide the processing message
-        html += "post.done(function(p){"
-        html += "$('#loadingmessage').hide();"
-
-        # > global variable with the data
-        html += "var jdata = p['aaData'];"
+        
+        # > dumps the answers rset into javascript
+        html += "var all_data = {0};".format(json.dumps(records))
+        html += "var nbrecordstotal = {0};".format(len(records))
+        # > create a cache for search patterns filtering
+        html += "var filtered_indices = ['', undefined];"
+        # > set the default sorting direction
+        html += "var sort_dir = 'asc';"
 
         # > create the table
         html += "var table = $('#the_table').dataTable( { "
-
+        html += "serverSide: true,"
+        
+        # > set the ajax callback to fill dynamically the table
+        html += "ajax: function ( data, callback, settings ) {"
+        # > get the table sorting direction
+        html += "var current_sort_dir = data.order[0].dir.toLowerCase();"
+        html += "if ( current_sort_dir != sort_dir) {"
+        html += "all_data = all_data.reverse();"
+        html += "sort_dir = current_sort_dir;"
+        html += "}"
+        # > create the records array for the page being displayed
+        html += "var out = [];"
+        # > get the ID search field
+        html += "var search_pattern = data.search.value.toLowerCase().trim();"
+        html += "var nbrecordsfiltered = nbrecordstotal;"
+        # > if the search field is not empty
+        html += "if (search_pattern != '') {"
+        # check the filtered indicies cache
+        html += "if (filtered_indices[0] != search_pattern) {"
+        html += "filtered_indices[0] = search_pattern;"
+        html += "filtered_indices[1] = [];"
+        # fill the filtered indicies cache
+        html += "for ( var i=0; i<nbrecordstotal ; i++ ) {"
+        html += ("if (all_data[i][0].toLowerCase()"
+                 ".indexOf(search_pattern) >= 0) {")
+        html += "filtered_indices[1].push(i);"
+        # close the 'if some occurence of the search pattern is found' loop
+        html += "}"
+        # close the for loop
+        html += "}"
+        # > close the filtered indices cache verification
+        html += "}"
+        html += "nbrecordsfiltered = filtered_indices[1].length;"
+        # fill the records array based on the filtered indicies
+        html += ("for (var i=data.start, ien=Math.min(data.start+data.length, "
+                 "nbrecordsfiltered) ; i<ien ; i++) {")
+        html += "out.push( all_data[ filtered_indices[1][i] ] );"
+        html += "}"
+        # > close the 'if the search field is not empty' condition
+        html += "}"
+        # > if the search field is empty
+        html += "else {"
+        # fill the records array without filtering
+        html += ("for ( var i=data.start, ien=Math.min(data.start+data.length,"
+                 " nbrecordstotal) ; i<ien ; i++ ) {")
+        html += "out.push( all_data[i] );"
+        # > close the for loop
+        html += "}"
+        # > close the 'else if the search field is empty' condition
+        html += "}"
+        # register the ajax callback
+        html += "setTimeout( function () {"
+        html += "callback( {"
+        html += "draw: data.draw,"
+        html += "data: out,"
+        html += "recordsTotal: nbrecordstotal,"
+        html += "recordsFiltered: nbrecordsfiltered"
+        html += "} );"
+        # > close the ajax callback registration
+        html += "}, 50 );"
+        # > close the ajax callback
+        html += "},"
+        
         # > set table display options
-        html += "serverSide: true, "
-        html += "ordering: false, "
-        html += "searching: true, "
-        html += "scrollX: '100%',"
-        html += "scrollY: 600,"
-        html += "scrollCollapse: true,"
-        html += "aoColumns: {0}, ".format(json.dumps(headers))
+        html += "'scrollX': true,"
+        html += "'scrollCollapse': true,"
+        html += "'sPaginationType': 'bootstrap',"
         if use_scroller:
-            if csvcallback:
+            html += "'scrollY': '200px',"
+            if csv_export:
                 html += "dom: 'T<\"clear\"><\"toolbar\">frtiS', "
             else:
                 html += "dom: 'T<\"clear\">frtiS', "
             html += "scroller: {loadingIndicator: true}, "
         else:
-            if csvcallback:
-                html += "dom: 'T<\"clear\">l<\"toolbar\">frtip', "
+            html += "'processing': true,"
+            html += "'scrollY': '600px',"
+            if csv_export:
+                html += "'dom': 'T<\"clear\">l<\"toolbar\">frtip',"
             else:
-                html += "dom: 'T<\"clear\">lfrtip', "
-            html += "lengthMenu: [ [25, 50, 100, 200], [25, 50, 100, 200] ],"
-            html += "pagingType: 'full_numbers',"
-            html += "bProcessing: true, "
+                html += "'dom': 'T<\"clear\">lfrtip',"
+        html += "'oLanguage': {'sSearch': 'ID search'},"
+        html += "'pagingType': 'full_numbers',"
 
-        # > build the inner ajax call
-        html += "ajax: function ( data, callback, settings ) {"
-        # >> inner parameters
-        html += "var out = [];"
-        html += "var filtered_jdata = [];"
-        # >> filter the dataset using a regex
-        html += "if (data.search.value != '') {"
-        html += "for ( var i=0, ien=jdata.length ; i<ien ; i++ ) {"
-        html += "var reg = new RegExp(data.search.value);"
-        html += "if (jdata[i][0].match(reg)) {"
-        html += "filtered_jdata.push( jdata[i] );"
-        html += "}"
-        html += "}"
-        html += "}"
-        html += "else {"
-        html += "filtered_jdata = jdata;"
-        html += "}"
-        # >> display only a subset of the filtered dataset
-        html += ("for ( var i=data.start, ien=Math.min(data.start+data.length, "
-                 "filtered_jdata.length) ; i<ien ; i++ ) {")
-        html += "out.push( filtered_jdata[i] );"
-        html += "}"
-        # >> return the generated subset and add a timeout
-        html += "setTimeout( function () {"
-        html += "callback( {"
-        html += "draw: data.draw, "
-        html += "data: out, "
-        html += "recordsTotal: jdata.length, "
-        html += "recordsFiltered: filtered_jdata.length"
-        html += "} );"
-        html += "}, 50 );"
-        # >> close ajax
-        html += "}"
+        # > set table header
+        html += "'aoColumns': {0},".format(json.dumps(headers))
+
+        # > set sort widget on column
+        html += "'aoColumnDefs': [ "
+        html += "{{ 'bSortable': false, 'aTargets': {0} }}".format(
+            str(hide_sort_indices))
+        html += "],"
 
         # > close table
         html += "} );"
+
+        # > the first column is static in the display
+        html += "var fc = new $.fn.dataTable.FixedColumns( "
+        html += "table, {leftColumns: 1} "
+        html += ");"
+        html += "table.fnSetFilteringDelay(1000);"
 
         # Add tooltip in table column header
         html += "var question_text = {0};".format(json.dumps(tooltips))
@@ -267,7 +310,7 @@ class JhugetableView(View):
         html += "'fade': 250"
         html += "} );"
 
-        if csvcallback:
+        if csv_export:
 
             # > create a new csv download button
             csv_button_html = (u'<p><a class="btn btn-default" role="button" '
@@ -278,65 +321,59 @@ class JhugetableView(View):
             html += ("$('#the_table_filter').css({'float': 'none', "
                      "'text-align': 'center'});")
 
+            # > set csv file name
+            timestamp = time.strftime("%Y-%m-%d_%H:%M:%S")
+            filename_items = [title, timepoint, timestamp]
+            filename = "_".join([x for x in filename_items if x])
+
             # > assign ajax callback to csv button : start function click
-            html += "$( '#csv_button' ).click(function() {"
-            # # > display a processing message
-            html += "$('#loadingmessage').show();"
-            #
-            html += "headers = {0};".format(json.dumps(labels))
-            html += "var csvRows = [headers.join(';')];"
-            html += "csvRows.push({0}.join(';'));".format(json.dumps(tooltips))
-            html += "for(var i=0, l=jdata.length; i<l; ++i){"
-            html += "csvRows.push(jdata[i].join(';'));"
-            html += "}"
+            html += "$('#csv_button').click(function() {"
 
-            # > create a download link
-            html += "var csvString = csvRows.join('\\r\\n');"
-            html += "var a = document.createElement('a');"
-            html += ("a.href = 'data:application/csv;charset=utf-8,' "
-                     "+ encodeURIComponent(csvString);")
-            html += "a.target = '_blank';"
-            ts = time.time()
-            st = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
-            if "timepoint" in kwargs:
-                csv_file_name = "{0}_{1}_{2}.csv".format(
-                    title, kwargs["timepoint"], st)
-            else:
-                csv_file_name = "{0}_{1}".format(title, st)
-            html += "a.download = '{0}';".format(csv_file_name)
+            # > create in-memory csv file using python csv module
+            f = StringIO()
+            writer = csv.writer(f)
+            # write the headers
+            writer.writerow(["ID"] + labels)
+            # write all the rows
+            writer.writerows(records)
+            # get the csv result as string
+            result = f.getvalue()
 
-            # > hide the processing message
+            # > csv file javascript insertion with html compatibility
+            # (line break character)
+            html += "var result = \"{0}\";".format(
+                    result.replace("\r\n", "\\r\\n"))
+            # > create a web-browser download object
+            html += "var a = window.document.createElement('a');"
+            html += ("a.href = window.URL.createObjectURL(new Blob([result], "
+                     "{type: 'text/csv'}));")
+            html += "a.download = '{0}.csv';".format(filename)
             html += "document.body.appendChild(a);"
             html += "a.click();"
-            html += "$('#loadingmessage').hide();"
+            html += "document.body.removeChild(a);"
 
             # > end fct click
             html += "});"
 
-        # > post done
-        html += "});"
-
-        # > error when loading the data
-        html += "post.fail(function(){"
-        html += " alert('Error : Download Failed!');"
-        html += "});"
-
-        # > close function
+        # > close document section
         html += "} );"
 
-        # > close script
+        # Close script div
         html += "</script>"
 
         # > set a title
+        if tooltip_name is not None:
+            tiphref = self._cw.build_url(
+                "view", vid="piws-documentation", tooltip_name=tooltip_name,
+                _notemplate=True)
+            title = (u"<a class='btn btn-warning' href='{0}' target=_blanck>"
+                     "{1} &#9735;</a>".format(tiphref, title))
         html += "<h1>{0}</h1>".format(title)
-
-        # > create a div for the in progress resource
-        html += ("<div id='loadingmessage' style='display:none' "
-                 "align='center'><img src='{0}'/></div>".format(wait_image_url))
 
         # > display the table in the body
         html += "<table id='the_table' class='cell-border display'>"
         html += "<thead></thead>"
+        html += "<tbody></tbody>"
         html += "</table>"
 
         # Creat the corrsponding html page
@@ -344,14 +381,14 @@ class JhugetableView(View):
 
 
 class JtableView(View):
-    """ Create a table view with Jtable.
+    """ Create a table view with DataTables.
     """
     __regid__ = "jtable-table"
     paginable = False
     div_id = "jtable-table"
 
     mandatory_params = ["vid", "rql_labels", "ajaxcallback", "labels",
-                        "title", "elts_to_sort", "csvcallback",
+                        "title", "elts_to_sort", "csv_export",
                         "use_server"]
 
     def __init__(self, *args, **kwargs):
@@ -366,7 +403,7 @@ class JtableView(View):
             self.w = kwargs["parent_view"].w
 
     def call(self, rql_labels=None, labels=None, ajaxcallback=None,
-             csvcallback=False, title="", elts_to_sort=None,
+             csv_export=False, title="", elts_to_sort=None,
              use_server=True, tooltip_name=None, **kwargs):
         """ Method that will create a table.
 
@@ -395,7 +432,7 @@ class JtableView(View):
         ajaxcallback: @func (mandatory)
             a function thaty will be called by jtable to create dynamically the
             data to display: do not foget the decorator @ajaxfunc.
-        csvcallback: bool (optional)
+        csv_export: bool (optional)
             if True an export button will be available.
         title: string (optional, default '')
             the title of the table.
@@ -415,8 +452,8 @@ class JtableView(View):
         if labels is not None and not isinstance(labels, list):
             labels = [labels]
         ajaxcallback = ajaxcallback or self._cw.form.get("ajaxcallback", "")
-        if self._cw.form.get("csvcallback", None) is not None:
-            csvcallback = self._cw.form.get("csvcallback")
+        if self._cw.form.get("csv_export", None) is not None:
+            csv_export = self._cw.form.get("csv_export")
         elts_to_sort = elts_to_sort or self._cw.form.get("elts_to_sort", [])
         if not isinstance(elts_to_sort, list):
             elts_to_sort = [elts_to_sort]
@@ -426,28 +463,32 @@ class JtableView(View):
         # Get the path to the in progress resource
         wait_image_url = self._cw.data_url("images/please_wait.gif")
 
-        # Add css resources
-        self._cw.add_css("datatables-1.10.5/media/css/jquery.dataTables.min.css")
-        self._cw.add_css("datatables-1.10.5/extensions/FixedColumns/css/"
-                         "dataTables.fixedColumns.css")
+       # Add css resources
         self._cw.add_css(
-            "https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css",
-            localfile=False)
+            "DataTables-1.10.10/media/css/jquery.dataTables.min.css")
+        self._cw.add_css("DataTables-1.10.10/extensions/FixedColumns/css/"
+                         "fixedColumns.dataTables.min.css")
+        self._cw.add_css("DataTables-1.10.10/extensions/Scroller/css/"
+                         "scroller.dataTables.min.css")
+        self._cw.add_css(
+            ("https://code.jquery.com/ui/1.11.4/themes/smoothness/"
+             "jquery-ui.css"), localfile=False)
 
         # Add js resources
-        self._cw.add_js("datatables-1.10.5/media/js/jquery.js")
-        self._cw.add_js("datatables-1.10.5/media/js/jquery.dataTables.min.js")
-        self._cw.add_js("datatables-1.10.5/extensions/FixedColumns/js/"
+        self._cw.add_js("DataTables-1.10.10/media/js/jquery.js")
+        self._cw.add_js("DataTables-1.10.10/media/js/jquery.dataTables.min.js")
+        self._cw.add_js("DataTables-1.10.10/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
-        self._cw.add_js("datatables-1.10.5/extensions/fnSetFilteringDelay.js")
+        self._cw.add_js("http://cdn.datatables.net/plug-ins/1.10.10/api/"
+                        "fnSetFilteringDelay.js", localfile=False)
         self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
                         localfile=False)
 
         # Get table meta information
-        if rql_labels is not None:
-            labels = self._cw.execute(rql_labels)
-        if rql_labels is None and labels is not None:
-            labels = [[str(item)] for item in labels]
+        if labels is None:
+            if rql_labels is not None:
+                labels_rset = self._cw.execute(rql_labels)
+                labels = [item[0] for item in labels_rset]
         if labels is None:
             raise Exception("No labels can be selected while creating the "
                             "jtable")
@@ -458,7 +499,6 @@ class JtableView(View):
         # Associate a tooltip to each label
         tooltips = [""]
         for label_text in labels:
-            label_text = label_text[0]
             if label_text in qmap:
                 matches = re.findall("<!--.*tooltip:.*-->", qmap[label_text])
                 if len(matches) == 1:
@@ -473,27 +513,25 @@ class JtableView(View):
         # > table column headers and sort option
         headers = [{"sTitle": "ID"}]
         hide_sort_indices = []
-        label_list = ["ID"]
         if "ID" not in elts_to_sort:
             hide_sort_indices.append(0)
         for cnt, label_text in enumerate(sorted(labels)):
 
             # >> select if we can sort this column
-            if label_text[0] not in elts_to_sort:
+            if label_text not in elts_to_sort:
                 hide_sort_indices.append(cnt + 1)
 
             # >> add this column to the table definition parameters
-            label_list.append(label_text[0])
-            if label_text[0] in qmap:
+            if label_text in qmap:
                 tiphref = self._cw.build_url(
                     "view", vid="piws-documentation",
-                    tooltip_name=label_text[0], _notemplate=True)
+                    tooltip_name=label_text, _notemplate=True)
                 headers.append(
                     {"sTitle": "<a href='{0}' target=_blank>"
                                "<span class='fake-link'>{1} &#9735;"
-                               "</span></a>".format(tiphref, label_text[0])})
+                               "</span></a>".format(tiphref, label_text)})
             else:
-                headers.append({"sTitle": label_text[0]})
+                headers.append({"sTitle": label_text})
 
         # > begin the script
         html = "<script type='text/javascript'> "
@@ -503,15 +541,15 @@ class JtableView(View):
         html += "var table = $('#the_table').dataTable( { "
 
         # > set table display options
-        html += "'scrollX': '100%',"
+        # TODO fix scrollX bug since DataTables 1.10.10
+        # html += "'scrollX': '100%',"
         html += "'scrollY': '600px',"
         html += "'scrollCollapse': true,"
         html += "'sPaginationType': 'bootstrap',"
-        if csvcallback:
+        if csv_export:
             html += "'dom': 'T<\"clear\">l<\"toolbar\">frtip',"
         else:
             html += "'dom': 'T<\"clear\">lfrtip',"
-        html += "'lengthMenu': [ [10, 25, 50, 100], [10, 25, 50, 100] ],"
         html += "'sServerMethod': 'POST',"
         html += "'oLanguage': {'sSearch': 'ID search'},"
         html += "'pagingType': 'full_numbers',"
@@ -535,11 +573,12 @@ class JtableView(View):
         html += "'fnServerParams': function (aoData) {"
         html += "aoData.push("
         html += "{ name: 'labels', "
-        html += "value: '{0}'".format(json.dumps(label_list))
+        html += "value: '{0}'".format(json.dumps(["ID"]+labels))
         html += "}, "
         for key, value in kwargs.items():
             if isinstance(value, basestring):
-                html += "{{name: '{0}', value: '{1}'}}, ".format(key, str(value))
+                html += "{{name: '{0}', value: '{1}'}}, ".format(
+                    key, str(value))
             else:
                 html += "{{name: '{0}', value: {1}}}, ".format(key, value)
 
@@ -573,7 +612,7 @@ class JtableView(View):
         html += "'fade': 250"
         html += "} );"
 
-        if csvcallback:
+        if csv_export:
 
             # > create a new csv download button
             csv_button_html = (u'<p><a class="btn btn-default" role="button" '
@@ -588,7 +627,7 @@ class JtableView(View):
             # callback
             post_data = {'qname': kwargs['qname'],
                          'timepoint': kwargs['timepoint'],
-                         'labels': json.dumps(label_list)}
+                         'labels': json.dumps(["ID"]+labels)}
 
             # > set csv file name
             timestamp = time.strftime("%Y-%m-%d_%H:%M:%S")
@@ -854,7 +893,7 @@ def get_questionnaires_data(self):
     if jtpagesize == -1:
         higher = total_nb_of_rows
     else:
-        higher = min(jtstartindex+jtpagesize, len(qstruct))
+        higher = min(jtstartindex + jtpagesize, len(qstruct))
 
     # Build the list that will be dumped in the table
     records = []
@@ -871,11 +910,11 @@ def get_questionnaires_data(self):
         for timepoint in timepoints:
             # Construct the answer table view
             href = self._cw.build_url(
-                "view", vid="jtable-table",
+                "view", vid="file.answer.table",
                 rql_labels=rql_labels.format(qname),
                 ajaxcallback=ajaxcallback, title=qname, tooltip_name=qname,
                 qname=qname, timepoint=timepoint, elts_to_sort=["ID"],
-                csvcallback=True)
+                csv_export=True)
             # Find the column index corresponding to this timepoint
             timepoint_index = [label.lower() for label in labels].index(
                 timepoint.lower())
@@ -903,7 +942,8 @@ def get_questionnaires_data(self):
 
 def registration_callback(vreg):
     vreg.register(JtableView)
-    vreg.register(JhugetableView)
+    vreg.register(JHugetableView)
+    vreg.register(FileAnswerTableView)
     vreg.register(get_open_answers_data)
     vreg.register(get_questionnaires_data)
     vreg.register(PiwsCSVView)
