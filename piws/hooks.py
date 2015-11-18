@@ -122,8 +122,10 @@ class PiwsApacheDeauthenticationHook(hook.Hook):
                 cleanup_session_interval = min(60*60,
                                                self.repo.
                                                piws_cleanup_session_time / 3)
-                assert self.repo._tasks_manager is not None, \
-                    "This Repository is not intended to be used as a server"
+                assert self.repo._tasks_manager is not None, ("This Repository "
+                                                              "is not intended "
+                                                              "to be used as a "
+                                                              "server")
                 self.repo._tasks_manager.add_looping_task(
                     cleanup_session_interval, self.repo.piws_clean_sessions)
 
@@ -136,6 +138,8 @@ class PiwsCWUsersWatcher(hook.Hook):
     __regid__ = 'piws.cwusers_watcher'
     __select__ = hook.Hook.__select__ & is_instance('CWUser')
     events = ('after_add_entity', 'before_delete_entity')
+    mandatory_params = ['sender-name', 'sender-addr', 'supervising-addrs',
+                        'smtp-host', 'smtp-port']
 
     def sendmail(self, sender_name, sender_email, recipients_list, subject,
                  body, smtp_host, smtp_port):
@@ -167,9 +171,19 @@ class PiwsCWUsersWatcher(hook.Hook):
         s.quit()
 
     def __call__(self):
+        """
+        If the CW server is in production, create an admin message on CWUser
+        entity creation or deletion.
+        """
         config = self._cw.vreg.config
         if not (config.creating or config.repairing or config.quick_start):
-            if config.get('enable-cwusers-watcher', None) == 'yes':
+            if config.get('enable-cwusers-watcher', 'no') == 'yes':
+                if any(len(config.get(item, '')) == 0 for item
+                       in self.mandatory_params):
+                    raise Exception("In all-in-one section [MAIL] please fill "
+                                    "the fields  'sender-name', 'sender-addr', "
+                                    "'supervising-addrs', 'smtp-host', "
+                                    "'smtp-port'")
                 user_login = self.entity.login
                 if self.event == 'after_add_entity':
                     creation_date = self.entity.creation_date.strftime(
