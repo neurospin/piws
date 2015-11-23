@@ -44,4 +44,13 @@ options = (
       'group': 'piws',
       'level': 1,
       }),
+    ("enable-cwusers-watcher", {
+        "type": "string",
+        "default": 'no',
+        "help": ("If 'yes', an email is sent (this email address has to be "
+                 "set in the [MAIL] all-in-one section) when a CW user is "
+                 "created or deleted."),
+        "group": "piws",
+        "level": 1,
+    }),
 )
