@@ -30,11 +30,11 @@ This cube provides:
   meta-informations ...)
 
 - A web-interface that allows users to navigate efficiently within the database
-  content, consult data and select relevant subsets.
-    - Online visualisation of MRI sequences (3D and 4D).
-    - Online consultation of questionnaires, dynamic filtering of tables and direct
-      download possibility
-    - Multi-level documentation
+  content, consult data and select relevant subsets. Examples:
+  - Online visualisation of MRI sequences (3D and 4D).
+  - Online consultation of questionnaires, dynamic filtering of tables and direc
+    download possibility
+  - Multi-level documentation
 
 - A fine security model
   - Login/logout possibility
