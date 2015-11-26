@@ -26,14 +26,16 @@ This cube provides:
 -------------------
 
 - A database schema that supports any kind of data modality the PI projects can
-produce (MRI, EEG, Eye-Tracking, Questionnaires, Subjects and machines 
-meta-informations ...).
+  produce (MRI, EEG, Eye-Tracking, Questionnaires, Subjects and machines 
+  meta-informations ...)
+
 - A web-interface that allows users to navigate efficiently within the database
-content, consult data and select relevant subsets.
-  - Online visualisation of MRI sequences (3D and 4D).
-  - Online consultation of questionnaires, dynamic filtering of tables and direct
-  download possibility
-  - Multi-level documentation
+  content, consult data and select relevant subsets.
+    - Online visualisation of MRI sequences (3D and 4D).
+    - Online consultation of questionnaires, dynamic filtering of tables and direct
+      download possibility
+    - Multi-level documentation
+
 - A fine security model
   - Login/logout possibility
   - Access rules on each data element
@@ -47,12 +49,3 @@ which bring massive data download/upload functionalities.
 .. _rql_upload: https://github.com/neurospin/rql_upload
 .. _rql_download: https://github.com/neurospin/rql_download
 
-License
-=======
-
-Please note that this repository contains a few images that cannot be
-licensed under CeCILL-B because they were obtained under a different
-license:
-
-* data/images/dreamstime_s_32994616.jpg     © Rukanoga | Dreamstime.com
-* data/images/dreamstime_s_33211444.jpg     © Štěpán Kápl | Dreamstime.com
