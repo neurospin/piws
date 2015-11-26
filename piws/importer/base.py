@@ -275,7 +275,7 @@ class Base(object):
         return entity, is_created
 
     def _create_assessment(self, assessment_struct, subject_eids, study_eid,
-                           center_eid, groups, piws_security_model=True):
+                           center_eid, groups):
         """ Create an assessment and its associated relations.
 
         The groups that can access the 'in_assessment' linked entities are
@@ -326,7 +326,7 @@ class Base(object):
 
             # Set the permissions
             # Create/get the related assessment groups
-            if piws_security_model:
+            if self.piws_security_model:
                 assessment_id = assessment_id.split("_")
                 related_groups = [
                     assessment_id[0],

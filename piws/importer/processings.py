@@ -220,7 +220,7 @@ class Processings(Base):
                 else:
                     assessment_eid = self._create_assessment(
                         assessment_struct, subject_eid, study_eid, center_eid,
-                        groups, self.piws_security_model)
+                        groups)
                     self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################
