@@ -1,19 +1,18 @@
+.. image:: ./piws/data/images/nsap.png 
+   :scale: 10 %
+   :alt: NeuroSpin Analysis Platform
+   :align: center
 ==============================
 Population Imaging Web Service
 ==============================
 
-
-.. image:: ./piws/data/images/nsap.png 
-   :scale: 50 %
-   :alt: NeuroSpin Analysis Platform
-   :align: center
 
 Summary
 =======
 
 Population Imaging Web Service cube.
 
-Publish neuroimaging genetic datasets using CubicWeb framework.
+Publish neuroimaging genetic datasets using the CubicWeb framework.
 
 Content
 =======
@@ -44,7 +43,7 @@ This cube provides:
 Synergy:
 --------
 
-This cube is perfectly compatible with the rql_download_ and rql_upload_ cubes 
+This cube integrates the rql_download_ and rql_upload_ cubes 
 which bring massive data download/upload functionalities.
 
 .. _rql_upload: https://github.com/neurospin/rql_upload
