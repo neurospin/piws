@@ -50,20 +50,19 @@ class CWGroups(Base):
         """
         # Go through the goup names
         nb_of_groups = float(len(self.list_group_names))
-        for cnt_group, goup_name in enumerate(self.list_group_names):
+        for cnt_group, group_name in enumerate(self.list_group_names):
 
             # Print a progress bar
             self._progress_bar((cnt_group + 1) / nb_of_groups,
-                               title="Import {0}:".format(goup_name),
+                               title="{0}(groups):".format(group_name),
                                bar_length=40)
-            cnt_group += 1.
 
             # Create the group if necessary
             group_entity, _ = self._get_or_create_unique_entity(
                 rql=("Any X Where X is CWGroup, X name "
-                     "'{0}'".format(goup_name)),
+                     "'{0}'".format(group_name)),
                 check_unicity=True,
                 entity_name="CWGroup",
-                name=unicode(goup_name))
+                name=unicode(group_name))
 
         print  # new line after last progress bar update

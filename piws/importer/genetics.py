@@ -241,7 +241,7 @@ class Genetics(Base):
                 else:
                     assessment_eid = self._create_assessment(
                         assessment_struct, timepoint_subjects, study_eid,
-                        center_eid, groups, self.piws_security_model)
+                        center_eid, groups)
                     self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################

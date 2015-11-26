@@ -7,10 +7,11 @@
 ##########################################################################
 
 # Cubicweb import
-from cubicweb.predicates import is_instance, yes
+from cubicweb.predicates import is_instance
 from cubicweb.web.action import Action
 from cubicweb.web.views.wdoc import HelpAction, AboutAction
 from cubicweb.web.views.actions import PoweredByAction
+from logilab.common.registry import yes
 
 
 ###############################################################################

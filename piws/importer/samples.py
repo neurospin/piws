@@ -16,7 +16,7 @@ from .base import Base
 
 
 class Samples(Base):
-    """ This class enables us to parse and load the sapmle data
+    """ This class enables us to parse and load the sample data
     to the cubicweb database
     """
     def __init__(self, session, project_name, center_name, data_path, parser,
