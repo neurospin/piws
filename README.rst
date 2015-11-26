@@ -31,9 +31,10 @@ This cube provides:
 
 - A web-interface that allows users to navigate efficiently within the database
   content, consult data and select relevant subsets. Examples:
+
   - Online visualisation of MRI sequences (3D and 4D).
-  - Online consultation of questionnaires, dynamic filtering of tables and direc
-    download possibility
+  - Online consultation of questionnaires, dynamic filtering of tables and 
+    direct-download possibility
   - Multi-level documentation
 
 - A fine security model
