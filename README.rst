@@ -6,7 +6,10 @@ Population Imaging Web Service
 |logo|
 
 .. |logo| image:: ./piws/data/images/nsap.png
-
+                  :height: 14px
+                  :width: 35 px
+                  :alt: NeuroSpin Analysis Platform
+                  :align: center
 
 Summary
 =======
