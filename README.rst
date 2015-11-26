@@ -1,8 +1,9 @@
 
 ==============================
-Population Imaging Web Service |logo|
+Population Imaging Web Service
 ==============================
 
+|logo|
 
 .. |logo| image:: ./piws/data/images/nsap.png
    :height: 14px
