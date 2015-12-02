@@ -40,7 +40,9 @@ class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
         if config.get("show_user_status", None) == 'no':
             w(u'')
         elif config.get('apache-cleanup-session-time', None) is not None:
-            w(u'<button type="button">Logout</button>')
+            w(u'<form action="{0}">'.format(self._cw.base_url() + "logout"))
+            w(u'<input type="submit" value="Logout">')
+            w(u'</form>')
         else:
             super(PiwsAuthenticatedUserStatus, self).render(w)
 
