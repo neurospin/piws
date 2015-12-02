@@ -139,8 +139,7 @@ class JHugetableView(View):
                         "dataTables.fixedColumns.js")
         self._cw.add_js("DataTables-1.10.10/extensions/Scroller/js/"
                         "dataTables.scroller.min.js")
-        self._cw.add_js("http://cdn.datatables.net/plug-ins/1.10.10/api/"
-                        "fnSetFilteringDelay.js", localfile=False)
+        self._cw.add_js("DataTables-1.10.10/extensions/fnSetFilteringDelay.js")
         self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
                         localfile=False)
 
@@ -479,8 +478,7 @@ class JtableView(View):
         self._cw.add_js("DataTables-1.10.10/media/js/jquery.dataTables.min.js")
         self._cw.add_js("DataTables-1.10.10/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
-        self._cw.add_js("http://cdn.datatables.net/plug-ins/1.10.10/api/"
-                        "fnSetFilteringDelay.js", localfile=False)
+        self._cw.add_js("DataTables-1.10.10/extensions/fnSetFilteringDelay.js")
         self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
                         localfile=False)
 
