@@ -330,7 +330,7 @@ class JHugetableView(View):
 
             # > create in-memory csv file using python csv module
             f = StringIO()
-            writer = csv.writer(f)
+            writer = csv.writer(f, delimiter=';')
             # write the headers
             writer.writerow(["ID"] + labels)
             # write all the rows
@@ -340,7 +340,7 @@ class JHugetableView(View):
 
             # > csv file javascript insertion with html compatibility
             # (line break character)
-            html += "var result = \"{0}\";".format(
+            html += "var result = '{0}';".format(
                     result.replace("\r\n", "\\r\\n"))
             # > create a web-browser download object
             html += "var a = window.document.createElement('a');"
