@@ -30,21 +30,30 @@ class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
     """
     Overrride bootstrap user-status component.
     In all-in-one.conf:
-    If show-user-status=1 : activated (default: bootstrap component).
-    If show-user-status=0 : deactivated.
-    If show-user-status=1 and apache-cleanup-session-time is specified:
-    diplay a logout button next to the search field.
+    If show-user-status=no : display nothing.
+    If show-user-status=yes and enable-apache-logout=no: display the default
+    bootstrap cube component.
+    If show-user-status=yes and enable-apache-logout=yes: display a logout
+    button next to the search field.
+    If show-user-status=yes and enable-apache-logout=no and
+    apache-cleanup-session-time is not empty: raise an error.
     """
     def render(self, w):
         config = self._cw.vreg.config
-        if config.get("show_user_status", None) == 'no':
-            w(u'')
-        elif config.get('apache-cleanup-session-time', None) is not None:
-            w(u'<form action="{0}">'.format(self._cw.base_url() + "logout"))
-            w(u'<input type="submit" value="Logout">')
-            w(u'</form>')
+        if config.get("show_user_status", "no") == "yes":
+            if config.get("enable-apache-logout", "no") == "yes":
+                w(u"<a href='{0}' class='button'>Logout</a>".format(
+                    self._cw.base_url() + 'logout'))
+            else:
+                if config.get('apache-cleanup-session-time', None) is not None:
+                    raise NotImplementedError("Session expiration with Apache "
+                                              "is not yet available due to "
+                                              "cross browsers compatibility "
+                                              "issues")
+                else:
+                    super(PiwsAuthenticatedUserStatus, self).render(w)
         else:
-            super(PiwsAuthenticatedUserStatus, self).render(w)
+            w(u"")
 
 
 class NSNavigationtBox(component.CtxComponent):

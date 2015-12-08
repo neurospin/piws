@@ -110,6 +110,10 @@ class PiwsApacheDeauthenticationHook(hook.Hook):
             piws_cleanup_session_time = self.repo.config.get(
                 'apache-cleanup-session-time', None)
             if piws_cleanup_session_time is not None:
+                raise NotImplementedError("Session expiration with Apache "
+                                          "is not yet available due to "
+                                          "cross browsers compatibility "
+                                          "issues")
                 assert piws_cleanup_session_time > 0
                 self.repo.piws_cleanup_session_time = piws_cleanup_session_time
                 self.repo._piws_expired_sessionids = set()
