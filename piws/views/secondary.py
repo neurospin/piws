@@ -41,14 +41,12 @@ class BaseOutOfContextView(EntityView):
 
         # Get the associated images
         imagefiles = []
-        if entity.cw_etype == 'Scan':
+        if entity.cw_etype == "Scan":
             if hasattr(entity, "results_files"):
-                # TODO: deal with 4d images
-                if entity.label not in ["EPI", "DTI"]:
-                    for efentries in entity.results_files:
-                        imagefiles.extend(
-                            [e.filepath for e in efentries.file_entries
-                             if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))])
+                for efentries in entity.results_files:
+                    imagefiles.extend(
+                        [e.filepath for e in efentries.file_entries
+                         if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))])
 
         # Create a viewer if some images has been detected
         limagefiles = len(imagefiles)

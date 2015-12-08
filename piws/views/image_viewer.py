@@ -119,7 +119,7 @@ class ImageViewer(View):
         # Define global javascript variables
         html += "<script type='text/javascript'>"
         html += "var quality = 50;"
-        html += "var ajaxcallback = 'get_encoded_brainbrowser_image';"
+        html += "var ajaxcallback = 'get_brainbrowser_image';"
         html += "</script>"
 
         # Set brainbrowser nifti image loader
@@ -400,8 +400,7 @@ class ImageViewer(View):
 
         # Add out of range event
         html += "else {"
-        html += "ajaxcallback = 'get_encoded_brainbrowser_image';"
-        html += "quality = 50;"
+        html += "ajaxcallback = 'get_brainbrowser_image';"
         html += "}"
 
         # Show the new image representation
@@ -708,8 +707,8 @@ class ImageViewer(View):
 
         # Define item to change the panle size
         html += "<select id='volume-quality'>"
-        html += "<option value='RAW'>RAW</option>"
-        html += "<option value='LOW JPEG' SELECTED>LOW JPEG</option>"
+        html += "<option value='RAW' SELECTED>RAW</option>"
+        # html += "<option value='LOW JPEG' SELECTED>LOW JPEG</option>"
         html += "</select>"
 
         # Define item to change the panel size
@@ -720,11 +719,11 @@ class ImageViewer(View):
         html += "<option value='512'>512</option>"
         html += "</select>"
 
-        # Define item to rest displayed views
-        html += "<span id='sync-volumes-wrapper'>"
-        html += ("<input type='checkbox' class='button' id='reset-volumes'>"
-                 "<label for='reset-volumes'>Reset</label>")
-        html += "</span>"
+        # Define item to reset displayed views
+        # html += "<span id='sync-volumes-wrapper'>"
+        # html += ("<input type='checkbox' class='button' id='reset-volumes'>"
+        #          "<label for='reset-volumes'>Reset</label>")
+        # html += "</span>"
 
         # Define item to create a screenshot
         html += "<span id='screenshot' class='button'>Screenshot</span>"
@@ -866,7 +865,14 @@ def get_brainbrowser_image(self):
     # Load the image
     im = nibabel.load(imagefile)
     header = im.get_header()
-    data = im.get_data()
+    try:
+        data = im.get_data()
+    # Missing bytes intern specific error that can be overcome with
+    # an old lib
+    except:
+        import nifti
+        im = nifti.NiftiImage(imagefile)
+        data = im.getDataArray().T
 
     # Change the dynamic of the image intensities
     data = numpy.cast[numpy.uint16](
