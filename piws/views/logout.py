@@ -18,9 +18,49 @@ from cubes.trustedauth.views import LogoutController
 class PiwsLogoutController(Controller):
     """
     Override the default logout controller (<base url>/logout).
+    Sends invalid http credentials from clientside javascript to deauthenticate
+    from Apache.
+    """
+    __regid__ = "logout"
+
+    def publish(self, rset=None):
+        html = "<!DOCTYPE html>"
+        html += "<html lang='en'>"
+        html += "<head>"
+        html += "<meta charset='utf-8'>"
+        html += "<title>Loading</title>"
+        html += ("<script src='//code.jquery.com/"
+                 "jquery-1.11.3.min.js'></script>")
+        html += "</head>"
+        html += "<body>"
+        html += "<script>"
+        html += "$(document).ready(function() {"
+        html += "$.ajax({"
+        html += "url: 'index.php',"
+        html += "async: false,"
+        html += "username: '*',"
+        html += "password: '*'"
+        html += "}).fail(function() {"
+        html += "window.location.replace('{0}');".format(
+            self._cw.vreg.config['deauthentication-redirection-url'])
+        html += "});"
+        html += "});"
+        html += "</script>"
+        html += "<noscript>"
+        html += ("Javascript is not activated. Please activate "
+                 "javascript and restart your web-browser.")
+        html += "</noscript>"
+        html += "</body>"
+        html += "</html>"
+        return u"{0}".format(html)
+
+
+class PiwsExpirationLogoutController(Controller):
+    """
+    Override the default logout controller (<base url>/logout).
     If the user wants to logout, adds its sessionid in the expired session list.
     Then redirects the user to an inside page (e.g. the welcome page) to trigger
-    the deauthentication mechanism from PiwsInMemoryRepositorySessionManager.
+    the deauthentication mechanism from PiwsExpirationInMemoryRepositorySessionManager.
     """
     __regid__ = 'logout'
 
@@ -32,7 +72,7 @@ class PiwsLogoutController(Controller):
         raise Redirect(self._cw.base_url())
 
 
-class PiwsUnloadController(Controller):
+class PiwsExpirationUnloadController(Controller):
     """
     Restricted javascript access controller called just before redirection
     to external url in order to destroy session.
@@ -54,7 +94,7 @@ class PiwsUnloadController(Controller):
             raise Redirect(self._cw.base_url() + 'logout')
 
 
-class PiwsInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
+class PiwsExpirationInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
     """
     Called on any http request to get user's session before its execution.
     If session has expired, sends a direct http response to short the request
@@ -62,7 +102,7 @@ class PiwsInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
     """
 
     def __init__(self, *args, **kwargs):
-        super(PiwsInMemoryRepositorySessionManager,
+        super(PiwsExpirationInMemoryRepositorySessionManager,
               self).__init__(*args, **kwargs)
         self.repo = kwargs['repo']
         self.deauth_html = "<!DOCTYPE html>"
@@ -111,7 +151,7 @@ class PiwsInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
                                         stream=u'{0}'.format(self.deauth_html),
                                         twisted_request=req._twreq)
                 raise DirectResponse(response)
-        return super(PiwsInMemoryRepositorySessionManager,
+        return super(PiwsExpirationInMemoryRepositorySessionManager,
                      self).get_session(req, sessionid)
 
 
@@ -119,8 +159,17 @@ def registration_callback(vreg):
     """
     Update registry.
     """
-    if vreg.config.get('apache-cleanup-session-time', None) is not None:
-        vreg.register_and_replace(PiwsInMemoryRepositorySessionManager,
-                                  InMemoryRepositorySessionManager)
+    if vreg.config.get("enable-apache-logout", "no") == "yes":
         vreg.register_and_replace(PiwsLogoutController, LogoutController)
-        vreg.register(PiwsUnloadController)
+    else:
+        if vreg.config.get('apache-cleanup-session-time', None) is not None:
+            raise NotImplementedError("Session expiration with Apache is not yet "
+                                      "available due to cross browsers "
+                                      "compatibility issues")
+            vreg.register_and_replace(
+                PiwsExpirationInMemoryRepositorySessionManager,
+                InMemoryRepositorySessionManager)
+            vreg.register_and_replace(
+                PiwsExpirationLogoutController,
+                LogoutController)
+            vreg.register(PiwsExpirationUnloadController)

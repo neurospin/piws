@@ -53,4 +53,11 @@ options = (
         "group": "piws",
         "level": 1,
     }),
+    ('enable-apache-logout',
+     {'type': 'string',
+      'default': 'no',
+      'help': 'Enable Apache logout',
+      'group': 'piws',
+      'level': 1,
+      }),
 )
