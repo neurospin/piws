@@ -858,6 +858,16 @@ def get_questionnaires_data(self):
         raise Exception("Only the 'ID' column can be filtered by "
                         "'get_questionnaires_data' ajax callback.")
 
+    # Choose the questionnaire rendering view:
+    # > case 1: the answers are inserted in the database (OpenAnswer).
+    # > case 2: one line of answers inserted per subject (File)
+    rql = "Any QR Where QR is QuestionnaireRun, EXISTS(QR result F)"
+    rset = self._cw.execute(rql)
+    if rset.rowcount > 0:
+        vid = "file.answer.table"
+    else:
+        vid = "jtable-table"
+
     # Deal with sort options
     jtsort = "ORDERBY ID {0}".format(jtsort)
 
@@ -908,7 +918,7 @@ def get_questionnaires_data(self):
         for timepoint in timepoints:
             # Construct the answer table view
             href = self._cw.build_url(
-                "view", vid="file.answer.table",
+                "view", vid=vid,
                 rql_labels=rql_labels.format(qname),
                 ajaxcallback=ajaxcallback, title=qname, tooltip_name=qname,
                 qname=qname, timepoint=timepoint, elts_to_sort=["ID"],
