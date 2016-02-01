@@ -15,6 +15,7 @@ from cubicweb.web.views.facets import FacetFilterMixIn
 from cubes.brainomics.views.facets import MeasureHandednessFacet
 from cubes.brainomics.views.facets import MeasureGenderFacet
 from cubes.brainomics.views.facets import MeasureAgeFacet
+from cubicweb.web.views.facets import HasTextFacet
 
 ############################################################################
 # Hide facet while filtering
@@ -89,7 +90,7 @@ class SubjectFacet(facet.RQLPathFacet):
     """
     __regid__ = "subject-facet"
     __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
-    path = ["X in_assessment A", "A subjects S", "S code_in_study C"]
+    path = ["X in_assessment A", "A subject S", "S code_in_study C"]
     order = 3
     filter_variable = "C"
     title = _("Subjects")
@@ -141,7 +142,7 @@ class AssessmentSubjectFacet(facet.RQLPathFacet):
     """
     __regid__ = "assessment-subject-facet"
     __select__ = is_instance("Assessment")
-    path = ["X subjects S", "S code_in_study C"]
+    path = ["X subject S", "S code_in_study C"]
     order = 3
     filter_variable = "C"
     title = _("Subjects")
@@ -176,3 +177,4 @@ def registration_callback(vreg):
     vreg.register(ScanFormatFacet)
     vreg.register(AssessmentTimepointFacet)
     vreg.register(AssessmentSubjectFacet)
+    vreg.unregister(HasTextFacet)

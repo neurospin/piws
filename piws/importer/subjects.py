@@ -64,7 +64,7 @@ class Subjects(Base):
         # Class parameters
         self.subjects = subjects
         self.project_name = project_name
-        self.data_filepath = data_filepath or ""
+        # self.data_filepath = data_filepath or ""
 
     ###########################################################################
     #   Public Methods
@@ -95,7 +95,8 @@ class Subjects(Base):
             entity_name="Study",
             check_unicity=True,
             name=unicode(self.project_name),
-            data_filepath=unicode(self.data_filepath))
+            # data_filepath=unicode(self.data_filepath)
+        )
         study_eid = study_entity.eid
 
         #######################################################################
@@ -114,9 +115,13 @@ class Subjects(Base):
             cnt_subject += 1.
 
             # Create the subject if necessary
+
+            # ## TODO : imagen specific
+            # del subject_parameter["identifier"]
+
             subject_entity, is_created = self._get_or_create_unique_entity(
-                rql=("Any X Where X is Subject, X identifier "
-                     "'{0}'".format(subject_parameter["identifier"])),
+                rql=("Any X Where X is Subject, X code_in_study "
+                     "'{0}'".format(subject_parameter["code_in_study"])),
                 check_unicity=True,
                 entity_name="Subject",
                 **subject_parameter)

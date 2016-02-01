@@ -57,7 +57,7 @@ class Assessment(AnyEntity):
         if self.genomic_measures:
             relations.append("GenomicMeasure")
         return "Assessment of {0} (time {1} - type {2})".format(
-            self.subjects[0].code_in_study, self.timepoint,
+            self.subject[0].code_in_study, self.timepoint,
             "/".join(relations))
 
     @property
@@ -99,7 +99,7 @@ class QuestionnaireRun(AnyEntity):
         """Define the questionnaire run entity title.
         """
         return "QuestionnaireRun of {0}".format(
-            self.user_ident.replace("_", " - "))
+            self.subject[0].code_in_study.replace("_", " - "))
 
     @property
     def symbol(self):
@@ -124,17 +124,17 @@ class ProcessingRun(AnyEntity):
         return "images/processing.png"
 
 
-class GenomicMeasure(AnyEntity):
-    __regid__ = "GenomicMeasure"
-
-    def dc_title(self):
-        """Define the genomic measure run entity title.
-        """
-        return ("{0} (time {1})".format(self.label,
-                self.in_assessment[0].timepoint))
-
-    @property
-    def symbol(self):
-        """Return a symbol corresponding to the genomic measure type.
-        """
-        return "images/gchip.png"
+# class GenomicMeasure(AnyEntity):
+#     __regid__ = "GenomicMeasure"
+#
+#     def dc_title(self):
+#         """Define the genomic measure run entity title.
+#         """
+#         return ("{0} (time {1})".format(self.label,
+#                 self.assessment[0].timepoint))
+#
+#     @property
+#     def symbol(self):
+#         """Return a symbol corresponding to the genomic measure type.
+#         """
+#         return "images/gchip.png"

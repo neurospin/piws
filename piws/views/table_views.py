@@ -44,7 +44,7 @@ class FileAnswerTableView(View):
 
         # Execute the rql to get all subjects QuestionnaireRuns
         rql = ("Any ID, D ORDERBY ID ASC WHERE QR is QuestionnaireRun, "
-               "QR instance_of Q, Q name '{0}', QR in_assessment A, "
+               "QR questionnaire Q, Q name '{0}', QR in_assessment A, "
                "A timepoint '{1}', QR result F, F data D, QR subject S, "
                "S code_in_study ID".format(qname, timepoint))
         rset = self._cw.execute(rql)
@@ -738,7 +738,7 @@ def get_open_answers_data(self):
 
     # Get all the questionnaire runs and associated subjects
     rql = ("Any ID, QR {0} "
-           "Where QR is QuestionnaireRun, QR instance_of Q, Q name '{1}', "
+           "Where QR is QuestionnaireRun, QR questionnaire Q, Q name '{1}', "
            "QR subject S, S code_in_study ID, QR in_assessment A, "
            "A timepoint '{2}'".format(jtsort, qname, timepoint))
     rset = self._cw.execute(rql)
@@ -798,7 +798,7 @@ class PiwsCSVView(CSVMixIn, View):
         labels = json.loads(self._cw.form['labels'])
 
         rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
-               "S questionnaire_runs QR, QR instance_of QU, QU name '{0}', "
+               "S questionnaire_runs QR, QR questionnaire QU, QU name '{0}', "
                "QR open_answers O, O value OV, O in_assessment A, "
                "A timepoint '{1}', O question Q, Q text QT".format(qname,
                                                                    timepoint)
@@ -870,7 +870,7 @@ def get_questionnaires_data(self):
     # Get all the questionnaire and associated timepoints
     rql = ("DISTINCT Any ID, T {0} "
            "Where Q is Questionnaire, QR is QuestionnaireRun, "
-           "QR instance_of Q, QR in_assessment A, Q name ID, "
+           "QR questionnaire Q, QR in_assessment A, Q name ID, "
            "A timepoint T".format(jtsort))
     rset = self._cw.execute(rql)
 

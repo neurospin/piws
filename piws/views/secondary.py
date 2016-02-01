@@ -45,7 +45,7 @@ class BaseOutOfContextView(EntityView):
             if hasattr(entity, "results_files"):
                 for efentries in entity.results_files:
                     imagefiles.extend(
-                        [e.filepath for e in efentries.file_entries
+                        [e.filepath for e in efentries.external_files
                          if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))])
 
         # Create a viewer if some images has been detected
@@ -182,7 +182,7 @@ class OutOfContextAssessmentView(BaseOutOfContextView):
         """ Generate a dictionary with the Assessment description.
         """
         center = entity.center[0]
-        subjects = entity.subjects
+        subject = entity.subject
         run_items = []
         run_items.extend(entity.processing_runs)
         run_items.extend(entity.scans)
@@ -190,8 +190,8 @@ class OutOfContextAssessmentView(BaseOutOfContextView):
         run_items.extend(entity.genomic_measures)
         desc = {}
         desc["Acquisition center"] = center.name
-        if len(subjects) == 1:
-            subject = subjects[0]
+        if len(subject) == 1:
+            subject = subject[0]
             desc["Gender"] = subject.gender
             desc["Handedness"] = subject.handedness
             desc["Age"] = entity.age_of_subject

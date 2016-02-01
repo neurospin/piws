@@ -12,7 +12,7 @@ from cubicweb.predicates import is_instance
 from cubicweb.web.views.primary import PrimaryView
 
 # Cubes import
-from cubes.brainomics.views.startup import BrainomicsIndexView
+from cubicweb.web.views.startup import IndexView
 
 
 class NSIndexView(IndexView):
@@ -59,5 +59,5 @@ class NSCardView(PrimaryView):
 
 
 def registration_callback(vreg):
-    vreg.register_and_replace(NSIndexView, BrainomicsIndexView)
+    vreg.register_and_replace(NSIndexView, IndexView)
     vreg.register(NSCardView)

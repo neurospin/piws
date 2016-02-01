@@ -16,11 +16,8 @@ from cubicweb.predicates import match_view
 from cubicweb.predicates import match_kwargs
 
 # Cubes import
-from cubes.brainomics.views.components import BrainomicsLinksCenters
-from cubes.brainomics.views.components import BrainomicsEditBox
-from cubes.brainomics.views.components import BrainomicsDownloadBox
 from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
-
+from cubicweb.web.views.boxes import EditBox
 ###############################################################################
 # Navigation Box
 ###############################################################################
@@ -282,20 +279,20 @@ class NSImageViewers(component.CtxComponent):
         """ Method to create the image box content.
         """
         # 3D image viewer
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        efentries = self.cw_rset.get_entity(0, 0).results_files[0].file_entries
+        efentries = self.cw_rset.get_entity(0, 0).results_filesets[0].external_files
         imagefiles = [e.filepath for e in efentries
                       if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
         limagefiles = len(imagefiles)
         if limagefiles > 0:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
             href = self._cw.build_url(
                 "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
                 __message=(u"Found '{0}' image(s) that can be "
                             "displayed.".format(limagefiles)))
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Triplanar</a>')
-        w(u'</div></div><br/>')
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'Triplanar</a>')
+            w(u'</div></div><br/>')
 
 
 ###############################################################################
@@ -342,6 +339,18 @@ def registration_callback(vreg):
     vreg.register(NSSubjectStatistics)
     vreg.register(NSAssessmentStatistics)
     vreg.register(NSImageViewers)
-    vreg.unregister(BrainomicsLinksCenters)
-    vreg.unregister(BrainomicsEditBox)
-    vreg.unregister(BrainomicsDownloadBox)
+    vreg.unregister(EditBox)
+    # Unregister breadcrumbs
+    from cubicweb.web.views.ibreadcrumbs import (BreadCrumbEntityVComponent,
+                                                 BreadCrumbLinkToVComponent,
+                                                 BreadCrumbAnyRSetVComponent,
+                                                 BreadCrumbETypeVComponent)
+    vreg.unregister(BreadCrumbEntityVComponent)
+    vreg.unregister(BreadCrumbAnyRSetVComponent)
+    vreg.unregister(BreadCrumbETypeVComponent)
+    vreg.unregister(BreadCrumbLinkToVComponent)
+    # Unregister logo for now...
+    # Unregister anon status component
+    from cubicweb.web.views.basecomponents import ApplLogo, AnonUserStatusLink
+    vreg.unregister(ApplLogo)
+    vreg.unregister(AnonUserStatusLink)
