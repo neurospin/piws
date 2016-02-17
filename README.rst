@@ -10,6 +10,8 @@ Summary
 Population Imaging Web Service cube.
 
 Publish neuroimaging genetic datasets using the CubicWeb framework.
+Check `this link <https://neurospin.github.io/piws/>`_ for the complete
+documentation.
 
 Content
 =======
