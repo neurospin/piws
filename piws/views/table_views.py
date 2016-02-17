@@ -12,8 +12,6 @@ from collections import OrderedDict, defaultdict
 import json
 import re
 import time
-import csv
-from StringIO import StringIO
 
 # Cubicweb import
 from cubicweb.view import View
@@ -69,7 +67,7 @@ class FileAnswerTableView(View):
                 try:
                     record.append(sdata[label])
                 except KeyError:
-                    record.append("")
+                    record.append(u"")
             records.append(record)
 
         # Call JhugetableView for html generation of the table
@@ -184,7 +182,7 @@ class JHugetableView(View):
         # > begin the script
         html = "<script type='text/javascript'> "
         html += "$(document).ready(function() {"
-        
+
         # > dumps the answers rset into javascript
         html += "var all_data = {0};".format(json.dumps(records))
         html += "var nbrecordstotal = {0};".format(len(records))
@@ -196,7 +194,7 @@ class JHugetableView(View):
         # > create the table
         html += "var table = $('#the_table').dataTable( { "
         html += "serverSide: true,"
-        
+
         # > set the ajax callback to fill dynamically the table
         html += "ajax: function ( data, callback, settings ) {"
         # > get the table sorting direction
@@ -257,7 +255,7 @@ class JHugetableView(View):
         html += "}, 50 );"
         # > close the ajax callback
         html += "},"
-        
+
         # > set table display options
         html += "'scrollX': true,"
         html += "'scrollCollapse': true,"
@@ -328,24 +326,21 @@ class JHugetableView(View):
             # > assign ajax callback to csv button : start function click
             html += "$('#csv_button').click(function() {"
 
-            # > create in-memory csv file using python csv module
-            f = StringIO()
-            writer = csv.writer(f, delimiter=';')
-            # write the headers
-            writer.writerow(["ID"] + labels)
-            # write all the rows
-            writer.writerows(records)
-            # get the csv result as string
-            result = f.getvalue()
+            # > create the csv string
+            html += "var csv_headers = {0};".format(
+                    json.dumps([u"ID"] + labels))
+            html += "var csv_tooltips = {0};".format(json.dumps(tooltips))
+            html += ("var csv_rows = [csv_headers.join(';'), "
+                     "csv_tooltips.join(';')];")
+            html += "for(var i=0, l=all_data.length; i<l; ++i){"
+            html += "csv_rows.push(all_data[i].join(';'));"
+            html += "}"
+            html += "var csv_string = csv_rows.join('\\r\\n');"
 
-            # > csv file javascript insertion with html compatibility
-            # (line break character)
-            html += "var result = '{0}';".format(
-                    result.replace("\r\n", "\\r\\n"))
             # > create a web-browser download object
             html += "var a = window.document.createElement('a');"
-            html += ("a.href = window.URL.createObjectURL(new Blob([result], "
-                     "{type: 'text/csv'}));")
+            html += ("a.href = window.URL.createObjectURL("
+                     "new Blob([csv_string], {type: 'text/csv'}));")
             html += "a.download = '{0}.csv';".format(filename)
             html += "document.body.appendChild(a);"
             html += "a.click();"
@@ -462,7 +457,7 @@ class JtableView(View):
         # Get the path to the in progress resource
         wait_image_url = self._cw.data_url("images/please_wait.gif")
 
-       # Add css resources
+        # Add css resources
         self._cw.add_css(
             "DataTables-1.10.10/media/css/jquery.dataTables.min.css")
         self._cw.add_css("DataTables-1.10.10/extensions/FixedColumns/css/"
@@ -686,7 +681,8 @@ class JtableView(View):
 
         # > create a div for the in progress resource
         html += ("<div id='loadingmessage' style='display:none' "
-                 "align='center'><img src='{0}'/></div>".format(wait_image_url))
+                 "align='center'><img src='{0}'/></div>".format(
+                     wait_image_url))
 
         # > display the table in the body
         html += "<table id='the_table' class='cell-border display'>"
@@ -858,6 +854,16 @@ def get_questionnaires_data(self):
         raise Exception("Only the 'ID' column can be filtered by "
                         "'get_questionnaires_data' ajax callback.")
 
+    # Choose the questionnaire rendering view:
+    # > case 1: the answers are inserted in the database (OpenAnswer).
+    # > case 2: one line of answers inserted per subject (File)
+    rql = "Any QR Where QR is QuestionnaireRun, EXISTS(QR result F)"
+    rset = self._cw.execute(rql)
+    if rset.rowcount > 0:
+        vid = "file.answer.table"
+    else:
+        vid = "jtable-table"
+
     # Deal with sort options
     jtsort = "ORDERBY ID {0}".format(jtsort)
 
@@ -882,7 +888,7 @@ def get_questionnaires_data(self):
 
     # Open answer table parameters
     ajaxcallback = "get_open_answers_data"
-    rql_labels = ("Any QUT ORDERBY QUT WHERE Q is Questionnaire, Q name '{0}', "
+    rql_labels = ("Any QUT ORDERBY QUT WHERE Q is Questionnaire, Q name '{0}',"
                   "Q questions QU, QU text QUT")
 
     # Define start and stop display index for pagination
@@ -908,7 +914,7 @@ def get_questionnaires_data(self):
         for timepoint in timepoints:
             # Construct the answer table view
             href = self._cw.build_url(
-                "view", vid="file.answer.table",
+                "view", vid=vid,
                 rql_labels=rql_labels.format(qname),
                 ajaxcallback=ajaxcallback, title=qname, tooltip_name=qname,
                 qname=qname, timepoint=timepoint, elts_to_sort=["ID"],

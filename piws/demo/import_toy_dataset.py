@@ -19,12 +19,12 @@ from cubicweb.dbapi import in_memory_repo_cnx
 
 # Piws import
 sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
-from piws.scripts.groups import CWGroups
-from piws.scripts.users import CWUsers
-from piws.scripts.subjects import Subjects
-from piws.scripts.scans import Scans
-from piws.scripts.questionnaires import Questionnaires
-from piws.scripts.genetics import Genetics
+from piws.importer.groups import CWGroups
+from piws.importer.users import CWUsers
+from piws.importer.subjects import Subjects
+from piws.importer.scans import Scans
+from piws.importer.questionnaires import Questionnaires
+from piws.importer.genetics import Genetics
 from parse_toy_data import subject_parser
 from parse_toy_data import scan_parser
 from parse_toy_data import questionnaire_parser
@@ -90,7 +90,8 @@ db_scan_importer = Scans(
     data_filepath=demo_path, use_store=True)
 db_questionnaire_importer = Questionnaires(
     session, STUDY_NAME, CENTER_NAME, questionnaires, can_read=True,
-    can_update=False, data_filepath=demo_path, use_store=True)
+    can_update=False, data_filepath=demo_path, use_store=True,
+    use_openanswer=True)
 db_genetic_importer = Genetics(
     session, STUDY_NAME, CENTER_NAME, genetics, can_read=True,
     can_update=False, data_filepath=demo_path, use_store=True)

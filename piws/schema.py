@@ -233,6 +233,7 @@ Questionnaire.add_relation(
     name="questionnaire_runs")
 
 # GENOMIC MEASURE
+GenomicMeasure.remove_relation(name="concerns")
 GenomicMeasure.add_relation(
     SubjectRelation("Subject", cardinality="**", inlined=False),
     name="subjects")
@@ -265,6 +266,7 @@ GenomicPlatform.add_relation(
 Snp.add_relation(
     SubjectRelation("GenomicPlatform", cardinality="**", inlined=False),
     name="platforms")
+Snp.remove_relation(name="chromosome")
 
 # CWGROUP
 

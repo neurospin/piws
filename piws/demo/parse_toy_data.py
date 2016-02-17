@@ -160,7 +160,7 @@ def scan_parser(root, project_name):
                             "fov_y": 0,
                             "tr": 2.5,
                             "te": 0,
-                            "field": "3T"
+                            "field": u"3T"
                         }
 
                         # Create the scan entity structure
@@ -334,8 +334,8 @@ def genetic_parser(root, project_name):
 
                 # Create the scan entity structure
                 gmeasure_struct = {
-                    "identifier": assessment_id + "_Illumina_raw_json",
-                    "label": "Illumina_raw_json",
+                    "identifier": assessment_id + u"_Illumina_raw_json",
+                    "label": u"Illumina_raw_json",
                     "type": u"raw",
                     "format": u"json"
                 }
