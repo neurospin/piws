@@ -121,6 +121,17 @@ class ProcessingRun(AnyEntity):
     def symbol(self):
         """Return a symbol corresponding to the processing run type.
         """
+        fset = self.results_files[0]
+        if fset.name in ["EDDY", "FA", "MD", "MO", "NODIFF BRAIN", "RD",
+                         "RESTORE"]:
+            return "images/dmri.png"
+        elif fset.name == "1KG_snps_indels_EUR":
+            return "images/gchip.png"
+        elif fset.name == "freesurfer":
+            return "images/mri.jpg"
+        elif fset.name in ["SPM preproc EPI_mid", "SPM preproc EPI_faces",
+                           "SPM preproc EPI_stop_signal"]:
+            return "images/fmri.jpg"
         return "images/processing.png"
 
 
