@@ -39,33 +39,12 @@ from cubes.genomics.schema import GenomicMeasure
 from cubes.genomics.schema import ColumnRef
 from cubes.genomics.schema import GenomicPlatform
 from cubes.genomics.schema import Snp
+from cubes.card.schema import Card
 
 
 ###############################################################################
 # Modification of the schema
 ###############################################################################
-
-# It seems it's the only way to remove inlined relations
-def post_build_callback(schema):
-    # Remove inlined relations
-    schema.del_relation_def('Answer', 'question', 'Question')
-    # Add relation container with inlined=False
-    schema.add_relation_type(RelationType('question', inlined=False))
-    # Add again the deleted relation
-    schema.add_relation_def(
-        RelationDefinition(subject='Answer',
-                           name='question',
-                           object='Question',
-                           cardinality='1*',
-                           composite='object')
-    )
-    # Add a new relation
-    schema.add_relation_def(
-        RelationDefinition(subject='OpenAnswer',
-                           name='question',
-                           object='Question',
-                           cardinality='1*')
-    )
 
 # ATTRIBUTES
 
@@ -293,13 +272,13 @@ Snp.add_relation(
 class can_read(RelationDefinition):
     subject = "CWGroup"
     object = "Assessment"
-    cardinality = "*+"
+    cardinality = "**"
 
 
 class can_update(RelationDefinition):
     subject = "CWGroup"
     object = "Assessment"
-    cardinality = "*+"
+    cardinality = "**"
 
 # RIGHTS
 
@@ -344,18 +323,21 @@ Scan.add_relation(SubjectRelation("FMRIData", cardinality='?1',
 # Set permissions
 ###############################################################################
 
-ENTITIES = [
+RESTRICTED_ENTITIES = [
     Scan, FMRIData, DMRIData, PETData, MRIData, FileSet, ExternalFile,
     ScoreValue, ProcessingRun, QuestionnaireRun, OpenAnswer, GenomicMeasure]
 
+PUBLIC_ENTITIES = [
+    Subject, Center, Study, Questionnaire, Question, Card]
 
-DEFAULT_PERMISSIONS = {
+ENTITIES = RESTRICTED_ENTITIES + PUBLIC_ENTITIES + [Assessment]
+
+PUBLIC_PERMISSIONS = {
     "read": ("managers", "users", "guests"),
     "add": ("managers",),
     "update": ("managers",),
     "delete": ("managers",),
 }
-
 
 ASSESSMENT_PERMISSIONS = {
     "read": (
@@ -372,7 +354,6 @@ ASSESSMENT_PERMISSIONS = {
         ERQLExpression("U in_group G, G can_update X")),
 }
 
-
 RELATION_PERMISSIONS = {
     "read": (
         "managers",
@@ -385,8 +366,7 @@ RELATION_PERMISSIONS = {
         RRQLExpression("S in_assessment A, U in_group G, G can_update A"))
 }
 
-
-ENTITY_PERMISSIONS = {
+RESTRICTED_PERMISSIONS = {
     "read": (
         "managers",
         ERQLExpression("X in_assessment A, U in_group G, G can_read A")),
@@ -401,28 +381,52 @@ ENTITY_PERMISSIONS = {
         ERQLExpression("X in_assessment A, U in_group G, G can_update A")),
 }
 
+MANAGER_PERMISSIONS = {
+    "read": ("managers",),
+    "add": ("managers",),
+    "update": ("managers",),
+    "delete": ("managers",),
+}
 
-# Set the assessment entity permissions
-Assessment.set_permissions(ASSESSMENT_PERMISSIONS)
+# It seems it's the only way to remove inlined relations
+def post_build_callback(schema):
 
-# Set the subject/center/study/questionnaire/question entities permissions
-Subject.set_permissions(DEFAULT_PERMISSIONS)
-Center.set_permissions(DEFAULT_PERMISSIONS)
-Study.set_permissions(DEFAULT_PERMISSIONS)
-Questionnaire.set_permissions(DEFAULT_PERMISSIONS)
-Question.set_permissions(DEFAULT_PERMISSIONS)
+    # Set strict default permissions
+    entity_names = [e.__name__ for e in ENTITIES]
+    for entity in schema.entities():
+        if entity.type not in entity_names:
+            entity.permissions = MANAGER_PERMISSIONS
 
-# Set the permissions on the used entities only
-for entity in ENTITIES:
-    entity.__permissions__ = ENTITY_PERMISSIONS
+    # Set the relation permissions
+    for entity in ENTITIES:
+        for relation in entity.__relations__:
+            if relation.__class__ is SubjectRelation:
+                relation.__permissions__ = RELATION_PERMISSIONS
 
-# Update the entities list to set relation permissions
-ENTITIES.extend([Assessment, Subject, Center, Study, Questionnaire, Question])
+    # Set the specific entity permissions
+    Assessment.__permissions__ = ASSESSMENT_PERMISSIONS
+    for entity in PUBLIC_ENTITIES:
+        entity.__permissions__ = PUBLIC_PERMISSIONS
+    for entity in RESTRICTED_ENTITIES:
+        entity.__permissions__ = RESTRICTED_PERMISSIONS
 
-# Set the permissions on the ised entities relations only
-for entity in ENTITIES:
+    # Remove inlined relations
+    schema.del_relation_def('Answer', 'question', 'Question')
+    # Add relation container with inlined=False
+    schema.add_relation_type(RelationType('question', inlined=False))
+    # Add again the deleted relation
+    schema.add_relation_def(
+        RelationDefinition(subject='Answer',
+                           name='question',
+                           object='Question',
+                           cardinality='1*',
+                           composite='object')
+    )
+    # Add a new relation
+    schema.add_relation_def(
+        RelationDefinition(subject='OpenAnswer',
+                           name='question',
+                           object='Question',
+                           cardinality='1*')
+    )
 
-    # Get the subject relations
-    for relation in entity.__relations__:
-        if relation.__class__ is SubjectRelation:
-            relation.__permissions__ = RELATION_PERMISSIONS
