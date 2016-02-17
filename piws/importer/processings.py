@@ -9,6 +9,7 @@
 # System import
 import os
 import sys
+import warnings
 
 # Piws import
 from .base import Base
@@ -49,6 +50,30 @@ class Processings(Base):
         Notes
         -----
         Here is an axemple of the definiton of the 'processings' parameter:
+
+        ::
+
+            processings = {
+                "subjects1": [ {
+                    "Assessment": {
+                        "identifier": u"toy_V1_subject1",
+                        "timepoint": u"V1"},
+                    "Processings": [ {
+                        "Inputs": ["Any X Where X is Scan"],
+                        "ExternalResources": [[{
+                            "absolute_path": True, "name": u"p1",
+                            "identifier": u"toy_V1_subject1_p1_1",
+                            "filepath": u"/tmp/demo/V1/subject1/images/t1/t1.nii.gz"}]],
+                        "FileSets": [{
+                            "identifier": u"toy_V1_subject1_p1", "name": u"p1"}],
+                        "ProcessingRun": {
+                            "identifier": u"toy_V1_subject1_p1",
+                            "name": u"p1", "label": u"segmentation",
+                            "tool": u"spm", "version": u"8.1",
+                            "parameters": u"{'a': 1, 'r': 'mypath'}"}
+
+
+        Depreciated example:
 
         ::
 
@@ -232,8 +257,16 @@ class Processings(Base):
                     # Create the processing identifier
                     processing_struct = current_processing["ProcessingRun"]
                     processing_inputs = current_processing["Inputs"]
-                    fset_struct = current_processing["FileSet"]
-                    extfiles = current_processing["ExternalResources"]
+                    if "FileSet" in current_processing:
+                        warnings.warn("Use FileSets instead of FileSet.",
+                                      DeprecationWarning)
+                        fset_structs = [current_processing["FileSet"]]
+                        extfiles_structs = [
+                            current_processing["ExternalResources"]]
+                    else:
+                        fset_structs = current_processing["FileSets"]
+                        extfiles_structs = current_processing[
+                            "ExternalResources"]
                     scores = current_processing.get("Scores", None)
                     processing_id = processing_struct["identifier"]
 
@@ -253,13 +286,13 @@ class Processings(Base):
                     # Create the processing
                     else:
                         processing_eid = self._create_processing(
-                            processing_struct, fset_struct, extfiles,
+                            processing_struct, fset_structs, extfiles_structs,
                             scores, processing_inputs, subject_eid, study_eid,
                             assessment_eid)
 
-    def _create_processing(self, processing_struct, fset_struct, extfiles,
-                           scores, processing_inputs, subject_eid, study_eid,
-                           assessment_eid):
+    def _create_processing(self, processing_struct, fset_structs,
+                           extfiles_structs, scores, processing_inputs,
+                           subject_eid, study_eid, assessment_eid):
         """ Create a processing and its associated relations.
         """
         # Create the processing
@@ -302,9 +335,10 @@ class Processings(Base):
                         input_eid, "processing_runs", processing_eid,
                         check_unicity=False)
 
-            # Add the file set attached to a processing entity
-            self._import_file_set(fset_struct, extfiles, processing_eid,
-                                  assessment_eid)
+            # Add the file sets attached to a processing entity
+            for fset_struct, extfiles in zip(fset_structs, extfiles_structs):
+                self._import_file_set(fset_struct, extfiles, processing_eid,
+                                      assessment_eid)
 
         # Check if their is some scores attached to the current processing
         if scores is not None:
