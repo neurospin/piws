@@ -15,6 +15,8 @@ from cubicweb.web.views.facets import FacetFilterMixIn
 from cubes.brainomics.views.facets import MeasureHandednessFacet
 from cubes.brainomics.views.facets import MeasureGenderFacet
 from cubes.brainomics.views.facets import MeasureAgeFacet
+from cubes.neuroimaging.views.facets import ScanLabelFacet
+
 
 ############################################################################
 # Hide facet while filtering
@@ -160,6 +162,19 @@ class GenomicMeasureTypeFacet(facet.RQLPathFacet):
     title = _("Type")
 
 
+class ProcessingRunNameFacet(facet.RQLPathFacet):
+    """ Filter the ProcessingRun FileSets by name.
+
+    This filter is applied on 'ProcessingRun'.
+    """
+    __regid__ = "processingrun-name-facet"
+    __select__ = is_instance("ProcessingRun")
+    path = ["X results_files F", "F name N"]
+    order = 1
+    filter_variable = "N"
+    title = _("Type")
+
+
 ###############################################################################
 # Registration callback
 ###############################################################################
@@ -168,6 +183,7 @@ def registration_callback(vreg):
     vreg.unregister(MeasureHandednessFacet)
     vreg.unregister(MeasureGenderFacet)
     vreg.unregister(MeasureAgeFacet)
+    vreg.unregister(ScanLabelFacet)
     vreg.register(GenomicMeasureTypeFacet)
     vreg.register(TimepointFacet)
     vreg.register(StudyFacet)
@@ -176,3 +192,4 @@ def registration_callback(vreg):
     vreg.register(ScanFormatFacet)
     vreg.register(AssessmentTimepointFacet)
     vreg.register(AssessmentSubjectFacet)
+    vreg.register(ProcessingRunNameFacet)
