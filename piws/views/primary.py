@@ -92,7 +92,7 @@ class PiwsPrimaryView(PrimaryView):
             else:
                 source_etype = getattr(entity, "reverse_" + rschema.type)[0].cw_etype
                 target_etype = entity.cw_etype
-            label = (u"{0} <a class='btn btn-info disabled' href='#' "
+            label = (u"{0} <a class='btn btn-info active' href='#' "
                      "data-toggle='tooltip' title='{2}'>&#8594;</a> "
                      "{1}".format(source_etype, target_etype, rschema.type))
 
@@ -110,11 +110,11 @@ class PiwsPrimaryView(PrimaryView):
                 pos = rql.find("X")
                 rql = rql[:pos] + "F" + rql[pos + 1:]
                 label += (
-                    u"<a class='btn btn-info disabled' href='#' data-toggle='tooltip' "
+                    u"<a class='btn btn-info active' href='#' data-toggle='tooltip' "
                     "title='file_entries'>&#8594;</a> ExternalFile")
                 inner_rset = []
                 for fs_entity in rset.entities():
-                    inner_rset.append(fs_entity.file_entries)
+                    inner_rset.extend(fs_entity.file_entries)
                 rset = inner_rset
 
             # Construct the relation box
