@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/generated/table/cubes.piws.views.table_views.get_open_answers_data.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../index.html">
+        <img src="../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../views.html">Views</a></li>
+			  <li><a href="../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      <ul>
+<li><a class="reference internal" href="#">cubes.piws.views.table_views.get_open_answers_data</a></li>
+</ul>
+
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="cubes-piws-views-table-views-get-open-answers-data">
+<h1>cubes.piws.views.table_views.get_open_answers_data<a class="headerlink" href="#cubes-piws-views-table-views-get-open-answers-data" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="cubes.piws.views.table_views.get_open_answers_data">
+<code class="descclassname">cubes.piws.views.table_views.</code><code class="descname">get_open_answers_data</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#get_open_answers_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.get_open_answers_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the subject answer data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>jtsort: str</strong> :</p>
+<blockquote>
+<div><p>the sorting option to use.</p>
+</div></blockquote>
+<p><strong>jtstartindex: int</strong> :</p>
+<blockquote>
+<div><p>the current index provided by jtable.</p>
+</div></blockquote>
+<p><strong>jtpagesize: int</strong> :</p>
+<blockquote>
+<div><p>the number of rows per page.</p>
+</div></blockquote>
+<p><strong>id_pattern: str</strong> :</p>
+<blockquote>
+<div><p>pattern to search in the ID column.</p>
+</div></blockquote>
+<p><strong>labels: list of str</strong> :</p>
+<blockquote>
+<div><p>the table column names.</p>
+</div></blockquote>
+<p><strong>qname: string (mandatory)</strong> :</p>
+<blockquote>
+<div><p>the name of the questionnaire we want to export.</p>
+</div></blockquote>
+<p><strong>timepoint: string (mandatory)</strong> :</p>
+<blockquote>
+<div><p>filter request on a timepoint.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>data: dict</strong> :</p>
+<blockquote class="last">
+<div><p>the table content.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

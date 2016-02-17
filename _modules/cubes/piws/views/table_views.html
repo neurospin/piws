@@ -1,0 +1,1088 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubes/piws/views/table_views.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../../../index.html">
+        <img src="../../../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../../../index.html">Home</a></li>
+        <li><a href="../../../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../views.html">Views</a></li>
+			  <li><a href="../../../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubes.piws.views.table_views</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># Cubicweb import</span>
+<span class="kn">from</span> <span class="nn">cubicweb.view</span> <span class="kn">import</span> <span class="n">View</span>
+<span class="kn">from</span> <span class="nn">cubicweb.web.views.ajaxcontroller</span> <span class="kn">import</span> <span class="n">ajaxfunc</span>
+<span class="kn">from</span> <span class="nn">cubicweb.web.views.csvexport</span> <span class="kn">import</span> <span class="n">CSVMixIn</span>
+<span class="kn">from</span> <span class="nn">logilab.common.registry</span> <span class="kn">import</span> <span class="n">yes</span>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Datatables</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="FileAnswerTableView"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.FileAnswerTableView.html#cubes.piws.views.table_views.FileAnswerTableView">[docs]</a><span class="k">class</span> <span class="nc">FileAnswerTableView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; QuestionnaireRuns table view specific to the QuestionnaireRun (1?) File</span>
+<span class="sd">        schema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s1">&#39;file.answer.table&#39;</span>
+
+<div class="viewcode-block" id="FileAnswerTableView.call"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.FileAnswerTableView.html#cubes.piws.views.table_views.FileAnswerTableView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get all the questionnaire runs and associated subjects&quot;&quot;&quot;</span>
+
+        <span class="c1"># Retrieve form parameters from the url built by the ajax callback</span>
+        <span class="c1"># get_questionnaires_data</span>
+        <span class="n">qname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;qname&#39;</span><span class="p">]</span>
+        <span class="n">csv_export</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;csv_export&#39;</span><span class="p">]</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+        <span class="n">timepoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;timepoint&#39;</span><span class="p">]</span>
+        <span class="n">tooltip_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;tooltip_name&#39;</span><span class="p">]</span>
+        <span class="n">elts_to_sort</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;elts_to_sort&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Execute the rql to get all subjects QuestionnaireRuns</span>
+        <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any ID, D ORDERBY ID ASC WHERE QR is QuestionnaireRun, &quot;</span>
+               <span class="s2">&quot;QR instance_of Q, Q name &#39;{0}&#39;, QR in_assessment A, &quot;</span>
+               <span class="s2">&quot;A timepoint &#39;{1}&#39;, QR result F, F data D, QR subject S, &quot;</span>
+               <span class="s2">&quot;S code_in_study ID&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">qname</span><span class="p">,</span> <span class="n">timepoint</span><span class="p">))</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+
+        <span class="c1"># Load the dicts {question: answer, ..} per subject</span>
+        <span class="n">loaded_rset</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sid</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">sdata</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()))</span>
+                       <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">sdata</span> <span class="ow">in</span> <span class="n">rset</span><span class="p">]</span>
+
+        <span class="c1"># Get the table labels (ie headers) that corresponds to the questions</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">sdata</span> <span class="ow">in</span> <span class="n">loaded_rset</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sdata</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+        <span class="c1"># Construct all table rows</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">sdata</span> <span class="ow">in</span> <span class="n">loaded_rset</span><span class="p">:</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="p">[</span><span class="n">sid</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdata</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">u&quot;&quot;</span><span class="p">)</span>
+            <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+        <span class="c1"># Call JhugetableView for html generation of the table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wview</span><span class="p">(</span><span class="s1">&#39;jtable-hugetable-clientside&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="s1">&#39;null&#39;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+                   <span class="n">records</span><span class="o">=</span><span class="n">records</span><span class="p">,</span> <span class="n">csv_export</span><span class="o">=</span><span class="n">csv_export</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                   <span class="n">timepoint</span><span class="o">=</span><span class="n">timepoint</span><span class="p">,</span> <span class="n">elts_to_sort</span><span class="o">=</span><span class="n">elts_to_sort</span><span class="p">,</span>
+                   <span class="n">tooltip_name</span><span class="o">=</span><span class="n">tooltip_name</span><span class="p">,</span> <span class="n">use_scroller</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="JHugetableView"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.JHugetableView.html#cubes.piws.views.table_views.JHugetableView">[docs]</a><span class="k">class</span> <span class="nc">JHugetableView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a table view with DataTables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;jtable-hugetable-clientside&quot;</span>
+    <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;jhugetable-table&quot;</span>
+
+<div class="viewcode-block" id="JHugetableView.call"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.JHugetableView.html#cubes.piws.views.table_views.JHugetableView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">records</span><span class="p">,</span> <span class="n">csv_export</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">timepoint</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+             <span class="n">elts_to_sort</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">tooltip_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_scroller</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that will create a table with client-side processing only.</span>
+<span class="sd">         It is useful for huge datasets (million of entries).</span>
+
+<span class="sd">        An Ajax call is emulated within the JavaScript so this function is</span>
+<span class="sd">        client side only.</span>
+
+<span class="sd">        A special &#39;ID&#39; label will be added to the given labels to provide the</span>
+<span class="sd">        row string description. Thus the first column of the records array must</span>
+<span class="sd">        contain the corresponding &#39;ID&#39; values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        labels: list of string</span>
+<span class="sd">            the columns labels.</span>
+<span class="sd">        records: list of list</span>
+<span class="sd">            the table data.</span>
+<span class="sd">        csv_export: bool (optional)</span>
+<span class="sd">            if True an export button will be available.</span>
+<span class="sd">        title: string (optional, default &#39;&#39;)</span>
+<span class="sd">            the title of the table.</span>
+<span class="sd">        timepoint: string (optional, default &#39;&#39;)</span>
+<span class="sd">            the timepoint.</span>
+<span class="sd">        elts_to_sort: list (optional, default [])</span>
+<span class="sd">            labels of the columns to be sorted</span>
+<span class="sd">        tooltip_name: string (optional, default &#39;&#39;)</span>
+<span class="sd">            the piws documentation tooltip name.</span>
+<span class="sd">        use_scroller: bool (optional default False)</span>
+<span class="sd">            if True do not use pagination.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">elts_to_sort</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">elts_to_sort</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Add css resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_css</span><span class="p">(</span>
+            <span class="s2">&quot;DataTables-1.10.10/media/css/jquery.dataTables.min.css&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_css</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/FixedColumns/css/&quot;</span>
+                         <span class="s2">&quot;fixedColumns.dataTables.min.css&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_css</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/Scroller/css/&quot;</span>
+                         <span class="s2">&quot;scroller.dataTables.min.css&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_css</span><span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;https://code.jquery.com/ui/1.11.4/themes/smoothness/&quot;</span>
+             <span class="s2">&quot;jquery-ui.css&quot;</span><span class="p">),</span> <span class="n">localfile</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c1"># Add js resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/media/js/jquery.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/media/js/jquery.dataTables.min.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/FixedColumns/js/&quot;</span>
+                        <span class="s2">&quot;dataTables.fixedColumns.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/Scroller/js/&quot;</span>
+                        <span class="s2">&quot;dataTables.scroller.min.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/fnSetFilteringDelay.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;https://code.jquery.com/ui/1.11.4/jquery-ui.js&quot;</span><span class="p">,</span>
+                        <span class="n">localfile</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c1"># Get the instance questionnaire map</span>
+        <span class="n">qmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">vreg</span><span class="o">.</span><span class="n">docmap</span>
+
+        <span class="c1"># Associate a tooltip to each label</span>
+        <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">label_text</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">label_text</span> <span class="ow">in</span> <span class="n">qmap</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;&lt;!--.*tooltip:.*--&gt;&quot;</span><span class="p">,</span> <span class="n">qmap</span><span class="p">[</span><span class="n">label_text</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;tooltip:&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">8</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="n">tooltips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tooltips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tooltips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Generate the script</span>
+        <span class="c1"># &gt; table column headers and sort option</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;sTitle&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span><span class="p">}]</span>
+        <span class="n">hide_sort_indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;ID&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">elts_to_sort</span><span class="p">:</span>
+            <span class="n">hide_sort_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">label_text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="c1"># &gt;&gt; select if we can sort this column</span>
+            <span class="k">if</span> <span class="n">label_text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">elts_to_sort</span><span class="p">:</span>
+                <span class="n">hide_sort_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># &gt;&gt; add this column to the table definition parameters</span>
+            <span class="k">if</span> <span class="n">label_text</span> <span class="ow">in</span> <span class="n">qmap</span><span class="p">:</span>
+                <span class="n">tiphref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+                    <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;piws-documentation&quot;</span><span class="p">,</span>
+                    <span class="n">tooltip_name</span><span class="o">=</span><span class="n">label_text</span><span class="p">,</span> <span class="n">_notemplate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">&quot;sTitle&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;a href=&#39;{0}&#39; target=_blank&gt;&quot;</span>
+                               <span class="s2">&quot;&lt;span class=&#39;fake-link&#39;&gt;{1} &amp;#9735;&quot;</span>
+                               <span class="s2">&quot;&lt;/span&gt;&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tiphref</span><span class="p">,</span> <span class="n">label_text</span><span class="p">)})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;sTitle&quot;</span><span class="p">:</span> <span class="n">label_text</span><span class="p">})</span>
+
+        <span class="c1"># &gt; begin the script</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;script type=&#39;text/javascript&#39;&gt; &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(document).ready(function() {&quot;</span>
+
+        <span class="c1"># &gt; dumps the answers rset into javascript</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var all_data = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">records</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var nbrecordstotal = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">))</span>
+        <span class="c1"># &gt; create a cache for search patterns filtering</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var filtered_indices = [&#39;&#39;, undefined];&quot;</span>
+        <span class="c1"># &gt; set the default sorting direction</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var sort_dir = &#39;asc&#39;;&quot;</span>
+
+        <span class="c1"># &gt; create the table</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var table = $(&#39;#the_table&#39;).dataTable( { &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;serverSide: true,&quot;</span>
+
+        <span class="c1"># &gt; set the ajax callback to fill dynamically the table</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;ajax: function ( data, callback, settings ) {&quot;</span>
+        <span class="c1"># &gt; get the table sorting direction</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var current_sort_dir = data.order[0].dir.toLowerCase();&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;if ( current_sort_dir != sort_dir) {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;all_data = all_data.reverse();&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;sort_dir = current_sort_dir;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="c1"># &gt; create the records array for the page being displayed</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var out = [];&quot;</span>
+        <span class="c1"># &gt; get the ID search field</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var search_pattern = data.search.value.toLowerCase().trim();&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var nbrecordsfiltered = nbrecordstotal;&quot;</span>
+        <span class="c1"># &gt; if the search field is not empty</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;if (search_pattern != &#39;&#39;) {&quot;</span>
+        <span class="c1"># check the filtered indicies cache</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;if (filtered_indices[0] != search_pattern) {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;filtered_indices[0] = search_pattern;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;filtered_indices[1] = [];&quot;</span>
+        <span class="c1"># fill the filtered indicies cache</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;for ( var i=0; i&lt;nbrecordstotal ; i++ ) {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;if (all_data[i][0].toLowerCase()&quot;</span>
+                 <span class="s2">&quot;.indexOf(search_pattern) &gt;= 0) {&quot;</span><span class="p">)</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;filtered_indices[1].push(i);&quot;</span>
+        <span class="c1"># close the &#39;if some occurence of the search pattern is found&#39; loop</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="c1"># close the for loop</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="c1"># &gt; close the filtered indices cache verification</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;nbrecordsfiltered = filtered_indices[1].length;&quot;</span>
+        <span class="c1"># fill the records array based on the filtered indicies</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;for (var i=data.start, ien=Math.min(data.start+data.length, &quot;</span>
+                 <span class="s2">&quot;nbrecordsfiltered) ; i&lt;ien ; i++) {&quot;</span><span class="p">)</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;out.push( all_data[ filtered_indices[1][i] ] );&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="c1"># &gt; close the &#39;if the search field is not empty&#39; condition</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="c1"># &gt; if the search field is empty</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;else {&quot;</span>
+        <span class="c1"># fill the records array without filtering</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;for ( var i=data.start, ien=Math.min(data.start+data.length,&quot;</span>
+                 <span class="s2">&quot; nbrecordstotal) ; i&lt;ien ; i++ ) {&quot;</span><span class="p">)</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;out.push( all_data[i] );&quot;</span>
+        <span class="c1"># &gt; close the for loop</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="c1"># &gt; close the &#39;else if the search field is empty&#39; condition</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="c1"># register the ajax callback</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;setTimeout( function () {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;callback( {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;draw: data.draw,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;data: out,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;recordsTotal: nbrecordstotal,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;recordsFiltered: nbrecordsfiltered&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+        <span class="c1"># &gt; close the ajax callback registration</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}, 50 );&quot;</span>
+        <span class="c1"># &gt; close the ajax callback</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;},&quot;</span>
+
+        <span class="c1"># &gt; set table display options</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollX&#39;: true,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollCollapse&#39;: true,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;sPaginationType&#39;: &#39;bootstrap&#39;,&quot;</span>
+        <span class="k">if</span> <span class="n">use_scroller</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollY&#39;: &#39;200px&#39;,&quot;</span>
+            <span class="k">if</span> <span class="n">csv_export</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;dom: &#39;T&lt;</span><span class="se">\&quot;</span><span class="s2">clear</span><span class="se">\&quot;</span><span class="s2">&gt;&lt;</span><span class="se">\&quot;</span><span class="s2">toolbar</span><span class="se">\&quot;</span><span class="s2">&gt;frtiS&#39;, &quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;dom: &#39;T&lt;</span><span class="se">\&quot;</span><span class="s2">clear</span><span class="se">\&quot;</span><span class="s2">&gt;frtiS&#39;, &quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;scroller: {loadingIndicator: true}, &quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;processing&#39;: true,&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollY&#39;: &#39;600px&#39;,&quot;</span>
+            <span class="k">if</span> <span class="n">csv_export</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;dom&#39;: &#39;T&lt;</span><span class="se">\&quot;</span><span class="s2">clear</span><span class="se">\&quot;</span><span class="s2">&gt;l&lt;</span><span class="se">\&quot;</span><span class="s2">toolbar</span><span class="se">\&quot;</span><span class="s2">&gt;frtip&#39;,&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;dom&#39;: &#39;T&lt;</span><span class="se">\&quot;</span><span class="s2">clear</span><span class="se">\&quot;</span><span class="s2">&gt;lfrtip&#39;,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;oLanguage&#39;: {&#39;sSearch&#39;: &#39;ID search&#39;},&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;pagingType&#39;: &#39;full_numbers&#39;,&quot;</span>
+
+        <span class="c1"># &gt; set table header</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;aoColumns&#39;: {0},&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
+
+        <span class="c1"># &gt; set sort widget on column</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;aoColumnDefs&#39;: [ &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;{{ &#39;bSortable&#39;: false, &#39;aTargets&#39;: {0} }}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">hide_sort_indices</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;],&quot;</span>
+
+        <span class="c1"># &gt; close table</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+
+        <span class="c1"># &gt; the first column is static in the display</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var fc = new $.fn.dataTable.FixedColumns( &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;table, {leftColumns: 1} &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;);&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;table.fnSetFilteringDelay(1000);&quot;</span>
+
+        <span class="c1"># Add tooltip in table column header</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var question_text = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">tooltips</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;thead th&#39;).each(function(index, value){&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var sTitle = question_text[index];&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;this.setAttribute(&#39;title&#39;, sTitle);&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$( table.fnGetNodes() ).tooltip( {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;delay&#39;: 0,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;track&#39;: true,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;fade&#39;: 250&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+
+        <span class="k">if</span> <span class="n">csv_export</span><span class="p">:</span>
+
+            <span class="c1"># &gt; create a new csv download button</span>
+            <span class="n">csv_button_html</span> <span class="o">=</span> <span class="p">(</span><span class="s1">u&#39;&lt;p&gt;&lt;a class=&quot;btn btn-default&quot; role=&quot;button&quot; &#39;</span>
+                               <span class="s1">u&#39;id=&quot;csv_button&quot;&gt;CSV Export »&lt;/a&gt;&lt;/p&gt;&#39;</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">u&quot;$(&#39;div.toolbar&#39;).html(&#39;{0}&#39;);&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">csv_button_html</span><span class="p">)</span>
+
+            <span class="c1"># &gt; center the search-bar</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;$(&#39;#the_table_filter&#39;).css({&#39;float&#39;: &#39;none&#39;, &quot;</span>
+                     <span class="s2">&quot;&#39;text-align&#39;: &#39;center&#39;});&quot;</span><span class="p">)</span>
+
+            <span class="c1"># &gt; set csv file name</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%H:%M:%S&quot;</span><span class="p">)</span>
+            <span class="n">filename_items</span> <span class="o">=</span> <span class="p">[</span><span class="n">title</span><span class="p">,</span> <span class="n">timepoint</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">filename_items</span> <span class="k">if</span> <span class="n">x</span><span class="p">])</span>
+
+            <span class="c1"># &gt; assign ajax callback to csv button : start function click</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#csv_button&#39;).click(function() {&quot;</span>
+
+            <span class="c1"># &gt; create the csv string</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var csv_headers = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">u&quot;ID&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">labels</span><span class="p">))</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var csv_tooltips = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">tooltips</span><span class="p">))</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;var csv_rows = [csv_headers.join(&#39;;&#39;), &quot;</span>
+                     <span class="s2">&quot;csv_tooltips.join(&#39;;&#39;)];&quot;</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;for(var i=0, l=all_data.length; i&lt;l; ++i){&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;csv_rows.push(all_data[i].join(&#39;;&#39;));&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var csv_string = csv_rows.join(&#39;</span><span class="se">\\</span><span class="s2">r</span><span class="se">\\</span><span class="s2">n&#39;);&quot;</span>
+
+            <span class="c1"># &gt; create a web-browser download object</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var a = window.document.createElement(&#39;a&#39;);&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;a.href = window.URL.createObjectURL(&quot;</span>
+                     <span class="s2">&quot;new Blob([csv_string], {type: &#39;text/csv&#39;}));&quot;</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;a.download = &#39;{0}.csv&#39;;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;document.body.appendChild(a);&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;a.click();&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;document.body.removeChild(a);&quot;</span>
+
+            <span class="c1"># &gt; end fct click</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;});&quot;</span>
+
+        <span class="c1"># &gt; close document section</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+
+        <span class="c1"># Close script div</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/script&gt;&quot;</span>
+
+        <span class="c1"># &gt; set a title</span>
+        <span class="k">if</span> <span class="n">tooltip_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tiphref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+                <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;piws-documentation&quot;</span><span class="p">,</span> <span class="n">tooltip_name</span><span class="o">=</span><span class="n">tooltip_name</span><span class="p">,</span>
+                <span class="n">_notemplate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="p">(</span><span class="s2">u&quot;&lt;a class=&#39;btn btn-warning&#39; href=&#39;{0}&#39; target=_blanck&gt;&quot;</span>
+                     <span class="s2">&quot;{1} &amp;#9735;&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tiphref</span><span class="p">,</span> <span class="n">title</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;h1&gt;{0}&lt;/h1&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+
+        <span class="c1"># &gt; display the table in the body</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;table id=&#39;the_table&#39; class=&#39;cell-border display&#39;&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;thead&gt;&lt;/thead&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;tbody&gt;&lt;/tbody&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
+
+        <span class="c1"># Creat the corrsponding html page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">html</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="JtableView"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.JtableView.html#cubes.piws.views.table_views.JtableView">[docs]</a><span class="k">class</span> <span class="nc">JtableView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a table view with DataTables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;jtable-table&quot;</span>
+    <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;jtable-table&quot;</span>
+
+    <span class="n">mandatory_params</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vid&quot;</span><span class="p">,</span> <span class="s2">&quot;rql_labels&quot;</span><span class="p">,</span> <span class="s2">&quot;ajaxcallback&quot;</span><span class="p">,</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;elts_to_sort&quot;</span><span class="p">,</span> <span class="s2">&quot;csv_export&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;use_server&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="JtableView.__init__"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.JtableView.html#cubes.piws.views.table_views.JtableView.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize the JtableView class.</span>
+
+<span class="sd">        If you want to construct the table manually in your view pass the</span>
+<span class="sd">        parent view in the &#39;parent_view&#39; attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">JtableView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;parent_view&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;parent_view&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_cw</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;parent_view&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">w</span></div>
+
+<div class="viewcode-block" id="JtableView.call"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.JtableView.html#cubes.piws.views.table_views.JtableView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rql_labels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ajaxcallback</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">csv_export</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">elts_to_sort</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">use_server</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">tooltip_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that will create a table.</span>
+
+<span class="sd">        When left clicking on a row, the row is selected (highlighted) Click</span>
+<span class="sd">        again on this row to deselect it.</span>
+
+<span class="sd">        On the right side of each herder box, you can decide to sort the</span>
+<span class="sd">        the row if the option is available.</span>
+
+<span class="sd">        1) Extra parameters will be passed to the ajax callback.</span>
+
+<span class="sd">        2) Column labels must not contain space &#39; &#39; and they need to be</span>
+<span class="sd">        replaced: use the &#39;label_cleaner&#39; function.</span>
+
+<span class="sd">        3) A special &#39;ID&#39; column must be specified in the ajax callback that</span>
+<span class="sd">        contains the row string description.</span>
+
+<span class="sd">        4) All the sortable items must be handle in the ajax callback.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rql_labels: string (rql_labels)</span>
+<span class="sd">            a rql that will be executed to get the columns labels.</span>
+<span class="sd">        labels: list of string (xor rql_labels)</span>
+<span class="sd">            a rql that will be executed to get the columns labels.</span>
+<span class="sd">        ajaxcallback: @func (mandatory)</span>
+<span class="sd">            a function thaty will be called by jtable to create dynamically the</span>
+<span class="sd">            data to display: do not foget the decorator @ajaxfunc.</span>
+<span class="sd">        csv_export: bool (optional)</span>
+<span class="sd">            if True an export button will be available.</span>
+<span class="sd">        title: string (optional, default &#39;&#39;)</span>
+<span class="sd">            the title of the table.</span>
+<span class="sd">        elts_to_sort: list of str (optional)</span>
+<span class="sd">            the colums label that can be sortable.</span>
+<span class="sd">        use_server: bool (optional, default True)</span>
+<span class="sd">            if True, use server-side processing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the parameters</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mandatory_params</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">tooltip_name</span> <span class="o">=</span> <span class="n">tooltip_name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tooltip_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">rql_labels</span> <span class="o">=</span> <span class="n">rql_labels</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rql_labels&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;labels&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">labels</span><span class="p">]</span>
+        <span class="n">ajaxcallback</span> <span class="o">=</span> <span class="n">ajaxcallback</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ajaxcallback&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;csv_export&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">csv_export</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;csv_export&quot;</span><span class="p">)</span>
+        <span class="n">elts_to_sort</span> <span class="o">=</span> <span class="n">elts_to_sort</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;elts_to_sort&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elts_to_sort</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">elts_to_sort</span> <span class="o">=</span> <span class="p">[</span><span class="n">elts_to_sort</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;use_server&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">:</span>
+            <span class="n">use_server</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_server&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Get the path to the in progress resource</span>
+        <span class="n">wait_image_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">data_url</span><span class="p">(</span><span class="s2">&quot;images/please_wait.gif&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add css resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_css</span><span class="p">(</span>
+            <span class="s2">&quot;DataTables-1.10.10/media/css/jquery.dataTables.min.css&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_css</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/FixedColumns/css/&quot;</span>
+                         <span class="s2">&quot;fixedColumns.dataTables.min.css&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_css</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/Scroller/css/&quot;</span>
+                         <span class="s2">&quot;scroller.dataTables.min.css&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_css</span><span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;https://code.jquery.com/ui/1.11.4/themes/smoothness/&quot;</span>
+             <span class="s2">&quot;jquery-ui.css&quot;</span><span class="p">),</span> <span class="n">localfile</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c1"># Add js resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/media/js/jquery.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/media/js/jquery.dataTables.min.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/FixedColumns/js/&quot;</span>
+                        <span class="s2">&quot;dataTables.fixedColumns.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;DataTables-1.10.10/extensions/fnSetFilteringDelay.js&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span><span class="s2">&quot;https://code.jquery.com/ui/1.11.4/jquery-ui.js&quot;</span><span class="p">,</span>
+                        <span class="n">localfile</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c1"># Get table meta information</span>
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rql_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">labels_rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql_labels</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">labels_rset</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No labels can be selected while creating the &quot;</span>
+                            <span class="s2">&quot;jtable&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get the instance questionnaire map</span>
+        <span class="n">qmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">vreg</span><span class="o">.</span><span class="n">docmap</span>
+
+        <span class="c1"># Associate a tooltip to each label</span>
+        <span class="n">tooltips</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">label_text</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">label_text</span> <span class="ow">in</span> <span class="n">qmap</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;&lt;!--.*tooltip:.*--&gt;&quot;</span><span class="p">,</span> <span class="n">qmap</span><span class="p">[</span><span class="n">label_text</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;tooltip:&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">8</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="n">tooltips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tooltips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tooltips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Generate the script</span>
+        <span class="c1"># &gt; table column headers and sort option</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;sTitle&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span><span class="p">}]</span>
+        <span class="n">hide_sort_indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s2">&quot;ID&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">elts_to_sort</span><span class="p">:</span>
+            <span class="n">hide_sort_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">label_text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">labels</span><span class="p">)):</span>
+
+            <span class="c1"># &gt;&gt; select if we can sort this column</span>
+            <span class="k">if</span> <span class="n">label_text</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">elts_to_sort</span><span class="p">:</span>
+                <span class="n">hide_sort_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># &gt;&gt; add this column to the table definition parameters</span>
+            <span class="k">if</span> <span class="n">label_text</span> <span class="ow">in</span> <span class="n">qmap</span><span class="p">:</span>
+                <span class="n">tiphref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+                    <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;piws-documentation&quot;</span><span class="p">,</span>
+                    <span class="n">tooltip_name</span><span class="o">=</span><span class="n">label_text</span><span class="p">,</span> <span class="n">_notemplate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">&quot;sTitle&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;a href=&#39;{0}&#39; target=_blank&gt;&quot;</span>
+                               <span class="s2">&quot;&lt;span class=&#39;fake-link&#39;&gt;{1} &amp;#9735;&quot;</span>
+                               <span class="s2">&quot;&lt;/span&gt;&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tiphref</span><span class="p">,</span> <span class="n">label_text</span><span class="p">)})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;sTitle&quot;</span><span class="p">:</span> <span class="n">label_text</span><span class="p">})</span>
+
+        <span class="c1"># &gt; begin the script</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;script type=&#39;text/javascript&#39;&gt; &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(document).ready(function() {&quot;</span>
+
+        <span class="c1"># &gt; create the table</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var table = $(&#39;#the_table&#39;).dataTable( { &quot;</span>
+
+        <span class="c1"># &gt; set table display options</span>
+        <span class="c1"># TODO fix scrollX bug since DataTables 1.10.10</span>
+        <span class="c1"># html += &quot;&#39;scrollX&#39;: &#39;100%&#39;,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollY&#39;: &#39;600px&#39;,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollCollapse&#39;: true,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;sPaginationType&#39;: &#39;bootstrap&#39;,&quot;</span>
+        <span class="k">if</span> <span class="n">csv_export</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;dom&#39;: &#39;T&lt;</span><span class="se">\&quot;</span><span class="s2">clear</span><span class="se">\&quot;</span><span class="s2">&gt;l&lt;</span><span class="se">\&quot;</span><span class="s2">toolbar</span><span class="se">\&quot;</span><span class="s2">&gt;frtip&#39;,&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;dom&#39;: &#39;T&lt;</span><span class="se">\&quot;</span><span class="s2">clear</span><span class="se">\&quot;</span><span class="s2">&gt;lfrtip&#39;,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;sServerMethod&#39;: &#39;POST&#39;,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;oLanguage&#39;: {&#39;sSearch&#39;: &#39;ID search&#39;},&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;pagingType&#39;: &#39;full_numbers&#39;,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;bProcessing&#39;: true,&quot;</span>
+        <span class="k">if</span> <span class="n">use_server</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;bServerSide&#39;: true,&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;bServerSide&#39;: false,&quot;</span>
+
+        <span class="c1"># &gt; set table header</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;aoColumns&#39;: {0},&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
+
+        <span class="c1"># &gt; set sort widget on column</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;aoColumnDefs&#39;: [ &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;{{ &#39;bSortable&#39;: false, &#39;aTargets&#39;: {0} }}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">hide_sort_indices</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;],&quot;</span>
+
+        <span class="c1"># &gt; set the ajax callback to fill dynamically the table</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;sAjaxSource&#39;:&#39;ajax?fname={0}&#39;,&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ajaxcallback</span><span class="p">)</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;fnServerParams&#39;: function (aoData) {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;aoData.push(&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;{ name: &#39;labels&#39;, &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;value: &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">labels</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}, &quot;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;{{name: &#39;{0}&#39;, value: &#39;{1}&#39;}}, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;{{name: &#39;{0}&#39;, value: {1}}}, &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="c1"># Remove extre comma</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># &gt; close push data</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;);&quot;</span>
+
+        <span class="c1"># &gt; close function fnServerParams</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;},&quot;</span>
+
+        <span class="c1"># &gt; close table</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+
+        <span class="c1"># &gt; the first column is static in the display</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var fc = new $.fn.dataTable.FixedColumns( &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;table, {leftColumns: 1} &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;);&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;table.fnSetFilteringDelay(1000);&quot;</span>
+
+        <span class="c1"># Add tooltip in table column header</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var question_text = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">tooltips</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;thead th&#39;).each(function(index, value){&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var sTitle = question_text[index];&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;this.setAttribute(&#39;title&#39;, sTitle);&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$( table.fnGetNodes() ).tooltip( {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;delay&#39;: 0,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;track&#39;: true,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;fade&#39;: 250&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+
+        <span class="k">if</span> <span class="n">csv_export</span><span class="p">:</span>
+
+            <span class="c1"># &gt; create a new csv download button</span>
+            <span class="n">csv_button_html</span> <span class="o">=</span> <span class="p">(</span><span class="s1">u&#39;&lt;p&gt;&lt;a class=&quot;btn btn-default&quot; role=&quot;button&quot; &#39;</span>
+                               <span class="s1">u&#39;id=&quot;csv_button&quot;&gt;CSV Export »&lt;/a&gt;&lt;/p&gt;&#39;</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">u&quot;$(&#39;div.toolbar&#39;).html(&#39;{0}&#39;);&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">csv_button_html</span><span class="p">)</span>
+
+            <span class="c1"># &gt; center the search-bar</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;$(&#39;#the_table_filter&#39;).css({&#39;float&#39;: &#39;none&#39;, &quot;</span>
+                     <span class="s2">&quot;&#39;text-align&#39;: &#39;center&#39;});&quot;</span><span class="p">)</span>
+
+            <span class="c1"># &gt; set options to retrieve all the full result set from the ajax</span>
+            <span class="c1"># callback</span>
+            <span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;qname&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;qname&#39;</span><span class="p">],</span>
+                         <span class="s1">&#39;timepoint&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;timepoint&#39;</span><span class="p">],</span>
+                         <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">labels</span><span class="p">)}</span>
+
+            <span class="c1"># &gt; set csv file name</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%H:%M:%S&quot;</span><span class="p">)</span>
+            <span class="n">filename_items</span> <span class="o">=</span> <span class="p">[</span><span class="n">title</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timepoint&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">timestamp</span><span class="p">]</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">filename_items</span> <span class="k">if</span> <span class="n">x</span><span class="p">])</span>
+
+            <span class="c1"># &gt; assign ajax callback to csv button : start function click</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#csv_button&#39;).click(function() {&quot;</span>
+
+            <span class="c1"># &gt; display a processing message</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#loadingmessage&#39;).show();&quot;</span>
+
+            <span class="c1"># &gt; execute the ajax callback</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var request = $.ajax({&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;url: &#39;view?vid=piwscsvexport&#39;,&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;method: &#39;POST&#39;,&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;data: {0},&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">post_data</span><span class="p">))</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;dataType: &#39;html&#39;&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;});&quot;</span>
+
+            <span class="c1"># &gt; the ajax callback is done, get the result set</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;request.done(function( result ) {&quot;</span>
+            <span class="c1"># &gt; create a download link</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var a = window.document.createElement(&#39;a&#39;);&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;a.href = window.URL.createObjectURL(new Blob([result], &quot;</span>
+                     <span class="s2">&quot;{type: &#39;text/csv&#39;}));&quot;</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;a.download = &#39;{0}.csv&#39;;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;document.body.appendChild(a);&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;a.click();&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;document.body.removeChild(a);&quot;</span>
+            <span class="c1"># &gt; hide the processing message</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#loadingmessage&#39;).hide();&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;});&quot;</span>
+
+            <span class="c1"># &gt; if the ajax callback failed display an alert</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;request.fail(function(){&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#loadingmessage&#39;).hide();&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;alert(&#39;Error : Download Failed!&#39;);&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;});&quot;</span>
+
+            <span class="c1"># &gt; end fct click</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;});&quot;</span>
+
+        <span class="c1"># &gt; close script</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;} );&quot;</span>
+
+        <span class="c1"># Close script div</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/script&gt;&quot;</span>
+
+        <span class="c1"># &gt; set a title</span>
+        <span class="k">if</span> <span class="n">tooltip_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tiphref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+                <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;piws-documentation&quot;</span><span class="p">,</span> <span class="n">tooltip_name</span><span class="o">=</span><span class="n">tooltip_name</span><span class="p">,</span>
+                <span class="n">_notemplate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="p">(</span><span class="s2">u&quot;&lt;a class=&#39;btn btn-warning&#39; href=&#39;{0}&#39; target=_blanck&gt;&quot;</span>
+                     <span class="s2">&quot;{1} &amp;#9735;&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tiphref</span><span class="p">,</span> <span class="n">title</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;h1&gt;{0}&lt;/h1&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+
+        <span class="c1"># &gt; create a div for the in progress resource</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;&lt;div id=&#39;loadingmessage&#39; style=&#39;display:none&#39; &quot;</span>
+                 <span class="s2">&quot;align=&#39;center&#39;&gt;&lt;img src=&#39;{0}&#39;/&gt;&lt;/div&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">wait_image_url</span><span class="p">))</span>
+
+        <span class="c1"># &gt; display the table in the body</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;table id=&#39;the_table&#39; class=&#39;cell-border display&#39;&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;thead&gt;&lt;/thead&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;tbody&gt;&lt;/tbody&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
+
+        <span class="c1"># Creat the corrsponding html page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">html</span><span class="p">))</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Interact with jtable js</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="PiwsCSVView"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.PiwsCSVView.html#cubes.piws.views.table_views.PiwsCSVView">[docs]</a><span class="k">class</span> <span class="nc">PiwsCSVView</span><span class="p">(</span><span class="n">CSVMixIn</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Dumps questionnaires in CSV.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s1">&#39;piwscsvexport&#39;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">yes</span><span class="p">()</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;piws csv export&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PiwsCSVView.call"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.PiwsCSVView.html#cubes.piws.views.table_views.PiwsCSVView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">qname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;qname&#39;</span><span class="p">]</span>
+        <span class="n">timepoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;timepoint&#39;</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">])</span>
+
+        <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any ID, QT, OV Where S is Subject, S code_in_study ID, &quot;</span>
+               <span class="s2">&quot;S questionnaire_runs QR, QR instance_of QU, QU name &#39;{0}&#39;, &quot;</span>
+               <span class="s2">&quot;QR open_answers O, O value OV, O in_assessment A, &quot;</span>
+               <span class="s2">&quot;A timepoint &#39;{1}&#39;, O question Q, Q text QT&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">qname</span><span class="p">,</span>
+                                                                   <span class="n">timepoint</span><span class="p">)</span>
+               <span class="p">)</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rset</span><span class="p">:</span>
+            <span class="n">table</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">table</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">id</span>
+
+        <span class="n">writer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">csvwriter</span><span class="p">()</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">psc2</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">iteritems</span><span class="p">())):</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div></div>
+
+<span class="nd">@ajaxfunc</span><span class="p">(</span><span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="get_open_answers_data"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.get_open_answers_data.html#cubes.piws.views.table_views.get_open_answers_data">[docs]</a><span class="k">def</span> <span class="nf">get_open_answers_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get the subject answer data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    jtsort: str</span>
+<span class="sd">        the sorting option to use.</span>
+<span class="sd">    jtstartindex: int</span>
+<span class="sd">        the current index provided by jtable.</span>
+<span class="sd">    jtpagesize: int</span>
+<span class="sd">        the number of rows per page.</span>
+<span class="sd">    id_pattern: str</span>
+<span class="sd">        pattern to search in the ID column.</span>
+<span class="sd">    labels: list of str</span>
+<span class="sd">        the table column names.</span>
+<span class="sd">    qname: string (mandatory)</span>
+<span class="sd">        the name of the questionnaire we want to export.</span>
+<span class="sd">    timepoint: string (mandatory)</span>
+<span class="sd">        filter request on a timepoint.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: dict</span>
+<span class="sd">        the table content.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get parameters</span>
+    <span class="n">jtsort</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;sSortDir_0&#39;</span><span class="p">]</span>
+    <span class="n">jtstartindex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;iDisplayStart&#39;</span><span class="p">])</span>
+    <span class="n">jtpagesize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;iDisplayLength&#39;</span><span class="p">])</span>
+    <span class="n">id_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;sSearch&#39;</span><span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">])</span>
+    <span class="n">qname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;qname&#39;</span><span class="p">]</span>
+    <span class="n">timepoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;timepoint&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Deal with sort options</span>
+    <span class="n">jtsort</span> <span class="o">=</span> <span class="s2">&quot;ORDERBY ID {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jtsort</span><span class="p">)</span>
+
+    <span class="c1"># Get all the questionnaire runs and associated subjects</span>
+    <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any ID, QR {0} &quot;</span>
+           <span class="s2">&quot;Where QR is QuestionnaireRun, QR instance_of Q, Q name &#39;{1}&#39;, &quot;</span>
+           <span class="s2">&quot;QR subject S, S code_in_study ID, QR in_assessment A, &quot;</span>
+           <span class="s2">&quot;A timepoint &#39;{2}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jtsort</span><span class="p">,</span> <span class="n">qname</span><span class="p">,</span> <span class="n">timepoint</span><span class="p">))</span>
+    <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+
+    <span class="c1"># Filter the rset with the ID pattern</span>
+    <span class="n">filtered_rset</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">id_pattern</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">id_pattern</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">filtered_rset</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+
+    <span class="c1"># Set the appropriate range to access the data</span>
+    <span class="c1"># &gt; if the user want to show all the results</span>
+    <span class="k">if</span> <span class="n">jtpagesize</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">jtpagesize</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_rset</span><span class="p">):</span>
+        <span class="n">rset_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_rset</span><span class="p">))</span>
+    <span class="c1"># &gt; otherwise</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rset_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">jtstartindex</span><span class="p">,</span>
+                           <span class="nb">min</span><span class="p">(</span><span class="n">jtstartindex</span> <span class="o">+</span> <span class="n">jtpagesize</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_rset</span><span class="p">)))</span>
+
+    <span class="c1"># Get the answers of the desired subset of subjects</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">row_nb</span> <span class="ow">in</span> <span class="n">rset_range</span><span class="p">:</span>
+        <span class="n">user_data</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">user_data</span><span class="p">[</span><span class="s1">&#39;ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filtered_rset</span><span class="p">[</span><span class="n">row_nb</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Execute an rql to get the subject answers</span>
+        <span class="n">questionnaire_run_eid</span> <span class="o">=</span> <span class="n">filtered_rset</span><span class="p">[</span><span class="n">row_nb</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any QN, V Where QR eid &#39;{0}&#39;, QR open_answers A, A question Q,&quot;</span>
+               <span class="s2">&quot;Q text QN, A value V&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">questionnaire_run_eid</span><span class="p">))</span>
+        <span class="n">answer_rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+
+        <span class="c1"># Go through all answers</span>
+        <span class="k">for</span> <span class="n">qname</span><span class="p">,</span> <span class="n">answer</span> <span class="ow">in</span> <span class="n">answer_rset</span><span class="p">:</span>
+            <span class="n">user_data</span><span class="p">[</span><span class="n">qname</span><span class="p">]</span> <span class="o">=</span> <span class="n">answer</span>
+
+        <span class="c1"># Store the tabel formated row</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user_data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="c1"># Table formatting</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;iTotalRecords&quot;</span><span class="p">:</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span><span class="p">,</span>
+            <span class="s2">&quot;iTotalDisplayRecords&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_rset</span><span class="p">),</span>
+            <span class="s2">&quot;aaData&quot;</span><span class="p">:</span> <span class="n">records</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<span class="nd">@ajaxfunc</span><span class="p">(</span><span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="get_questionnaires_data"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.get_questionnaires_data.html#cubes.piws.views.table_views.get_questionnaires_data">[docs]</a><span class="k">def</span> <span class="nf">get_questionnaires_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Get the questionnaires data.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    jtsort: str</span>
+<span class="sd">        the sorting option to use.</span>
+<span class="sd">    jtstartindex: int</span>
+<span class="sd">        the current index provided by the datatable.</span>
+<span class="sd">    jtpagesize: int</span>
+<span class="sd">        the number of rows per page.</span>
+<span class="sd">    column_to_filter: int</span>
+<span class="sd">        index of the column to filter.</span>
+<span class="sd">    id_pattern: str</span>
+<span class="sd">        pattern to search in the ID column.</span>
+<span class="sd">    labels: list of str</span>
+<span class="sd">        the table column names.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data: dict</span>
+<span class="sd">        the table content.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get parameters</span>
+    <span class="n">jtsort</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;sSortDir_0&#39;</span><span class="p">]</span>
+    <span class="n">jtstartindex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;iDisplayStart&#39;</span><span class="p">])</span>
+    <span class="n">jtpagesize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;iDisplayLength&#39;</span><span class="p">])</span>
+    <span class="n">id_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;sSearch&#39;</span><span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">])</span>
+    <span class="n">column_to_filter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;iSortCol_0&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Only the ID column can be filtered</span>
+    <span class="k">if</span> <span class="n">column_to_filter</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Only the &#39;ID&#39; column can be filtered by &quot;</span>
+                        <span class="s2">&quot;&#39;get_questionnaires_data&#39; ajax callback.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Choose the questionnaire rendering view:</span>
+    <span class="c1"># &gt; case 1: the answers are inserted in the database (OpenAnswer).</span>
+    <span class="c1"># &gt; case 2: one line of answers inserted per subject (File)</span>
+    <span class="n">rql</span> <span class="o">=</span> <span class="s2">&quot;Any QR Where QR is QuestionnaireRun, EXISTS(QR result F)&quot;</span>
+    <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">vid</span> <span class="o">=</span> <span class="s2">&quot;file.answer.table&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vid</span> <span class="o">=</span> <span class="s2">&quot;jtable-table&quot;</span>
+
+    <span class="c1"># Deal with sort options</span>
+    <span class="n">jtsort</span> <span class="o">=</span> <span class="s2">&quot;ORDERBY ID {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jtsort</span><span class="p">)</span>
+
+    <span class="c1"># Get all the questionnaire and associated timepoints</span>
+    <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;DISTINCT Any ID, T {0} &quot;</span>
+           <span class="s2">&quot;Where Q is Questionnaire, QR is QuestionnaireRun, &quot;</span>
+           <span class="s2">&quot;QR instance_of Q, QR in_assessment A, Q name ID, &quot;</span>
+           <span class="s2">&quot;A timepoint T&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jtsort</span><span class="p">))</span>
+    <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+
+    <span class="c1"># Get the total number of rows (without filtering)</span>
+    <span class="n">total_nb_of_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rset</span><span class="p">]))</span>
+
+    <span class="c1"># Create a structure to be able to sort by questionnaire name</span>
+    <span class="n">qstruct</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rset</span><span class="p">:</span>
+        <span class="n">qname</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">timepoint</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># Filter the rset with the ID pattern</span>
+        <span class="k">if</span> <span class="n">id_pattern</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">id_pattern</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">qname</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">qstruct</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">qname</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timepoint</span><span class="p">)</span>
+
+    <span class="c1"># Open answer table parameters</span>
+    <span class="n">ajaxcallback</span> <span class="o">=</span> <span class="s2">&quot;get_open_answers_data&quot;</span>
+    <span class="n">rql_labels</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any QUT ORDERBY QUT WHERE Q is Questionnaire, Q name &#39;{0}&#39;,&quot;</span>
+                  <span class="s2">&quot;Q questions QU, QU text QUT&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Define start and stop display index for pagination</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">jtstartindex</span>
+    <span class="c1"># If ALL results are selected</span>
+    <span class="k">if</span> <span class="n">jtpagesize</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">higher</span> <span class="o">=</span> <span class="n">total_nb_of_rows</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">higher</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">jtstartindex</span> <span class="o">+</span> <span class="n">jtpagesize</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">qstruct</span><span class="p">))</span>
+
+    <span class="c1"># Build the list that will be dumped in the table</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">qstruct</span><span class="o">.</span><span class="n">items</span><span class="p">()[</span><span class="n">lower</span><span class="p">:</span><span class="n">higher</span><span class="p">]:</span>
+
+        <span class="n">qname</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">timepoints</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Build the current row</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="p">[</span><span class="n">qname</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Start filling the table dataset</span>
+        <span class="c1"># Go through all declared timepoints</span>
+        <span class="k">for</span> <span class="n">timepoint</span> <span class="ow">in</span> <span class="n">timepoints</span><span class="p">:</span>
+            <span class="c1"># Construct the answer table view</span>
+            <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+                <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="n">vid</span><span class="p">,</span>
+                <span class="n">rql_labels</span><span class="o">=</span><span class="n">rql_labels</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">qname</span><span class="p">),</span>
+                <span class="n">ajaxcallback</span><span class="o">=</span><span class="n">ajaxcallback</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">qname</span><span class="p">,</span> <span class="n">tooltip_name</span><span class="o">=</span><span class="n">qname</span><span class="p">,</span>
+                <span class="n">qname</span><span class="o">=</span><span class="n">qname</span><span class="p">,</span> <span class="n">timepoint</span><span class="o">=</span><span class="n">timepoint</span><span class="p">,</span> <span class="n">elts_to_sort</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ID&quot;</span><span class="p">],</span>
+                <span class="n">csv_export</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="c1"># Find the column index corresponding to this timepoint</span>
+            <span class="n">timepoint_index</span> <span class="o">=</span> <span class="p">[</span><span class="n">label</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+                <span class="n">timepoint</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="c1"># Fill the cells with hyperlinks to the questionnaire view</span>
+            <span class="n">record</span><span class="p">[</span><span class="n">timepoint_index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;&lt;a href=&#39;{0}&#39;&gt;&quot;</span>
+                <span class="s2">&quot;&lt;img src=&#39;data/images/blue-arrow.png&#39; &quot;</span>
+                <span class="s2">&quot;alt=&#39;Open questionnaire&#39; width=&#39;20&#39; &quot;</span>
+                <span class="s2">&quot;height=&#39;20&#39; border=&#39;0&#39;&gt;&lt;/a&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+
+        <span class="c1"># Store the table formatted row</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+    <span class="c1"># Table formatting</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;iTotalRecords&quot;</span><span class="p">:</span> <span class="n">total_nb_of_rows</span><span class="p">,</span>
+            <span class="s2">&quot;iTotalDisplayRecords&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">qstruct</span><span class="p">),</span>
+            <span class="s2">&quot;aaData&quot;</span><span class="p">:</span> <span class="n">records</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Update CW registery</span>
+<span class="c1">###############################################################################</span>
+
+<span class="k">def</span> <span class="nf">registration_callback</span><span class="p">(</span><span class="n">vreg</span><span class="p">):</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">JtableView</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">JHugetableView</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">FileAnswerTableView</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">get_open_answers_data</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">get_questionnaires_data</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">PiwsCSVView</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

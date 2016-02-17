@@ -1,0 +1,63 @@
+:orphan:
+
+cubes.piws.views.table_views.JtableView
+=======================================
+
+.. currentmodule:: cubes.piws.views.table_views
+
+.. autoclass:: JtableView
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~JtableView.__init__
+      ~JtableView.call
+      ~JtableView.cell_call
+      ~JtableView.critical
+      ~JtableView.cw_propval
+      ~JtableView.debug
+      ~JtableView.error
+      ~JtableView.exception
+      ~JtableView.field
+      ~JtableView.html_headers
+      ~JtableView.info
+      ~JtableView.is_primary
+      ~JtableView.last_modified
+      ~JtableView.linkable
+      ~JtableView.page_title
+      ~JtableView.render
+      ~JtableView.set_http_cache_headers
+      ~JtableView.set_request_content_type
+      ~JtableView.set_stream
+      ~JtableView.tal_render
+      ~JtableView.url
+      ~JtableView.warning
+      ~JtableView.wdata
+      ~JtableView.whead
+      ~JtableView.wview
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~JtableView.add_div_section
+      ~JtableView.add_to_breadcrumbs
+      ~JtableView.binary
+      ~JtableView.cache_max_age
+      ~JtableView.category
+      ~JtableView.content_type
+      ~JtableView.div_id
+      ~JtableView.mandatory_params
+      ~JtableView.paginable
+      ~JtableView.templatable
+    
+    
+

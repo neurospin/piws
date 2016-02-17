@@ -1,0 +1,63 @@
+:orphan:
+
+cubes.piws.views.highcharts_views.HighChartsRelationSummaryView
+===============================================================
+
+.. currentmodule:: cubes.piws.views.highcharts_views
+
+.. autoclass:: HighChartsRelationSummaryView
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~HighChartsRelationSummaryView.__init__
+      ~HighChartsRelationSummaryView.call
+      ~HighChartsRelationSummaryView.cell_call
+      ~HighChartsRelationSummaryView.critical
+      ~HighChartsRelationSummaryView.cw_propval
+      ~HighChartsRelationSummaryView.debug
+      ~HighChartsRelationSummaryView.error
+      ~HighChartsRelationSummaryView.exception
+      ~HighChartsRelationSummaryView.field
+      ~HighChartsRelationSummaryView.html_headers
+      ~HighChartsRelationSummaryView.info
+      ~HighChartsRelationSummaryView.is_primary
+      ~HighChartsRelationSummaryView.last_modified
+      ~HighChartsRelationSummaryView.linkable
+      ~HighChartsRelationSummaryView.page_title
+      ~HighChartsRelationSummaryView.render
+      ~HighChartsRelationSummaryView.rset_to_data
+      ~HighChartsRelationSummaryView.set_http_cache_headers
+      ~HighChartsRelationSummaryView.set_request_content_type
+      ~HighChartsRelationSummaryView.set_stream
+      ~HighChartsRelationSummaryView.tal_render
+      ~HighChartsRelationSummaryView.url
+      ~HighChartsRelationSummaryView.warning
+      ~HighChartsRelationSummaryView.wdata
+      ~HighChartsRelationSummaryView.whead
+      ~HighChartsRelationSummaryView.wview
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~HighChartsRelationSummaryView.add_div_section
+      ~HighChartsRelationSummaryView.add_to_breadcrumbs
+      ~HighChartsRelationSummaryView.binary
+      ~HighChartsRelationSummaryView.cache_max_age
+      ~HighChartsRelationSummaryView.category
+      ~HighChartsRelationSummaryView.content_type
+      ~HighChartsRelationSummaryView.div_id
+      ~HighChartsRelationSummaryView.paginable
+      ~HighChartsRelationSummaryView.templatable
+    
+    
+

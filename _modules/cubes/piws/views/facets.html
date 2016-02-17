@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubes/piws/views/facets.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../../../index.html">
+        <img src="../../../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../../../index.html">Home</a></li>
+        <li><a href="../../../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../views.html">Views</a></li>
+			  <li><a href="../../../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubes.piws.views.facets</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># Cubicweb import</span>
+<span class="kn">from</span> <span class="nn">cubicweb.web</span> <span class="kn">import</span> <span class="n">facet</span>
+<span class="kn">from</span> <span class="nn">cubicweb.selectors</span> <span class="kn">import</span> <span class="n">is_instance</span>
+<span class="kn">from</span> <span class="nn">cubicweb.web.views.facets</span> <span class="kn">import</span> <span class="n">FacetFilterMixIn</span>
+
+<span class="c1"># Brainomics import</span>
+<span class="kn">from</span> <span class="nn">cubes.brainomics.views.facets</span> <span class="kn">import</span> <span class="n">MeasureHandednessFacet</span>
+<span class="kn">from</span> <span class="nn">cubes.brainomics.views.facets</span> <span class="kn">import</span> <span class="n">MeasureGenderFacet</span>
+<span class="kn">from</span> <span class="nn">cubes.brainomics.views.facets</span> <span class="kn">import</span> <span class="n">MeasureAgeFacet</span>
+<span class="kn">from</span> <span class="nn">cubes.neuroimaging.views.facets</span> <span class="kn">import</span> <span class="n">ScanLabelFacet</span>
+
+
+<span class="c1">############################################################################</span>
+<span class="c1"># Hide facet while filtering</span>
+<span class="c1">############################################################################</span>
+
+<span class="n">FacetFilterMixIn</span><span class="o">.</span><span class="n">_generate_form</span> <span class="o">=</span> <span class="n">FacetFilterMixIn</span><span class="o">.</span><span class="n">generate_form</span>
+
+
+<span class="k">def</span> <span class="nf">generate_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">rset</span><span class="p">,</span> <span class="n">divid</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">vidargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mainvar</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                  <span class="n">paginate</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">cssclass</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">hiddens</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">FacetFilterMixIn</span><span class="o">.</span><span class="n">_generate_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">rset</span><span class="p">,</span> <span class="n">divid</span><span class="p">,</span> <span class="n">vid</span><span class="p">,</span> <span class="n">vidargs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                        <span class="n">mainvar</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">paginate</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                        <span class="n">cssclass</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">hiddens</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;script&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;function onFacetFiltering(event, divid /* ... */) {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#facet_filterbox&#39;).hide();&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;showFacetLoading(divid);&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;function onFacetContentLoaded&quot;</span>
+                 <span class="s2">&quot;(event, divid, rql, vid, extraparams) {&quot;</span><span class="p">)</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#facetLoading&#39;).hide();&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#facet_filterbox&#39;).show();&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/script&gt;&quot;</span>
+
+        <span class="n">w</span><span class="p">(</span><span class="s1">u&#39;{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">html</span><span class="p">))</span>
+
+<span class="n">FacetFilterMixIn</span><span class="o">.</span><span class="n">generate_form</span> <span class="o">=</span> <span class="n">generate_form</span>
+
+
+<span class="c1">############################################################################</span>
+<span class="c1"># FACETS</span>
+<span class="c1">############################################################################</span>
+
+<div class="viewcode-block" id="TimepointFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.TimepointFacet">[docs]</a><span class="k">class</span> <span class="nc">TimepointFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter on timepoint (form the &#39;Assessment&#39; entity).</span>
+
+<span class="sd">    This filter is applied on &#39;Scan&#39;, &#39;ProcessingRun&#39;,</span>
+<span class="sd">    &#39;QuestionnaireRun&#39; and &#39;GenomicMeasure&#39; entities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;timepoint-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X in_assessment A&quot;</span><span class="p">,</span> <span class="s2">&quot;A timepoint T&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;T&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Timepoints&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StudyFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.StudyFacet">[docs]</a><span class="k">class</span> <span class="nc">StudyFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter on study name (from the &#39;Study&#39; entity).</span>
+
+<span class="sd">    This filter is applied on &#39;Scan&#39;, &#39;ProcessingRun&#39;,</span>
+<span class="sd">    &#39;QuestionnaireRun&#39; and &#39;GenomicMeasure&#39; entities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;study-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X in_assessment A&quot;</span><span class="p">,</span> <span class="s2">&quot;A study S&quot;</span><span class="p">,</span> <span class="s2">&quot;S name N&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Studies&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubjectFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.SubjectFacet">[docs]</a><span class="k">class</span> <span class="nc">SubjectFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter on subject code (from the &#39;Subject&#39; entity).</span>
+
+<span class="sd">    This filter can is applied on &#39;Scan&#39;, &#39;ProcessingRun&#39;,</span>
+<span class="sd">    &#39;QuestionnaireRun&#39; and &#39;GenomicMeasure&#39; entities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;subject-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X in_assessment A&quot;</span><span class="p">,</span> <span class="s2">&quot;A subjects S&quot;</span><span class="p">,</span> <span class="s2">&quot;S code_in_study C&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;C&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Subjects&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ScanFieldFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.ScanFieldFacet">[docs]</a><span class="k">class</span> <span class="nc">ScanFieldFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter the scan fields.</span>
+
+<span class="sd">    This filter is applied on &#39;Scan&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;scan-field-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X has_data D&quot;</span><span class="p">,</span> <span class="s2">&quot;D field F&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Scanner Field&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ScanFormatFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.ScanFormatFacet">[docs]</a><span class="k">class</span> <span class="nc">ScanFormatFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter the scan formats.</span>
+
+<span class="sd">    This filter is applied on &#39;Scan&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;scan-format-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X format F&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;F&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Image Format&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AssessmentTimepointFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.AssessmentTimepointFacet">[docs]</a><span class="k">class</span> <span class="nc">AssessmentTimepointFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter the assessment timepoints.</span>
+
+<span class="sd">    This filter is applied on &#39;Assessment&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;assessment-timepoint-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X timepoint T&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;T&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Timepoints&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AssessmentSubjectFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.AssessmentSubjectFacet">[docs]</a><span class="k">class</span> <span class="nc">AssessmentSubjectFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter the assessment subjects.</span>
+
+<span class="sd">    This filter is applied on &#39;Assessment&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;assessment-subject-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X subjects S&quot;</span><span class="p">,</span> <span class="s2">&quot;S code_in_study C&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;C&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Subjects&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GenomicMeasureTypeFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.GenomicMeasureTypeFacet">[docs]</a><span class="k">class</span> <span class="nc">GenomicMeasureTypeFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter the genomic measure types.</span>
+
+<span class="sd">    This filter is applied on &#39;GenomicMeasure&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;genomicmeasure-type-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X type T&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;T&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProcessingRunNameFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.ProcessingRunNameFacet">[docs]</a><span class="k">class</span> <span class="nc">ProcessingRunNameFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter the ProcessingRun FileSets by name.</span>
+
+<span class="sd">    This filter is applied on &#39;ProcessingRun&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;processingrun-name-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X results_files F&quot;</span><span class="p">,</span> <span class="s2">&quot;F name N&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Registration callback</span>
+<span class="c1">###############################################################################</span>
+
+<span class="k">def</span> <span class="nf">registration_callback</span><span class="p">(</span><span class="n">vreg</span><span class="p">):</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="n">MeasureHandednessFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="n">MeasureGenderFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="n">MeasureAgeFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="n">ScanLabelFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">GenomicMeasureTypeFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">TimepointFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">StudyFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">SubjectFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ScanFieldFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ScanFormatFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">AssessmentTimepointFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">AssessmentSubjectFacet</span><span class="p">)</span>
+    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ProcessingRunNameFacet</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

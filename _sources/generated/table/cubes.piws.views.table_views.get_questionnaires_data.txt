@@ -1,0 +1,9 @@
+:orphan:
+
+cubes.piws.views.table_views.get_questionnaires_data
+====================================================
+
+.. currentmodule:: cubes.piws.views.table_views
+
+.. autofunction:: get_questionnaires_data
+

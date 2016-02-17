@@ -1,0 +1,534 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubes/piws/importer/base.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../../../index.html">
+        <img src="../../../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../../../index.html">Home</a></li>
+        <li><a href="../../../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../views.html">Views</a></li>
+			  <li><a href="../../../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubes.piws.importer.base</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+
+<span class="c1"># Cubicweb import</span>
+<span class="kn">from</span> <span class="nn">cubicweb.dataimport</span> <span class="kn">import</span> <span class="n">SQLGenObjectStore</span>
+
+
+<div class="viewcode-block" id="Base"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base">[docs]</a><span class="k">class</span> <span class="nc">Base</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This class enables us to add new entities and relations in CW.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    relations: list of 3-uplet (mandatory)</span>
+<span class="sd">        all the relations involved in schema we want to document.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Here is an example of the definition of the &#39;relations&#39; parameter:</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        relations = [</span>
+<span class="sd">            (&quot;CWUser&quot;, &quot;in_group&quot;, &quot;CWGroup&quot;)</span>
+<span class="sd">        ]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">relations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">assessment_relations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="s2">&quot;Study&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;assessments&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;assessments&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Center&quot;</span><span class="p">,</span> <span class="s2">&quot;assessments&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;Center&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;CWGroup&quot;</span><span class="p">,</span> <span class="s2">&quot;can_read&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;CWGroup&quot;</span><span class="p">,</span> <span class="s2">&quot;can_update&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">fileset_relations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;ParentEntitiyName&quot;</span><span class="p">,</span> <span class="s2">&quot;results_files&quot;</span><span class="p">,</span> <span class="s2">&quot;FileSet&quot;</span><span class="p">],</span>
+        <span class="p">(</span><span class="s2">&quot;FileSet&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;FileSet&quot;</span><span class="p">,</span> <span class="s2">&quot;file_entries&quot;</span><span class="p">,</span> <span class="s2">&quot;ExternalFile&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;ExternalFile&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="Base.__init__"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize the SeniorData class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        session: Session (mandatory)</span>
+<span class="sd">            a cubicweb session.</span>
+<span class="sd">        list_group_names: list of str (mandatory)</span>
+<span class="sd">            the name of the different groups</span>
+<span class="sd">        use_store: bool (optional, default True)</span>
+<span class="sd">            if True use an SQLGenObjectStore, otherwise the session.</span>
+<span class="sd">        piws_security_model: bool (optional, default True)</span>
+<span class="sd">            if True apply the PIWS security model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># CW parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_store</span> <span class="o">=</span> <span class="n">use_store</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_store</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span> <span class="o">=</span> <span class="n">SQLGenObjectStore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">relate_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">relate</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_entity_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">create_entity</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">relate_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add_relation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_entity_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">create_entity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">piws_security_model</span> <span class="o">=</span> <span class="n">piws_security_model</span></div>
+
+    <span class="c1">###########################################################################</span>
+    <span class="c1">#   Public Methods</span>
+    <span class="c1">###########################################################################</span>
+
+<div class="viewcode-block" id="Base.cleanup"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method to cleanup temporary items and to commit changes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Send the new entities to the db</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_store</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Base.import_data"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base.import_data">[docs]</a>    <span class="k">def</span> <span class="nf">import_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that import the data in cw.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This method has to be defined in child &quot;</span>
+                                  <span class="s2">&quot;class.&quot;</span><span class="p">)</span></div>
+
+    <span class="c1">###########################################################################</span>
+    <span class="c1">#   Private Methods</span>
+    <span class="c1">###########################################################################</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Base.schema"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base.schema">[docs]</a>    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfname</span><span class="p">,</span> <span class="n">text_font</span><span class="o">=</span><span class="s2">&quot;sans-serif&quot;</span><span class="p">,</span>
+               <span class="n">node_text_size</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a view of the schema described in a python structure.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        outfname: str (mandatory)</span>
+<span class="sd">            the path to the output file where the graph will be saved. The</span>
+<span class="sd">            directory containing this file must be created.</span>
+<span class="sd">        text_font: str (optional, default &#39;sans-serif&#39;)</span>
+<span class="sd">            the font used to display the text in the final image.</span>
+<span class="sd">        node_text_size: int (optional, default 12)</span>
+<span class="sd">            the text size.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">pygraphviz</span>
+
+        <span class="c1"># Create a graph</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">pygraphviz</span><span class="o">.</span><span class="n">AGraph</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                  <span class="n">rankdir</span><span class="o">=</span><span class="s2">&quot;LR&quot;</span><span class="p">,</span> <span class="n">overlap</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="c1"># Get all the entity names involved</span>
+        <span class="n">entities</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+            <span class="n">entities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">link</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">entities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">link</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="c1"># Go through all the entities and create a graphic table</span>
+        <span class="k">for</span> <span class="n">entity_name</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
+            <span class="n">attributes</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;CW authorized attributes&quot;</span><span class="p">)</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">entity_name</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;filled&quot;</span><span class="p">,</span> <span class="n">fillcolor</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+                           <span class="n">fontcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">node_text_size</span><span class="p">,</span>
+                           <span class="n">fontname</span><span class="o">=</span><span class="n">text_font</span><span class="p">,</span>
+                           <span class="n">label</span><span class="o">=</span><span class="n">entity_name</span> <span class="o">+</span> <span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="n">attributes</span><span class="p">,</span>
+                           <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;Mrecord&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Relate the entities</span>
+        <span class="k">for</span> <span class="n">link</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">link</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">link</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">link</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Save the graph</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">outfname</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Base._md5_sum"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base._md5_sum">[docs]</a>    <span class="k">def</span> <span class="nf">_md5_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a md5 sum of a path.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path: str (madatory)</span>
+<span class="sd">            a string to hash.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out: str</span>
+<span class="sd">            the input hashed string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Base._progress_bar"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base._progress_bar">[docs]</a>    <span class="k">def</span> <span class="nf">_progress_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ratio</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">bar_length</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method to generate a progress bar.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ratio: float (mandatory 0&lt;ratio&lt;1)</span>
+<span class="sd">            float describing the current processing status.</span>
+<span class="sd">        title: str (optional)</span>
+<span class="sd">            a title to identify the progress bar.</span>
+<span class="sd">        bar_length: int (optional)</span>
+<span class="sd">            the length of the bar that will be ploted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ratio</span> <span class="o">*</span> <span class="mf">100.</span><span class="p">)</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">bar_length</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">))</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">{2} in Progress: [{0}] {1}%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="n">block</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">bar_length</span> <span class="o">-</span> <span class="n">block</span><span class="p">),</span> <span class="n">progress</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+    <span class="c1">###########################################################################</span>
+    <span class="c1">#   Private Insertion Methods</span>
+    <span class="c1">###########################################################################</span>
+
+<div class="viewcode-block" id="Base._set_unique_relation"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base._set_unique_relation">[docs]</a>    <span class="k">def</span> <span class="nf">_set_unique_relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_eid</span><span class="p">,</span> <span class="n">relation_name</span><span class="p">,</span> <span class="n">detination_eid</span><span class="p">,</span>
+                             <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method to create a new unique relation.</span>
+
+<span class="sd">        First check that the relation do not exists if &#39;check_unicity&#39; is True.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source_eid: int (madatory)</span>
+<span class="sd">            the CW identifier of the object entity in the relation.</span>
+<span class="sd">        relation_name: str (madatory)</span>
+<span class="sd">            the relation name.</span>
+<span class="sd">        detination_eid: int (madatory)</span>
+<span class="sd">            the CW identifier of the subject entity in the relation.</span>
+<span class="sd">        check_unicity: bool (optional)</span>
+<span class="sd">            if True check if the relation already exists in the data base.</span>
+<span class="sd">        subjtype: str (optional)</span>
+<span class="sd">            give the subject etype for inlined relation when using a store.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># With unicity contrain</span>
+        <span class="k">if</span> <span class="n">check_unicity</span><span class="p">:</span>
+
+            <span class="c1"># First build the rql request</span>
+            <span class="n">rql</span> <span class="o">=</span> <span class="s2">&quot;Any X Where X eid &#39;{0}&#39;, X {1} Y, Y eid &#39;{2}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">source_eid</span><span class="p">,</span> <span class="n">relation_name</span><span class="p">,</span> <span class="n">detination_eid</span><span class="p">)</span>
+
+            <span class="c1"># Execute the rql request</span>
+            <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+
+            <span class="c1"># The request returns some data -&gt; do nothing</span>
+            <span class="k">if</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_store</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">relate_method</span><span class="p">(</span><span class="n">source_eid</span><span class="p">,</span> <span class="n">relation_name</span><span class="p">,</span>
+                                       <span class="n">detination_eid</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="n">subjtype</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">relate_method</span><span class="p">(</span><span class="n">source_eid</span><span class="p">,</span> <span class="n">relation_name</span><span class="p">,</span>
+                                       <span class="n">detination_eid</span><span class="p">)</span>
+
+        <span class="c1"># Without unicity constrain</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_store</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relate_method</span><span class="p">(</span><span class="n">source_eid</span><span class="p">,</span> <span class="n">relation_name</span><span class="p">,</span> <span class="n">detination_eid</span><span class="p">,</span>
+                                   <span class="n">subjtype</span><span class="o">=</span><span class="n">subjtype</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">relate_method</span><span class="p">(</span><span class="n">source_eid</span><span class="p">,</span> <span class="n">relation_name</span><span class="p">,</span> <span class="n">detination_eid</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Base._get_or_create_unique_entity"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base._get_or_create_unique_entity">[docs]</a>    <span class="k">def</span> <span class="nf">_get_or_create_unique_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rql</span><span class="p">,</span> <span class="n">entity_name</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                     <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method to create a new unique entity.</span>
+
+<span class="sd">        First check that the entity do not exists by executing the rql request</span>
+<span class="sd">        if &#39;check_unicity&#39; is True.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rql: str (madatory)</span>
+<span class="sd">            the rql request to check unicity.</span>
+<span class="sd">        entity_name: str (madatory)</span>
+<span class="sd">            the name of the entity we want to create.</span>
+<span class="sd">        check_unicity: bool (optional)</span>
+<span class="sd">            if True check if the entity already exists in the data base.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        entity: CW entity</span>
+<span class="sd">            the requested entity.</span>
+<span class="sd">        is_created: bool</span>
+<span class="sd">            return True if the entity has been created, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initilize output prameter</span>
+        <span class="n">is_created</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c1"># With unicity contrain</span>
+        <span class="k">if</span> <span class="n">check_unicity</span><span class="p">:</span>
+            <span class="c1"># First execute the rql request</span>
+            <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+
+            <span class="c1"># The request returns some data, get the unique entity</span>
+            <span class="k">if</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The database is corrupted, please &quot;</span>
+                                    <span class="s2">&quot;investigate.&quot;</span><span class="p">)</span>
+                <span class="n">entity</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">get_entity</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># Create a new unique entity</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">entity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_entity_method</span><span class="p">(</span><span class="n">entity_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">is_created</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c1"># Without unicity constrain</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">entity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_entity_method</span><span class="p">(</span><span class="n">entity_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">is_created</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">return</span> <span class="n">entity</span><span class="p">,</span> <span class="n">is_created</span></div>
+
+<div class="viewcode-block" id="Base._create_assessment"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base._create_assessment">[docs]</a>    <span class="k">def</span> <span class="nf">_create_assessment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assessment_struct</span><span class="p">,</span> <span class="n">subject_eids</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span>
+                           <span class="n">center_eid</span><span class="p">,</span> <span class="n">groups</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create an assessment and its associated relations.</span>
+
+<span class="sd">        The groups that can access the &#39;in_assessment&#39; linked entities are</span>
+<span class="sd">        generated dynamically from the assessment identifiers:</span>
+
+<span class="sd">            * we &#39;_&#39; split the string and create a group with the first returned</span>
+<span class="sd">              item and the concatenation of the two first items.</span>
+<span class="sd">            * the permissions &#39;can_read&#39;, &#39;can_update&#39; relate the assessments</span>
+<span class="sd">              with the corresponding groups.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Format inputs</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subject_eids</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">subject_eids</span> <span class="o">=</span> <span class="p">[</span><span class="n">subject_eids</span><span class="p">]</span>
+
+        <span class="c1"># Create the assessment</span>
+        <span class="n">assessment_id</span> <span class="o">=</span> <span class="n">assessment_struct</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">]</span>
+        <span class="n">assessment_entity</span><span class="p">,</span> <span class="n">is_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+            <span class="n">rql</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Any X Where X is Assessment, X identifier &quot;</span>
+                 <span class="s2">&quot;&#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">assessment_id</span><span class="p">)),</span>
+            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">assessment_struct</span><span class="p">)</span>
+        <span class="n">assessment_eid</span> <span class="o">=</span> <span class="n">assessment_entity</span><span class="o">.</span><span class="n">eid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span><span class="n">assessment_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">assessment_eid</span>
+
+        <span class="c1"># If we just create the assessment, relate the entity</span>
+        <span class="k">if</span> <span class="n">is_created</span><span class="p">:</span>
+            <span class="c1"># &gt; add relation with the study</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">study_eid</span><span class="p">,</span> <span class="s2">&quot;assessments&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+            <span class="c1"># &gt; add relation with the subject</span>
+            <span class="k">for</span> <span class="n">subject_eid</span> <span class="ow">in</span> <span class="n">subject_eids</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                    <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;assessments&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+                    <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                    <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span>
+                    <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+            <span class="c1"># &gt; add relation with the center</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">center_eid</span><span class="p">,</span> <span class="s2">&quot;assessments&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">center_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+            <span class="c1"># Set the permissions</span>
+            <span class="c1"># Create/get the related assessment groups</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">piws_security_model</span><span class="p">:</span>
+                <span class="n">assessment_id</span> <span class="o">=</span> <span class="n">assessment_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                <span class="n">related_groups</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">assessment_id</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">assessment_id</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="n">related_groups</span><span class="p">:</span>
+
+                    <span class="c1"># Check the group is created</span>
+                    <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+                        <span class="n">group_eid</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;Please create first the group &#39;{0}&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">group_name</span><span class="p">))</span>
+
+                    <span class="c1"># &gt; add relation with group</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_read</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                            <span class="n">group_eid</span><span class="p">,</span> <span class="s2">&quot;can_read&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_update</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                            <span class="n">group_eid</span><span class="p">,</span> <span class="s2">&quot;can_update&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="s1">&#39;guests&#39;</span><span class="p">):</span>
+                    <span class="n">group_eid</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+
+                    <span class="c1"># &gt; add relation with group</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_read</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                            <span class="n">group_eid</span><span class="p">,</span> <span class="s2">&quot;can_read&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_update</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                            <span class="n">group_eid</span><span class="p">,</span> <span class="s2">&quot;can_update&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">assessment_eid</span></div>
+
+<div class="viewcode-block" id="Base._import_file_set"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base._import_file_set">[docs]</a>    <span class="k">def</span> <span class="nf">_import_file_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fset_struct</span><span class="p">,</span> <span class="n">extfiles</span><span class="p">,</span> <span class="n">parent_eid</span><span class="p">,</span>
+                         <span class="n">assessment_eid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add the file set attached to a parent entity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create the file set</span>
+        <span class="n">fset_entity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+            <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+            <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;FileSet&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">fset_struct</span><span class="p">)</span>
+        <span class="c1"># &gt; add relation with the parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span><span class="n">parent_eid</span><span class="p">,</span>
+            <span class="s2">&quot;results_files&quot;</span><span class="p">,</span> <span class="n">fset_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="c1"># &gt; add relation with the assessment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span><span class="n">fset_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+            <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;FileSet&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create the external files</span>
+        <span class="k">for</span> <span class="n">extfile_struct</span> <span class="ow">in</span> <span class="n">extfiles</span><span class="p">:</span>
+            <span class="n">file_entity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+                <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;ExternalFile&quot;</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">extfile_struct</span><span class="p">)</span>
+            <span class="c1"># &gt; add relation with the file set</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span><span class="n">fset_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+                <span class="s2">&quot;file_entries&quot;</span><span class="p">,</span> <span class="n">file_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="c1"># &gt; add relation with the assessment</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span><span class="n">file_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+                <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;ExternalFile&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

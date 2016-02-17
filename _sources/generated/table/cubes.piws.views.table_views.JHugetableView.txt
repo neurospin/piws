@@ -1,0 +1,62 @@
+:orphan:
+
+cubes.piws.views.table_views.JHugetableView
+===========================================
+
+.. currentmodule:: cubes.piws.views.table_views
+
+.. autoclass:: JHugetableView
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~JHugetableView.__init__
+      ~JHugetableView.call
+      ~JHugetableView.cell_call
+      ~JHugetableView.critical
+      ~JHugetableView.cw_propval
+      ~JHugetableView.debug
+      ~JHugetableView.error
+      ~JHugetableView.exception
+      ~JHugetableView.field
+      ~JHugetableView.html_headers
+      ~JHugetableView.info
+      ~JHugetableView.is_primary
+      ~JHugetableView.last_modified
+      ~JHugetableView.linkable
+      ~JHugetableView.page_title
+      ~JHugetableView.render
+      ~JHugetableView.set_http_cache_headers
+      ~JHugetableView.set_request_content_type
+      ~JHugetableView.set_stream
+      ~JHugetableView.tal_render
+      ~JHugetableView.url
+      ~JHugetableView.warning
+      ~JHugetableView.wdata
+      ~JHugetableView.whead
+      ~JHugetableView.wview
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~JHugetableView.add_div_section
+      ~JHugetableView.add_to_breadcrumbs
+      ~JHugetableView.binary
+      ~JHugetableView.cache_max_age
+      ~JHugetableView.category
+      ~JHugetableView.content_type
+      ~JHugetableView.div_id
+      ~JHugetableView.paginable
+      ~JHugetableView.templatable
+    
+    
+

@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubes/piws/views/highcharts_views.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../../../index.html">
+        <img src="../../../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../../../index.html">Home</a></li>
+        <li><a href="../../../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../views.html">Views</a></li>
+			  <li><a href="../../../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubes.piws.views.highcharts_views</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="c1"># Cubicweb import</span>
+<span class="kn">from</span> <span class="nn">cubicweb.view</span> <span class="kn">import</span> <span class="n">View</span>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Pie Charts</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="HighChartsBasicPieView"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsBasicPieView.html#cubes.piws.views.highcharts_views.HighChartsBasicPieView">[docs]</a><span class="k">class</span> <span class="nc">HighChartsBasicPieView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a basic pie chart using highcharts.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;highcharts-basic-pie&quot;</span>
+    <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;highcharts-basic-pie&quot;</span>
+
+<div class="viewcode-block" id="HighChartsBasicPieView.rset_to_data"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsBasicPieView.html#cubes.piws.views.highcharts_views.HighChartsBasicPieView.rset_to_data">[docs]</a>    <span class="k">def</span> <span class="nf">rset_to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that format the rset parameters for highcharts pie chart.</span>
+
+<span class="sd">        We only consider the first element of each resultset row to construct the</span>
+<span class="sd">        highcharts formated parameter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rset: resultset (mandatory)</span>
+<span class="sd">            a cw resultset</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sdata: string</span>
+<span class="sd">            the highcharts formated parameter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the first element of each resultset row</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">nb_of_elements</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">rset</span><span class="o">.</span><span class="n">rows</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.</span>
+            <span class="n">nb_of_elements</span> <span class="o">+=</span> <span class="mf">1.</span>
+
+        <span class="c1"># Transform/convert (expect percents) the data</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">/</span> <span class="n">nb_of_elements</span> <span class="o">*</span> <span class="mf">100.</span><span class="p">]</span>
+                 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()]</span>
+
+        <span class="c1"># Create the highcharts string representation of the data</span>
+        <span class="n">sdata</span> <span class="o">=</span> <span class="s1">&#39;[&#39;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">sdata</span> <span class="o">+=</span> <span class="s1">&#39;[&quot;{0}&quot;, {1}], &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">sdata</span> <span class="o">+=</span> <span class="s1">&#39;]&#39;</span>
+
+        <span class="k">return</span> <span class="n">sdata</span></div>
+
+<div class="viewcode-block" id="HighChartsBasicPieView.call"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsBasicPieView.html#cubes.piws.views.highcharts_views.HighChartsBasicPieView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that will create a basic pie chart from a cw resultset.</span>
+
+<span class="sd">        If no resultset are passed to this method, the current resultset is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rset: resultset (optional, default None)</span>
+<span class="sd">            a  cw resultset</span>
+<span class="sd">        title: string (optional, default None)</span>
+<span class="sd">            the name of the chart.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the cw resultset</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="n">rset</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span>
+
+        <span class="c1"># Get the title</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get the highcharts string representation of the data</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rset_to_data</span><span class="p">(</span><span class="n">rset</span><span class="p">)</span>
+
+        <span class="c1"># Add some js resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;highcharts-4.0.4/js/highcharts.js&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;highcharts-4.0.4/js/modules/exporting.js&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Generate the script</span>
+        <span class="c1"># &gt; headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;script type=&quot;text/javascript&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;$(function () { $(&quot;#hc_container&quot;).highcharts({&#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure credit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;credits : {enabled : false}, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure chart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;chart: {plotBackgroundColor: null, plotBorderWidth: 1, &#39;</span>
+               <span class="s1">&#39;plotShadow: false}, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot;{0}&quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="c1"># &gt; configure tooltip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;tooltip: {pointFormat: &quot;{series.name}: &#39;</span>
+               <span class="s1">&#39;&lt;b&gt;{point.percentage:.1f}%&lt;/b&gt;&quot; }, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;plotOptions: {&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;pie: {allowPointSelect: true, cursor: &quot;pointer&quot;, dataLabels: {&#39;</span>
+               <span class="s1">&#39;enabled: true, format: &quot;&lt;b&gt;{point.name}&lt;/b&gt;: &#39;</span>
+               <span class="s1">&#39;{point.percentage:.1f} %&quot;, style: {color: (Highcharts.theme &amp;&amp; &#39;</span>
+               <span class="s1">&#39;Highcharts.theme.contrastTextColor) || &quot;black&quot;}}}&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;}, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure series</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;series: [{{type: &quot;pie&quot;, name: &quot;Browser share&quot;, data: {0}}}] &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="c1"># &gt; close headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;}); &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;}); &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/script&gt;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Add a container in the body to display the pie chart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div id=&quot;hc_container&quot; style=&quot;min-width: 310px; height: 400px; &#39;</span>
+                <span class="s1">&#39;max-width: 600px; margin: 0 auto&quot;&gt;&lt;/div&gt;&#39;</span><span class="p">)</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Tables</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="HighChartsRelationSummaryView"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsRelationSummaryView.html#cubes.piws.views.highcharts_views.HighChartsRelationSummaryView">[docs]</a><span class="k">class</span> <span class="nc">HighChartsRelationSummaryView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a basic table view that summarized an entity relation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;highcharts-relation-summary-view&quot;</span>
+    <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;highcharts-relation-summary-view&quot;</span>
+
+<div class="viewcode-block" id="HighChartsRelationSummaryView.rset_to_data"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsRelationSummaryView.html#cubes.piws.views.highcharts_views.HighChartsRelationSummaryView.rset_to_data">[docs]</a>    <span class="k">def</span> <span class="nf">rset_to_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rset</span><span class="p">,</span> <span class="n">relations</span><span class="p">,</span> <span class="n">subject_attr</span><span class="p">,</span> <span class="n">object_attr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that format the rset parameters for highcharts table view.</span>
+
+<span class="sd">        We only consider the first entity of each resultset row to construct the</span>
+<span class="sd">        highcharts formated parameters.</span>
+<span class="sd">        The object entities are related to the subject entities with the</span>
+<span class="sd">        &#39;relation&#39; link.</span>
+<span class="sd">        The columns correspond to the subject entity &#39;subject_attr&#39; attributes.</span>
+<span class="sd">        The lines corresspond to the object entity &#39;object_attr&#39; attributes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rset: resultset (mandatory)</span>
+<span class="sd">            a  cw resultset</span>
+<span class="sd">        relations: list of str (mandatory)</span>
+<span class="sd">            the relations to follow.</span>
+<span class="sd">        subject_attr: str (mandatory)</span>
+<span class="sd">            the subject attribute.</span>
+<span class="sd">        object_attr: str (mandatory)</span>
+<span class="sd">            the object attribute.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fdata: dict</span>
+<span class="sd">            the highcharts formated parameters: &#39;x&#39; contains the x labels,</span>
+<span class="sd">            &#39;y&#39; contains the y labels and &#39;grid&#39; the table values and positions.</span>
+<span class="sd">            If -1 is returned, this mean that no data can be displayed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the first element of each resultset row</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">line_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rset</span><span class="o">.</span><span class="n">rows</span><span class="p">)):</span>
+
+            <span class="c1"># Get the subject/object entities</span>
+            <span class="n">subject_entity</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">get_entity</span><span class="p">(</span><span class="n">line_number</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">object_entities</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">relation</span> <span class="ow">in</span> <span class="n">relations</span><span class="p">:</span>
+                <span class="n">object_entities</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                    <span class="nb">eval</span><span class="p">(</span><span class="s2">&quot;subject_entity.{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">relation</span><span class="p">)))</span>
+
+            <span class="c1"># Get the subject/object attributes</span>
+            <span class="n">col_name</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s2">&quot;subject_entity.{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject_attr</span><span class="p">))</span>
+            <span class="n">line_names</span> <span class="o">=</span> <span class="p">[</span><span class="nb">eval</span><span class="p">(</span><span class="s2">&quot;entity.{0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">object_attr</span><span class="p">))</span>
+                          <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">object_entities</span><span class="p">]</span>
+
+            <span class="c1"># Organize the data</span>
+            <span class="k">if</span> <span class="n">col_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">line_name</span> <span class="ow">in</span> <span class="n">line_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">col_name</span><span class="p">][</span><span class="n">line_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">col_name</span><span class="p">][</span><span class="n">line_name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Create the highcharts string representation of the data</span>
+        <span class="n">sdata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;grid&quot;</span><span class="p">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+        <span class="c1"># &gt; find all unique y labels</span>
+        <span class="n">all_y_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x_label</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">all_y_labels</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">all_y_labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_y_labels</span><span class="p">)</span>
+        <span class="c1"># &gt; create the x,y-labels and corresponding table item</span>
+        <span class="n">x_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">x_label</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">sdata</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
+            <span class="n">y_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">y_label</span> <span class="ow">in</span> <span class="n">all_y_labels</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">y_label</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+                    <span class="n">nb_of_elements</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">y_label</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">nb_of_elements</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">sdata</span><span class="p">[</span><span class="s2">&quot;grid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;[{0}, {1}, {2}]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">x_count</span><span class="p">,</span> <span class="n">y_count</span><span class="p">,</span> <span class="n">nb_of_elements</span><span class="p">))</span>
+                <span class="n">y_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">x_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># &gt; if no data on the grid return -1</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sdata</span><span class="p">[</span><span class="s2">&quot;grid&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># &gt; format the data outputs</span>
+        <span class="n">sdata</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;[&#39;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sdata</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;&#39;]&quot;</span>
+        <span class="n">sdata</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;[&#39;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">all_y_labels</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39;]&quot;</span>
+        <span class="n">sdata</span><span class="p">[</span><span class="s2">&quot;grid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sdata</span><span class="p">[</span><span class="s2">&quot;grid&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+
+        <span class="k">return</span> <span class="n">sdata</span></div>
+
+<div class="viewcode-block" id="HighChartsRelationSummaryView.call"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsRelationSummaryView.html#cubes.piws.views.highcharts_views.HighChartsRelationSummaryView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relations</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">subject_attr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">object_attr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">rset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that will create a table view from a cw resultset.</span>
+
+<span class="sd">        If no resultset are passed to this method, the current resultset is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        relations: list of str (optional, default None)</span>
+<span class="sd">            the relations to follow.</span>
+<span class="sd">        subject_attr: str (optional, default None)</span>
+<span class="sd">            the subject attribute that will be used to create the table columns.</span>
+<span class="sd">        object_attr: str (optional, default None)</span>
+<span class="sd">            the object attribute that will be used to create the table lines.</span>
+<span class="sd">        rset: resultset (optional, default None)</span>
+<span class="sd">            a  cw resultset</span>
+<span class="sd">        title: string (optional, default None)</span>
+<span class="sd">            the name of the chart.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the cw resultset</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="n">rset</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span>
+
+        <span class="c1"># Get the method parameters: if we use &#39;build_url&#39; method, the data</span>
+        <span class="c1"># are in the firm dictionary</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">relations</span> <span class="o">=</span> <span class="n">relations</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;relations&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">subject_attr</span> <span class="o">=</span> <span class="n">subject_attr</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subject_attr&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">object_attr</span> <span class="o">=</span> <span class="n">object_attr</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;object_attr&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="c1"># Relations has to be a list</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">relations</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">relations</span> <span class="o">=</span> <span class="p">[</span><span class="n">relations</span><span class="p">]</span>
+
+        <span class="c1"># Check that we have all the required information</span>
+        <span class="k">if</span> <span class="n">relations</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">subject_attr</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">object_attr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;a&gt;Wrong input arguments in HighChartsRelationSummaryView &#39;</span>
+                    <span class="s1">&#39;class.&lt;/a&gt;&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># Get the highcharts string representation of the data</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rset_to_data</span><span class="p">(</span><span class="n">rset</span><span class="p">,</span> <span class="n">relations</span><span class="p">,</span> <span class="n">subject_attr</span><span class="p">,</span> <span class="n">object_attr</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;panel panel-danger&quot;&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;panel-heading&quot;&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;h2 class=&quot;panel-title&quot;&gt;Error&lt;/h2&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;panel-body&quot;&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;h3&gt;Summary View Definition&lt;/h3&gt;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;Did you specify valid subject/object attributes and &quot;</span>
+                    <span class="s2">&quot;associated relations?&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># No data can be displayed</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;panel panel-warning&quot;&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;panel-heading&quot;&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;h2 class=&quot;panel-title&quot;&gt;WARNING&lt;/h2&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;panel-body&quot;&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;h3&gt;Summary View&lt;/h3&gt;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;No data available.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># Add some js resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;highcharts-4.0.4/js/highcharts.js&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;highcharts-4.0.4/js/modules/heatmap.js&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;highcharts-4.0.4/js/modules/exporting.js&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Generate the script</span>
+        <span class="c1"># &gt; headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;script type=&quot;text/javascript&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;$(function () { $(&quot;#hc_container&quot;).highcharts({&#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure credit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;credits : {enabled : false}, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure chart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;chart: {type: &quot;heatmap&quot;, marginTop: 40, marginBottom: 40}, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot;{0}&quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="c1"># &gt; configure axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;xAxis: {{categories: {0}}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;yAxis: {{categories: {0}, title: null}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;colorAxis: {min: 0, minColor: &quot;#FFFFFF&quot;, &#39;</span>
+                <span class="s1">&#39;maxColor: Highcharts.getOptions().colors[0]}, &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;legend: {align: &quot;right&quot;, layout: &quot;vertical&quot;, margin: 0, &#39;</span>
+                <span class="s1">&#39;verticalAlign: &quot;top&quot;, y: 25, symbolHeight: 320}, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure tooltip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;tooltip: {{formatter: function () {{return &quot;&lt;b&gt;&quot; + &#39;</span>
+                <span class="s1">&#39;this.series.xAxis.categories[this.point.x] + &#39;</span>
+                <span class="s1">&#39;&quot;&lt;/b&gt; {0} &lt;br&gt;&lt;b&gt;&quot; + this.point.value + &#39;</span>
+                <span class="s1">&#39;&quot;&lt;/b&gt; items &lt;br&gt;&lt;b&gt;&quot; + this.series.yAxis.categories[&#39;</span>
+                <span class="s1">&#39;this.point.y] + &quot;&lt;/b&gt;&quot;;}}}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">relations</span><span class="p">)))</span>
+        <span class="c1"># &gt; configure series</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;series: [{{name: &quot;Number of items per timepoint&quot;, borderWidth: 1, &#39;</span>
+                <span class="s1">&#39;data: {0}, dataLabels: {{enabled: true, color: &quot;black&quot;, style: &#39;</span>
+                <span class="s1">&#39;{{textShadow: &quot;none&quot;, HcTextStroke: null}}}}}}]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;grid&quot;</span><span class="p">]))</span>
+        <span class="c1"># &gt; close headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;}); &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;}); &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/script&gt;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Add a container in the body to display the pie chart. Try to estimate</span>
+        <span class="c1"># the cell size</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">20</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div style=&quot;max-height:700px; overflow: auto; &#39;</span>
+                <span class="s1">&#39;max-width: 800px;&quot;&gt; &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div id=&quot;hc_container&quot; style=&quot;width: {0}px; &#39;</span>
+                <span class="s1">&#39;height: {1}px; margin: 0 auto&quot;&gt;&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Plot</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="HighChartsBasicPlotView"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsBasicPlotView.html#cubes.piws.views.highcharts_views.HighChartsBasicPlotView">[docs]</a><span class="k">class</span> <span class="nc">HighChartsBasicPlotView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a basic plot using highcharts.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;highcharts-basic-plot&quot;</span>
+    <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;highcharts-basic-plot&quot;</span>
+
+<div class="viewcode-block" id="HighChartsBasicPlotView.rset_to_hist"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsBasicPlotView.html#cubes.piws.views.highcharts_views.HighChartsBasicPlotView.rset_to_hist">[docs]</a>    <span class="k">def</span> <span class="nf">rset_to_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rset</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that format the rset parameters for highcharts plot.</span>
+
+<span class="sd">        We only consider the first element of each resultset row to construct the</span>
+<span class="sd">        highcharts formated parameter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rset: resultset (mandatory)</span>
+<span class="sd">            a  cw resultset</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sdata: string</span>
+<span class="sd">            the highcharts formated parameter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the first element of each resultset row and store it if it is</span>
+        <span class="c1"># a float</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">rset</span><span class="o">.</span><span class="n">rows</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Create the histogram with numpy</span>
+        <span class="n">hist</span><span class="p">,</span> <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">bin_center</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%.1f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">((</span><span class="n">bin_edges</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">bin_edges</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+        <span class="n">hist</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">hist</span><span class="p">]</span>
+
+        <span class="c1"># Create the highcharts string representation of the data</span>
+        <span class="n">sdata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;[&#39;&quot;</span> <span class="o">+</span> <span class="s2">&quot;&#39;, &#39;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bin_center</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39;]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;grid&quot;</span><span class="p">:</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">sdata</span></div>
+
+<div class="viewcode-block" id="HighChartsBasicPlotView.call"><a class="viewcode-back" href="../../../../generated/highcharts/cubes.piws.views.highcharts_views.HighChartsBasicPlotView.html#cubes.piws.views.highcharts_views.HighChartsBasicPlotView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">value_suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">is_hist</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+             <span class="n">y_label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;hc_container&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that will create a basic plot from a cw resultset.</span>
+
+<span class="sd">        If no resultset are passed to this method, the current resultset is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rset: resultset (optional, default None)</span>
+<span class="sd">            a  cw resultset</span>
+<span class="sd">        title: string (optional, default None)</span>
+<span class="sd">            the name of the chart.</span>
+<span class="sd">        value_suffix: str (optional)</span>
+<span class="sd">            the units of what we measure.</span>
+<span class="sd">        is_hist: bool (optional, default False)</span>
+<span class="sd">            consider the rset as an input of a simple plot or an histogram plot.</span>
+<span class="sd">        y_label: str (optional)</span>
+<span class="sd">            the label of the y axis.</span>
+<span class="sd">        data: dict (optional, default None)</span>
+<span class="sd">            the highcharts string representation of the data. If set, do not</span>
+<span class="sd">            generate the data from the rset, so the &#39;is_hist&#39; option has no</span>
+<span class="sd">            effect.</span>
+<span class="sd">        tag: str (optional, default &#39;hc_container&#39;)</span>
+<span class="sd">            the html div identifier.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the cw resultset</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="n">rset</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span>
+
+        <span class="c1"># Get the method parameters: if we use &#39;build_url&#39; method, the data</span>
+        <span class="c1"># are in the firm dictionary</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">value_suffix</span> <span class="o">=</span> <span class="n">value_suffix</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value_suffix&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">is_hist</span> <span class="o">=</span> <span class="n">is_hist</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_hist&quot;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="c1"># Get the highcharts string representation of the data</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_hist</span><span class="p">:</span>
+                <span class="n">value_suffix</span> <span class="o">=</span> <span class="s2">&quot;Probability&quot;</span>
+                <span class="n">y_label</span> <span class="o">=</span> <span class="s2">&quot;Probability&quot;</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rset_to_hist</span><span class="p">(</span><span class="n">rset</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+                <span class="c1">#data = self.rset_to_data(rset)</span>
+
+        <span class="c1"># Add some js resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;highcharts-4.0.4/js/highcharts.js&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;highcharts-4.0.4/js/modules/exporting.js&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Generate the script</span>
+        <span class="c1"># &gt; headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;script type=&quot;text/javascript&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;$(function () {{ $(&quot;#{0}&quot;).highcharts({{&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+        <span class="c1"># &gt; configure credit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;credits : {enabled : false}, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot;{0}&quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="c1"># &gt; configure axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;xAxis: {{categories: {0}}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;yAxis: {{title: {{text: &quot;{0}&quot;}}}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_label</span><span class="p">))</span>
+        <span class="c1"># &gt; configure tooltip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;tooltip: {{valueSuffix: &quot; {0}&quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value_suffix</span><span class="p">))</span>
+        <span class="c1"># &gt; configure legend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;legend: {layout: &quot;vertical&quot;, align: &quot;right&quot;, verticalAlign: &#39;</span>
+                <span class="s1">&#39;&quot;middle&quot;, borderWidth: 0}, &#39;</span><span class="p">)</span>
+        <span class="c1"># &gt; configure series</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;series: [{{name: &quot;{0}&quot;, data: {1}}}] &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;grid&quot;</span><span class="p">]))</span>
+        <span class="c1"># &gt; close headers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;}); &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;}); &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/script&gt;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Add a container in the body to display the pie chart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div id=&quot;{0}&quot; style=&quot;min-width: 310px; height: 400px; &#39;</span>
+                <span class="s1">&#39;max-width: 600px; margin: 0 auto&quot;&gt;&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

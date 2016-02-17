@@ -1,0 +1,35 @@
+:orphan:
+
+cubes.piws.importer.genetics.Genetics
+=====================================
+
+.. currentmodule:: cubes.piws.importer.genetics
+
+.. autoclass:: Genetics
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~Genetics.__init__
+      ~Genetics.cleanup
+      ~Genetics.import_data
+      ~Genetics.schema
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~Genetics.assessment_relations
+      ~Genetics.fileset_relations
+      ~Genetics.relations
+    
+    
+

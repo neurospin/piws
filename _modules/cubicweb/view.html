@@ -1,0 +1,667 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+  
+   
+       <script type="text/javascript" src="../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubicweb/view.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../index.html">
+        <img src="../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../views.html">Views</a></li>
+			  <li><a href="../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubicweb.view</h1><div class="highlight"><pre>
+<span></span><span class="c1"># copyright 2003-2012 LOGILAB S.A. (Paris, FRANCE), all rights reserved.</span>
+<span class="c1"># contact http://www.logilab.fr/ -- mailto:contact@logilab.fr</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of CubicWeb.</span>
+<span class="c1">#</span>
+<span class="c1"># CubicWeb is free software: you can redistribute it and/or modify it under the</span>
+<span class="c1"># terms of the GNU Lesser General Public License as published by the Free</span>
+<span class="c1"># Software Foundation, either version 2.1 of the License, or (at your option)</span>
+<span class="c1"># any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># CubicWeb is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c1"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS</span>
+<span class="c1"># FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more</span>
+<span class="c1"># details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU Lesser General Public License along</span>
+<span class="c1"># with CubicWeb.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;abstract views and templates classes for CubicWeb web client&quot;&quot;&quot;</span>
+
+<span class="n">__docformat__</span> <span class="o">=</span> <span class="s2">&quot;restructuredtext en&quot;</span>
+<span class="n">_</span> <span class="o">=</span> <span class="nb">unicode</span>
+
+<span class="kn">from</span> <span class="nn">cStringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">from</span> <span class="nn">logilab.common.deprecation</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">logilab.common.registry</span> <span class="kn">import</span> <span class="n">yes</span>
+<span class="kn">from</span> <span class="nn">logilab.mtconverter</span> <span class="kn">import</span> <span class="n">xml_escape</span>
+
+<span class="kn">from</span> <span class="nn">rql</span> <span class="kn">import</span> <span class="n">nodes</span>
+
+<span class="kn">from</span> <span class="nn">cubicweb</span> <span class="kn">import</span> <span class="n">NotAnEntity</span>
+<span class="kn">from</span> <span class="nn">cubicweb.predicates</span> <span class="kn">import</span> <span class="n">non_final_entity</span><span class="p">,</span> <span class="n">nonempty_rset</span><span class="p">,</span> <span class="n">none_rset</span>
+<span class="kn">from</span> <span class="nn">cubicweb.appobject</span> <span class="kn">import</span> <span class="n">AppObject</span>
+<span class="kn">from</span> <span class="nn">cubicweb.utils</span> <span class="kn">import</span> <span class="n">UStringIO</span><span class="p">,</span> <span class="n">HTMLStream</span>
+<span class="kn">from</span> <span class="nn">cubicweb.uilib</span> <span class="kn">import</span> <span class="n">domid</span><span class="p">,</span> <span class="n">js</span>
+<span class="kn">from</span> <span class="nn">cubicweb.schema</span> <span class="kn">import</span> <span class="n">display_name</span>
+
+<span class="c1"># robots control</span>
+<span class="n">NOINDEX</span> <span class="o">=</span> <span class="s1">u&#39;&lt;meta name=&quot;ROBOTS&quot; content=&quot;NOINDEX&quot; /&gt;&#39;</span>
+<span class="n">NOFOLLOW</span> <span class="o">=</span> <span class="s1">u&#39;&lt;meta name=&quot;ROBOTS&quot; content=&quot;NOFOLLOW&quot; /&gt;&#39;</span>
+
+<span class="n">TRANSITIONAL_DOCTYPE_NOEXT</span> <span class="o">=</span> <span class="s1">u&#39;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">TRANSITIONAL_DOCTYPE</span> <span class="o">=</span> <span class="n">TRANSITIONAL_DOCTYPE_NOEXT</span> <span class="c1"># bw compat</span>
+
+<span class="n">STRICT_DOCTYPE_NOEXT</span> <span class="o">=</span> <span class="s1">u&#39;&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">STRICT_DOCTYPE</span> <span class="o">=</span> <span class="n">STRICT_DOCTYPE_NOEXT</span> <span class="c1"># bw compat</span>
+
+<span class="c1"># base view object ############################################################</span>
+
+<span class="k">class</span> <span class="nc">View</span><span class="p">(</span><span class="n">AppObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class is an abstraction of a view class, used as a base class for</span>
+<span class="sd">    every renderable object such as views, templates and other user interface</span>
+<span class="sd">    components.</span>
+
+<span class="sd">    A `View` is instantiated to render a result set or part of a result</span>
+<span class="sd">    set. `View` subclasses may be parametrized using the following class</span>
+<span class="sd">    attributes:</span>
+
+<span class="sd">    :py:attr:`templatable` indicates if the view may be embedded in a main</span>
+<span class="sd">      template or if it has to be rendered standalone (i.e. pure XML views must</span>
+<span class="sd">      not be embedded in the main template of HTML pages)</span>
+<span class="sd">    :py:attr:`content_type` if the view is not templatable, it should set the</span>
+<span class="sd">      `content_type` class attribute to the correct MIME type (text/xhtml being</span>
+<span class="sd">      the default)</span>
+<span class="sd">    :py:attr:`category` this attribute may be used in the interface to regroup</span>
+<span class="sd">      related objects (view kinds) together</span>
+
+<span class="sd">    :py:attr:`paginable`</span>
+
+<span class="sd">    :py:attr:`binary`</span>
+
+
+<span class="sd">    A view writes to its output stream thanks to its attribute `w` (the</span>
+<span class="sd">    append method of an `UStreamIO`, except for binary views).</span>
+
+<span class="sd">    At instantiation time, the standard `_cw`, and `cw_rset` attributes are</span>
+<span class="sd">    added and the `w` attribute will be set at rendering time to a write</span>
+<span class="sd">    function to use.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__registry__</span> <span class="o">=</span> <span class="s1">&#39;views&#39;</span>
+
+    <span class="n">templatable</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="c1"># content_type = &#39;application/xhtml+xml&#39; # text/xhtml&#39;</span>
+    <span class="n">binary</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">add_to_breadcrumbs</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="s1">&#39;view&#39;</span>
+    <span class="n">paginable</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">View</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="n">rset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">content_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">html_content_type</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">set_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">UStringIO</span><span class="p">()</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">write</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>
+        <span class="k">return</span> <span class="n">stream</span>
+
+    <span class="c1"># main view interface #####################################################</span>
+
+    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;called to render a view object for a result set.</span>
+
+<span class="sd">        This method is a dispatched to an actual method selected</span>
+<span class="sd">        according to optional row and col parameters, which are locating</span>
+<span class="sd">        a particular row or cell in the result set:</span>
+
+<span class="sd">        * if row is specified, `cell_call` is called</span>
+<span class="sd">        * if none of them is supplied, the view is considered to apply on</span>
+<span class="sd">          the whole result set (which may be None in this case), `call` is</span>
+<span class="sd">          called</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># XXX use .cw_row/.cw_col</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;row&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;col&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">view_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_call</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">view_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">call</span>
+        <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_stream</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">view_func</span><span class="p">(</span><span class="o">**</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;view call </span><span class="si">%s</span><span class="s1"> failed (context=</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">view_func</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="c1"># return stream content if we have created it</span>
+        <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">tal_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;render a precompiled page template with variables in the given</span>
+<span class="sd">        dictionary as context</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cubicweb.ext.tal</span> <span class="kn">import</span> <span class="n">CubicWebContext</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">CubicWebContext</span><span class="p">()</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;self&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;rset&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">_</span><span class="p">,</span>
+                        <span class="s1">&#39;req&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">user</span><span class="p">})</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">UStringIO</span><span class="p">()</span>
+        <span class="n">template</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+
+    <span class="c1"># should default .call() method add a &lt;div classs=&quot;section&quot;&gt; around each</span>
+    <span class="c1"># rset item</span>
+    <span class="n">add_div_section</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;the view is called for an entire result set, by default loop</span>
+<span class="sd">        other rows of the result set and call the same view on the</span>
+<span class="sd">        particular row</span>
+
+<span class="sd">        Views applicable on None result sets have to override this method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span>
+        <span class="k">if</span> <span class="n">rset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> an rset is required&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">wrap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">templatable</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">rset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_div_section</span>
+        <span class="c1"># avoid re-selection if rset of size 1, we already have the most</span>
+        <span class="c1"># specific view</span>
+        <span class="k">if</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;initargs&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_extra_kwargs</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rset</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">wrap</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;section&quot;&gt;&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wview</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">,</span> <span class="n">rset</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">wrap</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">wrap</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;section&quot;&gt;&#39;</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;col&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cell_call</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">wrap</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">cell_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;the view is called for a particular result set cell&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">linkable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return True if the view may be linked in a menu</span>
+
+<span class="sd">        by default views without title are not meant to be displayed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">is_primary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_extra_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_primary&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span> <span class="o">==</span> <span class="s1">&#39;primary&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return the url associated with this view. Should not be</span>
+<span class="sd">        necessary for non linkable views, but a default implementation</span>
+<span class="sd">        is provided anyway.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span>
+        <span class="k">if</span> <span class="n">rset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span><span class="s1">&#39;view&#39;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">)</span>
+        <span class="n">coltypes</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">column_types</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coltypes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">etype</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">coltypes</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">vreg</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">eschema</span><span class="p">(</span><span class="n">etype</span><span class="p">)</span><span class="o">.</span><span class="n">final</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">entity</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">get_entity</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">entity</span><span class="o">.</span><span class="n">absolute_url</span><span class="p">(</span><span class="n">vid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">)</span>
+            <span class="c1"># don&#39;t want to generate /&lt;etype&gt; url if there is some restriction</span>
+            <span class="c1"># on something else than the entity type</span>
+            <span class="n">restr</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">syntax_tree</span><span class="p">()</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">where</span>
+            <span class="c1"># XXX norestriction is not correct here. For instance, in cases like</span>
+            <span class="c1"># &quot;Any P,N WHERE P is Project, P name N&quot; norestriction should equal</span>
+            <span class="c1"># True</span>
+            <span class="n">norestriction</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">restr</span><span class="p">,</span> <span class="n">nodes</span><span class="o">.</span><span class="n">Relation</span><span class="p">)</span> <span class="ow">and</span>
+                             <span class="n">restr</span><span class="o">.</span><span class="n">is_types_restriction</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">norestriction</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span><span class="n">etype</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">vid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span><span class="s1">&#39;view&#39;</span><span class="p">,</span> <span class="n">rql</span><span class="o">=</span><span class="n">rset</span><span class="o">.</span><span class="n">printable_rql</span><span class="p">(),</span> <span class="n">vid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_request_content_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;set the content type returned by this view&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">set_content_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content_type</span><span class="p">)</span>
+
+    <span class="c1"># view utilities ##########################################################</span>
+
+    <span class="k">def</span> <span class="nf">wview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__vid</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">__fallback_vid</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;shortcut to self.view method automatically passing self.w as argument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">__vid</span><span class="p">,</span> <span class="n">rset</span><span class="p">,</span> <span class="n">__fallback_vid</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">whead</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">html_headers</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">wdata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;simple helper that escapes `data` and writes into `self.w`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">xml_escape</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">html_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return a list of html headers (eg something to be inserted between</span>
+<span class="sd">        &lt;head&gt; and &lt;/head&gt; of the returned page</span>
+
+<span class="sd">        by default return a meta tag to disable robot indexation of the page</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">NOINDEX</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">page_title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns a title according to the result set - used for the</span>
+<span class="sd">        title in the HTML header</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vtitle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vtitle&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vtitle</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">_</span><span class="p">(</span><span class="n">vtitle</span><span class="p">)</span>
+        <span class="c1"># class defined title will only be used if the resulting title doesn&#39;t</span>
+        <span class="c1"># seem clear enough</span>
+        <span class="n">vtitle</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">u&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">vtitle</span><span class="p">:</span>
+            <span class="n">vtitle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">_</span><span class="p">(</span><span class="n">vtitle</span><span class="p">)</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span>
+        <span class="k">if</span> <span class="n">rset</span> <span class="ow">and</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">entity</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">complete_entity</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="c1"># use long_title to get context information if any</span>
+                    <span class="n">clabel</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">dc_long_title</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">NotAnEntity</span><span class="p">:</span>
+                    <span class="n">clabel</span> <span class="o">=</span> <span class="n">display_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="p">,</span> <span class="n">rset</span><span class="o">.</span><span class="n">description</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">clabel</span> <span class="o">=</span> <span class="s1">u&#39;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">clabel</span><span class="p">,</span> <span class="n">vtitle</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">etypes</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">column_types</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">etypes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">etype</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">etypes</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="n">clabel</span> <span class="o">=</span> <span class="n">display_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="p">,</span> <span class="n">etype</span><span class="p">,</span> <span class="s1">&#39;plural&#39;</span><span class="p">)</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">clabel</span> <span class="o">=</span> <span class="s1">u&#39;#[*] (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">vtitle</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clabel</span> <span class="o">=</span> <span class="n">vtitle</span>
+        <span class="k">return</span> <span class="s1">u&#39;</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">clabel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">property_value</span><span class="p">(</span><span class="s1">&#39;ui.site-title&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">show_label</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">tr</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+              <span class="n">table</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;read-only field&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span>
+        <span class="k">if</span> <span class="n">table</span><span class="p">:</span>
+            <span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;tr class=&quot;entityfield&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div class=&quot;entityfield&quot;&gt;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">show_label</span> <span class="ow">and</span> <span class="n">label</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tr</span><span class="p">:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">display_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">table</span><span class="p">:</span>
+                <span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;th&gt;</span><span class="si">%s</span><span class="s1">&lt;/th&gt;&#39;</span> <span class="o">%</span> <span class="n">label</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;span class=&quot;label&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/span&gt; &#39;</span> <span class="o">%</span> <span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">table</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">show_label</span> <span class="ow">and</span> <span class="n">label</span><span class="p">):</span>
+                <span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;td colspan=&quot;2&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/td&gt;&lt;/tr&gt;&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;td&gt;</span><span class="si">%s</span><span class="s1">&lt;/td&gt;&lt;/tr&gt;&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;span&gt;</span><span class="si">%s</span><span class="s1">&lt;/span&gt;&lt;/div&gt;&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+
+
+
+<span class="c1"># concrete views base classes #################################################</span>
+
+<span class="k">class</span> <span class="nc">EntityView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;base class for views applying on an entity (i.e. uniform result set)&quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">non_final_entity</span><span class="p">()</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;entityview&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># * cw_extra_kwargs is the place where extra selection arguments are</span>
+            <span class="c1">#   stored</span>
+            <span class="c1"># * when calling req.view(&#39;somevid&#39;, entity=entity), &#39;entity&#39; ends</span>
+            <span class="c1">#   up in cw_extra_kwargs and kwargs</span>
+            <span class="c1">#</span>
+            <span class="c1"># handle that to avoid a TypeError with a sanity check</span>
+            <span class="c1">#</span>
+            <span class="c1"># Notice that could probably be avoided by handling entity_call in</span>
+            <span class="c1"># .render</span>
+            <span class="n">entity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_extra_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;entity&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="n">entity</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entity_call</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">EntityView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">cell_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entity_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span><span class="o">.</span><span class="n">get_entity</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">entity_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1"> </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">StartupView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;base class for views which doesn&#39;t need a particular result set to be</span>
+<span class="sd">    displayed (so they can always be displayed!)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">none_rset</span><span class="p">()</span>
+
+    <span class="n">category</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;startupview&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">html_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return a list of html headers (eg something to be inserted between</span>
+<span class="sd">        &lt;head&gt; and &lt;/head&gt; of the returned page</span>
+
+<span class="sd">        by default startup views are indexed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">EntityStartupView</span><span class="p">(</span><span class="n">EntityView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;base class for entity views which may also be applied to None</span>
+<span class="sd">    result set (usually a default rql is provided by the view class)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">none_rset</span><span class="p">()</span> <span class="o">|</span> <span class="n">non_final_entity</span><span class="p">()</span>
+
+    <span class="n">default_rql</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EntityStartupView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="n">rset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># this instance is not in the &quot;entityview&quot; category</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="s1">&#39;startupview&#39;</span>
+
+    <span class="k">def</span> <span class="nf">startup_rql</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return some rql to be executed if the result set is None&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_rql</span>
+
+    <span class="k">def</span> <span class="nf">no_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;override to display something when no entities were found&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;override call to execute rql returned by the .startup_rql method if</span>
+<span class="sd">        necessary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span>
+        <span class="k">if</span> <span class="n">rset</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startup_rql</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">rset</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rset</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wview</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">,</span> <span class="n">rset</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">no_entities</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">AnyRsetView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;base class for views applying on any non empty result sets&quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">nonempty_rset</span><span class="p">()</span>
+
+    <span class="n">category</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;anyrsetview&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">columns_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mainindex</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tr</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;compute the label of the rset colums</span>
+
+<span class="sd">        The logic is based on :meth:`~rql.stmts.Union.get_description`.</span>
+
+<span class="sd">        :param mainindex: The index of the main variable. This is an hint to get</span>
+<span class="sd">                          more accurate label for various situation</span>
+<span class="sd">        :type mainindex:  int</span>
+
+<span class="sd">        :param tr: Should the label be translated ?</span>
+<span class="sd">        :type tr: boolean</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tr</span><span class="p">:</span>
+            <span class="n">translate</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">display_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">translate</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">val</span>
+        <span class="c1"># XXX [0] because of missing Union support</span>
+        <span class="n">rql_syntax_tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span><span class="o">.</span><span class="n">syntax_tree</span><span class="p">()</span>
+        <span class="n">rqlstdescr</span> <span class="o">=</span> <span class="n">rql_syntax_tree</span><span class="o">.</span><span class="n">get_description</span><span class="p">(</span><span class="n">mainindex</span><span class="p">,</span> <span class="n">translate</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">colidx</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rqlstdescr</span><span class="p">):</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_label</span><span class="p">(</span><span class="n">colidx</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">translate</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">labels</span>
+
+    <span class="k">def</span> <span class="nf">column_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colidx</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">translate_func</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;return the label of a specified columns index</span>
+
+<span class="sd">        Overwrite me if you need to compute specific label.</span>
+
+<span class="sd">        :param colidx: The index of the column the call computes a label for.</span>
+<span class="sd">        :type colidx:  int</span>
+
+<span class="sd">        :param default: Default value. If ``&quot;Any&quot;`` the default value will be</span>
+<span class="sd">                        recomputed as coma separated list for all possible</span>
+<span class="sd">                        etypes name.</span>
+<span class="sd">        :type colidx:  string</span>
+
+<span class="sd">        :param translate_func: A function used to translate name.</span>
+<span class="sd">        :type colidx:  function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;Any&#39;</span><span class="p">:</span>
+            <span class="n">etypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span><span class="o">.</span><span class="n">column_types</span><span class="p">(</span><span class="n">colidx</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">translate_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">etypes</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">translate_func</span><span class="p">,</span> <span class="n">etypes</span><span class="p">)</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">u&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">etypes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">label</span>
+
+
+
+<span class="c1"># concrete template base classes ##############################################</span>
+
+<span class="k">class</span> <span class="nc">MainTemplate</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;main template are primary access point to render a full HTML page.</span>
+<span class="sd">    There is usually at least a regular main template and a simple fallback</span>
+<span class="sd">    one to display error if the first one failed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">doctype</span> <span class="o">=</span> <span class="s1">&#39;&lt;!DOCTYPE html&gt;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">set_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span> <span class="o">=</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">HTMLStream</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="p">)</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">write</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>
+        <span class="k">return</span> <span class="n">stream</span>
+
+    <span class="k">def</span> <span class="nf">write_doctype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmldecl</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="p">,</span> <span class="n">HTMLStream</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="o">.</span><span class="n">doctype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">doctype</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">xmldecl</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stream</span><span class="o">.</span><span class="n">xmldecl</span> <span class="o">=</span> <span class="s1">u&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">linkable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="c1"># concrete component base classes #############################################</span>
+
+<span class="k">class</span> <span class="nc">ReloadableMixIn</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;simple mixin for reloadable parts of UI&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">domid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Component</span><span class="p">(</span><span class="n">ReloadableMixIn</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;base class for components&quot;&quot;&quot;</span>
+    <span class="n">__registry__</span> <span class="o">=</span> <span class="s1">&#39;components&#39;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">yes</span><span class="p">()</span>
+
+    <span class="c1"># XXX huummm, much probably useless (should be...)</span>
+    <span class="n">htmlclass</span> <span class="o">=</span> <span class="s1">&#39;mainRelated&#39;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cssclass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">htmlclass</span><span class="p">,</span> <span class="n">domid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">))</span>
+
+    <span class="c1"># XXX should rely on ReloadableMixIn.domid</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Component&#39;</span> <span class="o">%</span> <span class="n">domid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__regid__</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Adapter</span><span class="p">(</span><span class="n">AppObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;base class for adapters&quot;&quot;&quot;</span>
+    <span class="n">__registry__</span> <span class="o">=</span> <span class="s1">&#39;adapters&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">EntityAdapter</span><span class="p">(</span><span class="n">Adapter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;base class for entity adapters (eg adapt an entity to an interface)&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_cw</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entity</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;entity&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entity</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;rset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get_entity</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;row&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">,</span>
+                                                    <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;col&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">Adapter</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_cw</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+:orphan:
+
+cubes.piws.views.table_views.FileAnswerTableView
+================================================
+
+.. currentmodule:: cubes.piws.views.table_views
+
+.. autoclass:: FileAnswerTableView
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~FileAnswerTableView.__init__
+      ~FileAnswerTableView.call
+      ~FileAnswerTableView.cell_call
+      ~FileAnswerTableView.critical
+      ~FileAnswerTableView.cw_propval
+      ~FileAnswerTableView.debug
+      ~FileAnswerTableView.error
+      ~FileAnswerTableView.exception
+      ~FileAnswerTableView.field
+      ~FileAnswerTableView.html_headers
+      ~FileAnswerTableView.info
+      ~FileAnswerTableView.is_primary
+      ~FileAnswerTableView.last_modified
+      ~FileAnswerTableView.linkable
+      ~FileAnswerTableView.page_title
+      ~FileAnswerTableView.render
+      ~FileAnswerTableView.set_http_cache_headers
+      ~FileAnswerTableView.set_request_content_type
+      ~FileAnswerTableView.set_stream
+      ~FileAnswerTableView.tal_render
+      ~FileAnswerTableView.url
+      ~FileAnswerTableView.warning
+      ~FileAnswerTableView.wdata
+      ~FileAnswerTableView.whead
+      ~FileAnswerTableView.wview
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~FileAnswerTableView.add_div_section
+      ~FileAnswerTableView.add_to_breadcrumbs
+      ~FileAnswerTableView.binary
+      ~FileAnswerTableView.cache_max_age
+      ~FileAnswerTableView.category
+      ~FileAnswerTableView.content_type
+      ~FileAnswerTableView.paginable
+      ~FileAnswerTableView.templatable
+    
+    
+

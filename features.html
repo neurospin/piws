@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="index.html" />
+  
+   
+       <script type="text/javascript" src="_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/features.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="index.html">
+        <img src="_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="views.html">Views</a></li>
+			  <li><a href="#">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      <ul>
+<li><a class="reference internal" href="#">Features documentation</a><ul>
+<li><a class="reference internal" href="#piws-views-facets"><code class="docutils literal"><span class="pre">piws.views.facets</span></code></a></li>
+<li><a class="reference internal" href="#the-access-rights-management">The access rights management</a></li>
+<li><a class="reference internal" href="#uplad-functionnality">Uplad functionnality</a></li>
+<li><a class="reference internal" href="#download-functionnality">Download functionnality</a></li>
+</ul>
+</li>
+</ul>
+
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="features-documentation">
+<span id="features-guide"></span><h1>Features documentation<a class="headerlink" href="#features-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Documentation regarding all other features implemented in this cube,
+especially access rights and facets</p>
+<div class="section" id="piws-views-facets">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">piws.views.facets</span></code><a class="headerlink" href="#piws-views-facets" title="Permalink to this headline">¶</a></h2>
+<p>CubicWeb has a builtin facet system to define restrictions filters.
+A number of criteria have been set up to restrict searches in this cube.</p>
+<span class="target" id="module-cubes.piws.views.facets"></span><dl class="class">
+<dt id="cubes.piws.views.facets.AssessmentSubjectFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">AssessmentSubjectFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#AssessmentSubjectFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.AssessmentSubjectFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the assessment subjects.</p>
+<p>This filter is applied on &#8216;Assessment&#8217;.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.AssessmentTimepointFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">AssessmentTimepointFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#AssessmentTimepointFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.AssessmentTimepointFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the assessment timepoints.</p>
+<p>This filter is applied on &#8216;Assessment&#8217;.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.GenomicMeasureTypeFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">GenomicMeasureTypeFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#GenomicMeasureTypeFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.GenomicMeasureTypeFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the genomic measure types.</p>
+<p>This filter is applied on &#8216;GenomicMeasure&#8217;.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.ProcessingRunNameFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">ProcessingRunNameFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#ProcessingRunNameFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.ProcessingRunNameFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the ProcessingRun FileSets by name.</p>
+<p>This filter is applied on &#8216;ProcessingRun&#8217;.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.ScanFieldFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">ScanFieldFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#ScanFieldFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.ScanFieldFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the scan fields.</p>
+<p>This filter is applied on &#8216;Scan&#8217;.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.ScanFormatFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">ScanFormatFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#ScanFormatFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.ScanFormatFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter the scan formats.</p>
+<p>This filter is applied on &#8216;Scan&#8217;.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.StudyFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">StudyFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#StudyFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.StudyFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter on study name (from the &#8216;Study&#8217; entity).</p>
+<p>This filter is applied on &#8216;Scan&#8217;, &#8216;ProcessingRun&#8217;,
+&#8216;QuestionnaireRun&#8217; and &#8216;GenomicMeasure&#8217; entities.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.SubjectFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">SubjectFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#SubjectFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.SubjectFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter on subject code (from the &#8216;Subject&#8217; entity).</p>
+<p>This filter can is applied on &#8216;Scan&#8217;, &#8216;ProcessingRun&#8217;,
+&#8216;QuestionnaireRun&#8217; and &#8216;GenomicMeasure&#8217; entities.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.TimepointFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">TimepointFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#TimepointFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.TimepointFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter on timepoint (form the &#8216;Assessment&#8217; entity).</p>
+<p>This filter is applied on &#8216;Scan&#8217;, &#8216;ProcessingRun&#8217;,
+&#8216;QuestionnaireRun&#8217; and &#8216;GenomicMeasure&#8217; entities.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="the-access-rights-management">
+<h2>The access rights management<a class="headerlink" href="#the-access-rights-management" title="Permalink to this headline">¶</a></h2>
+<p>All entities that requires access rights management are linked to
+one &#8216;Assessment&#8217; entity by the relation &#8216;in_assessment&#8217;.
+As the access rights are set on the &#8216;Assessment&#8217; entity through the
+&#8216;can_read&#8217; and &#8216;can_update&#8217; relations, the concerned entity are accessible
+only by authorized users. See schema below:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="figure align-center" id="id1">
+<a class="reference internal image-reference" href="_images/rights.png"><img alt="Access rights management" src="_images/rights.png" style="width: 500px;" /></a>
+<p class="caption"><span class="caption-text">Cube access rights management</span></p>
+</div>
+</div>
+<div class="section" id="uplad-functionnality">
+<h2>Uplad functionnality<a class="headerlink" href="#uplad-functionnality" title="Permalink to this headline">¶</a></h2>
+<p>The upload functionality is derived from the <a class="reference external" href="https://github.com/neurospin/rql_upload">rql_upload cube</a>.</p>
+</div>
+<div class="section" id="download-functionnality">
+<h2>Download functionnality<a class="headerlink" href="#download-functionnality" title="Permalink to this headline">¶</a></h2>
+<p>The download functionality is derived from the <a class="reference external" href="https://github.com/neurospin/rql_download">rql_download cube</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

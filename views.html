@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="index.html" />
+  
+   
+       <script type="text/javascript" src="_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/views.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="index.html">
+        <img src="_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="#">Views</a></li>
+			  <li><a href="features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      <ul>
+<li><a class="reference internal" href="#">Views documentation</a><ul>
+<li><a class="reference internal" href="#piws-views-highcharts-views-highchartsbasicpieview"><code class="docutils literal"><span class="pre">piws.views.highcharts_views</span></code>: HighChartsBasicPieView</a><ul>
+<li><a class="reference internal" href="#user-views">User Views</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#piws-views-table-views-table-views"><code class="docutils literal"><span class="pre">piws.views.table_views</span></code>: Table views</a><ul>
+<li><a class="reference internal" href="#id1">User Views</a></li>
+<li><a class="reference internal" href="#derived-views">Derived Views</a></li>
+<li><a class="reference internal" href="#export-views">Export Views</a></li>
+<li><a class="reference internal" href="#ajax-inner-callbacks">Ajax inner callbacks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="views-documentation">
+<span id="views-guide"></span><h1>Views documentation<a class="headerlink" href="#views-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Documentation regarding views defined on the cube.</p>
+<div class="section" id="piws-views-highcharts-views-highchartsbasicpieview">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">piws.views.highcharts_views</span></code>: HighChartsBasicPieView<a class="headerlink" href="#piws-views-highcharts-views-highchartsbasicpieview" title="Permalink to this headline">¶</a></h2>
+<p>All the views designed in this section are based on the &#8216;highcharts&#8217; JavaScript
+library. The aim here is to propose a bunch of views to summarize the
+database content.</p>
+<div class="section" id="user-views">
+<h3>User Views<a class="headerlink" href="#user-views" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/highcharts/cubes.piws.views.highcharts_views.HighChartsBasicPieView.html#cubes.piws.views.highcharts_views.HighChartsBasicPieView" title="cubes.piws.views.highcharts_views.HighChartsBasicPieView"><code class="xref py py-obj docutils literal"><span class="pre">highcharts_views.HighChartsBasicPieView</span></code></a>([...])</td>
+<td>Create a basic pie chart using highcharts.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/highcharts/cubes.piws.views.highcharts_views.HighChartsRelationSummaryView.html#cubes.piws.views.highcharts_views.HighChartsRelationSummaryView" title="cubes.piws.views.highcharts_views.HighChartsRelationSummaryView"><code class="xref py py-obj docutils literal"><span class="pre">highcharts_views.HighChartsRelationSummaryView</span></code></a>([...])</td>
+<td>Create a basic table view that summarized an entity relation.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/highcharts/cubes.piws.views.highcharts_views.HighChartsBasicPlotView.html#cubes.piws.views.highcharts_views.HighChartsBasicPlotView" title="cubes.piws.views.highcharts_views.HighChartsBasicPlotView"><code class="xref py py-obj docutils literal"><span class="pre">highcharts_views.HighChartsBasicPlotView</span></code></a>([...])</td>
+<td>Create a basic plot using highcharts.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="piws-views-table-views-table-views">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">piws.views.table_views</span></code>: Table views<a class="headerlink" href="#piws-views-table-views-table-views" title="Permalink to this headline">¶</a></h2>
+<p>All the views designed in this section are based on the &#8216;datatables&#8217; JavaScript
+library. Such views are convenient to display questionnaires associated answers
+or huge dataset as we may be confronted when treating genetic data.</p>
+<div class="section" id="id1">
+<h3>User Views<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The &#8216;JhugetableView&#8217; class will send a single request to the server and then
+everything will be deported to the client. The &#8216;JtableView&#8217; will interact
+with the server each time the user interact with the JavaScript table (ie,
+paging, sorting, ....).</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.JHugetableView.html#cubes.piws.views.table_views.JHugetableView" title="cubes.piws.views.table_views.JHugetableView"><code class="xref py py-obj docutils literal"><span class="pre">table_views.JHugetableView</span></code></a>([req,&nbsp;rset])</td>
+<td>Create a table view with DataTables.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.JtableView.html#cubes.piws.views.table_views.JtableView" title="cubes.piws.views.table_views.JtableView"><code class="xref py py-obj docutils literal"><span class="pre">table_views.JtableView</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Create a table view with DataTables.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="derived-views">
+<h3>Derived Views<a class="headerlink" href="#derived-views" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.FileAnswerTableView.html#cubes.piws.views.table_views.FileAnswerTableView" title="cubes.piws.views.table_views.FileAnswerTableView"><code class="xref py py-obj docutils literal"><span class="pre">table_views.FileAnswerTableView</span></code></a>([req,&nbsp;rset])</td>
+<td>QuestionnaireRuns table view specific to the QuestionnaireRun (1?) File schema.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="export-views">
+<h3>Export Views<a class="headerlink" href="#export-views" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.PiwsCSVView.html#cubes.piws.views.table_views.PiwsCSVView" title="cubes.piws.views.table_views.PiwsCSVView"><code class="xref py py-obj docutils literal"><span class="pre">table_views.PiwsCSVView</span></code></a>([req,&nbsp;rset])</td>
+<td>Dumps questionnaires in CSV.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="ajax-inner-callbacks">
+<h3>Ajax inner callbacks<a class="headerlink" href="#ajax-inner-callbacks" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.get_open_answers_data.html#cubes.piws.views.table_views.get_open_answers_data" title="cubes.piws.views.table_views.get_open_answers_data"><code class="xref py py-obj docutils literal"><span class="pre">table_views.get_open_answers_data</span></code></a>(self)</td>
+<td>Get the subject answer data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.get_questionnaires_data.html#cubes.piws.views.table_views.get_questionnaires_data" title="cubes.piws.views.table_views.get_questionnaires_data"><code class="xref py py-obj docutils literal"><span class="pre">table_views.get_questionnaires_data</span></code></a>(self)</td>
+<td>Get the questionnaires data.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

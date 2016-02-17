@@ -1,0 +1,35 @@
+:orphan:
+
+cubes.piws.importer.base.Base
+=============================
+
+.. currentmodule:: cubes.piws.importer.base
+
+.. autoclass:: Base
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~Base.__init__
+      ~Base.cleanup
+      ~Base.import_data
+      ~Base.schema
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~Base.assessment_relations
+      ~Base.fileset_relations
+      ~Base.relations
+    
+    
+

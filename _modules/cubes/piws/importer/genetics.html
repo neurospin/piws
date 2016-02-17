@@ -1,0 +1,515 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubes/piws/importer/genetics.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../../../index.html">
+        <img src="../../../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../../../index.html">Home</a></li>
+        <li><a href="../../../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../views.html">Views</a></li>
+			  <li><a href="../../../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not esitate to 
+          <a &mdash; <a href="https://github.com/neurospin/piws.git">
+          Report a Bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubes.piws.importer.genetics</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+
+<span class="c1"># Piws import</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">Base</span>
+
+
+<div class="viewcode-block" id="Genetics"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.genetics.Genetics.html#cubes.piws.importer.genetics.Genetics">[docs]</a><span class="k">class</span> <span class="nc">Genetics</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This class enables us to load the genetic data to CW.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Define the relations involved</span>
+    <span class="n">relations</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Base</span><span class="o">.</span><span class="n">fileset_relations</span> <span class="o">+</span> <span class="n">Base</span><span class="o">.</span><span class="n">assessment_relations</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="s2">&quot;Study&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">,</span> <span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">,</span> <span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">,</span> <span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">,</span> <span class="s2">&quot;platform&quot;</span><span class="p">,</span> <span class="s2">&quot;GenomicPlatform&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;GenomicPlatform&quot;</span><span class="p">,</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">,</span> <span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;GenomicPlatform&quot;</span><span class="p">,</span> <span class="s2">&quot;snps&quot;</span><span class="p">,</span> <span class="s2">&quot;Snp&quot;</span><span class="p">)]</span>
+    <span class="p">)</span>
+    <span class="n">relations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;GenomicMeasure&quot;</span>
+
+<div class="viewcode-block" id="Genetics.__init__"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.genetics.Genetics.html#cubes.piws.importer.genetics.Genetics.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">center_name</span><span class="p">,</span> <span class="n">genetics</span><span class="p">,</span>
+                 <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialize the Genetics class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        session: Session (mandatory)</span>
+<span class="sd">            a cubicweb session.</span>
+<span class="sd">        project_name: str (mandatory)</span>
+<span class="sd">            the name of the project</span>
+<span class="sd">        center_name: str (mandatory)</span>
+<span class="sd">            the center name</span>
+<span class="sd">        genetics: dict of list of dict (mandatory)</span>
+<span class="sd">            the genetic measure description: the first dictionary contains the</span>
+<span class="sd">            timepoint as keys and then a list of dictionaries with two keys</span>
+<span class="sd">            (GenomicMeasures - Assessment) that contains the entities parameter</span>
+<span class="sd">            descriptions.</span>
+<span class="sd">        can_read: bool (optional, default True)</span>
+<span class="sd">            set the read permission to the imported data.</span>
+<span class="sd">        can_update: bool (optional, default True)</span>
+<span class="sd">            set the update permission to the imported data.</span>
+<span class="sd">        data_filepath: str (optional, default None)</span>
+<span class="sd">            the path to folder containing the current study dataset.</span>
+<span class="sd">        use_store: bool (optional, default True)</span>
+<span class="sd">            if True use an SQLGenObjectStore, otherwise the session.</span>
+<span class="sd">        piws_security_model: bool (optional, default True)</span>
+<span class="sd">            if True apply the PIWS security model.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Here is an example of the definition of the &#39;genetics&#39; parameter:</span>
+
+<span class="sd">        ::</span>
+
+<span class="sd">            genetics = {</span>
+<span class="sd">                &quot;V1&quot;: [{</span>
+<span class="sd">                    &quot;GenomicMeasures&quot;: [{</span>
+<span class="sd">                        &quot;GenomicPlatform&quot;: {</span>
+<span class="sd">                            &quot;related_snps&quot;: [</span>
+<span class="sd">                                u&quot;rs325623&quot;, u&quot;rs272569&quot;, u&quot;rs400&quot;,</span>
+<span class="sd">                                u&quot;rs1053026&quot;</span>
+<span class="sd">                            ],</span>
+<span class="sd">                            &quot;name&quot;: u&quot;Illumina&quot;,</span>
+<span class="sd">                            &quot;related_subjects&quot;: [</span>
+<span class="sd">                                u&quot;subject0&quot;, u&quot;subject1&quot;, u&quot;subject2&quot;,</span>
+<span class="sd">                                u&quot;subject3&quot;, u&quot;subject4&quot;, u&quot;subject5&quot;,</span>
+<span class="sd">                                u&quot;subject6&quot;, u&quot;subject7&quot;, u&quot;subject8&quot;,</span>
+<span class="sd">                                u&quot;subject9&quot;</span>
+<span class="sd">                            ]</span>
+<span class="sd">                        },</span>
+<span class="sd">                        &quot;GenomicMeasure&quot;: {</span>
+<span class="sd">                            &quot;identifier&quot;: u&quot;toy_V1_genetic_Illumina_raw_json&quot;,</span>
+<span class="sd">                            &quot;label&quot;: u&quot;toy_V1_genetic_Illumina_raw_json&quot;,</span>
+<span class="sd">                            &quot;type&quot;: u&quot;raw&quot;,</span>
+<span class="sd">                            &quot;format&quot;: u&quot;json&quot;</span>
+<span class="sd">                        },</span>
+<span class="sd">                        &quot;FileSet&quot;: {</span>
+<span class="sd">                            &quot;identifier&quot;: u&quot;toy_V1_genetic&quot;,</span>
+<span class="sd">                            &quot;name&quot;: u&quot;raw genetic measure&quot;</span>
+<span class="sd">                        },</span>
+<span class="sd">                        &quot;ExternalResources&quot;: [{</span>
+<span class="sd">                            &quot;absolute_path&quot;: True,</span>
+<span class="sd">                            &quot;identifier&quot;: u&quot;toy_V1_genetic_1&quot;,</span>
+<span class="sd">                            &quot;name&quot;: u&quot;genetic&quot;,</span>
+<span class="sd">                            &quot;filepath&quot;: u&quot;/tmp/demo/V1/genetic/genetic.json&quot;</span>
+<span class="sd">                        }]</span>
+<span class="sd">                    }],</span>
+<span class="sd">                    &quot;Assessment&quot;: {</span>
+<span class="sd">                        &quot;identifier&quot;: u&quot;toy_V1_genetic&quot;,</span>
+<span class="sd">                        &quot;timepoint&quot;: u&quot;V1&quot;}</span>
+<span class="sd">                }]</span>
+<span class="sd">            }</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Inheritance</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Genetics</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">use_store</span><span class="p">,</span>
+                                       <span class="n">piws_security_model</span><span class="p">)</span>
+
+        <span class="c1"># Parse the file system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genetics</span> <span class="o">=</span> <span class="n">genetics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_filepath</span> <span class="o">=</span> <span class="n">data_filepath</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">project_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center_name</span> <span class="o">=</span> <span class="n">center_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">can_read</span> <span class="o">=</span> <span class="n">can_read</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">can_update</span> <span class="o">=</span> <span class="n">can_update</span>
+
+        <span class="c1"># Speed up parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_measures</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_platforms</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_snps</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+    <span class="c1">###########################################################################</span>
+    <span class="c1">#   Public Methods</span>
+    <span class="c1">###########################################################################</span>
+
+<div class="viewcode-block" id="Genetics.import_data"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.genetics.Genetics.html#cubes.piws.importer.genetics.Genetics.import_data">[docs]</a>    <span class="k">def</span> <span class="nf">import_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that import some genetic data in the db.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            Below the schema used to insert the genetic data:</span>
+
+<span class="sd">            |</span>
+
+<span class="sd">            .. image:: ../schemas/genetics.png</span>
+<span class="sd">                :width: 600px</span>
+<span class="sd">                :align: center</span>
+<span class="sd">                :alt: schema</span>
+
+<span class="sd">        .. warning::</span>
+
+<span class="sd">            This method assumes that all the subjects and groups have already</span>
+<span class="sd">            been inserted in the database.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#######################################################################</span>
+        <span class="c1"># First get/create the study and the center</span>
+        <span class="c1">#######################################################################</span>
+
+        <span class="n">center_entity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+            <span class="n">rql</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Any X Where X is Center, X name &quot;</span>
+                 <span class="s2">&quot;&#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_name</span><span class="p">)),</span>
+            <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;Center&quot;</span><span class="p">,</span>
+            <span class="n">identifier</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_md5_sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_name</span><span class="p">)),</span>
+            <span class="n">name</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">center_name</span><span class="p">))</span>
+        <span class="n">center_eid</span> <span class="o">=</span> <span class="n">center_entity</span><span class="o">.</span><span class="n">eid</span>
+        <span class="n">study_entity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+            <span class="n">rql</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Any X Where X is Study, X name &quot;</span>
+                 <span class="s2">&quot;&#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">)),</span>
+            <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">),</span>
+            <span class="n">data_filepath</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_filepath</span><span class="p">))</span>
+        <span class="n">study_eid</span> <span class="o">=</span> <span class="n">study_entity</span><span class="o">.</span><span class="n">eid</span>
+
+        <span class="c1">#######################################################################</span>
+        <span class="c1"># Get all the subjects</span>
+        <span class="c1">#######################################################################</span>
+
+        <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">&quot;Any S, C, N Where S is Subject, S code_in_study C, S study E, &quot;</span>
+            <span class="s2">&quot;E name N&quot;</span><span class="p">)</span>
+        <span class="n">study_subjects</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rset</span>
+                              <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">))</span>
+
+        <span class="c1">#######################################################################</span>
+        <span class="c1"># Get all the groups</span>
+        <span class="c1">#######################################################################</span>
+
+        <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">&quot;Any G, N Where G is CWGroup, G name N&quot;</span><span class="p">)</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rset</span><span class="p">)</span>
+
+        <span class="c1">#######################################################################</span>
+        <span class="c1"># Insert each genetic measure</span>
+        <span class="c1">#######################################################################</span>
+
+        <span class="c1"># Add the data</span>
+        <span class="k">for</span> <span class="n">timepoint</span><span class="p">,</span> <span class="n">timepoint_genetics</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">genetics</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+
+            <span class="c1"># Information to create a progress bar</span>
+            <span class="n">nb_of_measures</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timepoint_genetics</span><span class="p">))</span>
+            <span class="n">cnt_measure</span> <span class="o">=</span> <span class="mf">1.</span>
+
+            <span class="c1"># Select a platform</span>
+            <span class="k">for</span> <span class="n">tgenetic_item</span> <span class="ow">in</span> <span class="n">timepoint_genetics</span><span class="p">:</span>
+
+                <span class="c1"># Print a progress bar</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="p">(</span>
+                    <span class="n">cnt_measure</span> <span class="o">/</span> <span class="n">nb_of_measures</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;{0}(genetics)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">tgenetic_item</span><span class="p">[</span><span class="s2">&quot;Assessment&quot;</span><span class="p">][</span><span class="s2">&quot;identifier&quot;</span><span class="p">]),</span>
+                    <span class="n">bar_length</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+                <span class="n">cnt_measure</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1">###############################################################</span>
+                <span class="c1"># Check all the subjects exist in the database</span>
+                <span class="c1">###############################################################</span>
+
+                <span class="n">timepoint_subjects</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">tgenetic_measure</span> <span class="ow">in</span> <span class="n">tgenetic_item</span><span class="p">[</span><span class="s2">&quot;GenomicMeasures&quot;</span><span class="p">]:</span>
+                    <span class="n">platform_struct</span> <span class="o">=</span> <span class="n">tgenetic_measure</span><span class="p">[</span><span class="s2">&quot;GenomicPlatform&quot;</span><span class="p">]</span>
+                    <span class="n">related_subjects</span> <span class="o">=</span> <span class="n">platform_struct</span><span class="p">[</span><span class="s2">&quot;related_subjects&quot;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">subject_id</span> <span class="ow">in</span> <span class="n">related_subjects</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">subject_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">study_subjects</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                                <span class="s2">&quot;The subject &#39;{0}&#39; in not known by the &quot;</span>
+                                <span class="s2">&quot;database.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject_id</span><span class="p">))</span>
+                        <span class="n">timepoint_subjects</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">study_subjects</span><span class="p">[</span><span class="n">subject_id</span><span class="p">])</span>
+                <span class="n">timepoint_subjects</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">timepoint_subjects</span><span class="p">)</span>
+
+                <span class="c1">###############################################################</span>
+                <span class="c1"># Create the assessment</span>
+                <span class="c1">###############################################################</span>
+
+                <span class="c1"># Get the assessment identifier</span>
+                <span class="n">assessment_struct</span> <span class="o">=</span> <span class="n">tgenetic_item</span><span class="p">[</span><span class="s2">&quot;Assessment&quot;</span><span class="p">]</span>
+                <span class="n">assessment_id</span> <span class="o">=</span> <span class="n">assessment_struct</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">]</span>
+
+                <span class="c1"># Check if this item has already been inserted</span>
+                <span class="k">if</span> <span class="n">assessment_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">:</span>
+                    <span class="n">assessment_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span><span class="n">assessment_id</span><span class="p">]</span>
+
+                <span class="c1"># Create the assessment</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">assessment_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_assessment</span><span class="p">(</span>
+                        <span class="n">assessment_struct</span><span class="p">,</span> <span class="n">timepoint_subjects</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span>
+                        <span class="n">center_eid</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span><span class="n">assessment_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">assessment_eid</span>
+
+                <span class="c1">###############################################################</span>
+                <span class="c1"># Insert all the genetic measure at this timepoint</span>
+                <span class="c1">###############################################################</span>
+
+                <span class="k">for</span> <span class="n">tgenetic_measure</span> <span class="ow">in</span> <span class="n">tgenetic_item</span><span class="p">[</span><span class="s2">&quot;GenomicMeasures&quot;</span><span class="p">]:</span>
+
+                    <span class="n">platform_struct</span> <span class="o">=</span> <span class="n">tgenetic_measure</span><span class="p">[</span><span class="s2">&quot;GenomicPlatform&quot;</span><span class="p">]</span>
+                    <span class="n">related_subjects</span> <span class="o">=</span> <span class="n">platform_struct</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;related_subjects&quot;</span><span class="p">)</span>
+
+                    <span class="c1">############################################################</span>
+                    <span class="c1"># Create the genomic platform</span>
+                    <span class="c1">############################################################</span>
+
+                    <span class="c1"># Check if this item has already been inserted</span>
+                    <span class="n">platform_name</span> <span class="o">=</span> <span class="n">platform_struct</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">platform_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_platforms</span><span class="p">:</span>
+                        <span class="n">platform_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_platforms</span><span class="p">[</span><span class="n">platform_name</span><span class="p">]</span>
+
+                    <span class="c1"># Create the platform</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">related_snps</span> <span class="o">=</span> <span class="n">platform_struct</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;related_snps&quot;</span><span class="p">)</span>
+                        <span class="n">platform_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_platform</span><span class="p">(</span>
+                            <span class="n">platform_struct</span><span class="p">,</span> <span class="n">related_snps</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_platforms</span><span class="p">[</span><span class="n">platform_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">platform_eid</span>
+
+                    <span class="c1">############################################################</span>
+                    <span class="c1"># Create the genomic measure</span>
+                    <span class="c1">############################################################</span>
+
+                    <span class="n">measure_struct</span> <span class="o">=</span> <span class="n">tgenetic_measure</span><span class="p">[</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">]</span>
+                    <span class="n">fset_struct</span> <span class="o">=</span> <span class="n">tgenetic_measure</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FileSet&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                    <span class="n">extfiles</span> <span class="o">=</span> <span class="n">tgenetic_measure</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ExternalResources&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                    <span class="n">measure_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_measure</span><span class="p">(</span>
+                        <span class="n">measure_struct</span><span class="p">,</span> <span class="n">fset_struct</span><span class="p">,</span> <span class="n">extfiles</span><span class="p">,</span> <span class="n">related_subjects</span><span class="p">,</span>
+                        <span class="n">study_subjects</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span> <span class="n">platform_eid</span><span class="p">)</span>
+
+        <span class="k">print</span>  <span class="c1"># new line after last progress bar update</span></div>
+
+<div class="viewcode-block" id="Genetics._create_measure"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.genetics.Genetics.html#cubes.piws.importer.genetics.Genetics._create_measure">[docs]</a>    <span class="k">def</span> <span class="nf">_create_measure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measure_struct</span><span class="p">,</span> <span class="n">fset_struct</span><span class="p">,</span> <span class="n">extfiles</span><span class="p">,</span>
+                        <span class="n">related_subjects</span><span class="p">,</span> <span class="n">study_subjects</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span>
+                        <span class="n">assessment_eid</span><span class="p">,</span> <span class="n">platform_eid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a genomic measure and its associated relations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create the measure</span>
+        <span class="n">measure_entity</span><span class="p">,</span> <span class="n">is_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+            <span class="n">rql</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Any X Where X is GenomicMeasure, X identifier &quot;</span>
+                 <span class="s2">&quot;&#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">measure_struct</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">])),</span>
+            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">measure_struct</span><span class="p">)</span>
+        <span class="n">measure_eid</span> <span class="o">=</span> <span class="n">measure_entity</span><span class="o">.</span><span class="n">eid</span>
+
+        <span class="c1"># If we just create the measure, add relations</span>
+        <span class="k">if</span> <span class="n">is_created</span><span class="p">:</span>
+            <span class="c1"># &gt; add relation with the study</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">measure_eid</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">study_eid</span><span class="p">,</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">,</span> <span class="n">measure_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="c1"># &gt; add relation with the subjects</span>
+            <span class="k">for</span> <span class="n">subject_id</span> <span class="ow">in</span> <span class="n">related_subjects</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                    <span class="n">measure_eid</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="n">study_subjects</span><span class="p">[</span><span class="n">subject_id</span><span class="p">],</span>
+                    <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                    <span class="n">study_subjects</span><span class="p">[</span><span class="n">subject_id</span><span class="p">],</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">,</span> <span class="n">measure_eid</span><span class="p">,</span>
+                    <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="c1"># &gt; add relation with the assessment</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">,</span> <span class="n">measure_eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">measure_eid</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">)</span>
+            <span class="c1"># &gt; add relation with the platform</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">measure_eid</span><span class="p">,</span> <span class="s2">&quot;platform&quot;</span><span class="p">,</span> <span class="n">platform_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">platform_eid</span><span class="p">,</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">,</span> <span class="n">measure_eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+            <span class="c1"># Add the file set attached to a genomic measure</span>
+            <span class="k">if</span> <span class="n">fset_struct</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_import_file_set</span><span class="p">(</span><span class="n">fset_struct</span><span class="p">,</span> <span class="n">extfiles</span><span class="p">,</span> <span class="n">measure_eid</span><span class="p">,</span>
+                                      <span class="n">assessment_eid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">measure_eid</span></div>
+
+<div class="viewcode-block" id="Genetics._create_platform"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.genetics.Genetics.html#cubes.piws.importer.genetics.Genetics._create_platform">[docs]</a>    <span class="k">def</span> <span class="nf">_create_platform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">platform_struct</span><span class="p">,</span> <span class="n">related_snps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a genomic platform and its associated relations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create the platform</span>
+        <span class="n">platform_entity</span><span class="p">,</span> <span class="n">is_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+            <span class="n">rql</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Any X Where X is GenomicPlatform, X name &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                                    <span class="n">platform_struct</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])),</span>
+            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;GenomicPlatform&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">platform_struct</span><span class="p">)</span>
+        <span class="n">platform_eid</span> <span class="o">=</span> <span class="n">platform_entity</span><span class="o">.</span><span class="n">eid</span>
+
+        <span class="c1"># If we just create the platform, relate the platform with the measured</span>
+        <span class="c1"># snps</span>
+        <span class="k">if</span> <span class="n">is_created</span><span class="p">:</span>
+            <span class="c1"># &gt; add relation with the snps</span>
+            <span class="n">nb_of_snps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">related_snps</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">cnt_snps</span><span class="p">,</span> <span class="n">rs_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">related_snps</span><span class="p">):</span>
+
+                <span class="c1"># Print a progress bar</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">cnt_snps</span> <span class="o">%</span> <span class="mi">100</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="p">(</span>
+                        <span class="n">cnt_snps</span> <span class="o">/</span> <span class="n">nb_of_snps</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;{0}:{1}/{2}(snps)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">rs_id</span><span class="p">,</span> <span class="n">cnt_snps</span><span class="p">,</span> <span class="n">nb_of_snps</span><span class="p">),</span>
+                        <span class="n">bar_length</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+
+                <span class="c1"># Check if this item has already been inserted</span>
+                <span class="k">if</span> <span class="n">rs_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_snps</span><span class="p">:</span>
+                    <span class="n">snp_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_snps</span><span class="p">[</span><span class="n">rs_id</span><span class="p">]</span>
+
+                <span class="c1"># Create the Snp</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">snp_entity</span><span class="p">,</span> <span class="n">is_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+                        <span class="n">rql</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Any X Where X is Snp, S rs_id &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">rs_id</span><span class="p">)),</span>
+                        <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                        <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;Snp&quot;</span><span class="p">,</span>
+                        <span class="n">rs_id</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">rs_id</span><span class="p">),</span>
+                        <span class="n">position</span><span class="o">=-</span><span class="mi">9</span><span class="p">)</span>
+                    <span class="n">snp_eid</span> <span class="o">=</span> <span class="n">snp_entity</span><span class="o">.</span><span class="n">eid</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inserted_snps</span><span class="p">[</span><span class="n">rs_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">snp_eid</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                    <span class="n">platform_eid</span><span class="p">,</span> <span class="s2">&quot;snps&quot;</span><span class="p">,</span> <span class="n">snp_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">platform_eid</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

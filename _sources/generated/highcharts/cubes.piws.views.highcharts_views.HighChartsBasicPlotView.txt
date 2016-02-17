@@ -1,0 +1,63 @@
+:orphan:
+
+cubes.piws.views.highcharts_views.HighChartsBasicPlotView
+=========================================================
+
+.. currentmodule:: cubes.piws.views.highcharts_views
+
+.. autoclass:: HighChartsBasicPlotView
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~HighChartsBasicPlotView.__init__
+      ~HighChartsBasicPlotView.call
+      ~HighChartsBasicPlotView.cell_call
+      ~HighChartsBasicPlotView.critical
+      ~HighChartsBasicPlotView.cw_propval
+      ~HighChartsBasicPlotView.debug
+      ~HighChartsBasicPlotView.error
+      ~HighChartsBasicPlotView.exception
+      ~HighChartsBasicPlotView.field
+      ~HighChartsBasicPlotView.html_headers
+      ~HighChartsBasicPlotView.info
+      ~HighChartsBasicPlotView.is_primary
+      ~HighChartsBasicPlotView.last_modified
+      ~HighChartsBasicPlotView.linkable
+      ~HighChartsBasicPlotView.page_title
+      ~HighChartsBasicPlotView.render
+      ~HighChartsBasicPlotView.rset_to_hist
+      ~HighChartsBasicPlotView.set_http_cache_headers
+      ~HighChartsBasicPlotView.set_request_content_type
+      ~HighChartsBasicPlotView.set_stream
+      ~HighChartsBasicPlotView.tal_render
+      ~HighChartsBasicPlotView.url
+      ~HighChartsBasicPlotView.warning
+      ~HighChartsBasicPlotView.wdata
+      ~HighChartsBasicPlotView.whead
+      ~HighChartsBasicPlotView.wview
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~HighChartsBasicPlotView.add_div_section
+      ~HighChartsBasicPlotView.add_to_breadcrumbs
+      ~HighChartsBasicPlotView.binary
+      ~HighChartsBasicPlotView.cache_max_age
+      ~HighChartsBasicPlotView.category
+      ~HighChartsBasicPlotView.content_type
+      ~HighChartsBasicPlotView.div_id
+      ~HighChartsBasicPlotView.paginable
+      ~HighChartsBasicPlotView.templatable
+    
+    
+

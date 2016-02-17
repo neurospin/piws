@@ -1,0 +1,63 @@
+:orphan:
+
+cubes.piws.views.highcharts_views.HighChartsBasicPieView
+========================================================
+
+.. currentmodule:: cubes.piws.views.highcharts_views
+
+.. autoclass:: HighChartsBasicPieView
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~HighChartsBasicPieView.__init__
+      ~HighChartsBasicPieView.call
+      ~HighChartsBasicPieView.cell_call
+      ~HighChartsBasicPieView.critical
+      ~HighChartsBasicPieView.cw_propval
+      ~HighChartsBasicPieView.debug
+      ~HighChartsBasicPieView.error
+      ~HighChartsBasicPieView.exception
+      ~HighChartsBasicPieView.field
+      ~HighChartsBasicPieView.html_headers
+      ~HighChartsBasicPieView.info
+      ~HighChartsBasicPieView.is_primary
+      ~HighChartsBasicPieView.last_modified
+      ~HighChartsBasicPieView.linkable
+      ~HighChartsBasicPieView.page_title
+      ~HighChartsBasicPieView.render
+      ~HighChartsBasicPieView.rset_to_data
+      ~HighChartsBasicPieView.set_http_cache_headers
+      ~HighChartsBasicPieView.set_request_content_type
+      ~HighChartsBasicPieView.set_stream
+      ~HighChartsBasicPieView.tal_render
+      ~HighChartsBasicPieView.url
+      ~HighChartsBasicPieView.warning
+      ~HighChartsBasicPieView.wdata
+      ~HighChartsBasicPieView.whead
+      ~HighChartsBasicPieView.wview
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~HighChartsBasicPieView.add_div_section
+      ~HighChartsBasicPieView.add_to_breadcrumbs
+      ~HighChartsBasicPieView.binary
+      ~HighChartsBasicPieView.cache_max_age
+      ~HighChartsBasicPieView.category
+      ~HighChartsBasicPieView.content_type
+      ~HighChartsBasicPieView.div_id
+      ~HighChartsBasicPieView.paginable
+      ~HighChartsBasicPieView.templatable
+    
+    
+

@@ -1,0 +1,35 @@
+:orphan:
+
+cubes.piws.importer.scans.Scans
+===============================
+
+.. currentmodule:: cubes.piws.importer.scans
+
+.. autoclass:: Scans
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~Scans.__init__
+      ~Scans.cleanup
+      ~Scans.import_data
+      ~Scans.schema
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~Scans.assessment_relations
+      ~Scans.fileset_relations
+      ~Scans.relations
+    
+    
+
