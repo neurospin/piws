@@ -11,7 +11,7 @@ Documentation regarding views defined on the cube.
 :mod:`piws.views.highcharts_views`: HighChartsBasicPieView
 ==========================================================
 
-.. currentmodule:: piws.views
+.. currentmodule:: cubes.piws.views
 
 All the views designed in this section are based on the 'highcharts' JavaScript
 library. The aim here is to propose a bunch of views to summarize the
@@ -36,7 +36,7 @@ All the views designed in this section are based on the 'datatables' JavaScript
 library. Such views are convenient to display questionnaires associated answers
 or huge dataset as we may be confronted when treating genetic data.
 
-.. currentmodule:: piws.views
+.. currentmodule:: cubes.piws.views
 
 User Views
 ----------
@@ -52,17 +52,26 @@ paging, sorting, ....).
     :toctree: generated/table/
     :template: class.rst
 
-    table_views.JhugetableView
+    table_views.JHugetableView
     table_views.JtableView
 
-Inner tools
------------
+Derived Views
+-------------
 
 .. autosummary::
     :toctree: generated/table/
-    :template: function.rst
+    :template: class.rst
 
-    table_views.label_cleaner
+    table_views.FileAnswerTableView
+
+Export Views
+------------
+
+.. autosummary::
+    :toctree: generated/table/
+    :template: class.rst
+
+    table_views.PiwsCSVView
 
 Ajax inner callbacks
 --------------------

@@ -15,7 +15,7 @@ especially access rights and facets
 CubicWeb has a builtin facet system to define restrictions filters.
 A number of criteria have been set up to restrict searches in this cube.
 
-.. automodule:: piws.views.facets
+.. automodule:: cubes.piws.views.facets
 
 The access rights management
 ----------------------------
@@ -28,10 +28,22 @@ only by authorized users. See schema below:
 
 |
 
-.. figure:: _static/Image1.png
+.. figure:: _static/rights.png
     :width: 500px
     :alt: Access rights management
     :align: center
 
     Cube access rights management
+
+Uplad functionnality
+--------------------
+
+The upload functionality is derived from the `rql_upload cube
+<https://github.com/neurospin/rql_upload>`_.
+
+Download functionnality
+-----------------------
+
+The download functionality is derived from the `rql_download cube
+<https://github.com/neurospin/rql_download>`_
 

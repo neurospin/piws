@@ -18,6 +18,28 @@ from .base import Base
 class Scans(Base):
     """ This class enables us to load the scan data to CW.
     """
+    # Define the relations involved
+    relations = (
+        Base.fileset_relations + Base.assessment_relations + [
+            ("Scan", "study", "Study"),
+            ("Study", "scans", "Scan"),
+            ("Scan", "subject", "Subject"),
+            ("Subject", "scans", "Scan"),
+            ("Assessment", "scans", "Scan"),
+            ("Scan", "in_assessment", "Assessment"),
+            ("Scan", "has_data", "PETData"),
+            ("PETData", "in_assessment", "Assessment"),
+            ("Scan", "has_data", "FMRIData"),
+            ("FMRIData", "in_assessment", "Assessment"),
+            ("Scan", "has_data", "DMRIData"),
+            ("DMRIData", "in_assessment", "Assessment"),
+            ("Scan", "has_data", "MRIData"),
+            ("MRIData", "in_assessment", "Assessment"),
+            ("Scan", "score_values", "ScoreValue"),
+            ("ScoreValue", "in_assessment", "Assessment")]
+    )
+    relations[0][0] = "Scan"
+
     def __init__(self, session, project_name, center_name, scans,
                  can_read=True, can_update=True, data_filepath=None,
                  use_store=True, piws_security_model=True):
@@ -94,28 +116,6 @@ class Scans(Base):
         self.inserted_assessments = {}
         self.inserted_scans = {}
 
-        # Define the relations involved
-        self.relations = (
-            self.fileset_relations + self.assessment_relations + [
-                ("Scan", "study", "Study"),
-                ("Study", "scans", "Scan"),
-                ("Scan", "subject", "Subject"),
-                ("Subject", "scans", "Scan"),
-                ("Assessment", "scans", "Scan"),
-                ("Scan", "in_assessment", "Assessment"),
-                ("Scan", "has_data", "PETData"),
-                ("PETData", "in_assessment", "Assessment"),
-                ("Scan", "has_data", "FMRIData"),
-                ("FMRIData", "in_assessment", "Assessment"),
-                ("Scan", "has_data", "DMRIData"),
-                ("DMRIData", "in_assessment", "Assessment"),
-                ("Scan", "has_data", "MRIData"),
-                ("MRIData", "in_assessment", "Assessment"),
-                ("Scan", "score_values", "ScoreValue"),
-                ("ScoreValue", "in_assessment", "Assessment")]
-        )
-        self.relations[0][0] = "Scan"
-
     ###########################################################################
     #   Public Methods
     ###########################################################################
@@ -129,7 +129,7 @@ class Scans(Base):
 
             |
 
-            .. image:: ../schemas/scan.png
+            .. image:: ../schemas/scans.png
                 :width: 600px
                 :align: center
                 :alt: schema

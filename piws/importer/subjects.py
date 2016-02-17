@@ -19,6 +19,11 @@ from .base import Base
 class Subjects(Base):
     """ This class enables us to add new subjects in CW.
     """
+    # Define the relations involved
+    relations = [
+        ("Subjects", "study", "Study"),
+        ("Study", "subjects", "Subjects")]
+
     def __init__(self, session, project_name, subjects, data_filepath=None,
                  use_store=True):
         """ Initialize the Subjects class.
@@ -71,12 +76,18 @@ class Subjects(Base):
     ###########################################################################
 
     def import_data(self):
-        """ Method that import the subjects in cw.
+        """ Method that import the subjects in the db.
 
         .. note::
 
-            This procedure create a 'Subject' entity for each input subject
-            name.
+            Below the schema used to insert the subject data:
+
+            |
+
+            .. image:: ../schemas/subjects.png
+                :width: 600px
+                :align: center
+                :alt: schema
 
         .. warning::
 

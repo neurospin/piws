@@ -18,6 +18,21 @@ from .base import Base
 class Genetics(Base):
     """ This class enables us to load the genetic data to CW.
     """
+    # Define the relations involved
+    relations = (
+        Base.fileset_relations + Base.assessment_relations + [
+            ("GenomicMeasure", "study", "Study"),
+            ("Study", "genomic_measures", "GenomicMeasure"),
+            ("GenomicMeasure", "subjects", "Subject"),
+            ("Subject", "genomic_measures", "GenomicMeasure"),
+            ("Assessment", "genomic_measures", "GenomicMeasure"),
+            ("GenomicMeasure", "in_assessment", "Assessment"),
+            ("GenomicMeasure", "platform", "GenomicPlatform"),
+            ("GenomicPlatform", "genomic_measures", "GenomicMeasure"),
+            ("GenomicPlatform", "snps", "Snp")]
+    )
+    relations[0][0] = "GenomicMeasure"
+
     def __init__(self, session, project_name, center_name, genetics,
                  can_read=True, can_update=True, data_filepath=None,
                  use_store=True, piws_security_model=True):
@@ -111,21 +126,6 @@ class Genetics(Base):
         self.inserted_platforms = {}
         self.inserted_snps = {}
 
-        # Define the relations involved
-        self.relations = (
-            self.fileset_relations + self.assessment_relations + [
-                ("GenomicMeasure", "study", "Study"),
-                ("Study", "genomic_measures", "GenomicMeasure"),
-                ("GenomicMeasure", "subjects", "Subject"),
-                ("Subject", "genomic_measures", "GenomicMeasure"),
-                ("Assessment", "genomic_measures", "GenomicMeasure"),
-                ("GenomicMeasure", "in_assessment", "Assessment"),
-                ("GenomicMeasure", "platform", "GenomicPlatform"),
-                ("GenomicPlatform", "genomic_measures", "GenomicMeasure"),
-                ("GenomicPlatform", "snps", "Snp")]
-        )
-        self.relations[0][0] = "GenomicMeasure"
-
     ###########################################################################
     #   Public Methods
     ###########################################################################
@@ -139,7 +139,7 @@ class Genetics(Base):
 
             |
 
-            .. image:: ../schemas/genetic.png
+            .. image:: ../schemas/genetics.png
                 :width: 600px
                 :align: center
                 :alt: schema

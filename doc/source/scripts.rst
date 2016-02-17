@@ -15,7 +15,7 @@ that in turn enables us to design common views.
 :mod:`piws.scripts`: Unified importation methods
 ================================================
 
-.. currentmodule:: piws.scripts
+.. currentmodule:: cubes.piws.importer
 
 .. autosummary::
     :toctree: generated/scripts/
@@ -26,8 +26,9 @@ that in turn enables us to design common views.
     genetics.Genetics
     scans.Scans
     questionnaires.Questionnaires
-    groups.Groups
-    users.Users
+    processings.Processings
+    groups.CWGroups
+    users.CWUsers
 
 
 .. _scripts_demo:
@@ -37,9 +38,10 @@ that in turn enables us to design common views.
 
 To exemplify the proposed unified importation methods, a demonstrator has been
 leveraged. By executing the 'generate_toy_dataset.py' function, a toy neuroimaging
-genetic data is created on the local file system. The 'import_to_dataset.py' then
-enables us to insert the generated data in a cubicweb database using the
-previous unified insertion procedures.
+genetic data is created on your local file system.
+
+The 'import_to_dataset.py' then inserts the generated data in a cubicweb
+database using the presented unified insertion procedures.
     
 
 

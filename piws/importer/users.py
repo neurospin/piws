@@ -24,6 +24,11 @@ class CWUsers(Base):
     """ This class enables us to add new users in CW and associate this user to
     one or multiple groups.
     """
+    # Define the relations involved
+    relations = [
+        ("CWUser", "in_group", "CWGroup")
+    ]
+
     def __init__(self, session, users):
         """ Initialize the CWUsers class.
 
@@ -65,11 +70,6 @@ class CWUsers(Base):
         # Class parameters
         self.users = users
 
-        # Define the relations involved
-        self.relations = [
-            ("CWUser", "in_group", "CWGroup")
-        ]
-
     ###########################################################################
     #   Public Methods
     ###########################################################################
@@ -84,7 +84,7 @@ class CWUsers(Base):
 
             |
 
-            .. image:: ../schemas/user.png
+            .. image:: ../schemas/users.png
                 :width: 500px
                 :align: center
                 :alt: schema

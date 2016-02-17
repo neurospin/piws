@@ -98,6 +98,7 @@ class Base(object):
     #   Private Methods
     ###########################################################################
 
+    @classmethod
     def schema(self, outfname, text_font="sans-serif",
                node_text_size=12):
         """ Create a view of the schema described in a python structure.
@@ -126,7 +127,7 @@ class Base(object):
 
         # Go through all the entities and create a graphic table
         for entity_name in entities:
-            attributes = ("cw authorized attributes")
+            attributes = ("CW authorized attributes")
             graph.add_node(entity_name, style="filled", fillcolor="blue",
                            fontcolor="white", fontsize=node_text_size,
                            fontname=text_font,

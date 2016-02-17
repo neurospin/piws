@@ -22,6 +22,25 @@ from .base import Base
 class Questionnaires(Base):
     """ This class enables us to load the questionnaire to CW.
     """
+    # Define the relations involved
+    relations = Base.assessment_relations + [
+        ("Question", "questionnaire", "Questionnaire"),
+        ("Questionnaire", "questions", "Question"),
+        ("QuestionnaireRun", "instance_of", "Questionnaire"),
+        ("Questionnaire", "questionnaire_runs", "QuestionnaireRun"),
+        ("Assessment", "questionnaire_runs", "QuestionnaireRun"),
+        ("QuestionnaireRun", "in_assessment", "Assessment"),
+        ("QuestionnaireRun", "study", "Study"),
+        ("Study", "questionnaire_runs", "QuestionnaireRun"),
+        ("QuestionnaireRun", "subject", "Subject"),
+        ("Subject", "questionnaire_runs", "QuestionnaireRun"),
+        ("OpenAnswer", "question", "Question"),
+        ("Question", "open_answers", "OpenAnswer"),
+        ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
+        ("QuestionnaireRun", "open_answers", "OpenAnswer"),
+        ("OpenAnswer", "in_assessment", "Assessment"),
+    ]
+
     def __init__(self, session, project_name, center_name, questionnaires,
                  can_read=True, can_update=True, data_filepath=None,
                  use_store=True, piws_security_model=True,
@@ -108,25 +127,6 @@ class Questionnaires(Base):
         # Speed up parameters
         self.inserted_assessments = {}
 
-        # Define the relations involved
-        self.relations = self.assessment_relations + [
-            ("Question", "questionnaire", "Questionnaire"),
-            ("Questionnaire", "questions", "Question"),
-            ("QuestionnaireRun", "instance_of", "Questionnaire"),
-            ("Questionnaire", "questionnaire_runs", "QuestionnaireRun"),
-            ("Assessment", "questionnaire_runs", "QuestionnaireRun"),
-            ("QuestionnaireRun", "in_assessment", "Assessment"),
-            ("QuestionnaireRun", "study", "Study"),
-            ("Study", "questionnaire_runs", "QuestionnaireRun"),
-            ("QuestionnaireRun", "subject", "Subject"),
-            ("Subject", "questionnaire_runs", "QuestionnaireRun"),
-            ("OpenAnswer", "question", "Question"),
-            ("Question", "open_answers", "OpenAnswer"),
-            ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
-            ("QuestionnaireRun", "open_answers", "OpenAnswer"),
-            ("OpenAnswer", "in_assessment", "Assessment"),
-        ]
-
     ###########################################################################
     #   Public Methods
     ###########################################################################
@@ -140,7 +140,7 @@ class Questionnaires(Base):
 
             |
 
-            .. image:: ../schemas/questionnaire.png
+            .. image:: ../schemas/questionnaires.png
                 :width: 600px
                 :align: center
                 :alt: schema

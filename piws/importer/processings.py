@@ -18,6 +18,20 @@ from .base import Base
 class Processings(Base):
     """ This class enables us to load the processing data to CW.
     """
+    # Define the relations involved
+    relations = (
+        Base.fileset_relations + Base.assessment_relations + [
+            ("ProcessingRun", "study", "Study"),
+            ("Study", "processing_runs", "ProcessingRun"),
+            ("ProcessingRun", "subject", "Subject"),
+            ("Subject", "processing_runs", "ProcessingRun"),
+            ("Assessment", "processing_runs", "ProcessingRun"),
+            ("ProcessingRun", "in_assessment", "Assessment"),
+            ("ProcessingRun", "score_values", "ScoreValue"),
+            ("ScoreValue", "in_assessment", "Assessment")]
+    )
+    relations[0][0] = "ProcessingRun"
+
     def __init__(self, session, project_name, center_name, processings,
                  can_read=True, can_update=True, data_filepath=None,
                  use_store=True, piws_security_model=True):
@@ -115,20 +129,6 @@ class Processings(Base):
         self.inserted_assessments = {}
         self.inserted_processings = {}
 
-        # Define the relations involved
-        self.relations = (
-            self.fileset_relations + self.assessment_relations + [
-                ("ProcessingRun", "study", "Study"),
-                ("Study", "processing_runs", "ProcessingRun"),
-                ("ProcessingRun", "subject", "Subject"),
-                ("Subject", "processing_runs", "ProcessingRun"),
-                ("Assessment", "processing_runs", "ProcessingRun"),
-                ("ProcessingRun", "in_assessment", "Assessment"),
-                ("ProcessingRun", "score_values", "ScoreValue"),
-                ("ScoreValue", "in_assessment", "Assessment")]
-        )
-        self.relations[0][0] = "ProcessingRun"
-
     ###########################################################################
     #   Public Methods
     ###########################################################################
@@ -142,7 +142,7 @@ class Processings(Base):
 
             |
 
-            .. image:: ../schemas/processing.png
+            .. image:: ../schemas/processings.png
                 :width: 600px
                 :align: center
                 :alt: schema
