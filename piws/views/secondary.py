@@ -6,6 +6,9 @@
 # for details.
 ##########################################################################
 
+# System import
+import collections
+
 # Cubicweb import
 from cubicweb.predicates import is_instance
 from cubicweb.view import EntityView
@@ -124,7 +127,8 @@ class BaseOutOfContextView(EntityView):
         self.w(u'</div>')
 
         # Get the entity description
-        entity_desc = self.entity_description(entity)
+        entity_desc = collections.OrderedDict(
+            sorted(self.entity_description(entity).items()))
 
         # Create a div that will be show or hide when the see more button is
         # clicked
@@ -253,7 +257,6 @@ class OutOfContextProcessingRunView(BaseOutOfContextView):
         desc["Name"] = entity.name
         desc["Tool"] = entity.tool
         desc["Parameters"] = entity.parameters
-        desc["Note"] = entity.note
         return desc
 
 
