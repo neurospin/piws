@@ -67,29 +67,6 @@ class NSNavigationtBox(component.CtxComponent):
     def render_body(self, w):
         """ Create the diifferent item of the navigation box
         """
-        # Test
-        if 0:
-            w(u'<div class="btn-toolbar">')
-            w(u'<div class="btn-group-vertical btn-block">')
-            imagefiles = [
-                "/home/ag239446/git/brainbrowser/examples/models/nifti.nii.gz",
-                "/home/ag239446/git/brainbrowser/examples/models/nifti2.nii.gz"
-            ]
-            href = self._cw.build_url(
-                "view", vid="brainbrowser-image-viewer",
-                imagefiles=imagefiles)
-            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-            w(u'Test 3D</a>')
-            w(u'</div></div><br/>')
-            w(u'<div class="btn-toolbar">')
-            w(u'<div class="btn-group-vertical btn-block">')
-            imagefiles = ["/home/ag239446/git/brainbrowser/examples/models/nifti2.nii.gz"]
-            href = self._cw.build_url(
-                "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles)
-            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-            w(u'Test 4D</a>')
-            w(u'</div></div><br/>')
-
         # Subjects
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
@@ -323,7 +300,7 @@ class RelationBox(component.CtxComponent):
         if not isinstance(self.cw_rset, list):
             rset = list(self.cw_rset.entities())
         else:
-            rset = self.cw_rset[0]
+            rset = self.cw_rset
         for entity in rset[:(defaultlimit - 1)]:
             w(u"<div>&bull; " + entity.view(self.context) + u"</div>")
         # if len(rset) == defaultlimit:
