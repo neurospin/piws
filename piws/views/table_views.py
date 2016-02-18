@@ -44,7 +44,7 @@ class FileAnswerTableView(View):
 
         # Execute the rql to get all subjects QuestionnaireRuns
         rql = ("Any ID, D ORDERBY ID ASC WHERE QR is QuestionnaireRun, "
-               "QR instance_of Q, Q name '{0}', QR in_assessment A, "
+               "QR questionnaire Q, Q name '{0}', QR in_assessment A, "
                "A timepoint '{1}', QR result F, F data D, QR subject S, "
                "S code_in_study ID".format(qname, timepoint))
         rset = self._cw.execute(rql)
@@ -770,7 +770,7 @@ def get_open_answers_data(self):
 
     # Get all the questionnaire runs and associated subjects
     rql = ("Any ID, QR {0} "
-           "Where QR is QuestionnaireRun, QR instance_of Q, Q name '{1}', "
+           "Where QR is QuestionnaireRun, QR questionnaire Q, Q name '{1}', "
            "QR subject S, S code_in_study ID, QR in_assessment A, "
            "A timepoint '{2}'".format(jtsort, qname, timepoint))
     rset = self._cw.execute(rql)
@@ -815,6 +815,38 @@ def get_open_answers_data(self):
             "aaData": records}
 
     return data
+
+
+class PiwsCSVView(CSVMixIn, View):
+    """dumps questionnaires in CSV"""
+    __regid__ = 'piwscsvexport'
+    __select__ = yes()
+    title = _('piws csv export')
+
+    def call(self):
+
+        qname = self._cw.form['qname']
+        timepoint = self._cw.form['timepoint']
+        labels = json.loads(self._cw.form['labels'])
+
+        rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
+               "S questionnaire_runs QR, QR instance_of QU, QU name '{0}', "
+               "QR open_answers O, O value OV, O in_assessment A, "
+               "A timepoint '{1}', O question Q, Q text QT".format(qname,
+                                                                   timepoint)
+               )
+        rset = self._cw.execute(rql)
+
+        table = defaultdict(lambda: OrderedDict.fromkeys(labels, ''))
+        for item in rset:
+            table[item[0]][item[1]] = item[2]
+        for id, data in table.iteritems():
+            table[id]["ID"] = id
+
+        writer = self.csvwriter()
+        writer.writerow(labels)
+        for psc2, data in iter(sorted(table.iteritems())):
+            writer.writerow(data.values())
 
 
 @ajaxfunc(output_type="json")
@@ -870,7 +902,7 @@ def get_questionnaires_data(self):
     # Get all the questionnaire and associated timepoints
     rql = ("DISTINCT Any ID, T {0} "
            "Where Q is Questionnaire, QR is QuestionnaireRun, "
-           "QR instance_of Q, QR in_assessment A, Q name ID, "
+           "QR questionnaire Q, QR in_assessment A, Q name ID, "
            "A timepoint T".format(jtsort))
     rset = self._cw.execute(rql)
 

@@ -45,9 +45,10 @@ class Base(object):
         ("CWGroup", "can_update", "Assessment")
     ]
     fileset_relations = [
-        ["ParentEntitiyName", "results_files", "FileSet"],
+        ["ParentEntitiyName", "results_filesets", "FileSet"],
         ("FileSet", "in_assessment", "Assessment"),
-        ("FileSet", "file_entries", "ExternalFile"),
+        ("FileSet", "external_files", "ExternalFile"),
+        ("ExternalFile", "fileset", "FileSet"),
         ("ExternalFile", "in_assessment", "Assessment")
     ]
 
@@ -318,7 +319,7 @@ class Base(object):
                     check_unicity=False)
                 self._set_unique_relation(
                     assessment_eid, "subjects", subject_eid,
-                    check_unicity=False, subjtype="Assessment")
+                    check_unicity=False)
             # > add relation with the center
             self._set_unique_relation(
                 center_eid, "assessments", assessment_eid, check_unicity=False)
@@ -375,7 +376,7 @@ class Base(object):
             **fset_struct)
         # > add relation with the parent
         self._set_unique_relation(parent_eid,
-            "results_files", fset_entity.eid,
+            "results_filesets", fset_entity.eid,
             check_unicity=False)
         # > add relation with the assessment
         self._set_unique_relation(fset_entity.eid,
@@ -391,7 +392,10 @@ class Base(object):
                 **extfile_struct)
             # > add relation with the file set
             self._set_unique_relation(fset_entity.eid,
-                "file_entries", file_entity.eid,
+                "external_files", file_entity.eid,
+                check_unicity=False)
+            self._set_unique_relation(file_entity.eid,
+                "fileset", fset_entity.eid,
                 check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(file_entity.eid,

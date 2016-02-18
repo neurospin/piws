@@ -26,7 +26,7 @@ class Questionnaires(Base):
     relations = Base.assessment_relations + [
         ("Question", "questionnaire", "Questionnaire"),
         ("Questionnaire", "questions", "Question"),
-        ("QuestionnaireRun", "instance_of", "Questionnaire"),
+        ("QuestionnaireRun", "questionnaire", "Questionnaire"),
         ("Questionnaire", "questionnaire_runs", "QuestionnaireRun"),
         ("Assessment", "questionnaire_runs", "QuestionnaireRun"),
         ("QuestionnaireRun", "in_assessment", "Assessment"),
@@ -39,6 +39,7 @@ class Questionnaires(Base):
         ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
         ("QuestionnaireRun", "open_answers", "OpenAnswer"),
         ("OpenAnswer", "in_assessment", "Assessment"),
+        ("QuestionnaireRun", "result", "File")
     ]
 
     def __init__(self, session, project_name, center_name, questionnaires,
@@ -228,7 +229,8 @@ class Questionnaires(Base):
                     entity_name = "Question",
                     identifier=unicode(question_id),
                     text=unicode(question_name),
-                    type=u"text")
+                    # type=u"text"
+                )
                 question_eids[qname][question_name] = question_entity.eid
                 # > add relation with the questionnaire form
                 self._set_unique_relation(question_entity.eid, "questionnaire",
@@ -316,15 +318,15 @@ class Questionnaires(Base):
                  "'{0}'".format(qr_id)),
             check_unicity=True,
             entity_name="QuestionnaireRun",
-            user_ident=unicode(subject_id),
             identifier=unicode(qr_id),
-            label=unicode(questionnaire_name))
+            label=unicode(questionnaire_name)
+        )
 
         # If we just create the questionnaire run, specify and relate the entity
         if is_created:
             # > add relation with the questionnaire
             self._set_unique_relation(
-                qr_entity.eid, "instance_of",
+                qr_entity.eid, "questionnaire",
                 questionnaire_eids[questionnaire_name], check_unicity=False)
             self._set_unique_relation(
                 questionnaire_eids[questionnaire_name], "questionnaire_runs",

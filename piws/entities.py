@@ -19,6 +19,41 @@ from cubes.medicalexp.config import ASSESSMENT_CONTAINER
 # Define entities properties
 ##############################################################################
 
+class FMRIData(AnyEntity):
+    __regid__ = "FMRIData"
+
+    def dc_title(self):
+        """Define the FMRIData entity title.
+        """
+        return "FMRI data"
+
+
+class PETData(AnyEntity):
+    __regid__ = "PETData"
+
+    def dc_title(self):
+        """Define the PETData entity title.
+        """
+        return "PET data"
+
+class MRIData(AnyEntity):
+    __regid__ = "MRIData"
+
+    def dc_title(self):
+        """Define the MRIData entity title.
+        """
+        return "MRI data"
+
+
+class DMRIData(AnyEntity):
+    __regid__ = "DMRIData"
+
+    def dc_title(self):
+        """Define the DMRIData entity title.
+        """
+        return "DMRI data"
+
+
 class Scan(AnyEntity):
     __regid__ = "Scan"
 
@@ -99,7 +134,7 @@ class QuestionnaireRun(AnyEntity):
         """Define the questionnaire run entity title.
         """
         return "QuestionnaireRun of {0}".format(
-            self.user_ident.replace("_", " - "))
+            self.subject[0].code_in_study.replace("_", " - "))
 
     @property
     def symbol(self):

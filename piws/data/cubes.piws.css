@@ -74,3 +74,36 @@ div.DTFC_LeftBodyLiner {
     margin-left: -20px;
 }
 
+.navbar-nav {
+    padding-left: 15%;
+}
+
+.ooview .well{
+    padding: 5px;
+    webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+.ooview .glyphicon{
+    font-size: 30px;
+}
+
+.ooview .well p.text-center{
+    margin: 0 0 0px;
+}
+
+ul.list-striped li {
+    padding: 10px;
+    border-bottom: none;
+}
+
+ul.list-striped li.even {
+    background-color: transparent;
+}
+
+.well {
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+

@@ -266,6 +266,7 @@ class HighChartsRelationSummaryView(View):
             return -1
 
         # Get the highcharts string representation of the data
+        data = self.rset_to_data(rset, relations, subject_attr, object_attr)
         try:
             data = self.rset_to_data(rset, relations, subject_attr, object_attr)
         except:

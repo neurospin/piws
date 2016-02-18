@@ -56,7 +56,7 @@ class QuestionnaireLongitudinalView(View):
             timepoint = qr_entity.in_assessment[0].timepoint
 
             # Get the associated questionnaire/questions
-            q_entity = qr_entity.instance_of[0]
+            q_entity = qr_entity.questionnaire[0]
             if q_entity.name not in questionnaires:
                 questionnaires[q_entity.name] = dict(
                     (entity.text, {})

@@ -60,4 +60,11 @@ options = (
       'group': 'piws',
       'level': 1,
       }),
+    ('logo',
+     {'type': 'string',
+      'default': 'images/nsap.png',
+      'help': 'Navigation bar logo',
+      'group': 'piws',
+      'level': 1,
+      }),
 )

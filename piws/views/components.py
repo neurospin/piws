@@ -14,17 +14,22 @@ from cubicweb.predicates import anonymous_user
 from cubicweb.predicates import one_line_rset
 from cubicweb.predicates import match_view
 from cubicweb.predicates import match_kwargs
+from logilab.common.decorators import monkeypatch
+from cubicweb.web.views.basecomponents import AnonUserStatusLink
+from cubicweb.web.views.basecomponents import ApplLogo
+from cubicweb.web.views.ibreadcrumbs import BreadCrumbEntityVComponent
+from cubicweb.web.views.ibreadcrumbs import BreadCrumbLinkToVComponent
+from cubicweb.web.views.ibreadcrumbs import BreadCrumbAnyRSetVComponent
+from cubicweb.web.views.ibreadcrumbs import BreadCrumbETypeVComponent
 
 # Cubes import
-from cubes.brainomics.views.components import BrainomicsLinksCenters
-from cubes.brainomics.views.components import BrainomicsEditBox
-from cubes.brainomics.views.components import BrainomicsDownloadBox
 from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
+from cubicweb.web.views.boxes import EditBox
+
 
 ###############################################################################
 # Navigation Box
 ###############################################################################
-
 
 class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
     """
@@ -259,20 +264,20 @@ class NSImageViewers(component.CtxComponent):
         """ Method to create the image box content.
         """
         # 3D image viewer
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        efentries = self.cw_rset.get_entity(0, 0).results_files[0].file_entries
+        efentries = self.cw_rset.get_entity(0, 0).results_filesets[0].external_files
         imagefiles = [e.filepath for e in efentries
                       if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
         limagefiles = len(imagefiles)
         if limagefiles > 0:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
             href = self._cw.build_url(
                 "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
                 __message=(u"Found '{0}' image(s) that can be "
                             "displayed.".format(limagefiles)))
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Triplanar</a>')
-        w(u'</div></div><br/>')
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'Triplanar</a>')
+            w(u'</div></div><br/>')
 
 
 ###############################################################################
@@ -309,9 +314,21 @@ class RelationBox(component.CtxComponent):
         w(u"<br/><div><a href='{0}'>&#8634; see more</a></div>".format(href))
 
 
-def registration_callback(vreg):
+###############################################################################
+# Change logo
+###############################################################################
 
-    # Update components
+@monkeypatch(ApplLogo)
+def render(self, w):
+    w(u'<a class="navbar-brand" href="%s"><img id="logo" src="%s" alt="logo"/></a>'
+      % (self._cw.base_url(), self._cw.data_url(self._cw.vreg.config.get("logo"))))
+
+
+###############################################################################
+# Registry
+###############################################################################
+
+def registration_callback(vreg):
     vreg.register_and_replace(PiwsAuthenticatedUserStatus,
                               BSAuthenticatedUserStatus)
     vreg.register(RelationBox)
@@ -319,6 +336,9 @@ def registration_callback(vreg):
     vreg.register(NSSubjectStatistics)
     vreg.register(NSAssessmentStatistics)
     vreg.register(NSImageViewers)
-    vreg.unregister(BrainomicsLinksCenters)
-    vreg.unregister(BrainomicsEditBox)
-    vreg.unregister(BrainomicsDownloadBox)
+    vreg.unregister(EditBox)
+    vreg.unregister(BreadCrumbEntityVComponent)
+    vreg.unregister(BreadCrumbAnyRSetVComponent)
+    vreg.unregister(BreadCrumbETypeVComponent)
+    vreg.unregister(BreadCrumbLinkToVComponent)
+    vreg.unregister(AnonUserStatusLink)

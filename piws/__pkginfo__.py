@@ -10,7 +10,7 @@
 modname = 'piws'
 distname = 'cubicweb-piws'
 
-numversion = (1, 2, 0)
+numversion = (2, 0, 0)
 version = '.'.join(str(num) for num in numversion)
 
 license = 'CeCILL-B'
@@ -21,9 +21,11 @@ web = 'https://github.com/neurospin/piws'
 
 __depends__ = {
     'cubicweb': '>= 3.19.0',
-    'cubicweb-brainomics': '>= 0.9.0',
     'cubicweb-rql_download': '>= 0.1.0',
     'cubicweb-rql_upload': '>= 0.1.0',
+    'cubicweb-brainomics2': '>= 0.1.0',
+    'cubicweb-bootstrap': '>= 0.6.0',
+    'cubicweb-squareui': '>= 0.3.0',
 }
 __recommends__ = {}
 

@@ -23,7 +23,7 @@ class Processings(Base):
         Base.fileset_relations + Base.assessment_relations + [
             ("ProcessingRun", "study", "Study"),
             ("Study", "processing_runs", "ProcessingRun"),
-            ("ProcessingRun", "subject", "Subject"),
+            ("ProcessingRun", "subjects", "Subject"),
             ("Subject", "processing_runs", "ProcessingRun"),
             ("Assessment", "processing_runs", "ProcessingRun"),
             ("ProcessingRun", "in_assessment", "Assessment"),

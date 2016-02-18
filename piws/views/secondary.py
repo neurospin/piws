@@ -45,10 +45,10 @@ class BaseOutOfContextView(EntityView):
         # Get the associated images
         imagefiles = []
         if entity.cw_etype == "Scan":
-            if hasattr(entity, "results_files"):
-                for efentries in entity.results_files:
+            if hasattr(entity, "results_filesets"):
+                for efentries in entity.results_filesets:
                     imagefiles.extend(
-                        [e.filepath for e in efentries.file_entries
+                        [e.filepath for e in efentries.external_files
                          if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))])
 
         # Create a viewer if some images has been detected
@@ -230,7 +230,7 @@ class OutOfContextSubjectView(BaseOutOfContextView):
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
             rql="Any A WHERE S eid '{0}', S assessments A".format(entity.eid),
-            relations="related_processing", subject_attr="timepoint",
+            relations="processing_runs", subject_attr="timepoint",
             object_attr="tool", title="Processing status: {0}".format(
                 entity.code_in_study))
         desc["Processing summary"] = "<a href='{0}'>status</a>".format(href)

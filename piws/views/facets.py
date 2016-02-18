@@ -8,15 +8,14 @@
 
 # Cubicweb import
 from cubicweb.web import facet
-from cubicweb.selectors import is_instance
+from cubicweb.predicates import is_instance
 from cubicweb.web.views.facets import FacetFilterMixIn
 
 # Brainomics import
 from cubes.brainomics.views.facets import MeasureHandednessFacet
 from cubes.brainomics.views.facets import MeasureGenderFacet
 from cubes.brainomics.views.facets import MeasureAgeFacet
-from cubes.neuroimaging.views.facets import ScanLabelFacet
-
+from cubicweb.web.views.facets import HasTextFacet
 
 ############################################################################
 # Hide facet while filtering
@@ -66,6 +65,21 @@ class TimepointFacet(facet.RQLPathFacet):
     order = 1
     filter_variable = "T"
     title = _("Timepoints")
+
+
+class LabelFacet(facet.RQLPathFacet):
+    """ Filter on label.
+
+    This filter is applied on 'Scan', 'ProcessingRun',
+    'QuestionnaireRun' and 'GenomicMeasure' entities.
+    """
+    __regid__ = "label-facet"
+    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun",
+                             "GenomicMeasure")
+    path = ["X label L"]
+    order = 1
+    filter_variable = "L"
+    title = _("Labels")
 
 
 class StudyFacet(facet.RQLPathFacet):
@@ -169,7 +183,7 @@ class ProcessingRunNameFacet(facet.RQLPathFacet):
     """
     __regid__ = "processingrun-name-facet"
     __select__ = is_instance("ProcessingRun")
-    path = ["X results_files F", "F name N"]
+    path = ["X results_filesets F", "F name N"]
     order = 1
     filter_variable = "N"
     title = _("Type")
@@ -183,7 +197,7 @@ def registration_callback(vreg):
     vreg.unregister(MeasureHandednessFacet)
     vreg.unregister(MeasureGenderFacet)
     vreg.unregister(MeasureAgeFacet)
-    vreg.unregister(ScanLabelFacet)
+    vreg.unregister(HasTextFacet)
     vreg.register(GenomicMeasureTypeFacet)
     vreg.register(TimepointFacet)
     vreg.register(StudyFacet)
@@ -193,3 +207,4 @@ def registration_callback(vreg):
     vreg.register(AssessmentTimepointFacet)
     vreg.register(AssessmentSubjectFacet)
     vreg.register(ProcessingRunNameFacet)
+    vreg.register(LabelFacet)

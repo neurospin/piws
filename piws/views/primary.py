@@ -10,7 +10,7 @@
 from cubicweb.web.views.primary import PrimaryView
 
 # Cubes import
-from cubes.brainomics.views.primary import BrainomicsPrimaryView
+from cubicweb.web.views.primary import PrimaryView
 from cubes.piws.views.components import RelationBox
 
 
@@ -27,7 +27,7 @@ class PiwsPrimaryView(PrimaryView):
     def summary(self, entity):
         """ Add method for 3.20 compatibility.
         """
-        return
+        return u""
 
     def render_entity_attributes(self, entity):
         """ Renders all attributes and relations in the 'attributes' section.
@@ -106,15 +106,15 @@ class PiwsPrimaryView(PrimaryView):
 
             # FileSet special case
             if target_etype == "FileSet":
-                rql += ", X file_entries F"
+                rql += ", X external_files F"
                 pos = rql.find("X")
                 rql = rql[:pos] + "F" + rql[pos + 1:]
                 label += (
                     u"<a class='btn btn-info active' href='#' data-toggle='tooltip' "
-                    "title='file_entries'>&#8594;</a> ExternalFile")
+                    "title='external_files'>&#8594;</a> ExternalFile")
                 inner_rset = []
                 for fs_entity in rset.entities():
-                    inner_rset.extend(fs_entity.file_entries)
+                    inner_rset.extend(fs_entity.external_files)
                 rset = inner_rset
 
             # Construct the relation box
@@ -136,4 +136,4 @@ class PiwsPrimaryView(PrimaryView):
 def registration_callback(vreg):
     """ Update  primary views
     """
-    vreg.register_and_replace(PiwsPrimaryView, BrainomicsPrimaryView)
+    vreg.register_and_replace(PiwsPrimaryView, PrimaryView)

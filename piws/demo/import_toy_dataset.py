@@ -81,20 +81,20 @@ genetics = genetic_parser(demo_path, STUDY_NAME)
 
 # Define all the importers
 db_grp_importer = CWGroups(session, ["toy_V0", "toy_V1", "toy"],
-                         use_store=True)
+                         use_store=False)
 db_user_importer = CWUsers(session, USERS)
 db_subject_importer = Subjects(
-    session, STUDY_NAME, subjects, use_store=True)
+    session, STUDY_NAME, subjects, use_store=False)
 db_scan_importer = Scans(
     session, STUDY_NAME, CENTER_NAME, scans, can_read=True, can_update=False,
-    data_filepath=demo_path, use_store=True)
+    data_filepath=demo_path, use_store=False)
 db_questionnaire_importer = Questionnaires(
     session, STUDY_NAME, CENTER_NAME, questionnaires, can_read=True,
-    can_update=False, data_filepath=demo_path, use_store=True,
+    can_update=False, data_filepath=demo_path, use_store=False,
     use_openanswer=True)
 db_genetic_importer = Genetics(
     session, STUDY_NAME, CENTER_NAME, genetics, can_read=True,
-    can_update=False, data_filepath=demo_path, use_store=True)
+    can_update=False, data_filepath=demo_path, use_store=False)
 
 # Execute in the appropriate order the importation scripts
 # > groups
