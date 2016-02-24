@@ -151,22 +151,21 @@ class ProcessingRun(AnyEntity):
     def dc_title(self):
         """Define the processing run entity title.
         """
-        return ("ProcessingRun {0} (time {1})".format(self.name,
+        return ("ProcessingRun {0} (time {1})".format(self.label,
                 self.in_assessment[0].timepoint))
 
     @property
     def symbol(self):
         """Return a symbol corresponding to the processing run type.
         """
-        fset = self.results_files[0]
-        if fset.name in ["EDDY", "FA", "MD", "MO", "NODIFF BRAIN", "RD",
+        if self.label in ["EDDY", "FA", "MD", "MO", "NODIFF BRAIN", "RD",
                          "RESTORE"]:
             return "images/dmri.png"
-        elif fset.name == "1KG_snps_indels_EUR":
+        elif self.label == "1KG_snps_indels_EUR":
             return "images/gchip.png"
-        elif fset.name == "freesurfer":
+        elif self.label.lower() == "freesurfer":
             return "images/mri.jpg"
-        elif fset.name in ["SPM preproc EPI_mid", "SPM preproc EPI_faces",
+        elif self.label in ["SPM preproc EPI_mid", "SPM preproc EPI_faces",
                            "SPM preproc EPI_stop_signal"]:
             return "images/fmri.jpg"
         return "images/processing.png"
@@ -176,13 +175,32 @@ class GenomicMeasure(AnyEntity):
     __regid__ = "GenomicMeasure"
 
     def dc_title(self):
-        """Define the genomic measure run entity title.
+        """ Define the genomic measure run entity title.
         """
         return ("{0} (time {1})".format(self.label,
                 self.in_assessment[0].timepoint))
 
     @property
     def symbol(self):
-        """Return a symbol corresponding to the genomic measure type.
+        """ Return a symbol corresponding to the genomic measure type.
         """
         return "images/gchip.png"
+
+
+class FileSet(AnyEntity):
+    __regid__ = "FileSet"
+
+    def dc_title(self):
+        """ Define the fileset entity title.
+        """
+        return self.name
+
+
+class ExternalFile(AnyEntity):
+    __regid__ = "ExternalFile"
+
+    def dc_title(self):
+        """ Define the external file entity title.
+        """
+        return self.name
+

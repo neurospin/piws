@@ -67,7 +67,7 @@ class PiwsPrimaryView(PrimaryView):
         """ Create the right relation boxes to display.
 
         In the case of 'FileSet' object, go directly to the associated
-        'FileEntries'.
+        'ExternalResource' if only one 'FileSet' has been specified.
         """
         sideboxes = []
         boxesreg = self._cw.vreg["ctxcomponents"]
@@ -106,16 +106,20 @@ class PiwsPrimaryView(PrimaryView):
 
             # FileSet special case
             if target_etype == "FileSet":
-                rql += ", X external_files F"
-                pos = rql.find("X")
-                rql = rql[:pos] + "F" + rql[pos + 1:]
-                label += (
-                    u"<a class='btn btn-info active' href='#' data-toggle='tooltip' "
-                    "title='external_files'>&#8594;</a> ExternalFile")
-                inner_rset = []
-                for fs_entity in rset.entities():
-                    inner_rset.extend(fs_entity.external_files)
-                rset = inner_rset
+                entities = [e for e in rset.entities()]
+                nb_fsets = len(entities)
+                if nb_fsets == 1:
+                    rql += ", X external_files F"
+                    pos = rql.find("X")
+                    rql = rql[:pos] + "F" + rql[pos + 1:]
+                    label += (
+                        u"<a class='btn btn-info active' href='#' "
+                        "data-toggle='tooltip' "
+                        "title='external_files'>&#8594;</a> ExternalFile")
+                    inner_rset = []
+                    for fs_entity in entities:
+                        inner_rset.extend(fs_entity.external_files)
+                    rset = inner_rset
 
             # Construct the relation box
             box = boxesreg.select("relationbox", self._cw, rset=rset, rql=rql,

@@ -354,7 +354,7 @@ class Processings(Base):
                     **score_struct)
                 # > add relation with the processing
                 self._set_unique_relation(
-                    processing_eid, "outputs", score_entity.eid)
+                    processing_eid, "score_values", score_entity.eid)
                 # > add relation with the assessment
                 self._set_unique_relation(
                     score_entity.eid, "in_assessment", assessment_eid,

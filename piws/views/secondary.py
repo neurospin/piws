@@ -254,7 +254,7 @@ class OutOfContextProcessingRunView(BaseOutOfContextView):
         """ Generate a dictionary with the ProcessingRun description.
         """
         desc = {}
-        desc["Name"] = entity.name
+        desc["Label"] = entity.label
         desc["Tool"] = entity.tool
         desc["Parameters"] = entity.parameters
         return desc
