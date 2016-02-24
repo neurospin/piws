@@ -190,13 +190,14 @@ class Scans(Base):
 
         # Go through the data structure
         nb_of_subjects = float(len(self.scans))
+        maxsize = max([len(name) for name in self.scans])
         cnt_subject = 1.
         for subject_id, list_subj_scans in self.scans.iteritems():
 
             # Print a progress bar
             self._progress_bar(cnt_subject / nb_of_subjects,
-                               title="{0}(scans):".format(subject_id),
-                               bar_length=40)
+                               title="{0}(scans)".format(subject_id),
+                               bar_length=40, maxsize=maxsize + 7)
             cnt_subject += 1.
 
             ###################################################################

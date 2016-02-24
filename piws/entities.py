@@ -105,6 +105,8 @@ class Assessment(AnyEntity):
             return "images/processing.png"
         elif self.genomic_measures:
             return "images/samples.png"
+        else:
+            raise Exception("Unknown assessment.")
 
 
 class Subject(AnyEntity):

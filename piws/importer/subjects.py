@@ -116,13 +116,14 @@ class Subjects(Base):
 
         # Go through the subject names
         nb_of_subjects = float(len(self.subjects))
+        maxsize = max([len(name) for name in self.subjects])
         cnt_subject = 1
         for subject_name, subject_parameter in self.subjects.iteritems():
 
             # Print a progress bar
             self._progress_bar(cnt_subject / nb_of_subjects,
-                               title="Import {0}:".format(subject_name),
-                               bar_length=40)
+                               title="{0}(subjects)".format(subject_name),
+                               bar_length=40, maxsize=maxsize + 9)
             cnt_subject += 1.
 
             # Create the subject if necessary
@@ -145,3 +146,5 @@ class Subjects(Base):
                 self._set_unique_relation(
                     study_eid, "subjects", subject_entity.eid,
                     check_unicity=False)
+
+        print  # new line after last progress bar update

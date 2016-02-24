@@ -65,7 +65,10 @@ class FileAnswerTableView(View):
             record = [sid]
             for label in labels:
                 try:
-                    record.append(sdata[label])
+                    if isinstance(sdata[label], basestring):
+                        record.append(sdata[label])
+                    else:
+                        record.append(repr(sdata[label]))
                 except KeyError:
                     record.append(u"")
             records.append(record)
@@ -257,8 +260,9 @@ class JHugetableView(View):
         html += "},"
 
         # > set table display options
-        html += "'scrollX': true,"
-        html += "'scrollCollapse': true,"
+        html += '"sScrollX": "100%",'
+        html += '"sScrollXInner": "150%",'
+        html += '"bScrollCollapse": true,'
         html += "'sPaginationType': 'bootstrap',"
         if use_scroller:
             html += "'scrollY': '200px',"
@@ -534,9 +538,9 @@ class JtableView(View):
         html += "var table = $('#the_table').dataTable( { "
 
         # > set table display options
-        # TODO fix scrollX bug since DataTables 1.10.10
-        # html += "'scrollX': '100%',"
-        html += "'scrollY': '600px',"
+        html += '"sScrollX": "100%",'
+        html += '"sScrollXInner": "150%",'
+        html += '"bScrollCollapse": true,'
         html += "'scrollCollapse': true,"
         html += "'sPaginationType': 'bootstrap',"
         if csv_export:

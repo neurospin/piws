@@ -27,7 +27,7 @@ class Genetics(Base):
             ("Subject", "genomic_measures", "GenomicMeasure"),
             ("Assessment", "genomic_measures", "GenomicMeasure"),
             ("GenomicMeasure", "in_assessment", "Assessment"),
-            ("GenomicMeasure", "platform", "GenomicPlatform"),
+            ("GenomicMeasure", "genomic_platform", "GenomicPlatform"),
             ("GenomicPlatform", "genomic_measures", "GenomicMeasure"),
             ("GenomicPlatform", "snps", "Snp")]
     )
@@ -320,7 +320,8 @@ class Genetics(Base):
                 check_unicity=False, subjtype="GenomicMeasure")
             # > add relation with the platform
             self._set_unique_relation(
-                measure_eid, "platform", platform_eid, check_unicity=False)
+                measure_eid, "genomic_platform", platform_eid,
+                check_unicity=False)
             self._set_unique_relation(
                 platform_eid, "genomic_measures", measure_eid,
                 check_unicity=False)

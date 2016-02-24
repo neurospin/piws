@@ -106,14 +106,15 @@ class CWUsers(Base):
 
         # Go through the goup names
         nb_of_users = float(len(self.users))
+        maxsize = max([len(name) for name in self.users])
         cnt_user = 1.
         for user_name, user_item in self.users.iteritems():
 
             # Print a progress bar
             self._progress_bar(
                 cnt_user / nb_of_users,
-                title="Import {0}:".format(user_name),
-                bar_length=40)
+                title="{0}(users)".format(user_name),
+                bar_length=40, maxsize=maxsize + 7)
             cnt_user += 1.
 
             # Create the user
@@ -152,3 +153,5 @@ class CWUsers(Base):
                 # > add relation with the user
                 self._set_unique_relation(user_entity.eid,
                         "in_group", group_eid, check_unicity=True)
+
+        print  # new line after last progress bar update

@@ -25,6 +25,8 @@ from cubicweb.web.views.ibreadcrumbs import BreadCrumbETypeVComponent
 # Cubes import
 from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
 from cubicweb.web.views.boxes import EditBox
+from cubes.rql_upload.views.components import CWUploadBox
+from cubes.rql_upload.views.utils import load_forms
 
 
 ###############################################################################
@@ -342,3 +344,6 @@ def registration_callback(vreg):
     vreg.unregister(BreadCrumbETypeVComponent)
     vreg.unregister(BreadCrumbLinkToVComponent)
     vreg.unregister(AnonUserStatusLink)
+    config = load_forms(vreg.config)
+    if config < 0:
+        vreg.unregister(CWUploadBox)

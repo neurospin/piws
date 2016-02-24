@@ -244,6 +244,7 @@ class Questionnaires(Base):
 
         # Information to create a progress bar
         nb_of_subjects = float(len(self.questionnaires))
+        maxsize = max([len(name) for name in self.questionnaires])
         cnt_subject = 1.
 
         # Add the data
@@ -253,7 +254,7 @@ class Questionnaires(Base):
             self._progress_bar(
                 cnt_subject / nb_of_subjects,
                 title="{0}(questionnaires)".format(subject_id),
-                bar_length=40)
+                bar_length=40, maxsize=maxsize + 16)
             cnt_subject += 1
 
             ###################################################################
@@ -396,5 +397,8 @@ class Questionnaires(Base):
                 self._set_unique_relation(
                     qr_entity.eid, "result", f_entity.eid,
                     check_unicity=False, subjtype="QuestionnaireRun")
+                self._set_unique_relation(
+                    f_entity.eid, "in_assessment", assessment_eid,
+                    check_unicity=False)
 
         return qr_entity.eid

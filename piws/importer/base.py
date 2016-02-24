@@ -156,10 +156,10 @@ class Base(object):
             the input hashed string.
         """
         m = hashlib.md5()
-        m.update(path)
+        m.update(path.encode("utf-8"))
         return m.hexdigest()
 
-    def _progress_bar(self, ratio, title="", bar_length=40):
+    def _progress_bar(self, ratio, title="", bar_length=40, maxsize=20):
         """ Method to generate a progress bar.
 
         Parameters
@@ -170,10 +170,13 @@ class Base(object):
             a title to identify the progress bar.
         bar_length: int (optional)
             the length of the bar that will be ploted.
+        maxsize: int (optional)
+            use to justify title.
         """
         progress = int(ratio * 100.)
         block = int(round(bar_length * ratio))
-        text = "\r{2} in Progress: [{0}] {1}%".format(
+        title = title.ljust(maxsize, " ")
+        text = "\r[{0}] {1}% {2}".format(
             "=" * block + " " * (bar_length - block), progress, title)
         sys.stdout.write(text)
         sys.stdout.flush()

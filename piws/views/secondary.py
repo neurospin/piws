@@ -271,7 +271,7 @@ class OutOfContextQuestionnaireRunView(BaseOutOfContextView):
     def entity_description(self, entity):
         """ Generate a dictionary with the QuestionnaireRun description.
         """
-        questionnaire = entity.instance_of[0]
+        questionnaire = entity.questionnaire[0]
         desc = {}
         desc["Related questionnaire"] = questionnaire.view("incontext")
         return desc
