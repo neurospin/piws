@@ -14,6 +14,7 @@ class QuestionnaireLongitudinalView(View):
     """ Create a view that summarized the longitudinal material for a subject.
     """
     __regid__ = "questionnaire-longitudinal-measures"
+    title = _("Longitudinal")
     paginable = False
     div_id = "questionnaire-longitudinal-measures"
 

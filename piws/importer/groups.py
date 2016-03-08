@@ -31,7 +31,7 @@ class CWGroups(Base):
             if True use an SQLGenObjectStore, otherwise the session.
         """
         # Inheritance
-        super(CWGroups, self).__init__(session, use_store)
+        super(CWGroups, self).__init__(session, True, True, use_store, False)
 
         # Class parameters
         self.list_group_names = list_group_names

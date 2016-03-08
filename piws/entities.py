@@ -191,8 +191,6 @@ class FileSet(AnyEntity):
     __regid__ = "FileSet"
 
     def dc_title(self):
-        """ Define the fileset entity title.
-        """
         return self.name
 
 
@@ -200,7 +198,20 @@ class ExternalFile(AnyEntity):
     __regid__ = "ExternalFile"
 
     def dc_title(self):
-        """ Define the external file entity title.
-        """
         return self.name
+
+
+class Center(AnyEntity):
+    __regid__ = "Center"
+
+    def dc_title(self):
+        return "Center"
+
+
+class Study(AnyEntity):
+    __regid__ = "Study"
+
+    def dc_title(self):
+        return "Study"
+
 

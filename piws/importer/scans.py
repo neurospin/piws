@@ -22,9 +22,9 @@ class Scans(Base):
     relations = (
         Base.fileset_relations + Base.assessment_relations + [
             ("Scan", "study", "Study"),
-            ("Study", "scans", "Scan"),
+            ("Study", "study_scans", "Scan"),
             ("Scan", "subject", "Subject"),
-            ("Subject", "scans", "Scan"),
+            ("Subject", "subject_scans", "Scan"),
             ("Assessment", "scans", "Scan"),
             ("Scan", "in_assessment", "Assessment"),
             ("Scan", "has_data", "PETData"),
@@ -41,7 +41,7 @@ class Scans(Base):
     relations[0][0] = "Scan"
 
     def __init__(self, session, project_name, center_name, scans,
-                 can_read=True, can_update=True, data_filepath=None,
+                 can_read=True, can_update=False, data_filepath=None,
                  use_store=True, piws_security_model=True):
         """ Initialize the Scans class.
 
@@ -60,7 +60,7 @@ class Scans(Base):
             Assessment) that contains the entities parameter decriptions.
         can_read: bool (optional, default True)
             set the read permission to the imported data.
-        can_update: bool (optional, default True)
+        can_update: bool (optional, default False)
             set the update permission to the imported data.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
@@ -102,15 +102,14 @@ class Scans(Base):
             }
         """
         # Inheritance
-        super(Scans, self).__init__(session, use_store, piws_security_model)
+        super(Scans, self).__init__(session, can_read, can_update, use_store,
+                                    piws_security_model)
 
         # Class parameters
         self.scans = scans
         self.data_filepath = data_filepath or ""
         self.project_name = project_name
         self.center_name = center_name
-        self.can_read = can_read
-        self.can_update = can_update
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -281,12 +280,12 @@ class Scans(Base):
             self._set_unique_relation(
                 scan_eid, "study", study_eid, check_unicity=False)
             self._set_unique_relation(
-                study_eid, "scans", scan_eid, check_unicity=False)
+                study_eid, "study_scans", scan_eid, check_unicity=False)
             # > add relation with the subject
             self._set_unique_relation(
                 scan_eid, "subject", subject_eid, check_unicity=False)
             self._set_unique_relation(
-                subject_eid, "scans", scan_eid, check_unicity=False)
+                subject_eid, "subject_scans", scan_eid, check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
                 assessment_eid, "scans", scan_eid, check_unicity=False)

@@ -65,7 +65,7 @@ class CWUsers(Base):
             }
         """
         # Inheritance
-        super(CWUsers, self).__init__(session, False)
+        super(CWUsers, self).__init__(session, True, True, False, False)
 
         # Class parameters
         self.users = users

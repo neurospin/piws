@@ -81,7 +81,7 @@ genetics = genetic_parser(demo_path, STUDY_NAME)
 
 # Define all the importers
 db_grp_importer = CWGroups(session, ["toy_V0", "toy_V1", "toy"],
-                         use_store=False)
+                           use_store=False)
 db_user_importer = CWUsers(session, USERS)
 db_subject_importer = Subjects(
     session, STUDY_NAME, subjects, use_store=False)

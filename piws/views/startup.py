@@ -18,6 +18,7 @@ from cubicweb.web.views.startup import IndexView
 class NSIndexView(IndexView):
     """ Class that defines the piws index view.
     """
+    title = _("Index")
 
     def call(self, **kwargs):
         """ Create the 'index' like page of our site.

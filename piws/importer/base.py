@@ -45,28 +45,33 @@ class Base(object):
         ("CWGroup", "can_update", "Assessment")
     ]
     fileset_relations = [
-        ["ParentEntitiyName", "results_filesets", "FileSet"],
+        ["ParentEntitiyName", "filesets", "FileSet"],
         ("FileSet", "in_assessment", "Assessment"),
         ("FileSet", "external_files", "ExternalFile"),
         ("ExternalFile", "fileset", "FileSet"),
         ("ExternalFile", "in_assessment", "Assessment")
     ]
 
-    def __init__(self, session, use_store=True, piws_security_model=True):
+    def __init__(self, session, can_read=True, can_update=False,
+                 use_store=True, piws_security_model=True):
         """ Initialize the SeniorData class.
 
         Parameters
         ----------
         session: Session (mandatory)
             a cubicweb session.
-        list_group_names: list of str (mandatory)
-            the name of the different groups
+        can_read: bool (optional, default True)
+            set the read permission to the imported data.
+        can_update: bool (optional, default False)
+            set the update permission to the imported data.
         use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
         """
         # CW parameters
+        self.can_read = can_read
+        self.can_update = can_update
         self.use_store = use_store
         self.session = session
         if self.use_store:
@@ -354,7 +359,7 @@ class Base(object):
                         self._set_unique_relation(
                             group_eid, "can_update", assessment_eid)
             else:
-                for group_name in ('users', 'guests'):
+                for group_name in ("users", "guests"):
                     group_eid = groups[group_name]
 
                     # > add relation with group
@@ -379,8 +384,7 @@ class Base(object):
             **fset_struct)
         # > add relation with the parent
         self._set_unique_relation(parent_eid,
-            "results_filesets", fset_entity.eid,
-            check_unicity=False)
+            "filesets", fset_entity.eid, check_unicity=False)
         # > add relation with the assessment
         self._set_unique_relation(fset_entity.eid,
             "in_assessment", assessment_eid,

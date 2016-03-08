@@ -16,11 +16,14 @@ from cubes.piws.views.components import RelationBox
 
 class PiwsPrimaryView(PrimaryView):
     __regid__ = "primary"
-    title = _("primary")
+    title = _("Primary")
+    # Renders the attribute label next to the attribute value
     show_attr_label = True
+    # Renders the relation label next to the relation value
     show_rel_label = True
     rsection = None
     display_ctrl = None
+    # Renders the relations of the entity
     main_related_section = True
     allowed_relations = ["subject"]
 
@@ -134,7 +137,7 @@ class PiwsPrimaryView(PrimaryView):
             # default to 9999 so view boxes occurs after component boxes
             return x.cw_extra_kwargs.get("dispctrl", {}).get("order", 9999)
 
-        return sorted(sideboxes, key=get_order)
+        return sorted(sideboxes, key=get_order) 
 
 
 def registration_callback(vreg):

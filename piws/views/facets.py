@@ -183,7 +183,7 @@ class ProcessingRunNameFacet(facet.RQLPathFacet):
     """
     __regid__ = "processingrun-name-facet"
     __select__ = is_instance("ProcessingRun")
-    path = ["X results_filesets F", "F name N"]
+    path = ["X filesets F", "F name N"]
     order = 1
     filter_variable = "N"
     title = _("Type")

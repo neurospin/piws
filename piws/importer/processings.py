@@ -22,10 +22,14 @@ class Processings(Base):
     relations = (
         Base.fileset_relations + Base.assessment_relations + [
             ("ProcessingRun", "study", "Study"),
-            ("Study", "processing_runs", "ProcessingRun"),
+            ("Study", "study_processing_runs", "ProcessingRun"),
             ("ProcessingRun", "subjects", "Subject"),
-            ("Subject", "processing_runs", "ProcessingRun"),
+            ("Subject", "subject_processing_runs", "ProcessingRun"),
             ("Assessment", "processing_runs", "ProcessingRun"),
+            ("Scan", "processing_runs", "ProcessingRun"),
+            ("GenomicMeasure", "processing_runs", "ProcessingRun"),
+            ("ProcessingRun", "inputs", "GenomicMeasure"),
+            ("ProcessingRun", "inputs", "Scan"),
             ("ProcessingRun", "in_assessment", "Assessment"),
             ("ProcessingRun", "score_values", "ScoreValue"),
             ("ScoreValue", "in_assessment", "Assessment")]
@@ -33,7 +37,7 @@ class Processings(Base):
     relations[0][0] = "ProcessingRun"
 
     def __init__(self, session, project_name, center_name, processings,
-                 can_read=True, can_update=True, data_filepath=None,
+                 can_read=True, can_update=False, data_filepath=None,
                  use_store=True, piws_security_model=True):
         """ Initialize the Processings class.
 
@@ -52,7 +56,7 @@ class Processings(Base):
             decriptions.
         can_read: bool (optional, default True)
             set the read permission to the imported data.
-        can_update: bool (optional, default True)
+        can_update: bool (optional, default False)
             set the update permission to the imported data.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
@@ -114,16 +118,14 @@ class Processings(Base):
             }
         """
         # Inheritance
-        super(Processings, self).__init__(session, use_store,
-                                          piws_security_model)
+        super(Processings, self).__init__(session, can_read, can_update,
+                                          use_store, piws_security_model)
 
         # Class parameters
         self.processings = processings
         self.data_filepath = data_filepath or ""
         self.project_name = project_name
         self.center_name = center_name
-        self.can_read = can_read
-        self.can_update = can_update
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -280,7 +282,7 @@ class Processings(Base):
                             processing_eid, "subjects", subject_eid,
                             check_unicity=True)
                         self._set_unique_relation(
-                            subject_eid, "processing_runs", processing_eid,
+                            subject_eid, "subject_processing_runs", processing_eid,
                             check_unicity=True)
 
                     # Create the processing
@@ -312,18 +314,21 @@ class Processings(Base):
             self._set_unique_relation(
                 processing_eid, "study", study_eid, check_unicity=False)
             self._set_unique_relation(
-                study_eid, "processing_runs", processing_eid, check_unicity=False)
+                study_eid, "study_processing_runs", processing_eid,
+                check_unicity=False)
             # > add relation with the subject
             self._set_unique_relation(
                 processing_eid, "subjects", subject_eid, check_unicity=False)
             self._set_unique_relation(
-                subject_eid, "processing_runs", processing_eid, check_unicity=False)
+                subject_eid, "subject_processing_runs", processing_eid,
+                check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
-                assessment_eid, "processing_runs", processing_eid, check_unicity=False)
+                assessment_eid, "processing_runs", processing_eid,
+                check_unicity=False)
             self._set_unique_relation(
-                processing_eid, "in_assessment", assessment_eid, check_unicity=False,
-                subjtype="ProcessingRun")
+                processing_eid, "in_assessment", assessment_eid,
+                check_unicity=False, subjtype="ProcessingRun")
             # > add relation with the inputs
             for rql in processing_inputs:
                 for item in self.session.execute(rql):

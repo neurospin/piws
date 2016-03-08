@@ -22,13 +22,13 @@ class Genetics(Base):
     relations = (
         Base.fileset_relations + Base.assessment_relations + [
             ("GenomicMeasure", "study", "Study"),
-            ("Study", "genomic_measures", "GenomicMeasure"),
+            ("Study", "study_genomic_measures", "GenomicMeasure"),
             ("GenomicMeasure", "subjects", "Subject"),
-            ("Subject", "genomic_measures", "GenomicMeasure"),
+            ("Subject", "subject_genomic_measures", "GenomicMeasure"),
             ("Assessment", "genomic_measures", "GenomicMeasure"),
             ("GenomicMeasure", "in_assessment", "Assessment"),
             ("GenomicMeasure", "genomic_platform", "GenomicPlatform"),
-            ("GenomicPlatform", "genomic_measures", "GenomicMeasure"),
+            ("GenomicPlatform", "genomic_platform_genomic_measures", "GenomicMeasure"),
             ("GenomicPlatform", "snps", "Snp")]
     )
     relations[0][0] = "GenomicMeasure"
@@ -176,8 +176,8 @@ class Genetics(Base):
         rset = self.session.execute(
             "Any S, C, N Where S is Subject, S code_in_study C, S study E, "
             "E name N")
-        study_subjects = dict((row[1], row[0]) for row in rset
-                              if row[2].startswith(self.project_name))
+        subjects_eid_map = dict((row[1], row[0]) for row in rset
+                                if row[2].startswith(self.project_name))
 
         #######################################################################
         # Get all the groups
@@ -218,11 +218,11 @@ class Genetics(Base):
                     platform_struct = tgenetic_measure["GenomicPlatform"]
                     related_subjects = platform_struct["related_subjects"]
                     for subject_id in related_subjects:
-                        if subject_id not in study_subjects:
+                        if subject_id not in subjects_eid_map:
                             raise ValueError(
                                 "The subject '{0}' in not known by the "
                                 "database.".format(subject_id))
-                        timepoint_subjects.add(study_subjects[subject_id])
+                        timepoint_subjects.add(subjects_eid_map[subject_id])
                 timepoint_subjects = list(timepoint_subjects)
 
                 ###############################################################
@@ -278,12 +278,12 @@ class Genetics(Base):
                     extfiles = tgenetic_measure.get("ExternalResources", None)
                     measure_eid = self._create_measure(
                         measure_struct, fset_struct, extfiles, related_subjects,
-                        study_subjects, study_eid, assessment_eid, platform_eid)
+                        subjects_eid_map, study_eid, assessment_eid, platform_eid)
 
         print  # new line after last progress bar update
 
     def _create_measure(self, measure_struct, fset_struct, extfiles,
-                        related_subjects, study_subjects, study_eid,
+                        related_subjects, subjects_eid_map, study_eid,
                         assessment_eid, platform_eid):
         """ Create a genomic measure and its associated relations.
         """
@@ -302,15 +302,16 @@ class Genetics(Base):
             self._set_unique_relation(
                 measure_eid, "study", study_eid, check_unicity=False)
             self._set_unique_relation(
-                study_eid, "genomic_measures", measure_eid, check_unicity=False)
+                study_eid, "study_genomic_measures", measure_eid,
+                check_unicity=False)
             # > add relation with the subjects
             for subject_id in related_subjects:
                 self._set_unique_relation(
-                    measure_eid, "subjects", study_subjects[subject_id],
+                    measure_eid, "subjects", subjects_eid_map[subject_id],
                     check_unicity=False)
                 self._set_unique_relation(
-                    study_subjects[subject_id], "genomic_measures", measure_eid,
-                    check_unicity=False)
+                    subjects_eid_map[subject_id], "subject_genomic_measures",
+                    measure_eid, check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
                 assessment_eid, "genomic_measures", measure_eid,
@@ -323,7 +324,7 @@ class Genetics(Base):
                 measure_eid, "genomic_platform", platform_eid,
                 check_unicity=False)
             self._set_unique_relation(
-                platform_eid, "genomic_measures", measure_eid,
+                platform_eid, "genomic_platform_genomic_measures", measure_eid,
                 check_unicity=False)
 
             # Add the file set attached to a genomic measure

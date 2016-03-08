@@ -82,12 +82,12 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'Subjects</a>')
         w(u'</div></div><br/>')
 
-        # Exams
+        # Assessments
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         href = self._cw.build_url(rql="Any A Where A is Assessment")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Exams</a>')
+        w(u'Assessments</a>')
         w(u'</div></div><br/>')
 
         # Scan
@@ -95,7 +95,7 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'<div class="btn-group-vertical btn-block">')
         href = self._cw.build_url(rql="Any S Where S is Scan")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Images</a>')
+        w(u'Scans</a>')
         w(u'</div></div><br/>')
 
         # ProcessingRun
@@ -103,7 +103,7 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'<div class="btn-group-vertical btn-block">')
         href = self._cw.build_url(rql="Any PR Where PR is ProcessingRun")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Processings</a>')
+        w(u'Processing runs</a>')
         w(u'</div></div><br/>')
 
         # QuestionnaireRun
@@ -266,7 +266,7 @@ class NSImageViewers(component.CtxComponent):
         """ Method to create the image box content.
         """
         # 3D image viewer
-        efentries = self.cw_rset.get_entity(0, 0).results_filesets[0].external_files
+        efentries = self.cw_rset.get_entity(0, 0).filesets[0].external_files
         imagefiles = [e.filepath for e in efentries
                       if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
         limagefiles = len(imagefiles)
@@ -277,7 +277,8 @@ class NSImageViewers(component.CtxComponent):
                 "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
                 __message=(u"Found '{0}' image(s) that can be "
                             "displayed.".format(limagefiles)))
-            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'<a class="btn btn-primary" href="{0}" target=_blank>'.format(
+                href))
             w(u'Triplanar</a>')
             w(u'</div></div><br/>')
 

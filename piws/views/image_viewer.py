@@ -28,6 +28,7 @@ class ImageViewer(View):
     """ Create an image viewer.
     """
     __regid__ = "brainbrowser-image-viewer"
+    title = _("Brainbrowser")
     paginable = False
     div_id = "brainbrowser-simple"
 

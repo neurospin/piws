@@ -22,6 +22,7 @@ class PiwsLogoutController(Controller):
     from Apache.
     """
     __regid__ = "logout"
+    title = _("Logout")
 
     def publish(self, rset=None):
         html = "<!DOCTYPE html>"
@@ -63,6 +64,7 @@ class PiwsExpirationLogoutController(Controller):
     the deauthentication mechanism from PiwsExpirationInMemoryRepositorySessionManager.
     """
     __regid__ = 'logout'
+    title = _("Logout")
 
     def publish(self, rset=None):
         sessionid = self._cw.session.sessionid
@@ -78,6 +80,7 @@ class PiwsExpirationUnloadController(Controller):
     to external url in order to destroy session.
     """
     __regid__ = 'piws-unload'
+    title = _("Unload")
 
     def publish(self, rset=None):
         req = self._cw

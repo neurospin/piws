@@ -64,7 +64,7 @@ class Subjects(Base):
             }
         """
         # Inheritance
-        super(Subjects, self).__init__(session, use_store)
+        super(Subjects, self).__init__(session, True, True, use_store, False)
 
         # Class parameters
         self.subjects = subjects
@@ -127,10 +127,6 @@ class Subjects(Base):
             cnt_subject += 1.
 
             # Create the subject if necessary
-
-            # ## TODO : imagen specific
-            # del subject_parameter["identifier"]
-
             subject_entity, is_created = self._get_or_create_unique_entity(
                 rql=("Any X Where X is Subject, X code_in_study "
                      "'{0}'".format(subject_parameter["code_in_study"])),

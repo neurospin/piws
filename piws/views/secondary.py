@@ -30,6 +30,7 @@ from components import AUTHORIZED_IMAGE_EXT
 class BaseOutOfContextView(EntityView):
     __regid__ = "outofcontext"
     __select__ = False
+    title = _("Outofcontext")
 
     def entity_description(self, entity):
         """ Generate a dictionary with the entity description.
@@ -45,8 +46,8 @@ class BaseOutOfContextView(EntityView):
         # Get the associated images
         imagefiles = []
         if entity.cw_etype == "Scan":
-            if hasattr(entity, "results_filesets"):
-                for efentries in entity.results_filesets:
+            if hasattr(entity, "filesets"):
+                for efentries in entity.filesets:
                     imagefiles.extend(
                         [e.filepath for e in efentries.external_files
                          if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))])
@@ -56,7 +57,7 @@ class BaseOutOfContextView(EntityView):
         if limagefiles > 0:
             href = self._cw.build_url(
                 "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
-                __message=(u"Found {0} image(s) that can be "
+                __message=(u"Found '{0}' image(s) that can be "
                             "displayed.".format(limagefiles)))
 
         # Get the associated documentation if available
@@ -257,6 +258,23 @@ class OutOfContextProcessingRunView(BaseOutOfContextView):
         desc["Label"] = entity.label
         desc["Tool"] = entity.tool
         desc["Parameters"] = entity.parameters
+        return desc
+
+
+###############################################################################
+# Genomic Measure
+###############################################################################
+
+class OutOfContextProcessingRunView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("GenomicMeasure")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the ProcessingRun description.
+        """
+        desc = {}
+        desc["Label"] = entity.label
+        desc["Type"] = entity.type
+        desc["Format"] = entity.format
         return desc
 
 

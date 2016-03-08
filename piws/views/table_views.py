@@ -25,10 +25,11 @@ from logilab.common.registry import yes
 ###############################################################################
 
 class FileAnswerTableView(View):
-    """ QuestionnaireRuns table view specific to the QuestionnaireRun (1?) File
-        schema.
+    """ QuestionnaireRuns table view when subject questionnaires are inserted
+    using the QuestionnaireRun -> file ->  File strategy, ie. one File
+    per questionnaire.
     """
-    __regid__ = 'file.answer.table'
+    __regid__ = "file-answer-table"
 
     def call(self):
         """Get all the questionnaire runs and associated subjects"""
@@ -45,7 +46,7 @@ class FileAnswerTableView(View):
         # Execute the rql to get all subjects QuestionnaireRuns
         rql = ("Any ID, D ORDERBY ID ASC WHERE QR is QuestionnaireRun, "
                "QR questionnaire Q, Q name '{0}', QR in_assessment A, "
-               "A timepoint '{1}', QR result F, F data D, QR subject S, "
+               "A timepoint '{1}', QR file F, F data D, QR subject S, "
                "S code_in_study ID".format(qname, timepoint))
         rset = self._cw.execute(rql)
 
@@ -84,6 +85,7 @@ class JHugetableView(View):
     """ Create a table view with DataTables.
     """
     __regid__ = "jtable-hugetable-clientside"
+    title = _("Jtable")
     paginable = False
     div_id = "jhugetable-table"
 
@@ -382,6 +384,7 @@ class JtableView(View):
     """ Create a table view with DataTables.
     """
     __regid__ = "jtable-table"
+    title = _("Jtable")
     paginable = False
     div_id = "jtable-table"
 
@@ -702,38 +705,6 @@ class JtableView(View):
 # Interact with jtable js
 ###############################################################################
 
-class PiwsCSVView(CSVMixIn, View):
-    """ Dumps questionnaires in CSV.
-    """
-    __regid__ = 'piwscsvexport'
-    __select__ = yes()
-    title = _('piws csv export')
-
-    def call(self):
-
-        qname = self._cw.form['qname']
-        timepoint = self._cw.form['timepoint']
-        labels = json.loads(self._cw.form['labels'])
-
-        rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
-               "S questionnaire_runs QR, QR instance_of QU, QU name '{0}', "
-               "QR open_answers O, O value OV, O in_assessment A, "
-               "A timepoint '{1}', O question Q, Q text QT".format(qname,
-                                                                   timepoint)
-               )
-        rset = self._cw.execute(rql)
-
-        table = defaultdict(lambda: OrderedDict.fromkeys(labels, ''))
-        for item in rset:
-            table[item[0]][item[1]] = item[2]
-        for id, data in table.iteritems():
-            table[id]["ID"] = id
-
-        writer = self.csvwriter()
-        writer.writerow(labels)
-        for psc2, data in iter(sorted(table.iteritems())):
-            writer.writerow(data.values())
-
 @ajaxfunc(output_type="json")
 def get_open_answers_data(self):
     """ Get the subject answer data.
@@ -821,38 +792,6 @@ def get_open_answers_data(self):
     return data
 
 
-class PiwsCSVView(CSVMixIn, View):
-    """dumps questionnaires in CSV"""
-    __regid__ = 'piwscsvexport'
-    __select__ = yes()
-    title = _('piws csv export')
-
-    def call(self):
-
-        qname = self._cw.form['qname']
-        timepoint = self._cw.form['timepoint']
-        labels = json.loads(self._cw.form['labels'])
-
-        rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
-               "S questionnaire_runs QR, QR instance_of QU, QU name '{0}', "
-               "QR open_answers O, O value OV, O in_assessment A, "
-               "A timepoint '{1}', O question Q, Q text QT".format(qname,
-                                                                   timepoint)
-               )
-        rset = self._cw.execute(rql)
-
-        table = defaultdict(lambda: OrderedDict.fromkeys(labels, ''))
-        for item in rset:
-            table[item[0]][item[1]] = item[2]
-        for id, data in table.iteritems():
-            table[id]["ID"] = id
-
-        writer = self.csvwriter()
-        writer.writerow(labels)
-        for psc2, data in iter(sorted(table.iteritems())):
-            writer.writerow(data.values())
-
-
 @ajaxfunc(output_type="json")
 def get_questionnaires_data(self):
     """ Get the questionnaires data.
@@ -891,12 +830,12 @@ def get_questionnaires_data(self):
                         "'get_questionnaires_data' ajax callback.")
 
     # Choose the questionnaire rendering view:
-    # > case 1: the answers are inserted in the database (OpenAnswer).
-    # > case 2: one line of answers inserted per subject (File)
-    rql = "Any QR Where QR is QuestionnaireRun, EXISTS(QR result F)"
+    # > case 1: one line of answers inserted per subject (File)
+    # > case 2: the answers are inserted in the database (OpenAnswer).
+    rql = "Any QR Where QR is QuestionnaireRun, EXISTS(QR file F)"
     rset = self._cw.execute(rql)
     if rset.rowcount > 0:
-        vid = "file.answer.table"
+        vid = "file-answer-table"
     else:
         vid = "jtable-table"
 
@@ -986,4 +925,3 @@ def registration_callback(vreg):
     vreg.register(FileAnswerTableView)
     vreg.register(get_open_answers_data)
     vreg.register(get_questionnaires_data)
-    vreg.register(PiwsCSVView)

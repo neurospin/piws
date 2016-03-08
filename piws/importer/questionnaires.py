@@ -27,15 +27,15 @@ class Questionnaires(Base):
         ("Question", "questionnaire", "Questionnaire"),
         ("Questionnaire", "questions", "Question"),
         ("QuestionnaireRun", "questionnaire", "Questionnaire"),
-        ("Questionnaire", "questionnaire_runs", "QuestionnaireRun"),
+        ("Questionnaire", "questionnaire_questionnaire_runs", "QuestionnaireRun"),
         ("Assessment", "questionnaire_runs", "QuestionnaireRun"),
         ("QuestionnaireRun", "in_assessment", "Assessment"),
         ("QuestionnaireRun", "study", "Study"),
-        ("Study", "questionnaire_runs", "QuestionnaireRun"),
+        ("Study", "study_questionnaire_runs", "QuestionnaireRun"),
         ("QuestionnaireRun", "subject", "Subject"),
-        ("Subject", "questionnaire_runs", "QuestionnaireRun"),
+        ("Subject", "subject_questionnaire_runs", "QuestionnaireRun"),
         ("OpenAnswer", "question", "Question"),
-        ("Question", "open_answers", "OpenAnswer"),
+        ("Question", "question_open_answers", "OpenAnswer"),
         ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
         ("QuestionnaireRun", "open_answers", "OpenAnswer"),
         ("OpenAnswer", "in_assessment", "Assessment"),
@@ -111,8 +111,8 @@ class Questionnaires(Base):
             }
         """
         # Inheritance
-        super(Questionnaires, self).__init__(session, use_store,
-                                             piws_security_model)
+        super(Questionnaires, self).__init__(session, can_read, can_update,
+                                             use_store, piws_security_model)
 
         # Define QuestionnaireRuns insertion strategy
         self.use_openanswer = use_openanswer
@@ -122,8 +122,6 @@ class Questionnaires(Base):
         self.data_filepath = data_filepath or ""
         self.project_name = project_name
         self.center_name = center_name
-        self.can_read = can_read
-        self.can_update = can_update
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -330,8 +328,9 @@ class Questionnaires(Base):
                 qr_entity.eid, "questionnaire",
                 questionnaire_eids[questionnaire_name], check_unicity=False)
             self._set_unique_relation(
-                questionnaire_eids[questionnaire_name], "questionnaire_runs",
-                qr_entity.eid, check_unicity=False)
+                questionnaire_eids[questionnaire_name],
+                "questionnaire_questionnaire_runs", qr_entity.eid,
+                check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
                 assessment_eid, "questionnaire_runs", qr_entity.eid,
@@ -343,13 +342,13 @@ class Questionnaires(Base):
             self._set_unique_relation(
                 qr_entity.eid, "study", study_eid, check_unicity=False)
             self._set_unique_relation(
-                study_eid, "questionnaire_runs", qr_entity.eid,
+                study_eid, "study_questionnaire_runs", qr_entity.eid,
                 check_unicity=False)
             # > add relation with the subject
             self._set_unique_relation(
                 qr_entity.eid, "subject", subject_eid, check_unicity=False)
             self._set_unique_relation(
-                subject_eid, "questionnaire_runs", qr_entity.eid,
+                subject_eid, "subject_questionnaire_runs", qr_entity.eid,
                 check_unicity=False)
 
             if self.use_openanswer:
@@ -373,8 +372,8 @@ class Questionnaires(Base):
                         answer_entity.eid, "question", question_eid,
                         check_unicity=False, subjtype="OpenAnswer")
                     self._set_unique_relation(
-                        question_eid, "open_answers", answer_entity.eid,
-                        check_unicity=False)
+                        question_eid, "question_open_answers",
+                        answer_entity.eid, check_unicity=False)
                     # > add relation with the questionnaire run
                     self._set_unique_relation(
                         answer_entity.eid, "questionnaire_run", qr_entity.eid,
