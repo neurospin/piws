@@ -13,12 +13,6 @@ import collections
 from cubicweb.predicates import is_instance
 from cubicweb.view import EntityView
 
-# Brainomics import
-from cubes.brainomics.views.outofcontext import ScanOutOfContextView
-from cubes.brainomics.views.outofcontext import AssessmentOutOfContextView
-from cubes.brainomics.views.outofcontext import QuestionnaireRunOutOfContextView
-from cubes.brainomics.views.outofcontext import SubjectOutOfContextView
-
 # PIWS import
 from components import AUTHORIZED_IMAGE_EXT
 
@@ -74,11 +68,16 @@ class BaseOutOfContextView(EntityView):
             nbsubjects = 1
         else:
             nbsubjects = "nc"
-        study = entity.study[0]
+        study = None
+        if hasattr(entity, "study") and len(entity.study) > 0:
+            study = entity.study[0]
 
         # Get the entity symbol
-        image = u"<img alt='' src='{0}'>".format(
-            self._cw.data_url(entity.symbol))
+        if hasattr(entity, "__bootstap_glyph__") and entity.__bootstap_glyph__:
+            image = unicode(entity.symbol)
+        else:
+            image = u"<img alt='' src='{0}'>".format(
+                self._cw.data_url(entity.symbol))
 
         # Create the div that will contain the list item
         self.w(u"<div class='ooview'><div class='well'>")
@@ -91,7 +90,9 @@ class BaseOutOfContextView(EntityView):
         # > second element: the entity description + link
         self.w(u"<div class='col-md-6'><h4>{0}</h4>".format(
             entity.view("incontext")))
-        entity_desc = u"Study <em>{0}</em>".format(study.name)
+        entity_desc = u""
+        if study is not None:
+            entity_desc += u"Study <em>{0}</em>".format(study.name)
         if nbsubjects not in [1, 'nc']:
             entity_desc += u" - Number of subjects <em>{0}</em>".format(
                 nbsubjects)
@@ -172,7 +173,6 @@ class OutOfContextScanView(BaseOutOfContextView):
         desc["Echo time"] = dtype_entity.te
         desc["Scanner field"] = dtype_entity.field
         #desc["Related subject"] = subject.view("incontext")
-        desc["Related study"] = study.view("incontext")
         return desc
 
 
@@ -188,11 +188,6 @@ class OutOfContextAssessmentView(BaseOutOfContextView):
         """
         center = entity.center[0]
         subjects = entity.subjects
-        run_items = []
-        run_items.extend(entity.processing_runs)
-        run_items.extend(entity.scans)
-        run_items.extend(entity.questionnaire_runs)
-        run_items.extend(entity.genomic_measures)
         desc = {}
         desc["Acquisition center"] = center.name
         if len(subjects) == 1:
@@ -200,8 +195,6 @@ class OutOfContextAssessmentView(BaseOutOfContextView):
             desc["Gender"] = subject.gender
             desc["Handedness"] = subject.handedness
             desc["Age"] = entity.age_of_subject
-        desc["Related runs"] = " - ".join(
-            [x.view("incontext") for x in run_items])
         return desc
 
 
@@ -218,9 +211,6 @@ class OutOfContextSubjectView(BaseOutOfContextView):
         desc = {}
         desc["Gender"] = entity.gender
         desc["Handedness"] = entity.handedness
-        desc["Related assessments"] = "".join(
-            ["<li><a href='{0}'>{1}</a></li>".format(item.absolute_url(), item.identifier)
-             for item in entity.assessments])
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
             rql="Any A WHERE S eid '{0}', S assessments A".format(entity.eid),
@@ -269,7 +259,7 @@ class OutOfContextProcessingRunView(BaseOutOfContextView):
     __select__ = EntityView.__select__ & is_instance("GenomicMeasure")
 
     def entity_description(self, entity):
-        """ Generate a dictionary with the ProcessingRun description.
+        """ Generate a dictionary with the GenomicMeasure description.
         """
         desc = {}
         desc["Label"] = entity.label
@@ -281,7 +271,6 @@ class OutOfContextProcessingRunView(BaseOutOfContextView):
 ###############################################################################
 # QuestionnaireRun
 ###############################################################################
-
 
 class OutOfContextQuestionnaireRunView(BaseOutOfContextView):
     __select__ = EntityView.__select__ & is_instance("QuestionnaireRun")
@@ -296,33 +285,131 @@ class OutOfContextQuestionnaireRunView(BaseOutOfContextView):
 
 
 ###############################################################################
-# Default
+# Question
 ###############################################################################
 
-class OutOfContextDefaultView(EntityView):
-    __regid__ = "outofcontext"
-    __select__ = EntityView.__select__ & is_instance("CWSearch", "CWUpload")
+class OutOfContextQuestionView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("Question")
 
-    def cell_call(self, row, col):
-        """ Create the default view line by line.
+    def entity_description(self, entity):
+        """ Generate a dictionary with the Question description.
         """
-        # Get the processing run entity
-        entity = self.cw_rset.get_entity(row, col)
+        questionnaire = entity.questionnaire[0]
+        desc = {}
+        desc["Related questionnaire"] = questionnaire.view("incontext")
+        return desc
 
-        # Create the div that will contain the list item
-        self.w(u'<div class="ooview"><div class="well">')
 
-        # Create a bootstrap row item
-        self.w(u'<div class="row">')
-        # > add the scan description + link
-        self.w(u'<div class="col-md-4"><h4>{0}</h4>'.format(
-            entity.view("incontext")))
-        self.w(u'</div>')
-        # Close row item
-        self.w(u'</div>')
 
-        # Close list item
-        self.w(u'</div></div>')
+###############################################################################
+# Questionnaire
+###############################################################################
+
+class OutOfContextQuestionnaireView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("Questionnaire")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the QuestionnaireRun description.
+        """
+        questionnaire = entity.questionnaire[0]
+        desc = {}
+        desc["Related questionnaire"] = questionnaire.view("incontext")
+        return desc
+
+
+###############################################################################
+# Snp
+###############################################################################
+
+class OutOfContextSnpView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("Snp")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the Snp description.
+        """
+        desc = {}
+        desc["Identifier"] = entity.rs_id
+        desc["Position"] = entity.position
+        return desc
+
+
+###############################################################################
+# GenomicPlatform
+###############################################################################
+
+class OutOfContextGenomicPlatformView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("GenomicPlatform")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the GenomicPlatform description.
+        """
+        desc = {}
+        desc["Name"] = entity.name
+        return desc
+
+
+###############################################################################
+# FileSet
+###############################################################################
+
+class OutOfContextFileSetView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("FileSet")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the FileSet description.
+        """
+        desc = {}
+        desc["Name"] = entity.name
+        return desc
+
+
+###############################################################################
+# ExternalFile
+###############################################################################
+
+class OutOfContextExternalFileView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("ExternalFile")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the ExternalFile description.
+        """
+        desc = {}
+        desc["Name"] = entity.name
+        desc["Abolute path"] = entity.absolute_path
+        desc["Path"] = entity.filepath
+        return desc
+
+
+###############################################################################
+# CWSearch
+###############################################################################
+
+class OutOfContextCWSearchView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("CWSearch")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the CWSearch description.
+        """
+        desc = {}
+        desc["Tile"] = entity.title
+        desc["RQL"] = entity.path
+        desc["Expiration data"] = entity.expiration_date
+        desc["Type"] = entity.rset_type
+        return desc
+
+
+###############################################################################
+# CWUpload
+###############################################################################
+
+class OutOfContextCWUploadView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("CWUpload")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the CWUpload description.
+        """
+        desc = {}
+        return desc
 
 
 ###############################################################################
@@ -332,11 +419,12 @@ class OutOfContextDefaultView(EntityView):
 def registration_callback(vreg):
     """ Update outofcontext views.
     """
-    vreg.register(OutOfContextDefaultView)
-    vreg.register(OutOfContextProcessingRunView)
-    vreg.register_and_replace(OutOfContextScanView, ScanOutOfContextView)
-    vreg.register_and_replace(OutOfContextSubjectView, SubjectOutOfContextView)
-    vreg.register_and_replace(
-        OutOfContextAssessmentView, AssessmentOutOfContextView)
-    vreg.register_and_replace(
-        OutOfContextQuestionnaireRunView, QuestionnaireRunOutOfContextView)
+    for klass in [OutOfContextQuestionView, OutOfContextGenomicPlatformView,
+                  OutOfContextSnpView, OutOfContextFileSetView,
+                  OutOfContextQuestionnaireView, OutOfContextCWUploadView,
+                  OutOfContextProcessingRunView, OutOfContextScanView,
+                  OutOfContextSubjectView, OutOfContextAssessmentView,
+                  OutOfContextQuestionnaireRunView,
+                  OutOfContextExternalFileView, OutOfContextCWSearchView]:
+        vreg.register(klass)
+

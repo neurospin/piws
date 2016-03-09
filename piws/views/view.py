@@ -36,7 +36,7 @@ def page_title(self):
     elif len(re.findall(regex, rql)) == 1:
         title = rql.split()[-1]
     else:
-        title = _("Default")
+        title = _("NoMatch")
 
     return title
 

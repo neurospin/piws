@@ -69,7 +69,7 @@ class Subjects(Base):
         # Class parameters
         self.subjects = subjects
         self.project_name = project_name
-        # self.data_filepath = data_filepath or ""
+        self.data_filepath = data_filepath or ""
 
     ###########################################################################
     #   Public Methods
@@ -106,7 +106,7 @@ class Subjects(Base):
             entity_name="Study",
             check_unicity=True,
             name=unicode(self.project_name),
-            # data_filepath=unicode(self.data_filepath)
+            data_filepath=unicode(self.data_filepath)
         )
         study_eid = study_entity.eid
 

@@ -385,6 +385,8 @@ class Base(object):
         # > add relation with the parent
         self._set_unique_relation(parent_eid,
             "filesets", fset_entity.eid, check_unicity=False)
+        self._set_unique_relation(fset_entity.eid,
+            "containers", parent_eid, check_unicity=False)
         # > add relation with the assessment
         self._set_unique_relation(fset_entity.eid,
             "in_assessment", assessment_eid,

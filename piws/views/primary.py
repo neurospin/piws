@@ -6,15 +6,20 @@
 # for details.
 ##########################################################################
 
+# System import
+import json
+
 # Cubicweb import
 from cubicweb.web.views.primary import PrimaryView
+from cubicweb.predicates import is_instance
+from cubicweb.web.views.primary import PrimaryView
+from cubicweb.utils import json_dumps
 
 # Cubes import
-from cubicweb.web.views.primary import PrimaryView
 from cubes.piws.views.components import RelationBox
 
 
-class PiwsPrimaryView(PrimaryView):
+class PIWSPrimaryView(PrimaryView):
     __regid__ = "primary"
     title = _("Primary")
     # Renders the attribute label next to the attribute value
@@ -44,10 +49,23 @@ class PiwsPrimaryView(PrimaryView):
         # Select only entity attributes
         display_attributes = []
         for rschema, _, role, dispctrl in self._section_def(entity, "attributes"):
-            if rschema.final and rschema.type != "identifier":
+            vid = dispctrl.get("vid", "reledit")
+            if ((not self.main_related_section and not rschema.final) or 
+                    rschema.type == "identifier"):
+                continue
+            if rschema.final:
                 value = entity.cw_attr_cache.get(rschema.type)
-                if value is not None and value != "":
-                    display_attributes.append((rschema, role, dispctrl, value))
+            elif vid == "reledit":
+                if role in self.allowed_relations:
+                    value = entity.view(
+                        vid, rtype=rschema.type, role=role,
+                        initargs={"dispctrl": dispctrl})
+                else:
+                    value = None
+            else:
+                value = None
+            if value is not None and value != "":
+                display_attributes.append((rschema, role, dispctrl, value))
 
         # Display the selected attributes in a table and add a documentation
         # item if available
@@ -57,8 +75,9 @@ class PiwsPrimaryView(PrimaryView):
                 label = self._rel_label(entity, rschema, role, dispctrl)
                 self.render_attribute(label, value, table=True)
             if tooltip_name is not None:
-                tiphref = self._cw.build_url("view", vid="piws-documentation",
-                                             tooltip_name=tooltip_name, _notemplate=True)
+                tiphref = self._cw.build_url(
+                    "view", vid="piws-documentation",
+                    tooltip_name=tooltip_name, _notemplate=True)
                 tipbutton = (
                     "<a href='{0}' target=_blank class='btn btn-warning' "
                     "type='button'>Doc &#9735;</a>".format(
@@ -101,14 +120,15 @@ class PiwsPrimaryView(PrimaryView):
 
             # Construct rql depending on entity role
             if role == "subject":
-                rql = "Any X WHERE X is {0}, E eid '{1}', E {2} X".format(target_etype,
-                    entity.eid, rschema.type)
+                rql = "Any X WHERE X is {0}, E eid '{1}', E {2} X".format(
+                    target_etype, entity.eid, rschema.type)
             else:
-                rql = "Any X WHERE X is {0}, E eid '{1}', X {2} E".format(target_etype,
-                    entity.eid, rschema.type)
+                rql = "Any X WHERE X is {0}, E eid '{1}', X {2} E".format(
+                    target_etype, entity.eid, rschema.type)
+
 
             # FileSet special case
-            if target_etype == "FileSet":
+            if target_etype == "FileSet" and entity.cw_etype != "ExternalFile":
                 entities = [e for e in rset.entities()]
                 nb_fsets = len(entities)
                 if nb_fsets == 1:
@@ -137,10 +157,23 @@ class PiwsPrimaryView(PrimaryView):
             # default to 9999 so view boxes occurs after component boxes
             return x.cw_extra_kwargs.get("dispctrl", {}).get("order", 9999)
 
-        return sorted(sideboxes, key=get_order) 
+        return sorted(sideboxes, key=get_order)
+
+
+class PIWSFilePrimaryView(PrimaryView):
+    __select__ = PrimaryView.__select__ & is_instance("File")
+
+    def call(self, rset=None):
+        entity = self.cw_rset.get_entity(0, 0)
+        if entity.data_format == "text/json":
+            data = json.loads(entity.data.getvalue())
+        else:
+            data = str(entity.data.getvalue())
+        self.w(unicode(json.dumps(data, indent=4)))
 
 
 def registration_callback(vreg):
     """ Update  primary views
     """
-    vreg.register_and_replace(PiwsPrimaryView, PrimaryView)
+    vreg.register_and_replace(PIWSPrimaryView, PrimaryView)
+    vreg.register(PIWSFilePrimaryView)

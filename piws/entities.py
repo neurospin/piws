@@ -32,16 +32,12 @@ class PETData(AnyEntity):
     __regid__ = "PETData"
 
     def dc_title(self):
-        """Define the PETData entity title.
-        """
         return "PET data"
 
 class MRIData(AnyEntity):
     __regid__ = "MRIData"
 
     def dc_title(self):
-        """Define the MRIData entity title.
-        """
         return "MRI data"
 
 
@@ -49,8 +45,6 @@ class DMRIData(AnyEntity):
     __regid__ = "DMRIData"
 
     def dc_title(self):
-        """Define the DMRIData entity title.
-        """
         return "DMRI data"
 
 
@@ -58,16 +52,12 @@ class Scan(AnyEntity):
     __regid__ = "Scan"
 
     def dc_title(self):
-        """Define the scan entity title.
-        """
-        return "{0} of {1} (time {2})".format(
-            self.label, self.subject[0].code_in_study,
-            self.in_assessment[0].timepoint)
+        return "{0} ({1}): {2}".format(
+            self.label, self.in_assessment[0].timepoint,
+            self.subject[0].code_in_study)
 
     @property
     def symbol(self):
-        """Return a symbol corresponding to the scan type.
-        """
         dtype = self.has_data[0]
         if dtype.__class__.__name__ == "DMRIData":
             return "images/dmri.png"
@@ -82,8 +72,6 @@ class Assessment(AnyEntity):
     container_config = ASSESSMENT_CONTAINER
 
     def dc_title(self):
-        """Define the assessment entity title.
-        """
         relations = []
         if self.scans:
             relations.append("Scans")
@@ -91,14 +79,12 @@ class Assessment(AnyEntity):
             relations.append("QuestionnaireRun")
         if self.genomic_measures:
             relations.append("GenomicMeasure")
-        return "Assessment of {0} (time {1} - type {2})".format(
-            self.subjects[0].code_in_study, self.timepoint,
-            "/".join(relations))
+        return "{0}: {1} {2}".format(
+            self.timepoint, self.subjects[0].code_in_study,
+            "..." if len(self.subjects) > 1 else "")
 
     @property
     def symbol(self):
-        """Return a symbol corresponding to the assessment type.
-        """
         if self.scans or self.questionnaire_runs:
             return "images/questionnaire.png"
         elif self.processing_runs:
@@ -113,14 +99,10 @@ class Subject(AnyEntity):
     __regid__ = "Subject"
 
     def dc_title(self):
-        """Define the subject entity title.
-        """
-        return "Subject {0}".format(self.code_in_study)
+        return self.code_in_study
 
     @property
     def symbol(self):
-        """Return a symbol corresponding to the subject gender.
-        """
         if self.gender == "male":
             return "images/male.png"
         elif self.gender == "female":
@@ -133,15 +115,12 @@ class QuestionnaireRun(AnyEntity):
     __regid__ = "QuestionnaireRun"
 
     def dc_title(self):
-        """Define the questionnaire run entity title.
-        """
-        return "QuestionnaireRun of {0}".format(
-            self.subject[0].code_in_study.replace("_", " - "))
+        return "{0} ({1}): {2}".format(
+            self.questionnaire[0].name, self.in_assessment[0].timepoint,
+            self.subject[0].code_in_study)
 
     @property
     def symbol(self):
-        """Return a symbol corresponding to the questionnaire run type.
-        """
         return "images/questionnaire.png"
 
 
@@ -151,13 +130,13 @@ class ProcessingRun(AnyEntity):
     def dc_title(self):
         """Define the processing run entity title.
         """
-        return ("ProcessingRun {0} (time {1})".format(self.label,
-                self.in_assessment[0].timepoint))
+        return "{0} ({1}): {2} {3}".format(
+            self.label, self.in_assessment[0].timepoint,
+            self.subjects[0].code_in_study,
+            "..." if len(self.subjects) > 1 else "")
 
     @property
     def symbol(self):
-        """Return a symbol corresponding to the processing run type.
-        """
         if self.label in ["EDDY", "FA", "MD", "MO", "NODIFF BRAIN", "RD",
                          "RESTORE"]:
             return "images/dmri.png"
@@ -175,43 +154,123 @@ class GenomicMeasure(AnyEntity):
     __regid__ = "GenomicMeasure"
 
     def dc_title(self):
-        """ Define the genomic measure run entity title.
-        """
-        return ("{0} (time {1})".format(self.label,
-                self.in_assessment[0].timepoint))
+        return "{0} ({1}): {2} {3}".format(
+            self.label, self.in_assessment[0].timepoint,
+            self.subjects[0].code_in_study,
+            "..." if len(self.subjects) > 1 else "")
 
     @property
     def symbol(self):
-        """ Return a symbol corresponding to the genomic measure type.
-        """
         return "images/gchip.png"
+
+
+class Question(AnyEntity):
+    __regid__ = "Question"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.questionnaire[0].name + ": " + self.text
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-question-sign'></span>"
+
+
+class OpenAnswer(AnyEntity):
+    __regid__ = "OpenAnswer"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.question[0].dc_title() + ": " + self.value
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-plus-sign'></span>"
+
+
+class Snp(AnyEntity):
+    __regid__ = "Snp"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.rs_id
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-plus'></span>"
+
+
+class GenomicPlatform(AnyEntity):
+    __regid__ = "GenomicPlatform"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.name
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-filter'></span>"
 
 
 class FileSet(AnyEntity):
     __regid__ = "FileSet"
+    __bootstap_glyph__ = True
 
     def dc_title(self):
         return self.name
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-folder-open'></span>"
 
 
 class ExternalFile(AnyEntity):
     __regid__ = "ExternalFile"
+    __bootstap_glyph__ = True
 
     def dc_title(self):
         return self.name
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-file'></span>"
+
+
+class File(AnyEntity):
+    __regid__ = "File"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.data_format
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-file'></span>"
+
+
+class CWSearch(AnyEntity):
+    __regid__ = "CWSearch"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.title
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-shopping-cart'></span>"
 
 
 class Center(AnyEntity):
     __regid__ = "Center"
 
     def dc_title(self):
-        return "Center"
+        return self.name
 
 
 class Study(AnyEntity):
     __regid__ = "Study"
 
     def dc_title(self):
-        return "Study"
+        return self.name
 
 

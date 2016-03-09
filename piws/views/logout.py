@@ -43,7 +43,7 @@ class PiwsLogoutController(Controller):
         html += "password: '*'"
         html += "}).fail(function() {"
         html += "window.location.replace('{0}');".format(
-            self._cw.vreg.config['deauthentication-redirection-url'])
+            self._cw.vreg.config["deauthentication-redirection-url"])
         html += "});"
         html += "});"
         html += "</script>"
@@ -59,11 +59,14 @@ class PiwsLogoutController(Controller):
 class PiwsExpirationLogoutController(Controller):
     """
     Override the default logout controller (<base url>/logout).
-    If the user wants to logout, adds its sessionid in the expired session list.
-    Then redirects the user to an inside page (e.g. the welcome page) to trigger
-    the deauthentication mechanism from PiwsExpirationInMemoryRepositorySessionManager.
+    If the user wants to logout, adds its sessionid in the expired session
+    list.
+    Then redirects the user to an inside page (e.g. the welcome page)
+    to trigger
+    the deauthentication mechanism from
+    PiwsExpirationInMemoryRepositorySessionManager.
     """
-    __regid__ = 'logout'
+    __regid__ = "logout"
     title = _("Logout")
 
     def publish(self, rset=None):
@@ -166,9 +169,9 @@ def registration_callback(vreg):
         vreg.register_and_replace(PiwsLogoutController, LogoutController)
     else:
         if vreg.config.get('apache-cleanup-session-time', None) is not None:
-            raise NotImplementedError("Session expiration with Apache is not yet "
-                                      "available due to cross browsers "
-                                      "compatibility issues")
+            raise NotImplementedError(
+                "Session expiration with Apache is not yet available due to "
+                "cross browsers compatibility issues")
             vreg.register_and_replace(
                 PiwsExpirationInMemoryRepositorySessionManager,
                 InMemoryRepositorySessionManager)

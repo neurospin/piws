@@ -14,13 +14,13 @@ from cubicweb.predicates import anonymous_user
 from cubicweb.predicates import one_line_rset
 from cubicweb.predicates import match_view
 from cubicweb.predicates import match_kwargs
-from logilab.common.decorators import monkeypatch
 from cubicweb.web.views.basecomponents import AnonUserStatusLink
 from cubicweb.web.views.basecomponents import ApplLogo
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbEntityVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbLinkToVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbAnyRSetVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbETypeVComponent
+from logilab.common.decorators import monkeypatch
 
 # Cubes import
 from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
@@ -33,16 +33,16 @@ from cubes.rql_upload.views.utils import load_forms
 # Navigation Box
 ###############################################################################
 
-class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
+class PIWSAuthenticatedUserStatus(BSAuthenticatedUserStatus):
     """
     Overrride bootstrap user-status component.
     In all-in-one.conf:
-    If show-user-status=no : display nothing.
-    If show-user-status=yes and enable-apache-logout=no: display the default
+    If show_user_status=no : display nothing.
+    If show_user_status=yes and enable-apache-logout=no: display the default
     bootstrap cube component.
-    If show-user-status=yes and enable-apache-logout=yes: display a logout
+    If show_user_status=yes and enable-apache-logout=yes: display a logout
     button next to the search field.
-    If show-user-status=yes and enable-apache-logout=no and
+    If show_user_status=yes and enable-apache-logout=no and
     apache-cleanup-session-time is not empty: raise an error.
     """
     def render(self, w):
@@ -52,19 +52,22 @@ class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
                 w(u"<a href='{0}' class='button'>Logout</a>".format(
                     self._cw.base_url() + 'logout'))
             else:
-                if config.get('apache-cleanup-session-time', None) is not None:
-                    raise NotImplementedError("Session expiration with Apache "
-                                              "is not yet available due to "
-                                              "cross browsers compatibility "
-                                              "issues")
+                if config.get("apache-cleanup-session-time", None) is not None:
+                    raise NotImplementedError(
+                        "Session expiration with Apache is not yet available "
+                        "due to cross browsers compatibility issues.")
                 else:
-                    super(PiwsAuthenticatedUserStatus, self).render(w)
+                    super(PIWSAuthenticatedUserStatus, self).render(w)
         else:
             w(u"")
 
 
-class NSNavigationtBox(component.CtxComponent):
+class PIWSNavigationtBox(component.CtxComponent):
     """ Display a box containing navigation shortcuts.
+
+    To add documentation to the 'All Questionnaires' documentation main button,
+    add a 'All Questionnaires.rst' file in instance all-in-one
+    'documentation_folder' parameter configuration file.
     """
     __regid__ = "nav_box"
     context = "left"
@@ -116,7 +119,7 @@ class NSNavigationtBox(component.CtxComponent):
             "view", vid="jtable-table",
             rql_labels=rql_labels, ajaxcallback=ajaxcallback,
             title="All Questionnaires", elts_to_sort=["ID"],
-            tooltip_name="Questionnaire_general_doc")
+            tooltip_name="All Questionnaires")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Questionnaires</a>')
         w(u'</div></div><br/>')
@@ -140,19 +143,21 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'</div></div><br/>')
 
         # CWUpload
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any U Where U is CWUpload")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'My uploads</a>')
-        w(u'</div></div><br/>')
+        config = load_forms(self._cw.vreg.config)
+        if config > 0:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            href = self._cw.build_url(rql="Any U Where U is CWUpload")
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'My uploads</a>')
+            w(u'</div></div><br/>')
 
 
 ###############################################################################
 # Statistic boxes
 ###############################################################################
 
-class NSSubjectStatistics(component.CtxComponent):
+class PIWSSubjectStatistics(component.CtxComponent):
     """ Display a box containing links to statistics on the cw entities.
     """
     __regid__ = "subject_statistics"
@@ -198,7 +203,7 @@ class NSSubjectStatistics(component.CtxComponent):
         w(u'</div></div><br/>')
 
 
-class NSAssessmentStatistics(component.CtxComponent):
+class PIWSAssessmentStatistics(component.CtxComponent):
     """ Display a box containing links to statistics on the cw entities.
     """
     __regid__ = "assessment_statistics"
@@ -226,7 +231,7 @@ class NSAssessmentStatistics(component.CtxComponent):
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
             rql="Any A WHERE A is Assessment", title="Processing status",
-            relations="related_processing", subject_attr="timepoint",
+            relations="processing_runs", subject_attr="timepoint",
             object_attr="tool")
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
@@ -252,8 +257,7 @@ class NSAssessmentStatistics(component.CtxComponent):
 
 AUTHORIZED_IMAGE_EXT = [".nii", ".nii.gz"]
 
-
-class NSImageViewers(component.CtxComponent):
+class PIWSImageViewers(component.CtxComponent):
     """ Display a box containing links to image viewers.
     """
     __regid__ = "image_viewers"
@@ -323,8 +327,10 @@ class RelationBox(component.CtxComponent):
 
 @monkeypatch(ApplLogo)
 def render(self, w):
-    w(u'<a class="navbar-brand" href="%s"><img id="logo" src="%s" alt="logo"/></a>'
-      % (self._cw.base_url(), self._cw.data_url(self._cw.vreg.config.get("logo"))))
+    w(u'<a class="navbar-brand" href="%s"><img id="logo" src="%s" '
+      'alt="logo"/></a>' % (
+            self._cw.base_url(),
+            self._cw.data_url(self._cw.vreg.config.get("logo"))))
 
 
 ###############################################################################
@@ -332,13 +338,13 @@ def render(self, w):
 ###############################################################################
 
 def registration_callback(vreg):
-    vreg.register_and_replace(PiwsAuthenticatedUserStatus,
-                              BSAuthenticatedUserStatus)
+    vreg.register_and_replace(
+        PIWSAuthenticatedUserStatus, BSAuthenticatedUserStatus)
     vreg.register(RelationBox)
-    vreg.register(NSNavigationtBox)
-    vreg.register(NSSubjectStatistics)
-    vreg.register(NSAssessmentStatistics)
-    vreg.register(NSImageViewers)
+    vreg.register(PIWSNavigationtBox)
+    vreg.register(PIWSSubjectStatistics)
+    vreg.register(PIWSAssessmentStatistics)
+    vreg.register(PIWSImageViewers)
     vreg.unregister(EditBox)
     vreg.unregister(BreadCrumbEntityVComponent)
     vreg.unregister(BreadCrumbAnyRSetVComponent)

@@ -39,7 +39,7 @@ class Questionnaires(Base):
         ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
         ("QuestionnaireRun", "open_answers", "OpenAnswer"),
         ("OpenAnswer", "in_assessment", "Assessment"),
-        ("QuestionnaireRun", "result", "File")
+        ("QuestionnaireRun", "file", "RestrictedFile")
     ]
 
     def __init__(self, session, project_name, center_name, questionnaires,
@@ -388,13 +388,13 @@ class Questionnaires(Base):
             else:
                 f_entity, _ = self._get_or_create_unique_entity(
                     rql="",
-                    entity_name="File",
+                    entity_name="RestrictedFile",
                     data=Binary(json.dumps(q_items)),
                     data_format=u"text/json",
                     data_name=u"result.json",
                     check_unicity=False)
                 self._set_unique_relation(
-                    qr_entity.eid, "result", f_entity.eid,
+                    qr_entity.eid, "file", f_entity.eid,
                     check_unicity=False, subjtype="QuestionnaireRun")
                 self._set_unique_relation(
                     f_entity.eid, "in_assessment", assessment_eid,

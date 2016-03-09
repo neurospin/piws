@@ -23,6 +23,8 @@ You could setup site properties or a workflow here for example.
 
 # Change the site name
 set_property("ui.site-title", "")
+
+# Change pagination properties
 set_property("navigation.page-size", "20")
 
 # Set cards

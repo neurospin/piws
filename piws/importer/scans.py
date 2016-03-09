@@ -14,11 +14,20 @@ import hashlib
 # Piws import
 from .base import Base
 
+# Brainomics2 import
+from cubes.brainomics2.schema.neuroimaging import SCAN_DATA
+
 
 class Scans(Base):
     """ This class enables us to load the scan data to CW.
     """
     # Define the relations involved
+    has_data = []
+    for dtype in SCAN_DATA:
+        has_data.extend([
+            ("Scan", "has_data", dtype),
+            (dtype, "scan", "PETData"),
+            (dtype, "in_assessment", "Assessment")])
     relations = (
         Base.fileset_relations + Base.assessment_relations + [
             ("Scan", "study", "Study"),
@@ -27,16 +36,8 @@ class Scans(Base):
             ("Subject", "subject_scans", "Scan"),
             ("Assessment", "scans", "Scan"),
             ("Scan", "in_assessment", "Assessment"),
-            ("Scan", "has_data", "PETData"),
-            ("PETData", "in_assessment", "Assessment"),
-            ("Scan", "has_data", "FMRIData"),
-            ("FMRIData", "in_assessment", "Assessment"),
-            ("Scan", "has_data", "DMRIData"),
-            ("DMRIData", "in_assessment", "Assessment"),
-            ("Scan", "has_data", "MRIData"),
-            ("MRIData", "in_assessment", "Assessment"),
             ("Scan", "score_values", "ScoreValue"),
-            ("ScoreValue", "in_assessment", "Assessment")]
+            ("ScoreValue", "in_assessment", "Assessment")] + has_data
     )
     relations[0][0] = "Scan"
 
@@ -307,6 +308,8 @@ class Scans(Base):
                 # > add relation with the scan
                 self._set_unique_relation(
                     scan_eid, "has_data", dtype_entity.eid, check_unicity=False)
+                self._set_unique_relation(
+                    dtype_entity.eid, "scan", scan_eid, check_unicity=False)
                 # > add relation with the assessment
                 self._set_unique_relation(
                     dtype_entity.eid, "in_assessment", assessment_eid,

@@ -17,6 +17,7 @@ from cubes.brainomics.views.facets import MeasureGenderFacet
 from cubes.brainomics.views.facets import MeasureAgeFacet
 from cubicweb.web.views.facets import HasTextFacet
 
+
 ############################################################################
 # Hide facet while filtering
 ############################################################################
@@ -80,6 +81,19 @@ class LabelFacet(facet.RQLPathFacet):
     order = 1
     filter_variable = "L"
     title = _("Labels")
+
+
+class NameFacet(facet.RQLPathFacet):
+    """ Filter on name.
+
+    This filter is applied on 'FileSet'.
+    """
+    __regid__ = "name-facet"
+    __select__ = is_instance("FileSet")
+    path = ["X name N"]
+    order = 1
+    filter_variable = "N"
+    title = _("Name")
 
 
 class StudyFacet(facet.RQLPathFacet):
@@ -208,3 +222,4 @@ def registration_callback(vreg):
     vreg.register(AssessmentSubjectFacet)
     vreg.register(ProcessingRunNameFacet)
     vreg.register(LabelFacet)
+    vreg.register(NameFacet)
