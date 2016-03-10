@@ -68,11 +68,15 @@ class PIWSNavigationtBox(component.CtxComponent):
     To add documentation to the 'All Questionnaires' documentation main button,
     add a 'All Questionnaires.rst' file in instance all-in-one
     'documentation_folder' parameter configuration file.
+
+    Set the 'display_assessment' to False to remove the 'Assessments'
+    button.
     """
     __regid__ = "nav_box"
     context = "left"
     title = _("Navigation")
     order = 0
+    display_assessment = True
 
     def render_body(self, w):
         """ Create the diifferent item of the navigation box
@@ -86,12 +90,13 @@ class PIWSNavigationtBox(component.CtxComponent):
         w(u'</div></div><br/>')
 
         # Assessments
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any A Where A is Assessment")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Assessments</a>')
-        w(u'</div></div><br/>')
+        if self.display_assessment:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            href = self._cw.build_url(rql="Any A Where A is Assessment")
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'Assessments</a>')
+            w(u'</div></div><br/>')
 
         # Scan
         w(u'<div class="btn-toolbar">')
@@ -101,28 +106,69 @@ class PIWSNavigationtBox(component.CtxComponent):
         w(u'Scans</a>')
         w(u'</div></div><br/>')
 
-        # ProcessingRun
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any PR Where PR is ProcessingRun")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Processing runs</a>')
-        w(u'</div></div><br/>')
-
         # QuestionnaireRun
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
         ajaxcallback = "get_questionnaires_data"
         rql_labels = ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
                       "A timepoint T")
-        href = self._cw.build_url(
-            "view", vid="jtable-table",
-            rql_labels=rql_labels, ajaxcallback=ajaxcallback,
-            title="All Questionnaires", elts_to_sort=["ID"],
-            tooltip_name="All Questionnaires")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Questionnaires</a>')
-        w(u'</div></div><br/>')
+        rql_types = ("DISTINCT Any T ORDERBY T WHERE Q is Questionnaire, "
+                      "Q type T")
+        rset = self._cw.execute(rql_types)
+        types = [line[0] for line in rset.rows]
+        if len(types) > 0:
+            # > main button
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            w(u'<a class="btn btn-info"'
+               'data-toggle="collapse" data-target="#questionnaires">')
+            w(u'Tables</a>')
+            w(u'</div></div>')
+            # > typed buttons container
+            w(u'<div id="questionnaires" class="collapse">')
+            w(u'<div class="panel-body">')
+            w(u'<hr>')
+            # > typed buttons
+            for qtype in types:
+                href = self._cw.build_url(
+                    "view", vid="jtable-table",
+                    rql_labels=rql_labels, ajaxcallback=ajaxcallback,
+                    title="All Questionnaires", elts_to_sort=["ID"],
+                    tooltip_name="All Questionnaires", qtype=qtype)
+                w(u'<div class="btn-toolbar">')
+                w(u'<div class="btn-group-vertical btn-block">')
+                w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+                w(u'{0}</a>'.format(qtype.title()))
+                w(u'</div></div><br/>')
+            w(u'<hr>')
+            w(u'</div></div><br/>')
+
+        # ProcessingRun
+        rql_types = ("DISTINCT Any T ORDERBY T WHERE P is ProcessingRun, "
+                      "P type T")
+        rset = self._cw.execute(rql_types)
+        types = [line[0] for line in rset.rows]
+        if len(types) > 0:
+            # > main button
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            w(u'<a class="btn btn-info"'
+               'data-toggle="collapse" data-target="#processings">')
+            w(u'Processed data</a>')
+            w(u'</div></div>')
+            # > typed buttons container
+            w(u'<div id="processings" class="collapse">')
+            w(u'<div class="panel-body">')
+            w(u'<hr>')
+            # > typed buttons
+            for ptype in types:
+                href = self._cw.build_url(rql="Any P Where P is ProcessingRun, "
+                                              "P type '{0}'".format(ptype))
+                w(u'<div class="btn-toolbar">')
+                w(u'<div class="btn-group-vertical btn-block">')
+                w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+                w(u'{0}</a>'.format(ptype.title()))
+                w(u'</div></div><br/>')
+            w(u'<hr>')
+            w(u'</div></div><br/>')
 
         # GenomicMeasures
         w(u'<div class="btn-toolbar">')
@@ -149,7 +195,8 @@ class PIWSNavigationtBox(component.CtxComponent):
             w(u'<div class="btn-group-vertical btn-block">')
             href = self._cw.build_url(rql="Any U Where U is CWUpload")
             w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-            w(u'My uploads</a>')
+            w(u'<span class="glyphicon glyphicon glyphicon-cloud-upload">'
+                '</span> My uploads</a>')
             w(u'</div></div><br/>')
 
 

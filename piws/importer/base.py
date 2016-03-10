@@ -93,6 +93,8 @@ class Base(object):
         # Send the new entities to the db
         if self.use_store:
             self.store.flush()
+        else:
+            self.session.commit()
 
     def import_data(self):
         """ Method that import the data in cw.

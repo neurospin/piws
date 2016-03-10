@@ -9,11 +9,15 @@
 
 # System import
 import os
+import sys
 import logging
 import glob
 import nibabel
 import json
 
+# Piws import
+sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+from piws.parser.freesurfer import freesurfer
 
 # Global parameters
 raw_datatypes = {
@@ -44,7 +48,7 @@ def subject_parser(root, project_name):
     # Get all the subjects
     subjects = set([
         os.path.basename(d) for d in glob.glob(os.path.join(root, "*", "*"))
-        if os.path.basename(d) != "genetic"])
+        if os.path.basename(d) not in ("genetic", "processed")])
 
     # Go through each subject
     for subject in subjects:
@@ -91,7 +95,7 @@ def scan_parser(root, project_name):
     # Get all the subjects
     subjects = set([
         os.path.basename(d) for d in glob.glob(os.path.join(root, "*", "*"))
-        if os.path.basename(d) != "genetic"])
+        if os.path.basename(d) not in ("genetic", "processed")])
 
     # Initialize the output structure
     scans = dict((subject_name, []) for subject_name in subjects)
@@ -224,7 +228,7 @@ def questionnaire_parser(root, project_name):
     # Get all the subjects
     subjects = set([
         os.path.basename(d) for d in glob.glob(os.path.join(root, "*", "*"))
-        if os.path.basename(d) != "genetic"])
+        if os.path.basename(d) not in ("genetic", "processed")])
 
     # Initialize the output structure
     questionnaires = dict((subject_name, []) for subject_name in subjects)
@@ -379,6 +383,51 @@ def genetic_parser(root, project_name):
     return genetics
 
 
+def freesurfer_parser(root, project_name):
+    """ Method to get the freesurfer elements.
+
+    Parameters
+    ----------
+    root: str (mandatory)
+        the path to the dataset.
+    project_name: str (mandatory)
+        the name of the project.
+
+    Returns
+    -------
+    processings: dict
+        the generated structure with the generated FreeSurfer files
+        information.
+    """
+    # Get all the timepoints
+    timepoints = os.listdir(root)
+
+    # Get all the stat directories
+    fsdirs = {}
+    for timepoint in timepoints:
+        fsdir = os.path.join(root, timepoint, "processed", "freesurfer")
+        if os.path.isdir(fsdir):
+            fsdirs[timepoint] = fsdir
+
+    # Get t1 RQL template
+    rql_t1 = ("Any SC Where S is Subject, S code_in_study '{0}', "
+              "S subject_scans SC, SC in_assessment A, A timepoint '{1}', "
+              "SC label 'T1'")
+
+    # Execute the default parser and update security groups
+    processings = freesurfer(
+        fsdirs, project_name, subject_pattern="subject[0-9]{1,3}",
+        tool_version="5.1", tool_parameters="recon-all -all",
+        rql_template=rql_t1)
+    for subject in processings:
+        for index in range(len(processings[subject])):
+            security = processings[subject][index]["Assessment"]["identifier"]
+            processings[subject][index]["Assessment"]["identifier"] = (
+                project_name + "_" + security)
+
+    return processings
+
+
 if __name__ == "__main__":
     scans = scan_parser("/tmp/demo", "toy")
     print scans["subject1"]
@@ -388,3 +437,5 @@ if __name__ == "__main__":
     print questionnaires["subject1"]
     genetics = genetic_parser("/tmp/demo", "toy")
     print genetics["V1"]
+    processings = freesurfer_parser("/tmp/demo", "toy")
+    print processings

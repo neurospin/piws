@@ -43,8 +43,8 @@ class Questionnaires(Base):
     ]
 
     def __init__(self, session, project_name, center_name, questionnaires,
-                 can_read=True, can_update=True, data_filepath=None,
-                 use_store=True, piws_security_model=True,
+                 questionnaire_type, can_read=True, can_update=True,
+                 data_filepath=None, use_store=True, piws_security_model=True,
                  use_openanswer=False):
         """ Initialize the 'Questionnaires' class.
 
@@ -61,6 +61,9 @@ class Questionnaires(Base):
             name as keys and then a list of dictionaries with four keys (Scans -
             (Scan - TypeData - FileSet - ExternalResource - ScoreValues) -
             Assessment) that contains the entities parameter decriptions.
+        questionnaire_type: str (mandatory)
+            a questionnaire type used to gather together similar
+            questionnaires.
         can_read: bool (optional, default True)
             set the read permission to the imported data.
         can_update: bool (optional, default True)
@@ -122,6 +125,7 @@ class Questionnaires(Base):
         self.data_filepath = data_filepath or ""
         self.project_name = project_name
         self.center_name = center_name
+        self.questionnaire_type = questionnaire_type
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -213,7 +217,7 @@ class Questionnaires(Base):
                 entity_name = "Questionnaire",
                 identifier=unicode(self._md5_sum(qname)),
                 name=unicode(qname),
-                type=u"unknown")
+                type=unicode(self.questionnaire_type))
             questionnaire_eids[qname] = questionnaire_entity.eid
             question_eids[qname] = {}
 
@@ -226,8 +230,7 @@ class Questionnaires(Base):
                     check_unicity=True,
                     entity_name = "Question",
                     identifier=unicode(question_id),
-                    text=unicode(question_name),
-                    # type=u"text"
+                    text=unicode(question_name)
                 )
                 question_eids[qname][question_name] = question_entity.eid
                 # > add relation with the questionnaire form
@@ -389,6 +392,7 @@ class Questionnaires(Base):
                 f_entity, _ = self._get_or_create_unique_entity(
                     rql="",
                     entity_name="RestrictedFile",
+                    title=u"{0} ({1})".format(questionnaire_name, subject_id),
                     data=Binary(json.dumps(q_items)),
                     data_format=u"text/json",
                     data_name=u"result.json",

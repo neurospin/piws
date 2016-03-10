@@ -13,7 +13,6 @@ import json
 from cubicweb.web.views.primary import PrimaryView
 from cubicweb.predicates import is_instance
 from cubicweb.web.views.primary import PrimaryView
-from cubicweb.utils import json_dumps
 
 # Cubes import
 from cubes.piws.views.components import RelationBox
@@ -161,15 +160,34 @@ class PIWSPrimaryView(PrimaryView):
 
 
 class PIWSFilePrimaryView(PrimaryView):
+    """ Specific view for File entities where binary content has to be
+    displayed.
+    """
     __select__ = PrimaryView.__select__ & is_instance("File")
 
-    def call(self, rset=None):
+    def call(self, rset=None, separator=";"):
         entity = self.cw_rset.get_entity(0, 0)
-        if entity.data_format == "text/json":
+        if "json" in entity.data_format:
             data = json.loads(entity.data.getvalue())
+            data = unicode(json.dumps(data, indent=4))
+        elif "comma-separated-values" in entity.data_format:
+            rset = entity.data.getvalue().split("\n")
+            labels = rset[0].split(separator)
+            records = []
+            for index, line in enumerate(rset[1:]):
+                elements = line.split(separator)
+                if len(elements) == len(labels):
+                    elements.insert(0, str(index))
+                    records.append(elements)
+
+            self.wview("jtable-hugetable-clientside", None, "null",
+                       labels=labels, records=records, csv_export=True,
+                       title=entity.data_format, elts_to_sort="ID")
+            return
         else:
-            data = str(entity.data.getvalue())
-        self.w(unicode(json.dumps(data, indent=4)))
+            data = unicode(entity.data.getvalue())
+        self.w(u"<h1>{0}</h1>".format(entity.data_format))
+        self.w(data.replace("\n", "<br/>").replace(" ", "&nbsp"))
 
 
 def registration_callback(vreg):

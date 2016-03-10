@@ -176,6 +176,18 @@ class Question(AnyEntity):
         return "<span class='glyphicon glyphicon-question-sign'></span>"
 
 
+class Questionnaire(AnyEntity):
+    __regid__ = "Questionnaire"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.name
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-question-sign'></span>"
+
+
 class OpenAnswer(AnyEntity):
     __regid__ = "OpenAnswer"
     __bootstap_glyph__ = True
@@ -248,6 +260,30 @@ class File(AnyEntity):
         return "<span class='glyphicon glyphicon-file'></span>"
 
 
+class UploadFile(AnyEntity):
+    __regid__ = "UploadFile"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.title
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-file'></span>"
+
+
+class RestrictedFile(AnyEntity):
+    __regid__ = "RestrictedFile"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return self.title
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-file'></span>"
+
+
 class CWSearch(AnyEntity):
     __regid__ = "CWSearch"
     __bootstap_glyph__ = True
@@ -258,6 +294,18 @@ class CWSearch(AnyEntity):
     @property
     def symbol(self):
         return "<span class='glyphicon glyphicon-shopping-cart'></span>"
+
+
+class CWUpload(AnyEntity):
+    __regid__ = "CWUpload"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return "{0} ({1})".format(self.title, self.form_name)
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-cloud-upload'></span>"
 
 
 class Center(AnyEntity):

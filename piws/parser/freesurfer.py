@@ -11,6 +11,7 @@ from __future__ import print_function
 import os
 import re
 import csv
+import copy
 import glob
 import datetime
 import json
@@ -198,7 +199,7 @@ def freesurfer(fsdirs, study_name, subject_pattern, tool_version,
 
             # Create the final structure
             processing_struct = {
-                "Assessment": assessment_struct,
+                "Assessment": copy.deepcopy(assessment_struct),
                 "Processings": [{
                     "Inputs": [rql_t1],
                     "ExternalResources": extresources_structs,

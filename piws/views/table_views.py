@@ -30,6 +30,7 @@ class FileAnswerTableView(View):
     per questionnaire.
     """
     __regid__ = "file-answer-table"
+    title = _("Jtable")
 
     def call(self):
         """Get all the questionnaire runs and associated subjects"""
@@ -627,7 +628,7 @@ class JtableView(View):
             # callback
             post_data = {'qname': kwargs['qname'],
                          'timepoint': kwargs['timepoint'],
-                         'labels': json.dumps(["ID"]+labels)}
+                         'labels': json.dumps(["ID"] + labels)}
 
             # > set csv file name
             timestamp = time.strftime("%Y-%m-%d_%H:%M:%S")
@@ -810,6 +811,8 @@ def get_questionnaires_data(self):
         pattern to search in the ID column.
     labels: list of str
         the table column names.
+    qtype: str
+        the requested questionnaires type.
 
     Returns
     -------
@@ -822,6 +825,7 @@ def get_questionnaires_data(self):
     jtpagesize = int(self._cw.form['iDisplayLength'])
     id_pattern = self._cw.form['sSearch']
     labels = json.loads(self._cw.form['labels'])
+    qtype = self._cw.form['qtype']
     column_to_filter = int(self._cw.form['iSortCol_0'])
 
     # Only the ID column can be filtered
@@ -845,8 +849,8 @@ def get_questionnaires_data(self):
     # Get all the questionnaire and associated timepoints
     rql = ("DISTINCT Any ID, T {0} "
            "Where Q is Questionnaire, QR is QuestionnaireRun, "
-           "QR questionnaire Q, QR in_assessment A, Q name ID, "
-           "A timepoint T".format(jtsort))
+           "QR questionnaire Q, Q type '{1}', QR in_assessment A, Q name ID, "
+           "A timepoint T".format(jtsort, qtype))
     rset = self._cw.execute(rql)
 
     # Get the total number of rows (without filtering)

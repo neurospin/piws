@@ -6,6 +6,9 @@
 # for details.
 ##########################################################################
 
+# System import
+import json
+
 # Cubicweb import
 from cubicweb.view import View
 
@@ -48,7 +51,7 @@ class QuestionnaireLongitudinalView(View):
 
         # Get the data from the result set
         questionnaires = {}
-        for line_number in range(len(rset.rows)):
+        for line_number in range(rset.rowcount):
 
             # Get the questionnaire run entity
             qr_entity = rset.get_entity(line_number, 0)
@@ -65,13 +68,25 @@ class QuestionnaireLongitudinalView(View):
 
             # Get the questionnaire run associated answers and fill the
             # 'questionnaires' structure
-            answer_entities = qr_entity.open_answers
-            for entity in answer_entities:
-                questionnaires[q_entity.name][entity.question[0].text][
-                    timepoint] = entity.value
+            # > case 1: one line of answers inserted per subject (File)
+            # > case 2: the answers are inserted in the database (OpenAnswer).
+            if len(qr_entity.file) > 0:
+                answers = json.loads(qr_entity.file[0].data.getvalue())
+                for qname, answer in answers.items():
+                    questionnaires[q_entity.name][qname][timepoint] = str(
+                        answer)
+            else:
+                answer_entities = qr_entity.open_answers
+                for entity in answer_entities:
+                    questionnaires[q_entity.name][entity.question[0].text][
+                        timepoint] = entity.value
+
+
+
 
         # Create a selector
-        html = "<select class='selectpicker' data-live-search='true'>"
+        html = "<h1>Select a question to follow:</h1>"
+        html += "<select class='selectpicker' data-live-search='true'>"
         html += "<option></option>"
         for questionnaire_name, questions in questionnaires.iteritems():
             html += "<optgroup label='{0}' data-icon='glyphicon-heart'>".format(

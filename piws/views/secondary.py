@@ -248,6 +248,7 @@ class OutOfContextProcessingRunView(BaseOutOfContextView):
         desc["Label"] = entity.label
         desc["Tool"] = entity.tool
         desc["Parameters"] = entity.parameters
+        desc["Type"] = entity.type
         return desc
 
 
@@ -255,7 +256,7 @@ class OutOfContextProcessingRunView(BaseOutOfContextView):
 # Genomic Measure
 ###############################################################################
 
-class OutOfContextProcessingRunView(BaseOutOfContextView):
+class OutOfContextGenomicMeasureView(BaseOutOfContextView):
     __select__ = EntityView.__select__ & is_instance("GenomicMeasure")
 
     def entity_description(self, entity):
@@ -309,11 +310,11 @@ class OutOfContextQuestionnaireView(BaseOutOfContextView):
     __select__ = EntityView.__select__ & is_instance("Questionnaire")
 
     def entity_description(self, entity):
-        """ Generate a dictionary with the QuestionnaireRun description.
+        """ Generate a dictionary with the Questionnaire description.
         """
-        questionnaire = entity.questionnaire[0]
         desc = {}
-        desc["Related questionnaire"] = questionnaire.view("incontext")
+        desc["Name"] = entity.name
+        desc["Nimber of questions"] = len(entity.questions)
         return desc
 
 
@@ -409,6 +410,59 @@ class OutOfContextCWUploadView(BaseOutOfContextView):
         """ Generate a dictionary with the CWUpload description.
         """
         desc = {}
+        desc["Tile"] = entity.title
+        desc["Form"] = entity.form_name
+        return desc
+
+
+###############################################################################
+# File
+###############################################################################
+
+class OutOfContextFileView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("File")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the File description.
+        """
+        desc = {}
+        desc["Title"] = entity.title
+        desc["Format"] = entity.data_format
+        desc["SHA1"] = entity.data_sha1hex
+        return desc
+
+
+###############################################################################
+# UploadFile
+###############################################################################
+
+class OutOfContextUploadFileView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("UploadFile")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the UploadFile description.
+        """
+        desc = {}
+        desc["Title"] = entity.title
+        desc["Format"] = entity.data_extension
+        desc["SHA1"] = entity.data_sha1hex
+        return desc
+
+
+###############################################################################
+# RestrictedFile
+###############################################################################
+
+class OutOfContextRestrictedFileView(BaseOutOfContextView):
+    __select__ = EntityView.__select__ & is_instance("RestrictedFile")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the RestrictedFile description.
+        """
+        desc = {}
+        desc["Title"] = entity.title
+        desc["Format"] = entity.data_format
+        desc["SHA1"] = entity.data_sha1hex
         return desc
 
 
@@ -425,6 +479,9 @@ def registration_callback(vreg):
                   OutOfContextProcessingRunView, OutOfContextScanView,
                   OutOfContextSubjectView, OutOfContextAssessmentView,
                   OutOfContextQuestionnaireRunView,
-                  OutOfContextExternalFileView, OutOfContextCWSearchView]:
+                  OutOfContextExternalFileView, OutOfContextCWSearchView,
+                  OutOfContextFileView, OutOfContextUploadFileView,
+                  OutOfContextRestrictedFileView,
+                  OutOfContextGenomicMeasureView]:
         vreg.register(klass)
 

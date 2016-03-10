@@ -11,7 +11,7 @@ from cubicweb.web.views import uicfg
 
 # Brainomics2 import
 from cubes.brainomics2.schema.neuroimaging import SCAN_DATA
-from cubes.brainomics2.schema.security import RESTRICTED_ENTITIES
+from cubes.piws.schema.security import RESTRICTED_ENTITIES
 
 
 uicfg.primaryview_section.tag_subject_of(
@@ -50,6 +50,17 @@ uicfg.primaryview_section.tag_subject_of(
     ("CWSearch", "result", "File"), "sideboxes")
 uicfg.primaryview_section.tag_subject_of(
     ("CWSearch", "rset", "File"), "sideboxes")
+uicfg.primaryview_section.tag_subject_of(
+    ("CWSearch", "owned_by", "CWUser"), "sideboxes")
+
+uicfg.primaryview_section.tag_subject_of(
+    ("CWUpload", "uploaded_by", "CWUser"), "sideboxes")
+
+uicfg.primaryview_section.tag_subject_of(
+    ("UploadForm", "upload", "CWUpload"), "sideboxes")
+
+uicfg.primaryview_section.tag_subject_of(
+    ("ProcessingRun", "study", "Study"), "sideboxes")
 
 for dtype in SCAN_DATA:
     uicfg.primaryview_section.tag_subject_of(

@@ -37,8 +37,8 @@ class Processings(Base):
     relations[0][0] = "ProcessingRun"
 
     def __init__(self, session, project_name, center_name, processings,
-                 can_read=True, can_update=False, data_filepath=None,
-                 use_store=True, piws_security_model=True):
+                 processing_type, can_read=True, can_update=False,
+                 data_filepath=None, use_store=True, piws_security_model=True):
         """ Initialize the Processings class.
 
         Parameters
@@ -54,6 +54,9 @@ class Processings(Base):
             name as keys and then a list of dictionaries with two keys (
             Assessment - Processings) that contains the entities parameter
             decriptions.
+        processing_type: str (mandatory)
+            a processing type used to gather together similar
+            processings.
         can_read: bool (optional, default True)
             set the read permission to the imported data.
         can_update: bool (optional, default False)
@@ -126,6 +129,7 @@ class Processings(Base):
         self.data_filepath = data_filepath or ""
         self.project_name = project_name
         self.center_name = center_name
+        self.processing_type = processing_type
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -292,6 +296,8 @@ class Processings(Base):
                             scores, processing_inputs, subject_eid, study_eid,
                             assessment_eid)
 
+        print  # new line after last progress bar update
+
     def _create_processing(self, processing_struct, fset_structs,
                            extfiles_structs, scores, processing_inputs,
                            subject_eid, study_eid, assessment_eid):
@@ -304,6 +310,7 @@ class Processings(Base):
                 processing_id)),
             check_unicity=True,
             entity_name="ProcessingRun",
+            type=unicode(self.processing_type),
             **processing_struct)
         processing_eid = processing_entity.eid
         self.inserted_processings[processing_id] = processing_eid
