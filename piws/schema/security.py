@@ -81,7 +81,7 @@ RESTRICTED_ENTITIES = [
     GenomicMeasure, RestrictedFile]
 
 PUBLIC_ENTITIES = [
-    Subject, Center, Study, Questionnaire, Question, Card, CWUser, CWGroup]
+    Subject, Center, Study, Questionnaire, Question, Card]
 
 ENTITIES = RESTRICTED_ENTITIES + PUBLIC_ENTITIES + [
     Assessment, CWSearch, File, CWUpload, UploadForm, UploadFile]

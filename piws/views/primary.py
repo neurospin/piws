@@ -8,6 +8,7 @@
 
 # System import
 import json
+import types
 
 # Cubicweb import
 from cubicweb.web.views.primary import PrimaryView
@@ -16,6 +17,12 @@ from cubicweb.web.views.primary import PrimaryView
 
 # Cubes import
 from cubes.piws.views.components import RelationBox
+
+
+# Add summary method for 3.20 compatibility.
+def summary(self, entity):
+    return u""
+PrimaryView.summary= types.MethodType(summary, PrimaryView)
 
 
 class PIWSPrimaryView(PrimaryView):
@@ -30,11 +37,6 @@ class PIWSPrimaryView(PrimaryView):
     # Renders the relations of the entity
     main_related_section = True
     allowed_relations = ["subject"]
-
-    def summary(self, entity):
-        """ Add method for 3.20 compatibility.
-        """
-        return u""
 
     def render_entity_attributes(self, entity):
         """ Renders all attributes and relations in the 'attributes' section.
