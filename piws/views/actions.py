@@ -24,10 +24,10 @@ class PoweredByPIWSAction(Action):
 
     category = "footer"
     order = 3
-    title = _("Powered by PIWS")
+    title = _("Powered by NSAp")
 
     def url(self):
-        return self._cw.build_url("piws")
+        return self._cw.build_url("https://github.com/neurospin/piws")
 
 
 def registration_callback(vreg):
