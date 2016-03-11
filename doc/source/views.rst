@@ -29,6 +29,15 @@ User Views
     highcharts_views.HighChartsBasicPlotView
 
 
+:mod:`piws.views.longitudinal_views`: Longitudinal views
+========================================================
+
+When dealing with multiple timepoints, it is crucial to display the scores
+of a subject at these timepoints.
+
+.. automodule:: cubes.piws.views.longitudinal_views
+
+
 :mod:`piws.views.table_views`: Table views
 ==========================================
 
@@ -64,14 +73,6 @@ Derived Views
 
     table_views.FileAnswerTableView
 
-Export Views
-------------
-
-.. autosummary::
-    :toctree: generated/table/
-    :template: class.rst
-
-    table_views.PiwsCSVView
 
 Ajax inner callbacks
 --------------------
@@ -82,3 +83,25 @@ Ajax inner callbacks
 
     table_views.get_open_answers_data
     table_views.get_questionnaires_data
+
+
+
+:mod:`piws.views.primary`: Primary views
+============================================
+
+Each entity content is displayed with a primary view. 
+
+
+.. automodule:: cubes.piws.views.primary
+    :private-members:
+
+
+:mod:`piws.views.secondary`: Secondary views
+============================================
+
+A request may returns a bunch of results that are displayed in a list where
+each returned entity is displayed with a secondary view. 
+
+
+.. automodule:: cubes.piws.views.secondary
+    :private-members:

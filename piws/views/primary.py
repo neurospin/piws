@@ -26,6 +26,8 @@ PrimaryView.summary= types.MethodType(summary, PrimaryView)
 
 
 class PIWSPrimaryView(PrimaryView):
+    """ Default primary view rendering.
+    """
     __regid__ = "primary"
     title = _("Primary")
     # Renders the attribute label next to the attribute value
@@ -88,6 +90,10 @@ class PIWSPrimaryView(PrimaryView):
 
     def _prepare_side_boxes(self, entity):
         """ Create the right relation boxes to display.
+
+        This is a common functionality to learn the schema by browsing the
+        database content that will enalbe the users to phrase direct RQL to
+        get their data.
 
         In the case of 'FileSet' object, go directly to the associated
         'ExternalResource' if only one 'FileSet' has been specified.

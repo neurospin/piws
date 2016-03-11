@@ -12,8 +12,12 @@ Summary
 
 * Address neuroimaging genetic datasets.
 * Propose a unified insertion procedure in a CubicWeb database.
+* Propose a download strategy for images and associated metadata.
+* Propose dynamic filters: what you see is what you get.
+* Propose simplified data collection tools.
 * Propose user-friendly views.
 * Contain a demonstrator that can be generated from scratch.
+
 
 Description
 -----------

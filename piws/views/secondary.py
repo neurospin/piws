@@ -22,6 +22,8 @@ from components import AUTHORIZED_IMAGE_EXT
 ###############################################################################
 
 class BaseOutOfContextView(EntityView):
+    """ Default secondary view rendering.
+    """
     __regid__ = "outofcontext"
     __select__ = False
     title = _("Outofcontext")
@@ -155,6 +157,8 @@ class BaseOutOfContextView(EntityView):
 ###############################################################################
 
 class OutOfContextScanView(BaseOutOfContextView):
+    """ Scan secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("Scan")
 
     def entity_description(self, entity):
@@ -181,6 +185,8 @@ class OutOfContextScanView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextAssessmentView(BaseOutOfContextView):
+    """ Assessment secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("Assessment")
 
     def entity_description(self, entity):
@@ -203,6 +209,8 @@ class OutOfContextAssessmentView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextSubjectView(BaseOutOfContextView):
+    """ Subject secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("Subject")
 
     def entity_description(self, entity):
@@ -239,6 +247,8 @@ class OutOfContextSubjectView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextProcessingRunView(BaseOutOfContextView):
+    """ ProcessingRun secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("ProcessingRun")
 
     def entity_description(self, entity):
@@ -257,6 +267,8 @@ class OutOfContextProcessingRunView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextGenomicMeasureView(BaseOutOfContextView):
+    """ GenomicMeasure secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("GenomicMeasure")
 
     def entity_description(self, entity):
@@ -274,6 +286,8 @@ class OutOfContextGenomicMeasureView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextQuestionnaireRunView(BaseOutOfContextView):
+    """ QuestionnaireRun secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("QuestionnaireRun")
 
     def entity_description(self, entity):
@@ -290,6 +304,8 @@ class OutOfContextQuestionnaireRunView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextQuestionView(BaseOutOfContextView):
+    """ Question secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("Question")
 
     def entity_description(self, entity):
@@ -307,6 +323,8 @@ class OutOfContextQuestionView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextQuestionnaireView(BaseOutOfContextView):
+    """ Questionnaire secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("Questionnaire")
 
     def entity_description(self, entity):
@@ -323,6 +341,8 @@ class OutOfContextQuestionnaireView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextSnpView(BaseOutOfContextView):
+    """ Snp secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("Snp")
 
     def entity_description(self, entity):
@@ -339,6 +359,8 @@ class OutOfContextSnpView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextGenomicPlatformView(BaseOutOfContextView):
+    """ GenomicPlatform secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("GenomicPlatform")
 
     def entity_description(self, entity):
@@ -354,6 +376,8 @@ class OutOfContextGenomicPlatformView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextFileSetView(BaseOutOfContextView):
+    """ FileSet secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("FileSet")
 
     def entity_description(self, entity):
@@ -369,6 +393,8 @@ class OutOfContextFileSetView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextExternalFileView(BaseOutOfContextView):
+    """ ExternalFile secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("ExternalFile")
 
     def entity_description(self, entity):
@@ -386,6 +412,8 @@ class OutOfContextExternalFileView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextCWSearchView(BaseOutOfContextView):
+    """ CWSearch secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("CWSearch")
 
     def entity_description(self, entity):
@@ -404,6 +432,8 @@ class OutOfContextCWSearchView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextCWUploadView(BaseOutOfContextView):
+    """ CWUpload secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("CWUpload")
 
     def entity_description(self, entity):
@@ -420,6 +450,8 @@ class OutOfContextCWUploadView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextFileView(BaseOutOfContextView):
+    """ File secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("File")
 
     def entity_description(self, entity):
@@ -437,6 +469,8 @@ class OutOfContextFileView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextUploadFileView(BaseOutOfContextView):
+    """ UploadFile secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("UploadFile")
 
     def entity_description(self, entity):
@@ -454,6 +488,8 @@ class OutOfContextUploadFileView(BaseOutOfContextView):
 ###############################################################################
 
 class OutOfContextRestrictedFileView(BaseOutOfContextView):
+    """ RestrictedFile secondary rendering.
+    """
     __select__ = EntityView.__select__ & is_instance("RestrictedFile")
 
     def entity_description(self, entity):
