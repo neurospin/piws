@@ -27,7 +27,7 @@ class PoweredByPIWSAction(Action):
     title = _("Powered by NSAp")
 
     def url(self):
-        return self._cw.build_url("https://github.com/neurospin/piws")
+        return "https://github.com/neurospin/piws"
 
 
 def registration_callback(vreg):
