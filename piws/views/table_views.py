@@ -643,7 +643,7 @@ class JtableView(View):
 
             # > execute the ajax callback
             html += "var request = $.ajax({"
-            html += "url: 'view?vid=piwscsvexport',"
+            html += "url: 'view?vid=jtable-table-csv-export',"
             html += "method: 'POST',"
             html += "data: {0},".format(json.dumps(post_data))
             html += "dataType: 'html'"
@@ -700,6 +700,44 @@ class JtableView(View):
 
         # Creat the corrsponding html page
         self.w(unicode(html))
+
+
+###############################################################################
+# Export table data in CSV
+###############################################################################
+
+class PIWSCSVView(CSVMixIn, View):
+    """ Dumps table data in CSV: used by 'jtable-table' view.
+    """
+    __regid__ = "jtable-table-csv-export"
+    __select__ = yes()
+    title = _("piws csv export")
+
+    def call(self):
+        """ Display the CSV formated table data.
+        """
+
+        qname = self._cw.form["qname"]
+        timepoint = self._cw.form["timepoint"]
+        labels = json.loads(self._cw.form["labels"])
+
+        rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
+               "S subject_questionnaire_runs QR, QR questionnaire QU, "
+               "QU name '{0}', QR open_answers O, O value OV, "
+               "O in_assessment A, A timepoint '{1}', O question Q, "
+               "Q text QT".format(qname, timepoint))
+        rset = self._cw.execute(rql)
+
+        table = defaultdict(lambda: OrderedDict.fromkeys(labels, ""))
+        for item in rset:
+            table[item[0]][item[1]] = item[2]
+        for id, data in table.iteritems():
+            table[id]["ID"] = id
+
+        writer = self.csvwriter()
+        writer.writerow(labels)
+        for psc2, data in iter(sorted(table.iteritems())):
+            writer.writerow(data.values())
 
 
 ###############################################################################
@@ -924,8 +962,11 @@ def get_questionnaires_data(self):
 ###############################################################################
 
 def registration_callback(vreg):
-    vreg.register(JtableView)
-    vreg.register(JHugetableView)
-    vreg.register(FileAnswerTableView)
-    vreg.register(get_open_answers_data)
-    vreg.register(get_questionnaires_data)
+
+    for tclass in [JtableView, JHugetableView, FileAnswerTableView,
+                   PIWSCSVView]:
+        vreg.register(tclass)
+
+    for ajax in [get_questionnaires_data, get_open_answers_data]:
+        vreg.register(ajax)
+
