@@ -51,6 +51,9 @@ from cubes.rql_upload.schema import UploadFile
 
 # CWGROUP
 class can_read(RelationDefinition):
+    """ Link a group to an assessment with this relation to give the group
+    users read access to the assessment related entities.
+    """
     inlined = False
     subject = "CWGroup"
     object = "Assessment"
@@ -58,6 +61,9 @@ class can_read(RelationDefinition):
 
 
 class can_update(RelationDefinition):
+    """ Link a group to an assessment with this relation to give the group
+    users write access to the assessment related entities.
+    """
     inlined = False
     subject = "CWGroup"
     object = "Assessment"
@@ -65,6 +71,9 @@ class can_update(RelationDefinition):
 
 
 class in_assessment(RelationType):
+    """ Relate entities to an assessment with this relation in order to apply
+    the proposed simplified rights management mechanism.
+    """
     inlined = False
     cardinality = "1*"
     subject = "*"
