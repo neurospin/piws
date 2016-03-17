@@ -73,6 +73,15 @@ Derived Views
 
     table_views.FileAnswerTableView
 
+Export Views
+------------
+
+.. autosummary::
+    :toctree: generated/table/
+    :template: class.rst
+
+    table_views.PIWSCSVView
+
 
 Ajax inner callbacks
 --------------------

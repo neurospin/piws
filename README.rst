@@ -17,7 +17,7 @@ Content
 =======
 
 This cube contains most of the functionalities that have been developped by
-the neurospin platform in collaboration with Logilab to produce wed-semantic 
+the NeuroSpin platform in collaboration with Logilab to produce semantic web
 population imaging databases.
 
 This cube provides:
@@ -47,4 +47,3 @@ which bring massive data download/upload functionalities.
 
 .. _rql_upload: https://github.com/neurospin/rql_upload
 .. _rql_download: https://github.com/neurospin/rql_download
-
