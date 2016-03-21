@@ -322,7 +322,7 @@ class Scans(Base):
             for score_struct in scores:
 
                 # Create the entity
-                score_entity = self._get_or_create_unique_entity(
+                score_entity, _ = self._get_or_create_unique_entity(
                     rql="",
                     check_unicity=False,
                     entity_name="ScoreValue",

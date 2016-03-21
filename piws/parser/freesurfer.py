@@ -138,7 +138,7 @@ def freesurfer(fsdirs, study_name, subject_pattern, tool_version,
 
         # Create an assessment
         assessment_id = u"{0}_FREESURFER_{1}".format(
-                timepoint, study_name.upper())
+            timepoint, study_name.upper())
         assessment_struct = {
             "age_of_subject": 0,
             "identifier": assessment_id,
