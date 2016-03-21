@@ -58,6 +58,7 @@ cubes.piws.views.highcharts_views.HighChartsRelationSummaryView
       ~HighChartsRelationSummaryView.div_id
       ~HighChartsRelationSummaryView.paginable
       ~HighChartsRelationSummaryView.templatable
+      ~HighChartsRelationSummaryView.title
     
     
 

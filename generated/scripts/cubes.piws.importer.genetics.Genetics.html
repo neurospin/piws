@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -75,10 +75,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../rights.html">Rights management</a></li>
 			  <li><a href="../../views.html">Views</a></li>
 			  <li><a href="../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../download.html">Download</a></li>
+			  <li><a href="../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -94,12 +99,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -265,7 +269,7 @@ descriptions.</p>
 
 <dl class="method">
 <dt id="cubes.piws.importer.genetics.Genetics._create_measure">
-<code class="descname">_create_measure</code><span class="sig-paren">(</span><em>measure_struct</em>, <em>fset_struct</em>, <em>extfiles</em>, <em>related_subjects</em>, <em>study_subjects</em>, <em>study_eid</em>, <em>assessment_eid</em>, <em>platform_eid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/genetics.html#Genetics._create_measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.genetics.Genetics._create_measure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_create_measure</code><span class="sig-paren">(</span><em>measure_struct</em>, <em>fset_struct</em>, <em>extfiles</em>, <em>related_subjects</em>, <em>subjects_eid_map</em>, <em>study_eid</em>, <em>assessment_eid</em>, <em>platform_eid</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/genetics.html#Genetics._create_measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.genetics.Genetics._create_measure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a genomic measure and its associated relations.</p>
 </dd></dl>
 
@@ -296,7 +300,7 @@ been inserted in the database.</p>
 
 <dl class="attribute">
 <dt id="cubes.piws.importer.genetics.Genetics.relations">
-<code class="descname">relations</code><em class="property"> = [['Scan', 'results_files', 'FileSet'], ('FileSet', 'in_assessment', 'Assessment'), ('FileSet', 'file_entries', 'ExternalFile'), ('ExternalFile', 'in_assessment', 'Assessment'), ('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('GenomicMeasure', 'study', 'Study'), ('Study', 'genomic_measures', 'GenomicMeasure'), ('GenomicMeasure', 'subjects', 'Subject'), ('Subject', 'genomic_measures', 'GenomicMeasure'), ('Assessment', 'genomic_measures', 'GenomicMeasure'), ('GenomicMeasure', 'in_assessment', 'Assessment'), ('GenomicMeasure', 'platform', 'GenomicPlatform'), ('GenomicPlatform', 'genomic_measures', 'GenomicMeasure'), ('GenomicPlatform', 'snps', 'Snp')]</em><a class="headerlink" href="#cubes.piws.importer.genetics.Genetics.relations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">relations</code><em class="property"> = [['Scan', 'filesets', 'FileSet'], ('FileSet', 'in_assessment', 'Assessment'), ('FileSet', 'external_files', 'ExternalFile'), ('ExternalFile', 'fileset', 'FileSet'), ('ExternalFile', 'in_assessment', 'Assessment'), ('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('GenomicMeasure', 'study', 'Study'), ('Study', 'study_genomic_measures', 'GenomicMeasure'), ('GenomicMeasure', 'subjects', 'Subject'), ('Subject', 'subject_genomic_measures', 'GenomicMeasure'), ('Assessment', 'genomic_measures', 'GenomicMeasure'), ('GenomicMeasure', 'in_assessment', 'Assessment'), ('GenomicMeasure', 'genomic_platform', 'GenomicPlatform'), ('GenomicPlatform', 'genomic_platform_genomic_measures', 'GenomicMeasure'), ('GenomicPlatform', 'snps', 'Snp')]</em><a class="headerlink" href="#cubes.piws.importer.genetics.Genetics.relations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

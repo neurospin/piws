@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -76,10 +76,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../../../rights.html">Rights management</a></li>
 			  <li><a href="../../../../views.html">Views</a></li>
 			  <li><a href="../../../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../download.html">Download</a></li>
+			  <li><a href="../../../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -95,12 +100,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -133,34 +137,35 @@
 <span class="c1"># Piws import</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">Base</span>
 
+<span class="c1"># Brainomics2 import</span>
+<span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.neuroimaging</span> <span class="kn">import</span> <span class="n">SCAN_DATA</span>
+
 
 <div class="viewcode-block" id="Scans"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.scans.Scans.html#cubes.piws.importer.scans.Scans">[docs]</a><span class="k">class</span> <span class="nc">Scans</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This class enables us to load the scan data to CW.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Define the relations involved</span>
+    <span class="n">has_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">SCAN_DATA</span><span class="p">:</span>
+        <span class="n">has_data</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+            <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;has_data&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">&quot;scan&quot;</span><span class="p">,</span> <span class="s2">&quot;PETData&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)])</span>
     <span class="n">relations</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">Base</span><span class="o">.</span><span class="n">fileset_relations</span> <span class="o">+</span> <span class="n">Base</span><span class="o">.</span><span class="n">assessment_relations</span> <span class="o">+</span> <span class="p">[</span>
             <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="s2">&quot;Study&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;scans&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;study_scans&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;scans&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;subject_scans&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;scans&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;has_data&quot;</span><span class="p">,</span> <span class="s2">&quot;PETData&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;PETData&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;has_data&quot;</span><span class="p">,</span> <span class="s2">&quot;FMRIData&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;FMRIData&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;has_data&quot;</span><span class="p">,</span> <span class="s2">&quot;DMRIData&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;DMRIData&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;has_data&quot;</span><span class="p">,</span> <span class="s2">&quot;MRIData&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;MRIData&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;score_values&quot;</span><span class="p">,</span> <span class="s2">&quot;ScoreValue&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;ScoreValue&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)]</span>
+            <span class="p">(</span><span class="s2">&quot;ScoreValue&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="n">has_data</span>
     <span class="p">)</span>
     <span class="n">relations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Scan&quot;</span>
 
 <div class="viewcode-block" id="Scans.__init__"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.scans.Scans.html#cubes.piws.importer.scans.Scans.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">center_name</span><span class="p">,</span> <span class="n">scans</span><span class="p">,</span>
-                 <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the Scans class.</span>
 
@@ -179,7 +184,7 @@
 <span class="sd">            Assessment) that contains the entities parameter decriptions.</span>
 <span class="sd">        can_read: bool (optional, default True)</span>
 <span class="sd">            set the read permission to the imported data.</span>
-<span class="sd">        can_update: bool (optional, default True)</span>
+<span class="sd">        can_update: bool (optional, default False)</span>
 <span class="sd">            set the update permission to the imported data.</span>
 <span class="sd">        data_filepath: str (optional, default None)</span>
 <span class="sd">            the path to folder containing the current study dataset.</span>
@@ -221,15 +226,14 @@
 <span class="sd">            }</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Inheritance</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Scans</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">use_store</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Scans</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">can_read</span><span class="p">,</span> <span class="n">can_update</span><span class="p">,</span> <span class="n">use_store</span><span class="p">,</span>
+                                    <span class="n">piws_security_model</span><span class="p">)</span>
 
         <span class="c1"># Class parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="n">scans</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_filepath</span> <span class="o">=</span> <span class="n">data_filepath</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">project_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">center_name</span> <span class="o">=</span> <span class="n">center_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">can_read</span> <span class="o">=</span> <span class="n">can_read</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">can_update</span> <span class="o">=</span> <span class="n">can_update</span>
 
         <span class="c1"># Speed up parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span> <span class="o">=</span> <span class="p">{}</span>
@@ -309,13 +313,14 @@
 
         <span class="c1"># Go through the data structure</span>
         <span class="n">nb_of_subjects</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scans</span><span class="p">))</span>
+        <span class="n">maxsize</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scans</span><span class="p">])</span>
         <span class="n">cnt_subject</span> <span class="o">=</span> <span class="mf">1.</span>
         <span class="k">for</span> <span class="n">subject_id</span><span class="p">,</span> <span class="n">list_subj_scans</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scans</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
 
             <span class="c1"># Print a progress bar</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="p">(</span><span class="n">cnt_subject</span> <span class="o">/</span> <span class="n">nb_of_subjects</span><span class="p">,</span>
-                               <span class="n">title</span><span class="o">=</span><span class="s2">&quot;{0}(scans):&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject_id</span><span class="p">),</span>
-                               <span class="n">bar_length</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+                               <span class="n">title</span><span class="o">=</span><span class="s2">&quot;{0}(scans)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject_id</span><span class="p">),</span>
+                               <span class="n">bar_length</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span>
             <span class="n">cnt_subject</span> <span class="o">+=</span> <span class="mf">1.</span>
 
             <span class="c1">###################################################################</span>
@@ -399,12 +404,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                 <span class="n">scan_eid</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">study_eid</span><span class="p">,</span> <span class="s2">&quot;scans&quot;</span><span class="p">,</span> <span class="n">scan_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">study_eid</span><span class="p">,</span> <span class="s2">&quot;study_scans&quot;</span><span class="p">,</span> <span class="n">scan_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="c1"># &gt; add relation with the subject</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                 <span class="n">scan_eid</span><span class="p">,</span> <span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;scans&quot;</span><span class="p">,</span> <span class="n">scan_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;subject_scans&quot;</span><span class="p">,</span> <span class="n">scan_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="c1"># &gt; add relation with the assessment</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                 <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;scans&quot;</span><span class="p">,</span> <span class="n">scan_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -426,6 +431,8 @@
                 <span class="c1"># &gt; add relation with the scan</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                     <span class="n">scan_eid</span><span class="p">,</span> <span class="s2">&quot;has_data&quot;</span><span class="p">,</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                    <span class="n">dtype_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;scan&quot;</span><span class="p">,</span> <span class="n">scan_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
                 <span class="c1"># &gt; add relation with the assessment</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                     <span class="n">dtype_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
@@ -438,7 +445,7 @@
             <span class="k">for</span> <span class="n">score_struct</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">:</span>
 
                 <span class="c1"># Create the entity</span>
-                <span class="n">score_entity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+                <span class="n">score_entity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
                     <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                     <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                     <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;ScoreValue&quot;</span><span class="p">,</span>

@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -76,10 +76,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../../../rights.html">Rights management</a></li>
 			  <li><a href="../../../../views.html">Views</a></li>
 			  <li><a href="../../../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../download.html">Download</a></li>
+			  <li><a href="../../../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -95,12 +100,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -140,6 +144,7 @@
     <span class="sd">&quot;&quot;&quot; Create a basic pie chart using highcharts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;highcharts-basic-pie&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;HighCharts&quot;</span><span class="p">)</span>
     <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;highcharts-basic-pie&quot;</span>
 
@@ -251,6 +256,7 @@
     <span class="sd">&quot;&quot;&quot; Create a basic table view that summarized an entity relation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;highcharts-relation-summary-view&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;HighCharts&quot;</span><span class="p">)</span>
     <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;highcharts-relation-summary-view&quot;</span>
 
@@ -385,6 +391,7 @@
             <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="c1"># Get the highcharts string representation of the data</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rset_to_data</span><span class="p">(</span><span class="n">rset</span><span class="p">,</span> <span class="n">relations</span><span class="p">,</span> <span class="n">subject_attr</span><span class="p">,</span> <span class="n">object_attr</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rset_to_data</span><span class="p">(</span><span class="n">rset</span><span class="p">,</span> <span class="n">relations</span><span class="p">,</span> <span class="n">subject_attr</span><span class="p">,</span> <span class="n">object_attr</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
@@ -471,6 +478,7 @@
     <span class="sd">&quot;&quot;&quot; Create a basic plot using highcharts.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;highcharts-basic-plot&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;HighCharts&quot;</span><span class="p">)</span>
     <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;highcharts-basic-plot&quot;</span>
 

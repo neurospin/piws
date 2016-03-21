@@ -1,0 +1,361 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubes/piws/parser/freesurfer.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../../../index.html">
+        <img src="../../../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../../../index.html">Home</a></li>
+        <li><a href="../../../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../rights.html">Rights management</a></li>
+			  <li><a href="../../../../views.html">Views</a></li>
+			  <li><a href="../../../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../download.html">Download</a></li>
+			  <li><a href="../../../../upload.html">Upload</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubes.piws.parser.freesurfer</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013 - 2016</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+
+<span class="n">FREESURFER_QUESTIONNAIRES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;LH.APARC.FOLDIND&quot;</span><span class="p">,</span> <span class="s2">&quot;LH.APARC.AREA&quot;</span><span class="p">,</span> <span class="s2">&quot;RH.APARC.CURVIND&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LH.APARC.THICKNESSSTD&quot;</span><span class="p">,</span> <span class="s2">&quot;MEASURE:VOLUME&quot;</span><span class="p">,</span> <span class="s2">&quot;LH.APARC.MEANCURV&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RH.APARC.THICKNESSSTD&quot;</span><span class="p">,</span> <span class="s2">&quot;LH.APARC.VOLUME&quot;</span><span class="p">,</span> <span class="s2">&quot;RH.APARC.MEANCURV&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RH.APARC.VOLUME&quot;</span><span class="p">,</span> <span class="s2">&quot;LH.APARC.CURVIND&quot;</span><span class="p">,</span> <span class="s2">&quot;LH.APARC.THICKNESS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RH.APARC.FOLDIND&quot;</span><span class="p">,</span> <span class="s2">&quot;RH.APARC.GAUSCURV&quot;</span><span class="p">,</span> <span class="s2">&quot;RH.APARC.AREA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LH.APARC.GAUSCURV&quot;</span><span class="p">,</span> <span class="s2">&quot;RH.APARC.THICKNESS&quot;</span><span class="p">]</span>
+<span class="n">FREESURFER</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;FREESURFER&quot;</span><span class="p">]</span>
+
+<span class="n">RQL_T1</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any SC Where S is Subject, S code_in_study &#39;{0}&#39;, &quot;</span>
+          <span class="s2">&quot;S scans SC, SC in_assessment A, A timepoint &#39;{1}&#39;, &quot;</span>
+          <span class="s2">&quot;SC label &#39;ADNI_MPRAGE&#39;&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="freesurfer_stats"><a class="viewcode-back" href="../../../../parsers.html#cubes.piws.parser.freesurfer.freesurfer_stats">[docs]</a><span class="k">def</span> <span class="nf">freesurfer_stats</span><span class="p">(</span><span class="n">fsstatdirs</span><span class="p">,</span> <span class="n">study_name</span><span class="p">,</span> <span class="n">subject_age_map</span><span class="p">,</span> <span class="n">savedir</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parse the freesurfer stats files and create a structure that</span>
+<span class="sd">    fulfill the questionnaire importer synthax.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fsstatdirs: dict (mandatory)</span>
+<span class="sd">        the location of the FreeSurfer stats directories with the timepoints</span>
+<span class="sd">        as key.</span>
+<span class="sd">    study_name: str (mandatory)</span>
+<span class="sd">        the name of the study.</span>
+<span class="sd">    subject_age_map: dict (mandatory)</span>
+<span class="sd">        a map between subject ids as keys and subject ages as</span>
+<span class="sd">        values with the time points as a fist key.</span>
+<span class="sd">    savedir: str (optional, defafult None)</span>
+<span class="sd">        if a valid directory is specified write the generated structure as</span>
+<span class="sd">        a json file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    questionnaires: dict</span>
+<span class="sd">        the generated structure with the stat files information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Go through timepoints</span>
+    <span class="n">questionnaires</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">timepoint</span><span class="p">,</span> <span class="n">statdir</span> <span class="ow">in</span> <span class="n">fsstatdirs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="c1"># List all csv stat files</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">statdir</span><span class="p">,</span> <span class="s2">&quot;*.csv&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Go through stat files</span>
+        <span class="k">for</span> <span class="n">filepath</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+
+            <span class="c1"># Parse the stat file</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+                <span class="n">dialect</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">Sniffer</span><span class="p">()</span><span class="o">.</span><span class="n">sniff</span><span class="p">(</span><span class="n">csvfile</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                <span class="n">csvfile</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">dialect</span><span class="p">)</span>
+                <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">]</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">qname</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                    <span class="n">subject</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">age</span> <span class="o">=</span> <span class="n">subject_age_map</span><span class="p">[</span><span class="n">timepoint</span><span class="p">][</span><span class="n">subject</span><span class="p">]</span>
+                    <span class="n">qstruct</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;Questionnaires&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="n">qname</span><span class="p">:</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:])}</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;Assessment&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;age_of_subject&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">age</span><span class="p">),</span>
+                            <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">u&quot;{0}_{1}_{2}_{3}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="n">timepoint</span><span class="p">,</span> <span class="n">qname</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
+                                    <span class="n">study_name</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">subject</span><span class="p">),</span>
+                            <span class="s2">&quot;timepoint&quot;</span><span class="p">:</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">timepoint</span><span class="p">)</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                    <span class="n">questionnaires</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qstruct</span><span class="p">)</span>
+
+    <span class="c1"># Save the generated structure</span>
+    <span class="k">if</span> <span class="n">savedir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">savedir</span><span class="p">):</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="n">save_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">savedir</span><span class="p">,</span> <span class="s2">&quot;freesurfer_stats_{0}.json&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">date</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">openfile</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">questionnaires</span><span class="p">,</span> <span class="n">openfile</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">questionnaires</span></div>
+
+
+<div class="viewcode-block" id="freesurfer"><a class="viewcode-back" href="../../../../parsers.html#cubes.piws.parser.freesurfer.freesurfer">[docs]</a><span class="k">def</span> <span class="nf">freesurfer</span><span class="p">(</span><span class="n">fsdirs</span><span class="p">,</span> <span class="n">study_name</span><span class="p">,</span> <span class="n">subject_pattern</span><span class="p">,</span> <span class="n">tool_version</span><span class="p">,</span>
+               <span class="n">tool_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">savedir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rql_template</span><span class="o">=</span><span class="n">RQL_T1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parse the freesurfer files and create a structure that</span>
+<span class="sd">    fulfill the processing importer synthax.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fsdirs: dict (mandatory)</span>
+<span class="sd">        the location of the FreeSurfer directory with the</span>
+<span class="sd">        timepoints as key.</span>
+<span class="sd">    study_name: str (mandatory)</span>
+<span class="sd">        the name of the study.</span>
+<span class="sd">    subject_pattern: str (mandatory)</span>
+<span class="sd">        a pattern used to extract the subject name from the FreeSurfer</span>
+<span class="sd">        directories names.</span>
+<span class="sd">    tool_version: str (mandatory)</span>
+<span class="sd">        the FreeSurfer tool version.</span>
+<span class="sd">    tool_parameters: object (optional, defafult None)</span>
+<span class="sd">        a structure describing the used options.</span>
+<span class="sd">    savedir: str (optional, defafult None)</span>
+<span class="sd">        if a valid directory is specified write the generated structure as</span>
+<span class="sd">        a json file.</span>
+<span class="sd">    rql_template: str (optional, default RQL_T1)</span>
+<span class="sd">        the rql used to retrieve the t1 scan attached to a FreeSurfer</span>
+<span class="sd">        processing.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    processings: dict</span>
+<span class="sd">        the generated structure with the FreeSurfeer files information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Go through timepoints</span>
+    <span class="n">processings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">timepoint</span><span class="p">,</span> <span class="n">fsdir</span> <span class="ow">in</span> <span class="n">fsdirs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="c1"># Create an assessment</span>
+        <span class="n">assessment_id</span> <span class="o">=</span> <span class="s2">u&quot;{0}_FREESURFER_{1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">timepoint</span><span class="p">,</span> <span class="n">study_name</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+        <span class="n">assessment_struct</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;age_of_subject&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="n">assessment_id</span><span class="p">,</span>
+            <span class="s2">&quot;timepoint&quot;</span><span class="p">:</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">timepoint</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Go through subjects</span>
+        <span class="k">for</span> <span class="n">subject</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">fsdir</span><span class="p">):</span>
+
+            <span class="c1"># Get the subject code</span>
+            <span class="n">subjectfsdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fsdir</span><span class="p">,</span> <span class="n">subject</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">subject_pattern</span><span class="p">,</span> <span class="n">subject</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Skip &#39;{0}&#39; since no valid subject can be extracted &quot;</span>
+                      <span class="s2">&quot;with pattern &#39;{1}&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subjectfsdir</span><span class="p">,</span>
+                                                   <span class="n">subject_pattern</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Build a RQL to get the input T1</span>
+            <span class="n">rql_t1</span> <span class="o">=</span> <span class="n">rql_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">timepoint</span><span class="p">)</span>
+
+            <span class="c1"># Create the processingrun: multiple filsets</span>
+            <span class="n">processingrun_id</span> <span class="o">=</span> <span class="s2">u&quot;{0}_{1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">assessment_id</span><span class="p">,</span> <span class="n">subject</span><span class="p">)</span>
+            <span class="n">processingrun_struct</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="n">processingrun_id</span><span class="p">,</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">u&quot;FreeSurfer&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="s2">u&quot;FreeSurfer&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">tool_version</span><span class="p">),</span>
+                <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">tool_parameters</span><span class="p">))</span>
+            <span class="p">}</span>
+            <span class="n">fileset_structs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">extresources_structs</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Go through FreeSurfer subdirectories</span>
+            <span class="k">for</span> <span class="n">dirname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">subjectfsdir</span><span class="p">):</span>
+                <span class="n">fsetpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subjectfsdir</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+
+                <span class="c1"># If subdirectory not empty</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">fsetpath</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">fsetpath</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
+                    <span class="c1"># Create a fileset</span>
+                    <span class="n">fset_id</span> <span class="o">=</span> <span class="s2">u&quot;{0}_{1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">processingrun_id</span><span class="p">,</span> <span class="n">dirname</span><span class="p">)</span>
+                    <span class="n">fileset_structs</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="n">fset_id</span><span class="p">,</span>
+                        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">u&quot;FreeSurfer {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dirname</span><span class="o">.</span><span class="n">upper</span><span class="p">())})</span>
+                    <span class="n">extresources_structs</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+
+                    <span class="c1"># Create the external files</span>
+                    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">fsetpath</span><span class="p">):</span>
+                        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                            <span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+                            <span class="n">file_struct</span> <span class="o">=</span> <span class="p">{</span>
+                                <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">fpath</span><span class="p">),</span>
+                                <span class="s2">&quot;absolute_path&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">fname</span><span class="p">),</span>
+                                <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+                            <span class="p">}</span>
+                            <span class="n">extresources_structs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_struct</span><span class="p">)</span>
+
+            <span class="c1"># Create the final structure</span>
+            <span class="n">processing_struct</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;Assessment&quot;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">assessment_struct</span><span class="p">),</span>
+                <span class="s2">&quot;Processings&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                    <span class="s2">&quot;Inputs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">rql_t1</span><span class="p">],</span>
+                    <span class="s2">&quot;ExternalResources&quot;</span><span class="p">:</span> <span class="n">extresources_structs</span><span class="p">,</span>
+                    <span class="s2">&quot;FileSets&quot;</span><span class="p">:</span> <span class="n">fileset_structs</span><span class="p">,</span>
+                    <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">:</span> <span class="n">processingrun_struct</span>
+                <span class="p">}]</span>
+            <span class="p">}</span>
+            <span class="n">processings</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">processing_struct</span><span class="p">)</span>
+
+    <span class="c1"># Save the generated structure</span>
+    <span class="k">if</span> <span class="n">savedir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">savedir</span><span class="p">):</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+        <span class="n">save_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">savedir</span><span class="p">,</span> <span class="s2">&quot;freesurfer_{0}.json&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">date</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()))</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">openfile</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">processings</span><span class="p">,</span> <span class="n">openfile</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">processings</span></div>
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

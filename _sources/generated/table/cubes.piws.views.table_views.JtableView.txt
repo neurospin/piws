@@ -58,6 +58,7 @@ cubes.piws.views.table_views.JtableView
       ~JtableView.mandatory_params
       ~JtableView.paginable
       ~JtableView.templatable
+      ~JtableView.title
     
     
 

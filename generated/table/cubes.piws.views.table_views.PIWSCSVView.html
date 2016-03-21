@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -37,7 +37,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="../../_static/js/bootstrap.min.js" type="text/javascript"></script>
-  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/generated/table/cubes.piws.views.table_views.PiwsCSVView.html" /> -->
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/generated/table/cubes.piws.views.table_views.PIWSCSVView.html" /> -->
 
   <script type="text/javascript">
     $("div.buttonNext, div.buttonPrevious").hover(
@@ -75,10 +75,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../rights.html">Rights management</a></li>
 			  <li><a href="../../views.html">Views</a></li>
 			  <li><a href="../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../download.html">Download</a></li>
+			  <li><a href="../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -94,17 +99,16 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
       <ul>
-<li><a class="reference internal" href="#">cubes.piws.views.table_views.PiwsCSVView</a></li>
+<li><a class="reference internal" href="#">cubes.piws.views.table_views.PIWSCSVView</a></li>
 </ul>
 
 
@@ -119,14 +123,14 @@
           <div class="body" role="main">
             
   <div class="section" id="cubes-piws-views-table-views-piwscsvview">
-<h1>cubes.piws.views.table_views.PiwsCSVView<a class="headerlink" href="#cubes-piws-views-table-views-piwscsvview" title="Permalink to this headline">¶</a></h1>
+<h1>cubes.piws.views.table_views.PIWSCSVView<a class="headerlink" href="#cubes-piws-views-table-views-piwscsvview" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="cubes.piws.views.table_views.PiwsCSVView">
-<em class="property">class </em><code class="descclassname">cubes.piws.views.table_views.</code><code class="descname">PiwsCSVView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#PiwsCSVView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.PiwsCSVView" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dumps questionnaires in CSV.</p>
+<dt id="cubes.piws.views.table_views.PIWSCSVView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.table_views.</code><code class="descname">PIWSCSVView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#PIWSCSVView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.PIWSCSVView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps table data in CSV: used by &#8216;jtable-table&#8217; view.</p>
 <dl class="method">
-<dt id="cubes.piws.views.table_views.PiwsCSVView.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cubes.piws.views.table_views.PiwsCSVView.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="cubes.piws.views.table_views.PIWSCSVView.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cubes.piws.views.table_views.PIWSCSVView.__init__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
@@ -136,11 +140,11 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.views.table_views.PiwsCSVView.__init__" title="cubes.piws.views.table_views.PiwsCSVView.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>([req,&nbsp;rset])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.views.table_views.PIWSCSVView.__init__" title="cubes.piws.views.table_views.PIWSCSVView.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>([req,&nbsp;rset])</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.views.table_views.PiwsCSVView.call" title="cubes.piws.views.table_views.PiwsCSVView.call"><code class="xref py py-obj docutils literal"><span class="pre">call</span></code></a>()</td>
-<td></td>
+<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.views.table_views.PIWSCSVView.call" title="cubes.piws.views.table_views.PIWSCSVView.call"><code class="xref py py-obj docutils literal"><span class="pre">call</span></code></a>()</td>
+<td>Display the CSV formated table data.</td>
 </tr>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">cell_call</span></code>(row,&nbsp;col,&nbsp;**kwargs)</td>
 <td>the view is called for a particular result set cell</td>
@@ -250,29 +254,30 @@
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">templatable</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.views.table_views.PiwsCSVView.title" title="cubes.piws.views.table_views.PiwsCSVView.title"><code class="xref py py-obj docutils literal"><span class="pre">title</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.views.table_views.PIWSCSVView.title" title="cubes.piws.views.table_views.PIWSCSVView.title"><code class="xref py py-obj docutils literal"><span class="pre">title</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="cubes.piws.views.table_views.PiwsCSVView.__module__">
-<code class="descname">__module__</code><em class="property"> = 'cubes.piws.views.table_views'</em><a class="headerlink" href="#cubes.piws.views.table_views.PiwsCSVView.__module__" title="Permalink to this definition">¶</a></dt>
+<dt id="cubes.piws.views.table_views.PIWSCSVView.__module__">
+<code class="descname">__module__</code><em class="property"> = 'cubes.piws.views.table_views'</em><a class="headerlink" href="#cubes.piws.views.table_views.PIWSCSVView.__module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="cubes.piws.views.table_views.PiwsCSVView.__regid__">
-<code class="descname">__regid__</code><em class="property"> = 'piwscsvexport'</em><a class="headerlink" href="#cubes.piws.views.table_views.PiwsCSVView.__regid__" title="Permalink to this definition">¶</a></dt>
+<dt id="cubes.piws.views.table_views.PIWSCSVView.__regid__">
+<code class="descname">__regid__</code><em class="property"> = 'jtable-table-csv-export'</em><a class="headerlink" href="#cubes.piws.views.table_views.PIWSCSVView.__regid__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="cubes.piws.views.table_views.PiwsCSVView.call">
-<code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#PiwsCSVView.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.PiwsCSVView.call" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="cubes.piws.views.table_views.PIWSCSVView.call">
+<code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#PIWSCSVView.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.PIWSCSVView.call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the CSV formated table data.</p>
+</dd></dl>
 
 <dl class="attribute">
-<dt id="cubes.piws.views.table_views.PiwsCSVView.title">
-<code class="descname">title</code><em class="property"> = u'piws csv export'</em><a class="headerlink" href="#cubes.piws.views.table_views.PiwsCSVView.title" title="Permalink to this definition">¶</a></dt>
+<dt id="cubes.piws.views.table_views.PIWSCSVView.title">
+<code class="descname">title</code><em class="property"> = u'piws csv export'</em><a class="headerlink" href="#cubes.piws.views.table_views.PIWSCSVView.title" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

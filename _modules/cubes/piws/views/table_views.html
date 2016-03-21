@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -76,10 +76,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../../../rights.html">Rights management</a></li>
 			  <li><a href="../../../../views.html">Views</a></li>
 			  <li><a href="../../../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../download.html">Download</a></li>
+			  <li><a href="../../../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -95,12 +100,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -144,10 +148,12 @@
 <span class="c1">###############################################################################</span>
 
 <div class="viewcode-block" id="FileAnswerTableView"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.FileAnswerTableView.html#cubes.piws.views.table_views.FileAnswerTableView">[docs]</a><span class="k">class</span> <span class="nc">FileAnswerTableView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; QuestionnaireRuns table view specific to the QuestionnaireRun (1?) File</span>
-<span class="sd">        schema.</span>
+    <span class="sd">&quot;&quot;&quot; QuestionnaireRuns table view when subject questionnaires are inserted</span>
+<span class="sd">    using the QuestionnaireRun -&gt; file -&gt;  File strategy, ie. one File</span>
+<span class="sd">    per questionnaire.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__regid__</span> <span class="o">=</span> <span class="s1">&#39;file.answer.table&#39;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;file-answer-table&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Jtable&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FileAnswerTableView.call"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.FileAnswerTableView.html#cubes.piws.views.table_views.FileAnswerTableView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get all the questionnaire runs and associated subjects&quot;&quot;&quot;</span>
@@ -163,8 +169,8 @@
 
         <span class="c1"># Execute the rql to get all subjects QuestionnaireRuns</span>
         <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any ID, D ORDERBY ID ASC WHERE QR is QuestionnaireRun, &quot;</span>
-               <span class="s2">&quot;QR instance_of Q, Q name &#39;{0}&#39;, QR in_assessment A, &quot;</span>
-               <span class="s2">&quot;A timepoint &#39;{1}&#39;, QR result F, F data D, QR subject S, &quot;</span>
+               <span class="s2">&quot;QR questionnaire Q, Q name &#39;{0}&#39;, QR in_assessment A, &quot;</span>
+               <span class="s2">&quot;A timepoint &#39;{1}&#39;, QR file F, F data D, QR subject S, &quot;</span>
                <span class="s2">&quot;S code_in_study ID&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">qname</span><span class="p">,</span> <span class="n">timepoint</span><span class="p">))</span>
         <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
 
@@ -184,7 +190,10 @@
             <span class="n">record</span> <span class="o">=</span> <span class="p">[</span><span class="n">sid</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdata</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sdata</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="nb">basestring</span><span class="p">):</span>
+                        <span class="n">record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdata</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">sdata</span><span class="p">[</span><span class="n">label</span><span class="p">]))</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                     <span class="n">record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">u&quot;&quot;</span><span class="p">)</span>
             <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
@@ -200,6 +209,7 @@
     <span class="sd">&quot;&quot;&quot; Create a table view with DataTables.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;jtable-hugetable-clientside&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Jtable&quot;</span><span class="p">)</span>
     <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;jhugetable-table&quot;</span>
 
@@ -376,8 +386,9 @@
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;},&quot;</span>
 
         <span class="c1"># &gt; set table display options</span>
-        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollX&#39;: true,&quot;</span>
-        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollCollapse&#39;: true,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s1">&#39;&quot;sScrollX&quot;: &quot;100%&quot;,&#39;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s1">&#39;&quot;sScrollXInner&quot;: &quot;150%&quot;,&#39;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s1">&#39;&quot;bScrollCollapse&quot;: true,&#39;</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;sPaginationType&#39;: &#39;bootstrap&#39;,&quot;</span>
         <span class="k">if</span> <span class="n">use_scroller</span><span class="p">:</span>
             <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollY&#39;: &#39;200px&#39;,&quot;</span>
@@ -497,6 +508,7 @@
     <span class="sd">&quot;&quot;&quot; Create a table view with DataTables.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;jtable-table&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Jtable&quot;</span><span class="p">)</span>
     <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;jtable-table&quot;</span>
 
@@ -653,9 +665,9 @@
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var table = $(&#39;#the_table&#39;).dataTable( { &quot;</span>
 
         <span class="c1"># &gt; set table display options</span>
-        <span class="c1"># TODO fix scrollX bug since DataTables 1.10.10</span>
-        <span class="c1"># html += &quot;&#39;scrollX&#39;: &#39;100%&#39;,&quot;</span>
-        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollY&#39;: &#39;600px&#39;,&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s1">&#39;&quot;sScrollX&quot;: &quot;100%&quot;,&#39;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s1">&#39;&quot;sScrollXInner&quot;: &quot;150%&quot;,&#39;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s1">&#39;&quot;bScrollCollapse&quot;: true,&#39;</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;scrollCollapse&#39;: true,&quot;</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;sPaginationType&#39;: &#39;bootstrap&#39;,&quot;</span>
         <span class="k">if</span> <span class="n">csv_export</span><span class="p">:</span>
@@ -739,7 +751,7 @@
             <span class="c1"># callback</span>
             <span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;qname&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;qname&#39;</span><span class="p">],</span>
                          <span class="s1">&#39;timepoint&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;timepoint&#39;</span><span class="p">],</span>
-                         <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">labels</span><span class="p">)}</span>
+                         <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">labels</span><span class="p">)}</span>
 
             <span class="c1"># &gt; set csv file name</span>
             <span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%H:%M:%S&quot;</span><span class="p">)</span>
@@ -754,7 +766,7 @@
 
             <span class="c1"># &gt; execute the ajax callback</span>
             <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var request = $.ajax({&quot;</span>
-            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;url: &#39;view?vid=piwscsvexport&#39;,&quot;</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;url: &#39;view?vid=jtable-table-csv-export&#39;,&quot;</span>
             <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;method: &#39;POST&#39;,&quot;</span>
             <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;data: {0},&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">post_data</span><span class="p">))</span>
             <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;dataType: &#39;html&#39;&quot;</span>
@@ -814,31 +826,32 @@
 
 
 <span class="c1">###############################################################################</span>
-<span class="c1"># Interact with jtable js</span>
+<span class="c1"># Export table data in CSV</span>
 <span class="c1">###############################################################################</span>
 
-<div class="viewcode-block" id="PiwsCSVView"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.PiwsCSVView.html#cubes.piws.views.table_views.PiwsCSVView">[docs]</a><span class="k">class</span> <span class="nc">PiwsCSVView</span><span class="p">(</span><span class="n">CSVMixIn</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Dumps questionnaires in CSV.</span>
+<div class="viewcode-block" id="PIWSCSVView"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.PIWSCSVView.html#cubes.piws.views.table_views.PIWSCSVView">[docs]</a><span class="k">class</span> <span class="nc">PIWSCSVView</span><span class="p">(</span><span class="n">CSVMixIn</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Dumps table data in CSV: used by &#39;jtable-table&#39; view.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__regid__</span> <span class="o">=</span> <span class="s1">&#39;piwscsvexport&#39;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;jtable-table-csv-export&quot;</span>
     <span class="n">__select__</span> <span class="o">=</span> <span class="n">yes</span><span class="p">()</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;piws csv export&#39;</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;piws csv export&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PiwsCSVView.call"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.PiwsCSVView.html#cubes.piws.views.table_views.PiwsCSVView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PIWSCSVView.call"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.PIWSCSVView.html#cubes.piws.views.table_views.PIWSCSVView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Display the CSV formated table data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">qname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;qname&#39;</span><span class="p">]</span>
-        <span class="n">timepoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;timepoint&#39;</span><span class="p">]</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">])</span>
+        <span class="n">qname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;qname&quot;</span><span class="p">]</span>
+        <span class="n">timepoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;timepoint&quot;</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">])</span>
 
         <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any ID, QT, OV Where S is Subject, S code_in_study ID, &quot;</span>
-               <span class="s2">&quot;S questionnaire_runs QR, QR instance_of QU, QU name &#39;{0}&#39;, &quot;</span>
-               <span class="s2">&quot;QR open_answers O, O value OV, O in_assessment A, &quot;</span>
-               <span class="s2">&quot;A timepoint &#39;{1}&#39;, O question Q, Q text QT&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">qname</span><span class="p">,</span>
-                                                                   <span class="n">timepoint</span><span class="p">)</span>
-               <span class="p">)</span>
+               <span class="s2">&quot;S subject_questionnaire_runs QR, QR questionnaire QU, &quot;</span>
+               <span class="s2">&quot;QU name &#39;{0}&#39;, QR open_answers O, O value OV, &quot;</span>
+               <span class="s2">&quot;O in_assessment A, A timepoint &#39;{1}&#39;, O question Q, &quot;</span>
+               <span class="s2">&quot;Q text QT&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">qname</span><span class="p">,</span> <span class="n">timepoint</span><span class="p">))</span>
         <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
 
-        <span class="n">table</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">rset</span><span class="p">:</span>
             <span class="n">table</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
@@ -848,6 +861,11 @@
         <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">psc2</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">iteritems</span><span class="p">())):</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Interact with jtable js</span>
+<span class="c1">###############################################################################</span>
 
 <span class="nd">@ajaxfunc</span><span class="p">(</span><span class="n">output_type</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
 <div class="viewcode-block" id="get_open_answers_data"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.get_open_answers_data.html#cubes.piws.views.table_views.get_open_answers_data">[docs]</a><span class="k">def</span> <span class="nf">get_open_answers_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -889,7 +907,7 @@
 
     <span class="c1"># Get all the questionnaire runs and associated subjects</span>
     <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any ID, QR {0} &quot;</span>
-           <span class="s2">&quot;Where QR is QuestionnaireRun, QR instance_of Q, Q name &#39;{1}&#39;, &quot;</span>
+           <span class="s2">&quot;Where QR is QuestionnaireRun, QR questionnaire Q, Q name &#39;{1}&#39;, &quot;</span>
            <span class="s2">&quot;QR subject S, S code_in_study ID, QR in_assessment A, &quot;</span>
            <span class="s2">&quot;A timepoint &#39;{2}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jtsort</span><span class="p">,</span> <span class="n">qname</span><span class="p">,</span> <span class="n">timepoint</span><span class="p">))</span>
     <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
@@ -954,6 +972,8 @@
 <span class="sd">        pattern to search in the ID column.</span>
 <span class="sd">    labels: list of str</span>
 <span class="sd">        the table column names.</span>
+<span class="sd">    qtype: str</span>
+<span class="sd">        the requested questionnaires type.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -966,6 +986,7 @@
     <span class="n">jtpagesize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;iDisplayLength&#39;</span><span class="p">])</span>
     <span class="n">id_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;sSearch&#39;</span><span class="p">]</span>
     <span class="n">labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">])</span>
+    <span class="n">qtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;qtype&#39;</span><span class="p">]</span>
     <span class="n">column_to_filter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;iSortCol_0&#39;</span><span class="p">])</span>
 
     <span class="c1"># Only the ID column can be filtered</span>
@@ -974,12 +995,12 @@
                         <span class="s2">&quot;&#39;get_questionnaires_data&#39; ajax callback.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Choose the questionnaire rendering view:</span>
-    <span class="c1"># &gt; case 1: the answers are inserted in the database (OpenAnswer).</span>
-    <span class="c1"># &gt; case 2: one line of answers inserted per subject (File)</span>
-    <span class="n">rql</span> <span class="o">=</span> <span class="s2">&quot;Any QR Where QR is QuestionnaireRun, EXISTS(QR result F)&quot;</span>
+    <span class="c1"># &gt; case 1: one line of answers inserted per subject (File)</span>
+    <span class="c1"># &gt; case 2: the answers are inserted in the database (OpenAnswer).</span>
+    <span class="n">rql</span> <span class="o">=</span> <span class="s2">&quot;Any QR Where QR is QuestionnaireRun, EXISTS(QR file F)&quot;</span>
     <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">vid</span> <span class="o">=</span> <span class="s2">&quot;file.answer.table&quot;</span>
+        <span class="n">vid</span> <span class="o">=</span> <span class="s2">&quot;file-answer-table&quot;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">vid</span> <span class="o">=</span> <span class="s2">&quot;jtable-table&quot;</span>
 
@@ -989,8 +1010,8 @@
     <span class="c1"># Get all the questionnaire and associated timepoints</span>
     <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;DISTINCT Any ID, T {0} &quot;</span>
            <span class="s2">&quot;Where Q is Questionnaire, QR is QuestionnaireRun, &quot;</span>
-           <span class="s2">&quot;QR instance_of Q, QR in_assessment A, Q name ID, &quot;</span>
-           <span class="s2">&quot;A timepoint T&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jtsort</span><span class="p">))</span>
+           <span class="s2">&quot;QR questionnaire Q, Q type &#39;{1}&#39;, QR in_assessment A, Q name ID, &quot;</span>
+           <span class="s2">&quot;A timepoint T&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">jtsort</span><span class="p">,</span> <span class="n">qtype</span><span class="p">))</span>
     <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
 
     <span class="c1"># Get the total number of rows (without filtering)</span>
@@ -1064,12 +1085,14 @@
 <span class="c1">###############################################################################</span>
 
 <span class="k">def</span> <span class="nf">registration_callback</span><span class="p">(</span><span class="n">vreg</span><span class="p">):</span>
-    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">JtableView</span><span class="p">)</span>
-    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">JHugetableView</span><span class="p">)</span>
-    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">FileAnswerTableView</span><span class="p">)</span>
-    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">get_open_answers_data</span><span class="p">)</span>
-    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">get_questionnaires_data</span><span class="p">)</span>
-    <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">PiwsCSVView</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">tclass</span> <span class="ow">in</span> <span class="p">[</span><span class="n">JtableView</span><span class="p">,</span> <span class="n">JHugetableView</span><span class="p">,</span> <span class="n">FileAnswerTableView</span><span class="p">,</span>
+                   <span class="n">PIWSCSVView</span><span class="p">]:</span>
+        <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">tclass</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">ajax</span> <span class="ow">in</span> <span class="p">[</span><span class="n">get_questionnaires_data</span><span class="p">,</span> <span class="n">get_open_answers_data</span><span class="p">]:</span>
+        <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ajax</span><span class="p">)</span>
+
 </pre></div>
 
           </div>

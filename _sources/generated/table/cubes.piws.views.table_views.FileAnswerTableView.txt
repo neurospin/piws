@@ -56,6 +56,7 @@ cubes.piws.views.table_views.FileAnswerTableView
       ~FileAnswerTableView.content_type
       ~FileAnswerTableView.paginable
       ~FileAnswerTableView.templatable
+      ~FileAnswerTableView.title
     
     
 

@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -76,10 +76,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../../../rights.html">Rights management</a></li>
 			  <li><a href="../../../../views.html">Views</a></li>
 			  <li><a href="../../../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../download.html">Download</a></li>
+			  <li><a href="../../../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -95,12 +100,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -145,24 +149,25 @@
     <span class="n">relations</span> <span class="o">=</span> <span class="n">Base</span><span class="o">.</span><span class="n">assessment_relations</span> <span class="o">+</span> <span class="p">[</span>
         <span class="p">(</span><span class="s2">&quot;Question&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire&quot;</span><span class="p">,</span> <span class="s2">&quot;Questionnaire&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;Questionnaire&quot;</span><span class="p">,</span> <span class="s2">&quot;questions&quot;</span><span class="p">,</span> <span class="s2">&quot;Question&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span> <span class="s2">&quot;instance_of&quot;</span><span class="p">,</span> <span class="s2">&quot;Questionnaire&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;Questionnaire&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire&quot;</span><span class="p">,</span> <span class="s2">&quot;Questionnaire&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Questionnaire&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire_questionnaire_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="s2">&quot;Study&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;study_questionnaire_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span> <span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;subject_questionnaire_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;OpenAnswer&quot;</span><span class="p">,</span> <span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="s2">&quot;Question&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;Question&quot;</span><span class="p">,</span> <span class="s2">&quot;open_answers&quot;</span><span class="p">,</span> <span class="s2">&quot;OpenAnswer&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Question&quot;</span><span class="p">,</span> <span class="s2">&quot;question_open_answers&quot;</span><span class="p">,</span> <span class="s2">&quot;OpenAnswer&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;OpenAnswer&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire_run&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span> <span class="s2">&quot;open_answers&quot;</span><span class="p">,</span> <span class="s2">&quot;OpenAnswer&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;OpenAnswer&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;RestrictedFile&quot;</span><span class="p">)</span>
     <span class="p">]</span>
 
 <div class="viewcode-block" id="Questionnaires.__init__"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.questionnaires.Questionnaires.html#cubes.piws.importer.questionnaires.Questionnaires.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">center_name</span><span class="p">,</span> <span class="n">questionnaires</span><span class="p">,</span>
-                 <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                 <span class="n">questionnaire_type</span><span class="p">,</span> <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                 <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                  <span class="n">use_openanswer</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the &#39;Questionnaires&#39; class.</span>
 
@@ -179,6 +184,9 @@
 <span class="sd">            name as keys and then a list of dictionaries with four keys (Scans -</span>
 <span class="sd">            (Scan - TypeData - FileSet - ExternalResource - ScoreValues) -</span>
 <span class="sd">            Assessment) that contains the entities parameter decriptions.</span>
+<span class="sd">        questionnaire_type: str (mandatory)</span>
+<span class="sd">            a questionnaire type used to gather together similar</span>
+<span class="sd">            questionnaires.</span>
 <span class="sd">        can_read: bool (optional, default True)</span>
 <span class="sd">            set the read permission to the imported data.</span>
 <span class="sd">        can_update: bool (optional, default True)</span>
@@ -229,8 +237,8 @@
 <span class="sd">            }</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Inheritance</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Questionnaires</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">use_store</span><span class="p">,</span>
-                                             <span class="n">piws_security_model</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Questionnaires</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">can_read</span><span class="p">,</span> <span class="n">can_update</span><span class="p">,</span>
+                                             <span class="n">use_store</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="p">)</span>
 
         <span class="c1"># Define QuestionnaireRuns insertion strategy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_openanswer</span> <span class="o">=</span> <span class="n">use_openanswer</span>
@@ -240,8 +248,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_filepath</span> <span class="o">=</span> <span class="n">data_filepath</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">project_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">center_name</span> <span class="o">=</span> <span class="n">center_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">can_read</span> <span class="o">=</span> <span class="n">can_read</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">can_update</span> <span class="o">=</span> <span class="n">can_update</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">questionnaire_type</span> <span class="o">=</span> <span class="n">questionnaire_type</span>
 
         <span class="c1"># Speed up parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span> <span class="o">=</span> <span class="p">{}</span></div>
@@ -333,7 +340,7 @@
                 <span class="n">entity_name</span> <span class="o">=</span> <span class="s2">&quot;Questionnaire&quot;</span><span class="p">,</span>
                 <span class="n">identifier</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_md5_sum</span><span class="p">(</span><span class="n">qname</span><span class="p">)),</span>
                 <span class="n">name</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">qname</span><span class="p">),</span>
-                <span class="nb">type</span><span class="o">=</span><span class="s2">u&quot;unknown&quot;</span><span class="p">)</span>
+                <span class="nb">type</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">questionnaire_type</span><span class="p">))</span>
             <span class="n">questionnaire_eids</span><span class="p">[</span><span class="n">qname</span><span class="p">]</span> <span class="o">=</span> <span class="n">questionnaire_entity</span><span class="o">.</span><span class="n">eid</span>
             <span class="n">question_eids</span><span class="p">[</span><span class="n">qname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -346,8 +353,8 @@
                     <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                     <span class="n">entity_name</span> <span class="o">=</span> <span class="s2">&quot;Question&quot;</span><span class="p">,</span>
                     <span class="n">identifier</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">question_id</span><span class="p">),</span>
-                    <span class="n">text</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">question_name</span><span class="p">),</span>
-                    <span class="nb">type</span><span class="o">=</span><span class="s2">u&quot;text&quot;</span><span class="p">)</span>
+                    <span class="n">text</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">question_name</span><span class="p">)</span>
+                <span class="p">)</span>
                 <span class="n">question_eids</span><span class="p">[</span><span class="n">qname</span><span class="p">][</span><span class="n">question_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">question_entity</span><span class="o">.</span><span class="n">eid</span>
                 <span class="c1"># &gt; add relation with the questionnaire form</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span><span class="n">question_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;questionnaire&quot;</span><span class="p">,</span>
@@ -361,6 +368,7 @@
 
         <span class="c1"># Information to create a progress bar</span>
         <span class="n">nb_of_subjects</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">questionnaires</span><span class="p">))</span>
+        <span class="n">maxsize</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">questionnaires</span><span class="p">])</span>
         <span class="n">cnt_subject</span> <span class="o">=</span> <span class="mf">1.</span>
 
         <span class="c1"># Add the data</span>
@@ -370,7 +378,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_progress_bar</span><span class="p">(</span>
                 <span class="n">cnt_subject</span> <span class="o">/</span> <span class="n">nb_of_subjects</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="s2">&quot;{0}(questionnaires)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subject_id</span><span class="p">),</span>
-                <span class="n">bar_length</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+                <span class="n">bar_length</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">maxsize</span><span class="o">=</span><span class="n">maxsize</span> <span class="o">+</span> <span class="mi">16</span><span class="p">)</span>
             <span class="n">cnt_subject</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="c1">###################################################################</span>
@@ -435,19 +443,20 @@
                  <span class="s2">&quot;&#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">qr_id</span><span class="p">)),</span>
             <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
             <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span>
-            <span class="n">user_ident</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">subject_id</span><span class="p">),</span>
             <span class="n">identifier</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">qr_id</span><span class="p">),</span>
-            <span class="n">label</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">questionnaire_name</span><span class="p">))</span>
+            <span class="n">label</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">questionnaire_name</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="c1"># If we just create the questionnaire run, specify and relate the entity</span>
         <span class="k">if</span> <span class="n">is_created</span><span class="p">:</span>
             <span class="c1"># &gt; add relation with the questionnaire</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;instance_of&quot;</span><span class="p">,</span>
+                <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;questionnaire&quot;</span><span class="p">,</span>
                 <span class="n">questionnaire_eids</span><span class="p">[</span><span class="n">questionnaire_name</span><span class="p">],</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">questionnaire_eids</span><span class="p">[</span><span class="n">questionnaire_name</span><span class="p">],</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span>
-                <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">questionnaire_eids</span><span class="p">[</span><span class="n">questionnaire_name</span><span class="p">],</span>
+                <span class="s2">&quot;questionnaire_questionnaire_runs&quot;</span><span class="p">,</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="c1"># &gt; add relation with the assessment</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                 <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
@@ -459,13 +468,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                 <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">study_eid</span><span class="p">,</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+                <span class="n">study_eid</span><span class="p">,</span> <span class="s2">&quot;study_questionnaire_runs&quot;</span><span class="p">,</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
                 <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="c1"># &gt; add relation with the subject</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                 <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+                <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;subject_questionnaire_runs&quot;</span><span class="p">,</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
                 <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_openanswer</span><span class="p">:</span>
@@ -489,8 +498,8 @@
                         <span class="n">answer_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;question&quot;</span><span class="p">,</span> <span class="n">question_eid</span><span class="p">,</span>
                         <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;OpenAnswer&quot;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                        <span class="n">question_eid</span><span class="p">,</span> <span class="s2">&quot;open_answers&quot;</span><span class="p">,</span> <span class="n">answer_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
-                        <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                        <span class="n">question_eid</span><span class="p">,</span> <span class="s2">&quot;question_open_answers&quot;</span><span class="p">,</span>
+                        <span class="n">answer_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
                     <span class="c1"># &gt; add relation with the questionnaire run</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                         <span class="n">answer_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;questionnaire_run&quot;</span><span class="p">,</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
@@ -505,14 +514,18 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">f_entity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
                     <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-                    <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;File&quot;</span><span class="p">,</span>
+                    <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;RestrictedFile&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">u&quot;{0} ({1})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">questionnaire_name</span><span class="p">,</span> <span class="n">subject_id</span><span class="p">),</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">Binary</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">q_items</span><span class="p">)),</span>
                     <span class="n">data_format</span><span class="o">=</span><span class="s2">u&quot;text/json&quot;</span><span class="p">,</span>
                     <span class="n">data_name</span><span class="o">=</span><span class="s2">u&quot;result.json&quot;</span><span class="p">,</span>
                     <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                    <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">,</span> <span class="n">f_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
+                    <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="n">f_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span>
                     <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                    <span class="n">f_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+                    <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">eid</span></div></div>
 </pre></div>

@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -75,10 +75,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../rights.html">Rights management</a></li>
 			  <li><a href="../../views.html">Views</a></li>
 			  <li><a href="../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../download.html">Download</a></li>
+			  <li><a href="../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -94,12 +99,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -123,8 +127,9 @@
 <dl class="class">
 <dt id="cubes.piws.views.table_views.FileAnswerTableView">
 <em class="property">class </em><code class="descclassname">cubes.piws.views.table_views.</code><code class="descname">FileAnswerTableView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#FileAnswerTableView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.FileAnswerTableView" title="Permalink to this definition">¶</a></dt>
-<dd><p>QuestionnaireRuns table view specific to the QuestionnaireRun (1?) File
-schema.</p>
+<dd><p>QuestionnaireRuns table view when subject questionnaires are inserted
+using the QuestionnaireRun -&gt; file -&gt;  File strategy, ie. one File
+per questionnaire.</p>
 <dl class="method">
 <dt id="cubes.piws.views.table_views.FileAnswerTableView.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cubes.piws.views.table_views.FileAnswerTableView.__init__" title="Permalink to this definition">¶</a></dt>
@@ -245,6 +250,9 @@ schema.</p>
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">templatable</span></code></td>
 <td></td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.views.table_views.FileAnswerTableView.title" title="cubes.piws.views.table_views.FileAnswerTableView.title"><code class="xref py py-obj docutils literal"><span class="pre">title</span></code></a></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 <dl class="attribute">
@@ -254,7 +262,7 @@ schema.</p>
 
 <dl class="attribute">
 <dt id="cubes.piws.views.table_views.FileAnswerTableView.__regid__">
-<code class="descname">__regid__</code><em class="property"> = 'file.answer.table'</em><a class="headerlink" href="#cubes.piws.views.table_views.FileAnswerTableView.__regid__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__regid__</code><em class="property"> = 'file-answer-table'</em><a class="headerlink" href="#cubes.piws.views.table_views.FileAnswerTableView.__regid__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -262,6 +270,11 @@ schema.</p>
 <code class="descname">call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#FileAnswerTableView.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.FileAnswerTableView.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all the questionnaire runs and associated subjects</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="cubes.piws.views.table_views.FileAnswerTableView.title">
+<code class="descname">title</code><em class="property"> = u'Jtable'</em><a class="headerlink" href="#cubes.piws.views.table_views.FileAnswerTableView.title" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -75,10 +75,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="rights.html">Rights management</a></li>
 			  <li><a href="#">Views</a></li>
 			  <li><a href="features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="scripts.html">Importation procedures</a></li>
+			  <li><a href="parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="download.html">Download</a></li>
+			  <li><a href="upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -94,12 +99,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -109,6 +113,7 @@
 <li><a class="reference internal" href="#user-views">User Views</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#piws-views-longitudinal-views-longitudinal-views"><code class="docutils literal"><span class="pre">piws.views.longitudinal_views</span></code>: Longitudinal views</a></li>
 <li><a class="reference internal" href="#piws-views-table-views-table-views"><code class="docutils literal"><span class="pre">piws.views.table_views</span></code>: Table views</a><ul>
 <li><a class="reference internal" href="#id1">User Views</a></li>
 <li><a class="reference internal" href="#derived-views">Derived Views</a></li>
@@ -116,6 +121,8 @@
 <li><a class="reference internal" href="#ajax-inner-callbacks">Ajax inner callbacks</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#piws-views-primary-primary-views"><code class="docutils literal"><span class="pre">piws.views.primary</span></code>: Primary views</a></li>
+<li><a class="reference internal" href="#piws-views-secondary-secondary-views"><code class="docutils literal"><span class="pre">piws.views.secondary</span></code>: Secondary views</a></li>
 </ul>
 </li>
 </ul>
@@ -160,6 +167,42 @@ database content.</p>
 </table>
 </div>
 </div>
+<div class="section" id="piws-views-longitudinal-views-longitudinal-views">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">piws.views.longitudinal_views</span></code>: Longitudinal views<a class="headerlink" href="#piws-views-longitudinal-views-longitudinal-views" title="Permalink to this headline">¶</a></h2>
+<p>When dealing with multiple timepoints, it is crucial to display the scores
+of a subject at these timepoints.</p>
+<span class="target" id="module-cubes.piws.views.longitudinal_views"></span><dl class="class">
+<dt id="cubes.piws.views.longitudinal_views.QuestionnaireLongitudinalView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.longitudinal_views.</code><code class="descname">QuestionnaireLongitudinalView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/longitudinal_views.html#QuestionnaireLongitudinalView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.longitudinal_views.QuestionnaireLongitudinalView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a view that summarized the longitudinal material for a subject.</p>
+<dl class="method">
+<dt id="cubes.piws.views.longitudinal_views.QuestionnaireLongitudinalView.call">
+<code class="descname">call</code><span class="sig-paren">(</span><em>rset=None</em>, <em>patient_id=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/longitudinal_views.html#QuestionnaireLongitudinalView.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.longitudinal_views.QuestionnaireLongitudinalView.call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that will create the subject longitudinal views.</p>
+<p>If no resultset are passed to this method, the current resultset is
+used.</p>
+<p>Only digits answers are considered.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rset: resultset (optional, default None)</strong> :</p>
+<blockquote>
+<div><p>a  cw resultset</p>
+</div></blockquote>
+<p><strong>patient_id: string (optional, default None)</strong> :</p>
+<blockquote class="last">
+<div><p>the patient identifier.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="piws-views-table-views-table-views">
 <h2><code class="xref py py-mod docutils literal"><span class="pre">piws.views.table_views</span></code>: Table views<a class="headerlink" href="#piws-views-table-views-table-views" title="Permalink to this headline">¶</a></h2>
 <p>All the views designed in this section are based on the &#8216;datatables&#8217; JavaScript
@@ -198,7 +241,7 @@ paging, sorting, ....).</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.FileAnswerTableView.html#cubes.piws.views.table_views.FileAnswerTableView" title="cubes.piws.views.table_views.FileAnswerTableView"><code class="xref py py-obj docutils literal"><span class="pre">table_views.FileAnswerTableView</span></code></a>([req,&nbsp;rset])</td>
-<td>QuestionnaireRuns table view specific to the QuestionnaireRun (1?) File schema.</td>
+<td>QuestionnaireRuns table view when subject questionnaires are inserted using the QuestionnaireRun -&gt; file -&gt;  File strategy, ie.</td>
 </tr>
 </tbody>
 </table>
@@ -211,8 +254,8 @@ paging, sorting, ....).</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.PiwsCSVView.html#cubes.piws.views.table_views.PiwsCSVView" title="cubes.piws.views.table_views.PiwsCSVView"><code class="xref py py-obj docutils literal"><span class="pre">table_views.PiwsCSVView</span></code></a>([req,&nbsp;rset])</td>
-<td>Dumps questionnaires in CSV.</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/table/cubes.piws.views.table_views.PIWSCSVView.html#cubes.piws.views.table_views.PIWSCSVView" title="cubes.piws.views.table_views.PIWSCSVView"><code class="xref py py-obj docutils literal"><span class="pre">table_views.PIWSCSVView</span></code></a>([req,&nbsp;rset])</td>
+<td>Dumps table data in CSV: used by &#8216;jtable-table&#8217; view.</td>
 </tr>
 </tbody>
 </table>
@@ -234,6 +277,279 @@ paging, sorting, ....).</p>
 </tbody>
 </table>
 </div>
+</div>
+<div class="section" id="piws-views-primary-primary-views">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">piws.views.primary</span></code>: Primary views<a class="headerlink" href="#piws-views-primary-primary-views" title="Permalink to this headline">¶</a></h2>
+<p>Each entity content is displayed with a primary view.</p>
+<span class="target" id="module-cubes.piws.views.primary"></span><dl class="class">
+<dt id="cubes.piws.views.primary.PIWSFilePrimaryView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.primary.</code><code class="descname">PIWSFilePrimaryView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/primary.html#PIWSFilePrimaryView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.primary.PIWSFilePrimaryView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specific view for File entities where binary content has to be
+displayed.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.primary.PIWSPrimaryView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.primary.</code><code class="descname">PIWSPrimaryView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/primary.html#PIWSPrimaryView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.primary.PIWSPrimaryView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default primary view rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.primary.PIWSPrimaryView._prepare_side_boxes">
+<code class="descname">_prepare_side_boxes</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/primary.html#PIWSPrimaryView._prepare_side_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.primary.PIWSPrimaryView._prepare_side_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the right relation boxes to display.</p>
+<p>This is a common functionality to learn the schema by browsing the
+database content that will enalbe the users to phrase direct RQL to
+get their data.</p>
+<p>In the case of &#8216;FileSet&#8217; object, go directly to the associated
+&#8216;ExternalResource&#8217; if only one &#8216;FileSet&#8217; has been specified.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cubes.piws.views.primary.PIWSPrimaryView.render_entity_attributes">
+<code class="descname">render_entity_attributes</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/primary.html#PIWSPrimaryView.render_entity_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.primary.PIWSPrimaryView.render_entity_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders all attributes and relations in the &#8216;attributes&#8217; section.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cubes.piws.views.primary.registration_callback">
+<code class="descclassname">cubes.piws.views.primary.</code><code class="descname">registration_callback</code><span class="sig-paren">(</span><em>vreg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/primary.html#registration_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.primary.registration_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update  primary views</p>
+</dd></dl>
+
+</div>
+<div class="section" id="piws-views-secondary-secondary-views">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">piws.views.secondary</span></code>: Secondary views<a class="headerlink" href="#piws-views-secondary-secondary-views" title="Permalink to this headline">¶</a></h2>
+<p>A request may returns a bunch of results that are displayed in a list where
+each returned entity is displayed with a secondary view.</p>
+<span class="target" id="module-cubes.piws.views.secondary"></span><dl class="class">
+<dt id="cubes.piws.views.secondary.BaseOutOfContextView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">BaseOutOfContextView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#BaseOutOfContextView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.BaseOutOfContextView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default secondary view rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.BaseOutOfContextView.cell_call">
+<code class="descname">cell_call</code><span class="sig-paren">(</span><em>row</em>, <em>col</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#BaseOutOfContextView.cell_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.BaseOutOfContextView.cell_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the out of context view template</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cubes.piws.views.secondary.BaseOutOfContextView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#BaseOutOfContextView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.BaseOutOfContextView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the entity description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextAssessmentView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextAssessmentView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextAssessmentView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextAssessmentView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assessment secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextAssessmentView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextAssessmentView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextAssessmentView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the Assessment description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextCWSearchView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextCWSearchView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextCWSearchView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextCWSearchView" title="Permalink to this definition">¶</a></dt>
+<dd><p>CWSearch secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextCWSearchView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextCWSearchView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextCWSearchView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the CWSearch description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextCWUploadView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextCWUploadView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextCWUploadView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextCWUploadView" title="Permalink to this definition">¶</a></dt>
+<dd><p>CWUpload secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextCWUploadView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextCWUploadView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextCWUploadView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the CWUpload description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextExternalFileView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextExternalFileView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextExternalFileView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextExternalFileView" title="Permalink to this definition">¶</a></dt>
+<dd><p>ExternalFile secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextExternalFileView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextExternalFileView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextExternalFileView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the ExternalFile description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextFileSetView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextFileSetView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextFileSetView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextFileSetView" title="Permalink to this definition">¶</a></dt>
+<dd><p>FileSet secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextFileSetView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextFileSetView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextFileSetView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the FileSet description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextFileView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextFileView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextFileView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextFileView" title="Permalink to this definition">¶</a></dt>
+<dd><p>File secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextFileView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextFileView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextFileView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the File description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextGenomicMeasureView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextGenomicMeasureView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextGenomicMeasureView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextGenomicMeasureView" title="Permalink to this definition">¶</a></dt>
+<dd><p>GenomicMeasure secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextGenomicMeasureView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextGenomicMeasureView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextGenomicMeasureView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the GenomicMeasure description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextGenomicPlatformView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextGenomicPlatformView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextGenomicPlatformView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextGenomicPlatformView" title="Permalink to this definition">¶</a></dt>
+<dd><p>GenomicPlatform secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextGenomicPlatformView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextGenomicPlatformView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextGenomicPlatformView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the GenomicPlatform description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextProcessingRunView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextProcessingRunView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextProcessingRunView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextProcessingRunView" title="Permalink to this definition">¶</a></dt>
+<dd><p>ProcessingRun secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextProcessingRunView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextProcessingRunView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextProcessingRunView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the ProcessingRun description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextQuestionView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextQuestionView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextQuestionView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextQuestionView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Question secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextQuestionView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextQuestionView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextQuestionView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the Question description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextQuestionnaireRunView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextQuestionnaireRunView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextQuestionnaireRunView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextQuestionnaireRunView" title="Permalink to this definition">¶</a></dt>
+<dd><p>QuestionnaireRun secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextQuestionnaireRunView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextQuestionnaireRunView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextQuestionnaireRunView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the QuestionnaireRun description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextQuestionnaireView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextQuestionnaireView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextQuestionnaireView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextQuestionnaireView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Questionnaire secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextQuestionnaireView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextQuestionnaireView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextQuestionnaireView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the Questionnaire description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextRestrictedFileView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextRestrictedFileView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextRestrictedFileView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextRestrictedFileView" title="Permalink to this definition">¶</a></dt>
+<dd><p>RestrictedFile secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextRestrictedFileView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextRestrictedFileView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextRestrictedFileView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the RestrictedFile description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextScanView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextScanView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextScanView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextScanView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextScanView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextScanView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextScanView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the Scan description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextSnpView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextSnpView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextSnpView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextSnpView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Snp secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextSnpView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextSnpView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextSnpView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the Snp description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextSubjectView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextSubjectView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextSubjectView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextSubjectView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subject secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextSubjectView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextSubjectView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextSubjectView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the Subject description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextUploadFileView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextUploadFileView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextUploadFileView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextUploadFileView" title="Permalink to this definition">¶</a></dt>
+<dd><p>UploadFile secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextUploadFileView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextUploadFileView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextUploadFileView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the UploadFile description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cubes.piws.views.secondary.registration_callback">
+<code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">registration_callback</code><span class="sig-paren">(</span><em>vreg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#registration_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.registration_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update outofcontext views.</p>
+</dd></dl>
+
 </div>
 </div>
 

@@ -58,6 +58,7 @@ cubes.piws.views.highcharts_views.HighChartsBasicPlotView
       ~HighChartsBasicPlotView.div_id
       ~HighChartsBasicPlotView.paginable
       ~HighChartsBasicPlotView.templatable
+      ~HighChartsBasicPlotView.title
     
     
 

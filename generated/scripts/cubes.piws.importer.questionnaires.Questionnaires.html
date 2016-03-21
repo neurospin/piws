@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -75,10 +75,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../rights.html">Rights management</a></li>
 			  <li><a href="../../views.html">Views</a></li>
 			  <li><a href="../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../download.html">Download</a></li>
+			  <li><a href="../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -94,12 +99,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -122,11 +126,11 @@
 <h1>cubes.piws.importer.questionnaires.Questionnaires<a class="headerlink" href="#cubes-piws-importer-questionnaires-questionnaires" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="cubes.piws.importer.questionnaires.Questionnaires">
-<em class="property">class </em><code class="descclassname">cubes.piws.importer.questionnaires.</code><code class="descname">Questionnaires</code><span class="sig-paren">(</span><em>session</em>, <em>project_name</em>, <em>center_name</em>, <em>questionnaires</em>, <em>can_read=True</em>, <em>can_update=True</em>, <em>data_filepath=None</em>, <em>use_store=True</em>, <em>piws_security_model=True</em>, <em>use_openanswer=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/questionnaires.html#Questionnaires"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.questionnaires.Questionnaires" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cubes.piws.importer.questionnaires.</code><code class="descname">Questionnaires</code><span class="sig-paren">(</span><em>session</em>, <em>project_name</em>, <em>center_name</em>, <em>questionnaires</em>, <em>questionnaire_type</em>, <em>can_read=True</em>, <em>can_update=True</em>, <em>data_filepath=None</em>, <em>use_store=True</em>, <em>piws_security_model=True</em>, <em>use_openanswer=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/questionnaires.html#Questionnaires"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.questionnaires.Questionnaires" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class enables us to load the questionnaire to CW.</p>
 <dl class="method">
 <dt id="cubes.piws.importer.questionnaires.Questionnaires.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>session</em>, <em>project_name</em>, <em>center_name</em>, <em>questionnaires</em>, <em>can_read=True</em>, <em>can_update=True</em>, <em>data_filepath=None</em>, <em>use_store=True</em>, <em>piws_security_model=True</em>, <em>use_openanswer=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/questionnaires.html#Questionnaires.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.questionnaires.Questionnaires.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>session</em>, <em>project_name</em>, <em>center_name</em>, <em>questionnaires</em>, <em>questionnaire_type</em>, <em>can_read=True</em>, <em>can_update=True</em>, <em>data_filepath=None</em>, <em>use_store=True</em>, <em>piws_security_model=True</em>, <em>use_openanswer=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/questionnaires.html#Questionnaires.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.questionnaires.Questionnaires.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the &#8216;Questionnaires&#8217; class.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -150,6 +154,11 @@
 name as keys and then a list of dictionaries with four keys (Scans -
 (Scan - TypeData - FileSet - ExternalResource - ScoreValues) -
 Assessment) that contains the entities parameter decriptions.</p>
+</div></blockquote>
+<p><strong>questionnaire_type: str (mandatory)</strong> :</p>
+<blockquote>
+<div><p>a questionnaire type used to gather together similar
+questionnaires.</p>
 </div></blockquote>
 <p><strong>can_read: bool (optional, default True)</strong> :</p>
 <blockquote>
@@ -285,7 +294,7 @@ been inserted in the database.</p>
 
 <dl class="attribute">
 <dt id="cubes.piws.importer.questionnaires.Questionnaires.relations">
-<code class="descname">relations</code><em class="property"> = [('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('Question', 'questionnaire', 'Questionnaire'), ('Questionnaire', 'questions', 'Question'), ('QuestionnaireRun', 'instance_of', 'Questionnaire'), ('Questionnaire', 'questionnaire_runs', 'QuestionnaireRun'), ('Assessment', 'questionnaire_runs', 'QuestionnaireRun'), ('QuestionnaireRun', 'in_assessment', 'Assessment'), ('QuestionnaireRun', 'study', 'Study'), ('Study', 'questionnaire_runs', 'QuestionnaireRun'), ('QuestionnaireRun', 'subject', 'Subject'), ('Subject', 'questionnaire_runs', 'QuestionnaireRun'), ('OpenAnswer', 'question', 'Question'), ('Question', 'open_answers', 'OpenAnswer'), ('OpenAnswer', 'questionnaire_run', 'QuestionnaireRun'), ('QuestionnaireRun', 'open_answers', 'OpenAnswer'), ('OpenAnswer', 'in_assessment', 'Assessment')]</em><a class="headerlink" href="#cubes.piws.importer.questionnaires.Questionnaires.relations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">relations</code><em class="property"> = [('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('Question', 'questionnaire', 'Questionnaire'), ('Questionnaire', 'questions', 'Question'), ('QuestionnaireRun', 'questionnaire', 'Questionnaire'), ('Questionnaire', 'questionnaire_questionnaire_runs', 'QuestionnaireRun'), ('Assessment', 'questionnaire_runs', 'QuestionnaireRun'), ('QuestionnaireRun', 'in_assessment', 'Assessment'), ('QuestionnaireRun', 'study', 'Study'), ('Study', 'study_questionnaire_runs', 'QuestionnaireRun'), ('QuestionnaireRun', 'subject', 'Subject'), ('Subject', 'subject_questionnaire_runs', 'QuestionnaireRun'), ('OpenAnswer', 'question', 'Question'), ('Question', 'question_open_answers', 'OpenAnswer'), ('OpenAnswer', 'questionnaire_run', 'QuestionnaireRun'), ('QuestionnaireRun', 'open_answers', 'OpenAnswer'), ('OpenAnswer', 'in_assessment', 'Assessment'), ('QuestionnaireRun', 'file', 'RestrictedFile')]</em><a class="headerlink" href="#cubes.piws.importer.questionnaires.Questionnaires.relations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

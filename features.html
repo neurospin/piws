@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -75,10 +75,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="rights.html">Rights management</a></li>
 			  <li><a href="views.html">Views</a></li>
 			  <li><a href="#">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="scripts.html">Importation procedures</a></li>
+			  <li><a href="parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="download.html">Download</a></li>
+			  <li><a href="upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -94,21 +99,18 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
       <ul>
 <li><a class="reference internal" href="#">Features documentation</a><ul>
 <li><a class="reference internal" href="#piws-views-facets"><code class="docutils literal"><span class="pre">piws.views.facets</span></code></a></li>
-<li><a class="reference internal" href="#the-access-rights-management">The access rights management</a></li>
-<li><a class="reference internal" href="#uplad-functionnality">Uplad functionnality</a></li>
-<li><a class="reference internal" href="#download-functionnality">Download functionnality</a></li>
+<li><a class="reference internal" href="#export-binary-fields">Export binary fields</a></li>
 </ul>
 </li>
 </ul>
@@ -154,10 +156,32 @@ A number of criteria have been set up to restrict searches in this cube.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="cubes.piws.views.facets.LabelFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">LabelFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#LabelFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.LabelFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter on label.</p>
+<p>This filter is applied on &#8216;Scan&#8217;, &#8216;ProcessingRun&#8217;,
+&#8216;QuestionnaireRun&#8217; and &#8216;GenomicMeasure&#8217; entities.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.NameFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">NameFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#NameFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.NameFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter on name.</p>
+<p>This filter is applied on &#8216;FileSet&#8217;.</p>
+</dd></dl>
+
+<dl class="class">
 <dt id="cubes.piws.views.facets.ProcessingRunNameFacet">
 <em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">ProcessingRunNameFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#ProcessingRunNameFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.ProcessingRunNameFacet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter the ProcessingRun FileSets by name.</p>
 <p>This filter is applied on &#8216;ProcessingRun&#8217;.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.facets.ProcessingRunSubjectFacet">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">ProcessingRunSubjectFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#ProcessingRunSubjectFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.ProcessingRunSubjectFacet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter on subject code (from the &#8216;Subject&#8217; entity).</p>
+<p>This filter can is applied on &#8216;ProcessingRun&#8217;.</p>
 </dd></dl>
 
 <dl class="class">
@@ -186,8 +210,8 @@ A number of criteria have been set up to restrict searches in this cube.</p>
 <dt id="cubes.piws.views.facets.SubjectFacet">
 <em class="property">class </em><code class="descclassname">cubes.piws.views.facets.</code><code class="descname">SubjectFacet</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/facets.html#SubjectFacet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.facets.SubjectFacet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter on subject code (from the &#8216;Subject&#8217; entity).</p>
-<p>This filter can is applied on &#8216;Scan&#8217;, &#8216;ProcessingRun&#8217;,
-&#8216;QuestionnaireRun&#8217; and &#8216;GenomicMeasure&#8217; entities.</p>
+<p>This filter can is applied on &#8216;Scan&#8217;, &#8216;QuestionnaireRun&#8217; and
+&#8216;GenomicMeasure&#8217; entities.</p>
 </dd></dl>
 
 <dl class="class">
@@ -199,28 +223,22 @@ A number of criteria have been set up to restrict searches in this cube.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="the-access-rights-management">
-<h2>The access rights management<a class="headerlink" href="#the-access-rights-management" title="Permalink to this headline">¶</a></h2>
-<p>All entities that requires access rights management are linked to
-one &#8216;Assessment&#8217; entity by the relation &#8216;in_assessment&#8217;.
-As the access rights are set on the &#8216;Assessment&#8217; entity through the
-&#8216;can_read&#8217; and &#8216;can_update&#8217; relations, the concerned entity are accessible
-only by authorized users. See schema below:</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
-<div class="figure align-center" id="id1">
-<a class="reference internal image-reference" href="_images/rights.png"><img alt="Access rights management" src="_images/rights.png" style="width: 500px;" /></a>
-<p class="caption"><span class="caption-text">Cube access rights management</span></p>
-</div>
-</div>
-<div class="section" id="uplad-functionnality">
-<h2>Uplad functionnality<a class="headerlink" href="#uplad-functionnality" title="Permalink to this headline">¶</a></h2>
-<p>The upload functionality is derived from the <a class="reference external" href="https://github.com/neurospin/rql_upload">rql_upload cube</a>.</p>
-</div>
-<div class="section" id="download-functionnality">
-<h2>Download functionnality<a class="headerlink" href="#download-functionnality" title="Permalink to this headline">¶</a></h2>
-<p>The download functionality is derived from the <a class="reference external" href="https://github.com/neurospin/rql_download">rql_download cube</a></p>
+<div class="section" id="export-binary-fields">
+<h2>Export binary fields<a class="headerlink" href="#export-binary-fields" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to request binary fields using the &#8216;_binary&#8217; key in the request
+URL.</p>
+<span class="target" id="module-cubes.piws.views.binary_json"></span><dl class="function">
+<dt id="cubes.piws.views.binary_json.wdata">
+<code class="descclassname">cubes.piws.views.binary_json.</code><code class="descname">wdata</code><span class="sig-paren">(</span><em>self</em>, <em>udata</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/binary_json.html#wdata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.binary_json.wdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mixin class for json views.</p>
+<p>Handles the following optional request parameters:</p>
+<ul class="simple">
+<li>&#8216;_indent&#8217;: must be an integer. If found, it is used to pretty print
+json output.</li>
+<li>&#8216;_binary&#8217;: must be an integer. If found, it will decode binary fields.</li>
+</ul>
+</dd></dl>
+
 </div>
 </div>
 

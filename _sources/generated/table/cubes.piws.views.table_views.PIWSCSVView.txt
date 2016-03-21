@@ -1,0 +1,64 @@
+:orphan:
+
+cubes.piws.views.table_views.PIWSCSVView
+========================================
+
+.. currentmodule:: cubes.piws.views.table_views
+
+.. autoclass:: PIWSCSVView
+    :members:
+    :private-members:
+    :special-members: __module__, __regid__
+    :undoc-members:
+    
+    .. automethod:: __init__
+    
+    .. rubric:: Methods
+    .. autosummary::
+    
+      ~PIWSCSVView.__init__
+      ~PIWSCSVView.call
+      ~PIWSCSVView.cell_call
+      ~PIWSCSVView.critical
+      ~PIWSCSVView.csvwriter
+      ~PIWSCSVView.cw_propval
+      ~PIWSCSVView.debug
+      ~PIWSCSVView.error
+      ~PIWSCSVView.exception
+      ~PIWSCSVView.field
+      ~PIWSCSVView.html_headers
+      ~PIWSCSVView.info
+      ~PIWSCSVView.is_primary
+      ~PIWSCSVView.last_modified
+      ~PIWSCSVView.linkable
+      ~PIWSCSVView.page_title
+      ~PIWSCSVView.render
+      ~PIWSCSVView.set_http_cache_headers
+      ~PIWSCSVView.set_request_content_type
+      ~PIWSCSVView.set_stream
+      ~PIWSCSVView.tal_render
+      ~PIWSCSVView.url
+      ~PIWSCSVView.warning
+      ~PIWSCSVView.wdata
+      ~PIWSCSVView.whead
+      ~PIWSCSVView.wview
+    
+    
+    
+    
+    .. rubric:: Attributes
+    .. autosummary::
+    
+      ~PIWSCSVView.add_div_section
+      ~PIWSCSVView.add_to_breadcrumbs
+      ~PIWSCSVView.binary
+      ~PIWSCSVView.cache_max_age
+      ~PIWSCSVView.category
+      ~PIWSCSVView.content_type
+      ~PIWSCSVView.csv_params
+      ~PIWSCSVView.paginable
+      ~PIWSCSVView.templatable
+      ~PIWSCSVView.title
+    
+    
+

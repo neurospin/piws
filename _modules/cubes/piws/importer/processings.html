@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -76,10 +76,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../../../rights.html">Rights management</a></li>
 			  <li><a href="../../../../views.html">Views</a></li>
 			  <li><a href="../../../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../download.html">Download</a></li>
+			  <li><a href="../../../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -95,12 +100,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -141,10 +145,14 @@
     <span class="n">relations</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">Base</span><span class="o">.</span><span class="n">fileset_relations</span> <span class="o">+</span> <span class="n">Base</span><span class="o">.</span><span class="n">assessment_relations</span> <span class="o">+</span> <span class="p">[</span>
             <span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="s2">&quot;Study&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;study_processing_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;subject_processing_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingRun&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span> <span class="s2">&quot;score_values&quot;</span><span class="p">,</span> <span class="s2">&quot;ScoreValue&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;ScoreValue&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)]</span>
@@ -152,8 +160,8 @@
     <span class="n">relations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ProcessingRun&quot;</span>
 
 <div class="viewcode-block" id="Processings.__init__"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.processings.Processings.html#cubes.piws.importer.processings.Processings.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">center_name</span><span class="p">,</span> <span class="n">processings</span><span class="p">,</span>
-                 <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+                 <span class="n">processing_type</span><span class="p">,</span> <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the Processings class.</span>
 
 <span class="sd">        Parameters</span>
@@ -169,9 +177,12 @@
 <span class="sd">            name as keys and then a list of dictionaries with two keys (</span>
 <span class="sd">            Assessment - Processings) that contains the entities parameter</span>
 <span class="sd">            decriptions.</span>
+<span class="sd">        processing_type: str (mandatory)</span>
+<span class="sd">            a processing type used to gather together similar</span>
+<span class="sd">            processings.</span>
 <span class="sd">        can_read: bool (optional, default True)</span>
 <span class="sd">            set the read permission to the imported data.</span>
-<span class="sd">        can_update: bool (optional, default True)</span>
+<span class="sd">        can_update: bool (optional, default False)</span>
 <span class="sd">            set the update permission to the imported data.</span>
 <span class="sd">        data_filepath: str (optional, default None)</span>
 <span class="sd">            the path to folder containing the current study dataset.</span>
@@ -204,6 +215,9 @@
 <span class="sd">                            &quot;name&quot;: u&quot;p1&quot;, &quot;label&quot;: u&quot;segmentation&quot;,</span>
 <span class="sd">                            &quot;tool&quot;: u&quot;spm&quot;, &quot;version&quot;: u&quot;8.1&quot;,</span>
 <span class="sd">                            &quot;parameters&quot;: u&quot;{&#39;a&#39;: 1, &#39;r&#39;: &#39;mypath&#39;}&quot;}</span>
+<span class="sd">                    } ]</span>
+<span class="sd">                } ]</span>
+<span class="sd">            }</span>
 
 
 <span class="sd">        Depreciated example:</span>
@@ -233,16 +247,15 @@
 <span class="sd">            }</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Inheritance</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Processings</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">use_store</span><span class="p">,</span>
-                                          <span class="n">piws_security_model</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Processings</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">can_read</span><span class="p">,</span> <span class="n">can_update</span><span class="p">,</span>
+                                          <span class="n">use_store</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="p">)</span>
 
         <span class="c1"># Class parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processings</span> <span class="o">=</span> <span class="n">processings</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_filepath</span> <span class="o">=</span> <span class="n">data_filepath</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">project_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">center_name</span> <span class="o">=</span> <span class="n">center_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">can_read</span> <span class="o">=</span> <span class="n">can_read</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">can_update</span> <span class="o">=</span> <span class="n">can_update</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processing_type</span> <span class="o">=</span> <span class="n">processing_type</span>
 
         <span class="c1"># Speed up parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span> <span class="o">=</span> <span class="p">{}</span>
@@ -386,6 +399,9 @@
                         <span class="n">fset_structs</span> <span class="o">=</span> <span class="n">current_processing</span><span class="p">[</span><span class="s2">&quot;FileSets&quot;</span><span class="p">]</span>
                         <span class="n">extfiles_structs</span> <span class="o">=</span> <span class="n">current_processing</span><span class="p">[</span>
                             <span class="s2">&quot;ExternalResources&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fset_structs</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">extfiles_structs</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;For each filset a list of external &quot;</span>
+                                         <span class="s2">&quot;files is required.&quot;</span><span class="p">)</span>
                     <span class="n">scores</span> <span class="o">=</span> <span class="n">current_processing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Scores&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
                     <span class="n">processing_id</span> <span class="o">=</span> <span class="n">processing_struct</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">]</span>
 
@@ -399,7 +415,7 @@
                             <span class="n">processing_eid</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span>
                             <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                            <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="n">processing_eid</span><span class="p">,</span>
+                            <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;subject_processing_runs&quot;</span><span class="p">,</span> <span class="n">processing_eid</span><span class="p">,</span>
                             <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
                     <span class="c1"># Create the processing</span>
@@ -407,7 +423,9 @@
                         <span class="n">processing_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_processing</span><span class="p">(</span>
                             <span class="n">processing_struct</span><span class="p">,</span> <span class="n">fset_structs</span><span class="p">,</span> <span class="n">extfiles_structs</span><span class="p">,</span>
                             <span class="n">scores</span><span class="p">,</span> <span class="n">processing_inputs</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span>
-                            <span class="n">assessment_eid</span><span class="p">)</span></div>
+                            <span class="n">assessment_eid</span><span class="p">)</span>
+
+        <span class="k">print</span>  <span class="c1"># new line after last progress bar update</span></div>
 
 <div class="viewcode-block" id="Processings._create_processing"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.processings.Processings.html#cubes.piws.importer.processings.Processings._create_processing">[docs]</a>    <span class="k">def</span> <span class="nf">_create_processing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processing_struct</span><span class="p">,</span> <span class="n">fset_structs</span><span class="p">,</span>
                            <span class="n">extfiles_structs</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">processing_inputs</span><span class="p">,</span>
@@ -421,6 +439,7 @@
                 <span class="n">processing_id</span><span class="p">)),</span>
             <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
             <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processing_type</span><span class="p">),</span>
             <span class="o">**</span><span class="n">processing_struct</span><span class="p">)</span>
         <span class="n">processing_eid</span> <span class="o">=</span> <span class="n">processing_entity</span><span class="o">.</span><span class="n">eid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inserted_processings</span><span class="p">[</span><span class="n">processing_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">processing_eid</span>
@@ -431,18 +450,21 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                 <span class="n">processing_eid</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">study_eid</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="n">processing_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">study_eid</span><span class="p">,</span> <span class="s2">&quot;study_processing_runs&quot;</span><span class="p">,</span> <span class="n">processing_eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="c1"># &gt; add relation with the subject</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                 <span class="n">processing_eid</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="n">processing_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;subject_processing_runs&quot;</span><span class="p">,</span> <span class="n">processing_eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="c1"># &gt; add relation with the assessment</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="n">processing_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="n">processing_eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                <span class="n">processing_eid</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">)</span>
+                <span class="n">processing_eid</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+                <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">)</span>
             <span class="c1"># &gt; add relation with the inputs</span>
             <span class="k">for</span> <span class="n">rql</span> <span class="ow">in</span> <span class="n">processing_inputs</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">):</span>
@@ -473,7 +495,7 @@
                     <span class="o">**</span><span class="n">score_struct</span><span class="p">)</span>
                 <span class="c1"># &gt; add relation with the processing</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
-                    <span class="n">processing_eid</span><span class="p">,</span> <span class="s2">&quot;outputs&quot;</span><span class="p">,</span> <span class="n">score_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">)</span>
+                    <span class="n">processing_eid</span><span class="p">,</span> <span class="s2">&quot;score_values&quot;</span><span class="p">,</span> <span class="n">score_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">)</span>
                 <span class="c1"># &gt; add relation with the assessment</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                     <span class="n">score_entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>

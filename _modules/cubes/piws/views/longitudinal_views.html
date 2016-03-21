@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubes/piws/views/longitudinal_views.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../../../index.html">
+        <img src="../../../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../../../index.html">Home</a></li>
+        <li><a href="../../../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../rights.html">Rights management</a></li>
+			  <li><a href="../../../../views.html">Views</a></li>
+			  <li><a href="../../../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../download.html">Download</a></li>
+			  <li><a href="../../../../upload.html">Upload</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubes.piws.views.longitudinal_views</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="c1"># Cubicweb import</span>
+<span class="kn">from</span> <span class="nn">cubicweb.view</span> <span class="kn">import</span> <span class="n">View</span>
+
+
+<div class="viewcode-block" id="QuestionnaireLongitudinalView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.longitudinal_views.QuestionnaireLongitudinalView">[docs]</a><span class="k">class</span> <span class="nc">QuestionnaireLongitudinalView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a view that summarized the longitudinal material for a subject.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;questionnaire-longitudinal-measures&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Longitudinal&quot;</span><span class="p">)</span>
+    <span class="n">paginable</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;questionnaire-longitudinal-measures&quot;</span>
+
+<div class="viewcode-block" id="QuestionnaireLongitudinalView.call"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.longitudinal_views.QuestionnaireLongitudinalView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">patient_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method that will create the subject longitudinal views.</span>
+
+<span class="sd">        If no resultset are passed to this method, the current resultset is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">        Only digits answers are considered.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        rset: resultset (optional, default None)</span>
+<span class="sd">            a  cw resultset</span>
+<span class="sd">        patient_id: string (optional, default None)</span>
+<span class="sd">            the patient identifier.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the cw resultset</span>
+        <span class="n">rset</span> <span class="o">=</span> <span class="n">rset</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span>
+
+        <span class="c1"># Get the method parameters: if we use &#39;build_url&#39; method, the data</span>
+        <span class="c1"># are in the firm dictionary</span>
+        <span class="n">patient_id</span> <span class="o">=</span> <span class="n">patient_id</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;patient_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add some js resources</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">add_js</span><span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;highcharts-4.0.4/js/highcharts.js&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;highcharts-4.0.4/js/modules/exporting.js&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Get the data from the result set</span>
+        <span class="n">questionnaires</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">line_number</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rset</span><span class="o">.</span><span class="n">rowcount</span><span class="p">):</span>
+
+            <span class="c1"># Get the questionnaire run entity</span>
+            <span class="n">qr_entity</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">get_entity</span><span class="p">(</span><span class="n">line_number</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># Get the questionnaire run timepoint</span>
+            <span class="n">timepoint</span> <span class="o">=</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">in_assessment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">timepoint</span>
+
+            <span class="c1"># Get the associated questionnaire/questions</span>
+            <span class="n">q_entity</span> <span class="o">=</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">questionnaire</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">q_entity</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">questionnaires</span><span class="p">:</span>
+                <span class="n">questionnaires</span><span class="p">[</span><span class="n">q_entity</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">q_entity</span><span class="o">.</span><span class="n">questions</span><span class="p">)</span>
+
+            <span class="c1"># Get the questionnaire run associated answers and fill the</span>
+            <span class="c1"># &#39;questionnaires&#39; structure</span>
+            <span class="c1"># &gt; case 1: one line of answers inserted per subject (File)</span>
+            <span class="c1"># &gt; case 2: the answers are inserted in the database (OpenAnswer).</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">qr_entity</span><span class="o">.</span><span class="n">file</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">answers</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">qr_entity</span><span class="o">.</span><span class="n">file</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+                <span class="k">for</span> <span class="n">qname</span><span class="p">,</span> <span class="n">answer</span> <span class="ow">in</span> <span class="n">answers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">questionnaires</span><span class="p">[</span><span class="n">q_entity</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="n">qname</span><span class="p">][</span><span class="n">timepoint</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+                        <span class="n">answer</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">answer_entities</span> <span class="o">=</span> <span class="n">qr_entity</span><span class="o">.</span><span class="n">open_answers</span>
+                <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">answer_entities</span><span class="p">:</span>
+                    <span class="n">questionnaires</span><span class="p">[</span><span class="n">q_entity</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="n">entity</span><span class="o">.</span><span class="n">question</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">][</span>
+                        <span class="n">timepoint</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">value</span>
+
+
+
+
+        <span class="c1"># Create a selector</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;h1&gt;Select a question to follow:&lt;/h1&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;select class=&#39;selectpicker&#39; data-live-search=&#39;true&#39;&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;option&gt;&lt;/option&gt;&quot;</span>
+        <span class="k">for</span> <span class="n">questionnaire_name</span><span class="p">,</span> <span class="n">questions</span> <span class="ow">in</span> <span class="n">questionnaires</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;optgroup label=&#39;{0}&#39; data-icon=&#39;glyphicon-heart&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">questionnaire_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">question_name</span><span class="p">,</span> <span class="n">question_item</span> <span class="ow">in</span> <span class="n">questions</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+
+                <span class="c1"># Get the plot data</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">question_item</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+
+                <span class="c1"># Check if we are dealing with numbers</span>
+                <span class="n">control_value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">control_value</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;option value=&#39;{0}&#39;&gt;{0}&lt;/option&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">question_name</span><span class="p">)</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/optgroup&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/select&gt;&quot;</span>
+
+        <span class="c1"># Ceate a div to display the plots</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;&lt;div id=&#39;longitudinal-plot&#39; style=&#39;min-width: 310px; &quot;</span>
+                 <span class="s2">&quot;height: 400px; max-width: 600px; margin: 0 auto&#39;&gt;&lt;/div&gt;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Convert the input data</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;script type=&#39;text/javascript&#39;&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var jdata = {};&quot;</span>
+        <span class="k">for</span> <span class="n">q_name</span><span class="p">,</span> <span class="n">q_item</span> <span class="ow">in</span> <span class="n">questionnaires</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">question_name</span><span class="p">,</span> <span class="n">question_item</span> <span class="ow">in</span> <span class="n">q_item</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+
+                <span class="c1"># Get the plot data</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">question_item</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+
+                <span class="c1"># Check if we are dealing with numbers</span>
+                <span class="n">control_value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">control_value</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var sdata = {};&quot;</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;sdata[&#39;x&#39;] = [];&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">question_name</span><span class="p">)</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;sdata[&#39;grid&#39;] = [];&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">question_name</span><span class="p">)</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;sdata[&#39;related_question&#39;] = &#39;{0}&#39;;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">question_name</span><span class="p">)</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;sdata[&#39;related_questionnaire&#39;] = &#39;{0}&#39;;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q_name</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;sdata[&#39;x&#39;].push(&#39;{0}&#39;);&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;sdata[&#39;grid&#39;].push({0});&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;jdata[&#39;{0}&#39;] = sdata;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">question_name</span><span class="p">)</span>
+
+        <span class="c1"># Add an event when the selection change</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(function() {&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;.selectpicker&#39;).on(&#39;change&#39;, function(){&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var selected = $(this).find(&#39;option:selected&#39;).val();&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;if (selected != &#39;&#39;){&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;$(&#39;#longitudinal-plot&#39;).highcharts({&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;credits : {enabled : false}, &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;title: {{text: jdata[selected][&#39;related_questionnaire&#39;] + &quot;</span>
+                 <span class="s2">&quot;&#39;-&#39; + jdata[selected][&#39;related_question&#39;] + &quot;</span>
+                 <span class="s2">&quot;&#39;: {0}&#39;}},&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">patient_id</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;xAxis: {categories: jdata[selected][&#39;x&#39;]},&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;yAxis: {title: {text: &#39;&#39;}},&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;legend: {layout: &#39;vertical&#39;, align: &#39;right&#39;, verticalAlign:&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;middle&#39;, borderWidth: 0},&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;series: [{name: &#39;longitudinal&#39;, data: jdata[selected][&#39;grid&#39;]}]&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;});&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;});&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;});&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/script&gt;&quot;</span>
+
+        <span class="c1"># Display the page content</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">html</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>

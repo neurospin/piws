@@ -57,6 +57,7 @@ cubes.piws.views.table_views.JHugetableView
       ~JHugetableView.div_id
       ~JHugetableView.paginable
       ~JHugetableView.templatable
+      ~JHugetableView.title
     
     
 

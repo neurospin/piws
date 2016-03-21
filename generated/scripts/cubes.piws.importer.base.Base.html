@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.2.0',
+        VERSION:     '2.0.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -75,10 +75,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="../../rights.html">Rights management</a></li>
 			  <li><a href="../../views.html">Views</a></li>
 			  <li><a href="../../features.html">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../download.html">Download</a></li>
+			  <li><a href="../../upload.html">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -94,12 +99,11 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 1.2.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
           </p>
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -122,7 +126,7 @@
 <h1>cubes.piws.importer.base.Base<a class="headerlink" href="#cubes-piws-importer-base-base" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="cubes.piws.importer.base.Base">
-<em class="property">class </em><code class="descclassname">cubes.piws.importer.base.</code><code class="descname">Base</code><span class="sig-paren">(</span><em>session</em>, <em>use_store=True</em>, <em>piws_security_model=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/base.html#Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.base.Base" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cubes.piws.importer.base.</code><code class="descname">Base</code><span class="sig-paren">(</span><em>session</em>, <em>can_read=True</em>, <em>can_update=False</em>, <em>use_store=True</em>, <em>piws_security_model=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/base.html#Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.base.Base" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class enables us to add new entities and relations in CW.</p>
 <p class="rubric">Notes</p>
 <p>Here is an example of the definition of the &#8216;relations&#8217; parameter:</p>
@@ -145,7 +149,7 @@
 </table>
 <dl class="method">
 <dt id="cubes.piws.importer.base.Base.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>session</em>, <em>use_store=True</em>, <em>piws_security_model=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/base.html#Base.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.base.Base.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>session</em>, <em>can_read=True</em>, <em>can_update=False</em>, <em>use_store=True</em>, <em>piws_security_model=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/base.html#Base.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.base.Base.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the SeniorData class.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -155,9 +159,13 @@
 <blockquote>
 <div><p>a cubicweb session.</p>
 </div></blockquote>
-<p><strong>list_group_names: list of str (mandatory)</strong> :</p>
+<p><strong>can_read: bool (optional, default True)</strong> :</p>
 <blockquote>
-<div><p>the name of the different groups</p>
+<div><p>set the read permission to the imported data.</p>
+</div></blockquote>
+<p><strong>can_update: bool (optional, default False)</strong> :</p>
+<blockquote>
+<div><p>set the update permission to the imported data.</p>
 </div></blockquote>
 <p><strong>use_store: bool (optional, default True)</strong> :</p>
 <blockquote>
@@ -180,7 +188,7 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.__init__" title="cubes.piws.importer.base.Base.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(session[,&nbsp;use_store,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.__init__" title="cubes.piws.importer.base.Base.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(session[,&nbsp;can_read,&nbsp;can_update,&nbsp;...])</td>
 <td>Initialize the SeniorData class.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.cleanup" title="cubes.piws.importer.base.Base.cleanup"><code class="xref py py-obj docutils literal"><span class="pre">cleanup</span></code></a>()</td>
@@ -303,7 +311,7 @@ if &#8216;check_unicity&#8217; is True.</p>
 
 <dl class="method">
 <dt id="cubes.piws.importer.base.Base._progress_bar">
-<code class="descname">_progress_bar</code><span class="sig-paren">(</span><em>ratio</em>, <em>title=''</em>, <em>bar_length=40</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/base.html#Base._progress_bar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.base.Base._progress_bar" title="Permalink to this definition">¶</a></dt>
+<code class="descname">_progress_bar</code><span class="sig-paren">(</span><em>ratio</em>, <em>title=''</em>, <em>bar_length=40</em>, <em>maxsize=20</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/base.html#Base._progress_bar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.base.Base._progress_bar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to generate a progress bar.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -318,8 +326,12 @@ if &#8216;check_unicity&#8217; is True.</p>
 <div><p>a title to identify the progress bar.</p>
 </div></blockquote>
 <p><strong>bar_length: int (optional)</strong> :</p>
-<blockquote class="last">
+<blockquote>
 <div><p>the length of the bar that will be ploted.</p>
+</div></blockquote>
+<p><strong>maxsize: int (optional)</strong> :</p>
+<blockquote class="last">
+<div><p>use to justify title.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -375,7 +387,7 @@ if &#8216;check_unicity&#8217; is True.</p>
 
 <dl class="attribute">
 <dt id="cubes.piws.importer.base.Base.fileset_relations">
-<code class="descname">fileset_relations</code><em class="property"> = [['Scan', 'results_files', 'FileSet'], ('FileSet', 'in_assessment', 'Assessment'), ('FileSet', 'file_entries', 'ExternalFile'), ('ExternalFile', 'in_assessment', 'Assessment')]</em><a class="headerlink" href="#cubes.piws.importer.base.Base.fileset_relations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fileset_relations</code><em class="property"> = [['Scan', 'filesets', 'FileSet'], ('FileSet', 'in_assessment', 'Assessment'), ('FileSet', 'external_files', 'ExternalFile'), ('ExternalFile', 'fileset', 'FileSet'), ('ExternalFile', 'in_assessment', 'Assessment')]</em><a class="headerlink" href="#cubes.piws.importer.base.Base.fileset_relations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

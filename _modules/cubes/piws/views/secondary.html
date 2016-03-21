@@ -1,0 +1,662 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+  
+    <title>Population Imaging Web Service &mdash; PIWS</title>
+  <!-- htmltitle is before nature.css - we use this hack to load bootstrap first -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap.min.css" media="screen" />
+  <link rel="stylesheet" href="../../../../_static/css/bootstrap-responsive.css"/>
+
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="top" title="PIWS" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+  
+   
+       <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="../../../../_static/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <link rel="canonical" href="https://bioproj.extra.cea.fr/redmine/projects/nsap/_modules/cubes/piws/views/secondary.html" /> -->
+
+  <script type="text/javascript">
+    $("div.buttonNext, div.buttonPrevious").hover(
+       function () {
+           $(this).css('background-color', '#FF9C34');
+       },
+       function () {
+           $(this).css('background-color', '#A7D6E2');
+       }
+    );
+    var bodywrapper = $('.bodywrapper');
+    var sidebarbutton = $('#sidebarbutton');
+    sidebarbutton.css({'height': '900px'});
+  </script>
+
+  </head>
+  <body role="document">
+
+<div class="header-wrapper">
+  <div class="header">
+    <p class="logo">
+      <a href="../../../../index.html">
+        <img src="../../../../_static/nsap.png" alt="Logo"/>
+      </a>
+    </p><div class="navbar">
+      <ul>
+        <li><a href="../../../../index.html">Home</a></li>
+        <li><a href="../../../../installation.html">Installation</a></li>
+        <li class="btn-li">
+          <div class="btn-group">
+		    <a href="../../../../documentation.html">Documentation</a>
+		    <a class="btn dropdown-toggle" data-toggle="dropdown">
+		      <span class="caret"></span>
+		    </a>
+		    <ul class="dropdown-menu">
+	          <li class="link-title">PIWS</li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../rights.html">Rights management</a></li>
+			  <li><a href="../../../../views.html">Views</a></li>
+			  <li><a href="../../../../features.html">Features documentation</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../scripts.html">Importation procedures</a></li>
+			  <li><a href="../../../../parsers.html">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="../../../../download.html">Download</a></li>
+			  <li><a href="../../../../upload.html">Upload</a></li>
+		    </ul>
+		  </div>
+        </li>
+        <li><a href="http://neurospin-wiki.org/">NeuroSpin Wiki</a></li>
+      </ul>
+    </div> <!-- end navbar --></div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="sphinxsidebar">
+      <div class="sphinxsidebarwrapper">
+
+        <!-- info setup -->
+          <p class="doc-version">
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+          </p>
+        <p class="citing">
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
+        </p>
+
+      <!-- toc tree -->
+      
+
+      </div>
+    </div>
+  
+
+  <div class="content">
+      
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cubes.piws.views.secondary</h1><div class="highlight"><pre>
+<span></span><span class="c1">##########################################################################</span>
+<span class="c1"># NSAp - Copyright (C) CEA, 2013</span>
+<span class="c1"># Distributed under the terms of the CeCILL-B license, as published by</span>
+<span class="c1"># the CEA-CNRS-INRIA. Refer to the LICENSE file or to</span>
+<span class="c1"># http://www.cecill.info/licences/Licence_CeCILL-B_V1-en.html</span>
+<span class="c1"># for details.</span>
+<span class="c1">##########################################################################</span>
+
+<span class="c1"># System import</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="c1"># Cubicweb import</span>
+<span class="kn">from</span> <span class="nn">cubicweb.predicates</span> <span class="kn">import</span> <span class="n">is_instance</span>
+<span class="kn">from</span> <span class="nn">cubicweb.view</span> <span class="kn">import</span> <span class="n">EntityView</span>
+
+<span class="c1"># PIWS import</span>
+<span class="kn">from</span> <span class="nn">components</span> <span class="kn">import</span> <span class="n">AUTHORIZED_IMAGE_EXT</span>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Base</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="BaseOutOfContextView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.BaseOutOfContextView">[docs]</a><span class="k">class</span> <span class="nc">BaseOutOfContextView</span><span class="p">(</span><span class="n">EntityView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Default secondary view rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;outofcontext&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Outofcontext&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BaseOutOfContextView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.BaseOutOfContextView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the entity description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="BaseOutOfContextView.cell_call"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.BaseOutOfContextView.cell_call">[docs]</a>    <span class="k">def</span> <span class="nf">cell_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create the out of context view template</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the entity</span>
+        <span class="n">entity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span><span class="o">.</span><span class="n">get_entity</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+
+        <span class="c1"># Get the associated images</span>
+        <span class="n">imagefiles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">entity</span><span class="o">.</span><span class="n">cw_etype</span> <span class="o">==</span> <span class="s2">&quot;Scan&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s2">&quot;filesets&quot;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">efentries</span> <span class="ow">in</span> <span class="n">entity</span><span class="o">.</span><span class="n">filesets</span><span class="p">:</span>
+                    <span class="n">imagefiles</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">filepath</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">efentries</span><span class="o">.</span><span class="n">external_files</span>
+                         <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">filepath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">AUTHORIZED_IMAGE_EXT</span><span class="p">))])</span>
+
+        <span class="c1"># Create a viewer if some images has been detected</span>
+        <span class="n">limagefiles</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">imagefiles</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">limagefiles</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+                <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;brainbrowser-image-viewer&quot;</span><span class="p">,</span> <span class="n">imagefiles</span><span class="o">=</span><span class="n">imagefiles</span><span class="p">,</span>
+                <span class="n">__message</span><span class="o">=</span><span class="p">(</span><span class="s2">u&quot;Found &#39;{0}&#39; image(s) that can be &quot;</span>
+                            <span class="s2">&quot;displayed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">limagefiles</span><span class="p">)))</span>
+
+        <span class="c1"># Get the associated documentation if available</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">):</span>
+            <span class="n">tooltip_name</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">label</span>
+            <span class="n">tooltip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">vreg</span><span class="o">.</span><span class="n">docmap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tooltip</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># Get the subjects/study/center related entities</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">):</span>
+            <span class="n">nbsubjects</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">subjects</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">entity</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;Subject&quot;</span><span class="p">:</span>
+            <span class="n">nbsubjects</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nbsubjects</span> <span class="o">=</span> <span class="s2">&quot;nc&quot;</span>
+        <span class="n">study</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">study</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">study</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">study</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Get the entity symbol</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s2">&quot;__bootstap_glyph__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">entity</span><span class="o">.</span><span class="n">__bootstap_glyph__</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="s2">u&quot;&lt;img alt=&#39;&#39; src=&#39;{0}&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">data_url</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">symbol</span><span class="p">))</span>
+
+        <span class="c1"># Create the div that will contain the list item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;div class=&#39;ooview&#39;&gt;&lt;div class=&#39;well&#39;&gt;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create a bootstrap row item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;div class=&#39;row&#39;&gt;&quot;</span><span class="p">)</span>
+        <span class="c1"># &gt; first element: the image</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;div class=&#39;col-md-2&#39;&gt;&lt;p class=&#39;text-center&#39;&gt;{0}&lt;/p&gt;&quot;</span>
+               <span class="s2">&quot;&lt;/div&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+        <span class="c1"># &gt; second element: the entity description + link</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;div class=&#39;col-md-6&#39;&gt;&lt;h4&gt;{0}&lt;/h4&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">entity</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;incontext&quot;</span><span class="p">)))</span>
+        <span class="n">entity_desc</span> <span class="o">=</span> <span class="s2">u&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">study</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">entity_desc</span> <span class="o">+=</span> <span class="s2">u&quot;Study &lt;em&gt;{0}&lt;/em&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nbsubjects</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;nc&#39;</span><span class="p">]:</span>
+            <span class="n">entity_desc</span> <span class="o">+=</span> <span class="s2">u&quot; - Number of subjects &lt;em&gt;{0}&lt;/em&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">nbsubjects</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">entity_desc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
+        <span class="c1"># &gt; third element: the see more button</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;button class=&#39;btn btn-danger&#39; type=&#39;button&#39; &quot;</span>
+               <span class="s2">&quot;style=&#39;margin-top:8px&#39; data-toggle=&#39;collapse&#39; &quot;</span>
+               <span class="s2">&quot;data-target=&#39;#info-{0}&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;See more&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/button&gt;&quot;</span><span class="p">)</span>
+        <span class="c1"># &gt; fourth element: the show button</span>
+        <span class="k">if</span> <span class="n">limagefiles</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;a href=&#39;{0}&#39; target=_blank class=&#39;btn btn-success&#39; &quot;</span>
+                   <span class="s2">&quot;type=&#39;button&#39; style=&#39;margin-top:8px&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">href</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;Show &amp;#9735;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/a&gt;&quot;</span><span class="p">)</span>
+        <span class="c1"># &gt; fifth element: the doc button</span>
+        <span class="k">if</span> <span class="n">tooltip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">tiphref</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span><span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;piws-documentation&quot;</span><span class="p">,</span>
+                                         <span class="n">tooltip_name</span><span class="o">=</span><span class="n">tooltip_name</span><span class="p">,</span>
+                                         <span class="n">_notemplate</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;button href=&#39;{0}&#39; class=&#39;btn btn-warning&#39; type=&#39;button&#39; &quot;</span>
+                   <span class="s2">&quot;style=&#39;margin-top:8px&#39; data-toggle=&#39;collapse&#39; &quot;</span>
+                   <span class="s2">&quot;data-target=&#39;#doc-{0}&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;Doc&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/button&gt;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;a href=&#39;{0}&#39; target=_blank class=&#39;btn btn-warning&#39; &quot;</span>
+                   <span class="s2">&quot;type=&#39;button&#39; style=&#39;margin-top:8px&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tiphref</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&amp;#9735;&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/a&gt;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Close row item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Get the entity description</span>
+        <span class="n">entity_desc</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_description</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+
+        <span class="c1"># Create a div that will be show or hide when the see more button is</span>
+        <span class="c1"># clicked</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;div id=&#39;info-{0}&#39; class=&#39;collapse&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;dl class=&#39;dl-horizontal&#39;&gt;&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">entity_desc</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;dt&gt;{0}&lt;/dt&gt;&lt;dd&gt;{1}&lt;/dd&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create a div that will be show or hide when the doc button is</span>
+        <span class="c1"># clicked</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;div id=&#39;doc-{0}&#39; class=&#39;collapse&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">tooltip</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Close list item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&lt;/div&gt;&quot;</span><span class="p">)</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Scans</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextScanView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextScanView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextScanView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Scan secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextScanView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextScanView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the Scan description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dtype_entity</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">has_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">study</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">study</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Image Shape (x)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">shape_x</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Image Shape (y)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">shape_y</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Image Shape (z)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">shape_z</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Voxel resolution (x)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">voxel_res_x</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Voxel resolution (y)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">voxel_res_y</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Voxel resolution (z)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">voxel_res_z</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Repetition time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">tr</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Echo time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">te</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Scanner field&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype_entity</span><span class="o">.</span><span class="n">field</span>
+        <span class="c1">#desc[&quot;Related subject&quot;] = subject.view(&quot;incontext&quot;)</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Assessment</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextAssessmentView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextAssessmentView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextAssessmentView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Assessment secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextAssessmentView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextAssessmentView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the Assessment description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">subjects</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">subjects</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Acquisition center&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subjects</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">subject</span> <span class="o">=</span> <span class="n">subjects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Gender&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subject</span><span class="o">.</span><span class="n">gender</span>
+            <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Handedness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subject</span><span class="o">.</span><span class="n">handedness</span>
+            <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">age_of_subject</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Subject</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextSubjectView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextSubjectView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextSubjectView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Subject secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextSubjectView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextSubjectView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the Subject description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Gender&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">gender</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Handedness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">handedness</span>
+        <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+            <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;highcharts-relation-summary-view&quot;</span><span class="p">,</span>
+            <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;Any A WHERE S eid &#39;{0}&#39;, S assessments A&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">eid</span><span class="p">),</span>
+            <span class="n">relations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;scans&quot;</span><span class="p">,</span> <span class="s2">&quot;questionnaire_runs&quot;</span><span class="p">,</span> <span class="s2">&quot;genomic_measures&quot;</span><span class="p">],</span>
+            <span class="n">subject_attr</span><span class="o">=</span><span class="s2">&quot;timepoint&quot;</span><span class="p">,</span> <span class="n">object_attr</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Acquisition status: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">code_in_study</span><span class="p">))</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Acquisition summary&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;a href=&#39;{0}&#39;&gt;status&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+        <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+            <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;highcharts-relation-summary-view&quot;</span><span class="p">,</span>
+            <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;Any A WHERE S eid &#39;{0}&#39;, S assessments A&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">eid</span><span class="p">),</span>
+            <span class="n">relations</span><span class="o">=</span><span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="n">subject_attr</span><span class="o">=</span><span class="s2">&quot;timepoint&quot;</span><span class="p">,</span>
+            <span class="n">object_attr</span><span class="o">=</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Processing status: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">entity</span><span class="o">.</span><span class="n">code_in_study</span><span class="p">))</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Processing summary&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;a href=&#39;{0}&#39;&gt;status&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+        <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
+            <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;questionnaire-longitudinal-measures&quot;</span><span class="p">,</span>
+            <span class="n">rql</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Any QR WHERE S eid &#39;{0}&#39;, S assessments A, &quot;</span>
+                 <span class="s2">&quot;A questionnaire_runs QR&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">eid</span><span class="p">)),</span>
+            <span class="n">patient_id</span><span class="o">=</span><span class="n">entity</span><span class="o">.</span><span class="n">code_in_study</span><span class="p">)</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Measure summary&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;a href=&#39;{0}&#39;&gt;status&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># ProcessingRun</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextProcessingRunView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextProcessingRunView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextProcessingRunView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; ProcessingRun secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;ProcessingRun&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextProcessingRunView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextProcessingRunView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the ProcessingRun description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Tool&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">tool</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">type</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Genomic Measure</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextGenomicMeasureView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextGenomicMeasureView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextGenomicMeasureView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; GenomicMeasure secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextGenomicMeasureView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextGenomicMeasureView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the GenomicMeasure description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">type</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">format</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># QuestionnaireRun</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextQuestionnaireRunView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextQuestionnaireRunView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextQuestionnaireRunView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; QuestionnaireRun secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextQuestionnaireRunView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextQuestionnaireRunView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the QuestionnaireRun description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">questionnaire</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">questionnaire</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Related questionnaire&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">questionnaire</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;incontext&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Question</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextQuestionView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextQuestionView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextQuestionView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Question secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Question&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextQuestionView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextQuestionView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the Question description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">questionnaire</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">questionnaire</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Related questionnaire&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">questionnaire</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;incontext&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Questionnaire</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextQuestionnaireView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextQuestionnaireView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextQuestionnaireView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Questionnaire secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Questionnaire&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextQuestionnaireView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextQuestionnaireView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the Questionnaire description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Nimber of questions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">questions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Snp</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextSnpView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextSnpView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextSnpView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Snp secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Snp&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextSnpView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextSnpView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the Snp description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Identifier&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">rs_id</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">position</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># GenomicPlatform</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextGenomicPlatformView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextGenomicPlatformView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextGenomicPlatformView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; GenomicPlatform secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;GenomicPlatform&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextGenomicPlatformView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextGenomicPlatformView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the GenomicPlatform description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># FileSet</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextFileSetView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextFileSetView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextFileSetView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; FileSet secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;FileSet&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextFileSetView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextFileSetView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the FileSet description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># ExternalFile</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextExternalFileView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextExternalFileView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextExternalFileView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; ExternalFile secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;ExternalFile&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextExternalFileView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextExternalFileView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the ExternalFile description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Abolute path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">absolute_path</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">filepath</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># CWSearch</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextCWSearchView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextCWSearchView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextCWSearchView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; CWSearch secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;CWSearch&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextCWSearchView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextCWSearchView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the CWSearch description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Tile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">title</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;RQL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Expiration data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">expiration_date</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">rset_type</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># CWUpload</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextCWUploadView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextCWUploadView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextCWUploadView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; CWUpload secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;CWUpload&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextCWUploadView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextCWUploadView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the CWUpload description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Tile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">title</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Form&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">form_name</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># File</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextFileView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextFileView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextFileView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; File secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;File&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextFileView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextFileView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the File description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">title</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_format</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;SHA1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_sha1hex</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># UploadFile</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextUploadFileView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextUploadFileView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextUploadFileView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; UploadFile secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;UploadFile&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextUploadFileView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextUploadFileView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the UploadFile description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">title</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_extension</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;SHA1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_sha1hex</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># RestrictedFile</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextRestrictedFileView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextRestrictedFileView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextRestrictedFileView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; RestrictedFile secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;RestrictedFile&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextRestrictedFileView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextRestrictedFileView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the RestrictedFile description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">title</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_format</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;SHA1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_sha1hex</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Register views</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="registration_callback"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.registration_callback">[docs]</a><span class="k">def</span> <span class="nf">registration_callback</span><span class="p">(</span><span class="n">vreg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Update outofcontext views.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">klass</span> <span class="ow">in</span> <span class="p">[</span><span class="n">OutOfContextQuestionView</span><span class="p">,</span> <span class="n">OutOfContextGenomicPlatformView</span><span class="p">,</span>
+                  <span class="n">OutOfContextSnpView</span><span class="p">,</span> <span class="n">OutOfContextFileSetView</span><span class="p">,</span>
+                  <span class="n">OutOfContextQuestionnaireView</span><span class="p">,</span> <span class="n">OutOfContextCWUploadView</span><span class="p">,</span>
+                  <span class="n">OutOfContextProcessingRunView</span><span class="p">,</span> <span class="n">OutOfContextScanView</span><span class="p">,</span>
+                  <span class="n">OutOfContextSubjectView</span><span class="p">,</span> <span class="n">OutOfContextAssessmentView</span><span class="p">,</span>
+                  <span class="n">OutOfContextQuestionnaireRunView</span><span class="p">,</span>
+                  <span class="n">OutOfContextExternalFileView</span><span class="p">,</span> <span class="n">OutOfContextCWSearchView</span><span class="p">,</span>
+                  <span class="n">OutOfContextFileView</span><span class="p">,</span> <span class="n">OutOfContextUploadFileView</span><span class="p">,</span>
+                  <span class="n">OutOfContextRestrictedFileView</span><span class="p">,</span>
+                  <span class="n">OutOfContextGenomicMeasureView</span><span class="p">]:</span>
+        <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">klass</span><span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer">
+    </div>
+  </div>
+  
+</div>
+
+<div class="footer">
+    &copy; 2015, NSAp developers &lt;antoine.grigis@cea.fr&gt;.
+</div>
+  </body>
+</html>
