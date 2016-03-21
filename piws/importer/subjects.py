@@ -64,7 +64,7 @@ class Subjects(Base):
             }
         """
         # Inheritance
-        super(Subjects, self).__init__(session, use_store)
+        super(Subjects, self).__init__(session, True, True, use_store, False)
 
         # Class parameters
         self.subjects = subjects
@@ -106,7 +106,8 @@ class Subjects(Base):
             entity_name="Study",
             check_unicity=True,
             name=unicode(self.project_name),
-            data_filepath=unicode(self.data_filepath))
+            data_filepath=unicode(self.data_filepath)
+        )
         study_eid = study_entity.eid
 
         #######################################################################
@@ -115,19 +116,20 @@ class Subjects(Base):
 
         # Go through the subject names
         nb_of_subjects = float(len(self.subjects))
+        maxsize = max([len(name) for name in self.subjects])
         cnt_subject = 1
         for subject_name, subject_parameter in self.subjects.iteritems():
 
             # Print a progress bar
             self._progress_bar(cnt_subject / nb_of_subjects,
-                               title="Import {0}:".format(subject_name),
-                               bar_length=40)
+                               title="{0}(subjects)".format(subject_name),
+                               bar_length=40, maxsize=maxsize + 9)
             cnt_subject += 1.
 
             # Create the subject if necessary
             subject_entity, is_created = self._get_or_create_unique_entity(
-                rql=("Any X Where X is Subject, X identifier "
-                     "'{0}'".format(subject_parameter["identifier"])),
+                rql=("Any X Where X is Subject, X code_in_study "
+                     "'{0}'".format(subject_parameter["code_in_study"])),
                 check_unicity=True,
                 entity_name="Subject",
                 **subject_parameter)
@@ -140,3 +142,5 @@ class Subjects(Base):
                 self._set_unique_relation(
                     study_eid, "subjects", subject_entity.eid,
                     check_unicity=False)
+
+        print  # new line after last progress bar update

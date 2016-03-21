@@ -26,24 +26,25 @@ class Questionnaires(Base):
     relations = Base.assessment_relations + [
         ("Question", "questionnaire", "Questionnaire"),
         ("Questionnaire", "questions", "Question"),
-        ("QuestionnaireRun", "instance_of", "Questionnaire"),
-        ("Questionnaire", "questionnaire_runs", "QuestionnaireRun"),
+        ("QuestionnaireRun", "questionnaire", "Questionnaire"),
+        ("Questionnaire", "questionnaire_questionnaire_runs", "QuestionnaireRun"),
         ("Assessment", "questionnaire_runs", "QuestionnaireRun"),
         ("QuestionnaireRun", "in_assessment", "Assessment"),
         ("QuestionnaireRun", "study", "Study"),
-        ("Study", "questionnaire_runs", "QuestionnaireRun"),
+        ("Study", "study_questionnaire_runs", "QuestionnaireRun"),
         ("QuestionnaireRun", "subject", "Subject"),
-        ("Subject", "questionnaire_runs", "QuestionnaireRun"),
+        ("Subject", "subject_questionnaire_runs", "QuestionnaireRun"),
         ("OpenAnswer", "question", "Question"),
-        ("Question", "open_answers", "OpenAnswer"),
+        ("Question", "question_open_answers", "OpenAnswer"),
         ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
         ("QuestionnaireRun", "open_answers", "OpenAnswer"),
         ("OpenAnswer", "in_assessment", "Assessment"),
+        ("QuestionnaireRun", "file", "RestrictedFile")
     ]
 
     def __init__(self, session, project_name, center_name, questionnaires,
-                 can_read=True, can_update=True, data_filepath=None,
-                 use_store=True, piws_security_model=True,
+                 questionnaire_type, can_read=True, can_update=True,
+                 data_filepath=None, use_store=True, piws_security_model=True,
                  use_openanswer=False):
         """ Initialize the 'Questionnaires' class.
 
@@ -60,6 +61,9 @@ class Questionnaires(Base):
             name as keys and then a list of dictionaries with four keys (Scans -
             (Scan - TypeData - FileSet - ExternalResource - ScoreValues) -
             Assessment) that contains the entities parameter decriptions.
+        questionnaire_type: str (mandatory)
+            a questionnaire type used to gather together similar
+            questionnaires.
         can_read: bool (optional, default True)
             set the read permission to the imported data.
         can_update: bool (optional, default True)
@@ -110,8 +114,8 @@ class Questionnaires(Base):
             }
         """
         # Inheritance
-        super(Questionnaires, self).__init__(session, use_store,
-                                             piws_security_model)
+        super(Questionnaires, self).__init__(session, can_read, can_update,
+                                             use_store, piws_security_model)
 
         # Define QuestionnaireRuns insertion strategy
         self.use_openanswer = use_openanswer
@@ -121,8 +125,7 @@ class Questionnaires(Base):
         self.data_filepath = data_filepath or ""
         self.project_name = project_name
         self.center_name = center_name
-        self.can_read = can_read
-        self.can_update = can_update
+        self.questionnaire_type = questionnaire_type
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -214,7 +217,7 @@ class Questionnaires(Base):
                 entity_name = "Questionnaire",
                 identifier=unicode(self._md5_sum(qname)),
                 name=unicode(qname),
-                type=u"unknown")
+                type=unicode(self.questionnaire_type))
             questionnaire_eids[qname] = questionnaire_entity.eid
             question_eids[qname] = {}
 
@@ -227,8 +230,8 @@ class Questionnaires(Base):
                     check_unicity=True,
                     entity_name = "Question",
                     identifier=unicode(question_id),
-                    text=unicode(question_name),
-                    type=u"text")
+                    text=unicode(question_name)
+                )
                 question_eids[qname][question_name] = question_entity.eid
                 # > add relation with the questionnaire form
                 self._set_unique_relation(question_entity.eid, "questionnaire",
@@ -242,6 +245,7 @@ class Questionnaires(Base):
 
         # Information to create a progress bar
         nb_of_subjects = float(len(self.questionnaires))
+        maxsize = max([len(name) for name in self.questionnaires])
         cnt_subject = 1.
 
         # Add the data
@@ -251,7 +255,7 @@ class Questionnaires(Base):
             self._progress_bar(
                 cnt_subject / nb_of_subjects,
                 title="{0}(questionnaires)".format(subject_id),
-                bar_length=40)
+                bar_length=40, maxsize=maxsize + 16)
             cnt_subject += 1
 
             ###################################################################
@@ -316,19 +320,20 @@ class Questionnaires(Base):
                  "'{0}'".format(qr_id)),
             check_unicity=True,
             entity_name="QuestionnaireRun",
-            user_ident=unicode(subject_id),
             identifier=unicode(qr_id),
-            label=unicode(questionnaire_name))
+            label=unicode(questionnaire_name)
+        )
 
         # If we just create the questionnaire run, specify and relate the entity
         if is_created:
             # > add relation with the questionnaire
             self._set_unique_relation(
-                qr_entity.eid, "instance_of",
+                qr_entity.eid, "questionnaire",
                 questionnaire_eids[questionnaire_name], check_unicity=False)
             self._set_unique_relation(
-                questionnaire_eids[questionnaire_name], "questionnaire_runs",
-                qr_entity.eid, check_unicity=False)
+                questionnaire_eids[questionnaire_name],
+                "questionnaire_questionnaire_runs", qr_entity.eid,
+                check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(
                 assessment_eid, "questionnaire_runs", qr_entity.eid,
@@ -340,13 +345,13 @@ class Questionnaires(Base):
             self._set_unique_relation(
                 qr_entity.eid, "study", study_eid, check_unicity=False)
             self._set_unique_relation(
-                study_eid, "questionnaire_runs", qr_entity.eid,
+                study_eid, "study_questionnaire_runs", qr_entity.eid,
                 check_unicity=False)
             # > add relation with the subject
             self._set_unique_relation(
                 qr_entity.eid, "subject", subject_eid, check_unicity=False)
             self._set_unique_relation(
-                subject_eid, "questionnaire_runs", qr_entity.eid,
+                subject_eid, "subject_questionnaire_runs", qr_entity.eid,
                 check_unicity=False)
 
             if self.use_openanswer:
@@ -370,8 +375,8 @@ class Questionnaires(Base):
                         answer_entity.eid, "question", question_eid,
                         check_unicity=False, subjtype="OpenAnswer")
                     self._set_unique_relation(
-                        question_eid, "open_answers", answer_entity.eid,
-                        check_unicity=False)
+                        question_eid, "question_open_answers",
+                        answer_entity.eid, check_unicity=False)
                     # > add relation with the questionnaire run
                     self._set_unique_relation(
                         answer_entity.eid, "questionnaire_run", qr_entity.eid,
@@ -386,13 +391,17 @@ class Questionnaires(Base):
             else:
                 f_entity, _ = self._get_or_create_unique_entity(
                     rql="",
-                    entity_name="File",
+                    entity_name="RestrictedFile",
+                    title=u"{0} ({1})".format(questionnaire_name, subject_id),
                     data=Binary(json.dumps(q_items)),
                     data_format=u"text/json",
                     data_name=u"result.json",
                     check_unicity=False)
                 self._set_unique_relation(
-                    qr_entity.eid, "result", f_entity.eid,
+                    qr_entity.eid, "file", f_entity.eid,
                     check_unicity=False, subjtype="QuestionnaireRun")
+                self._set_unique_relation(
+                    f_entity.eid, "in_assessment", assessment_eid,
+                    check_unicity=False)
 
         return qr_entity.eid

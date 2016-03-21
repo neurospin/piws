@@ -8,14 +8,9 @@
 
 # Cubicweb import
 from cubicweb.web import facet
-from cubicweb.selectors import is_instance
+from cubicweb.predicates import is_instance
 from cubicweb.web.views.facets import FacetFilterMixIn
-
-# Brainomics import
-from cubes.brainomics.views.facets import MeasureHandednessFacet
-from cubes.brainomics.views.facets import MeasureGenderFacet
-from cubes.brainomics.views.facets import MeasureAgeFacet
-from cubes.neuroimaging.views.facets import ScanLabelFacet
+from cubicweb.web.views.facets import HasTextFacet
 
 
 ############################################################################
@@ -68,6 +63,34 @@ class TimepointFacet(facet.RQLPathFacet):
     title = _("Timepoints")
 
 
+class LabelFacet(facet.RQLPathFacet):
+    """ Filter on label.
+
+    This filter is applied on 'Scan', 'ProcessingRun',
+    'QuestionnaireRun' and 'GenomicMeasure' entities.
+    """
+    __regid__ = "label-facet"
+    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun",
+                             "GenomicMeasure")
+    path = ["X label L"]
+    order = 1
+    filter_variable = "L"
+    title = _("Labels")
+
+
+class NameFacet(facet.RQLPathFacet):
+    """ Filter on name.
+
+    This filter is applied on 'FileSet'.
+    """
+    __regid__ = "name-facet"
+    __select__ = is_instance("FileSet")
+    path = ["X name N"]
+    order = 1
+    filter_variable = "N"
+    title = _("Name")
+
+
 class StudyFacet(facet.RQLPathFacet):
     """ Filter on study name (from the 'Study' entity).
 
@@ -86,11 +109,11 @@ class StudyFacet(facet.RQLPathFacet):
 class SubjectFacet(facet.RQLPathFacet):
     """ Filter on subject code (from the 'Subject' entity).
 
-    This filter can is applied on 'Scan', 'ProcessingRun',
-    'QuestionnaireRun' and 'GenomicMeasure' entities.
+    This filter can is applied on 'Scan', 'QuestionnaireRun' and
+    'GenomicMeasure' entities.
     """
     __regid__ = "subject-facet"
-    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun")
+    __select__ = is_instance("Scan", "QuestionnaireRun", "GenomicMeasure")
     path = ["X in_assessment A", "A subjects S", "S code_in_study C"]
     order = 3
     filter_variable = "C"
@@ -169,10 +192,23 @@ class ProcessingRunNameFacet(facet.RQLPathFacet):
     """
     __regid__ = "processingrun-name-facet"
     __select__ = is_instance("ProcessingRun")
-    path = ["X results_files F", "F name N"]
+    path = ["X filesets F", "F name N"]
     order = 1
     filter_variable = "N"
     title = _("Type")
+
+
+class ProcessingRunSubjectFacet(facet.RQLPathFacet):
+    """ Filter on subject code (from the 'Subject' entity).
+
+    This filter can is applied on 'ProcessingRun'.
+    """
+    __regid__ = "processingrun-subject-facet"
+    __select__ = is_instance("ProcessingRun")
+    path = ["X subjects S", "S code_in_study C"]
+    order = 2
+    filter_variable = "C"
+    title = _("Subjects")
 
 
 ###############################################################################
@@ -180,16 +216,13 @@ class ProcessingRunNameFacet(facet.RQLPathFacet):
 ###############################################################################
 
 def registration_callback(vreg):
-    vreg.unregister(MeasureHandednessFacet)
-    vreg.unregister(MeasureGenderFacet)
-    vreg.unregister(MeasureAgeFacet)
-    vreg.unregister(ScanLabelFacet)
-    vreg.register(GenomicMeasureTypeFacet)
-    vreg.register(TimepointFacet)
-    vreg.register(StudyFacet)
-    vreg.register(SubjectFacet)
-    vreg.register(ScanFieldFacet)
-    vreg.register(ScanFormatFacet)
-    vreg.register(AssessmentTimepointFacet)
-    vreg.register(AssessmentSubjectFacet)
-    vreg.register(ProcessingRunNameFacet)
+
+    vreg.unregister(HasTextFacet)
+
+    for eclass in [GenomicMeasureTypeFacet, TimepointFacet, StudyFacet,
+                   SubjectFacet, ScanFieldFacet, ScanFormatFacet,
+                   AssessmentTimepointFacet, AssessmentSubjectFacet,
+                   ProcessingRunNameFacet, LabelFacet, NameFacet,
+                   ProcessingRunSubjectFacet]:
+        vreg.register(eclass)
+

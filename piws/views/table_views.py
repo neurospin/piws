@@ -25,10 +25,12 @@ from logilab.common.registry import yes
 ###############################################################################
 
 class FileAnswerTableView(View):
-    """ QuestionnaireRuns table view specific to the QuestionnaireRun (1?) File
-        schema.
+    """ QuestionnaireRuns table view when subject questionnaires are inserted
+    using the QuestionnaireRun -> file ->  File strategy, ie. one File
+    per questionnaire.
     """
-    __regid__ = 'file.answer.table'
+    __regid__ = "file-answer-table"
+    title = _("Jtable")
 
     def call(self):
         """Get all the questionnaire runs and associated subjects"""
@@ -44,8 +46,8 @@ class FileAnswerTableView(View):
 
         # Execute the rql to get all subjects QuestionnaireRuns
         rql = ("Any ID, D ORDERBY ID ASC WHERE QR is QuestionnaireRun, "
-               "QR instance_of Q, Q name '{0}', QR in_assessment A, "
-               "A timepoint '{1}', QR result F, F data D, QR subject S, "
+               "QR questionnaire Q, Q name '{0}', QR in_assessment A, "
+               "A timepoint '{1}', QR file F, F data D, QR subject S, "
                "S code_in_study ID".format(qname, timepoint))
         rset = self._cw.execute(rql)
 
@@ -65,7 +67,10 @@ class FileAnswerTableView(View):
             record = [sid]
             for label in labels:
                 try:
-                    record.append(sdata[label])
+                    if isinstance(sdata[label], basestring):
+                        record.append(sdata[label])
+                    else:
+                        record.append(repr(sdata[label]))
                 except KeyError:
                     record.append(u"")
             records.append(record)
@@ -81,6 +86,7 @@ class JHugetableView(View):
     """ Create a table view with DataTables.
     """
     __regid__ = "jtable-hugetable-clientside"
+    title = _("Jtable")
     paginable = False
     div_id = "jhugetable-table"
 
@@ -257,8 +263,9 @@ class JHugetableView(View):
         html += "},"
 
         # > set table display options
-        html += "'scrollX': true,"
-        html += "'scrollCollapse': true,"
+        html += '"sScrollX": "100%",'
+        html += '"sScrollXInner": "150%",'
+        html += '"bScrollCollapse": true,'
         html += "'sPaginationType': 'bootstrap',"
         if use_scroller:
             html += "'scrollY': '200px',"
@@ -378,6 +385,7 @@ class JtableView(View):
     """ Create a table view with DataTables.
     """
     __regid__ = "jtable-table"
+    title = _("Jtable")
     paginable = False
     div_id = "jtable-table"
 
@@ -534,9 +542,9 @@ class JtableView(View):
         html += "var table = $('#the_table').dataTable( { "
 
         # > set table display options
-        # TODO fix scrollX bug since DataTables 1.10.10
-        # html += "'scrollX': '100%',"
-        html += "'scrollY': '600px',"
+        html += '"sScrollX": "100%",'
+        html += '"sScrollXInner": "150%",'
+        html += '"bScrollCollapse": true,'
         html += "'scrollCollapse': true,"
         html += "'sPaginationType': 'bootstrap',"
         if csv_export:
@@ -620,7 +628,7 @@ class JtableView(View):
             # callback
             post_data = {'qname': kwargs['qname'],
                          'timepoint': kwargs['timepoint'],
-                         'labels': json.dumps(["ID"]+labels)}
+                         'labels': json.dumps(["ID"] + labels)}
 
             # > set csv file name
             timestamp = time.strftime("%Y-%m-%d_%H:%M:%S")
@@ -635,7 +643,7 @@ class JtableView(View):
 
             # > execute the ajax callback
             html += "var request = $.ajax({"
-            html += "url: 'view?vid=piwscsvexport',"
+            html += "url: 'view?vid=jtable-table-csv-export',"
             html += "method: 'POST',"
             html += "data: {0},".format(json.dumps(post_data))
             html += "dataType: 'html'"
@@ -695,31 +703,32 @@ class JtableView(View):
 
 
 ###############################################################################
-# Interact with jtable js
+# Export table data in CSV
 ###############################################################################
 
-class PiwsCSVView(CSVMixIn, View):
-    """ Dumps questionnaires in CSV.
+class PIWSCSVView(CSVMixIn, View):
+    """ Dumps table data in CSV: used by 'jtable-table' view.
     """
-    __regid__ = 'piwscsvexport'
+    __regid__ = "jtable-table-csv-export"
     __select__ = yes()
-    title = _('piws csv export')
+    title = _("piws csv export")
 
     def call(self):
+        """ Display the CSV formated table data.
+        """
 
-        qname = self._cw.form['qname']
-        timepoint = self._cw.form['timepoint']
-        labels = json.loads(self._cw.form['labels'])
+        qname = self._cw.form["qname"]
+        timepoint = self._cw.form["timepoint"]
+        labels = json.loads(self._cw.form["labels"])
 
         rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
-               "S questionnaire_runs QR, QR instance_of QU, QU name '{0}', "
-               "QR open_answers O, O value OV, O in_assessment A, "
-               "A timepoint '{1}', O question Q, Q text QT".format(qname,
-                                                                   timepoint)
-               )
+               "S subject_questionnaire_runs QR, QR questionnaire QU, "
+               "QU name '{0}', QR open_answers O, O value OV, "
+               "O in_assessment A, A timepoint '{1}', O question Q, "
+               "Q text QT".format(qname, timepoint))
         rset = self._cw.execute(rql)
 
-        table = defaultdict(lambda: OrderedDict.fromkeys(labels, ''))
+        table = defaultdict(lambda: OrderedDict.fromkeys(labels, ""))
         for item in rset:
             table[item[0]][item[1]] = item[2]
         for id, data in table.iteritems():
@@ -729,6 +738,11 @@ class PiwsCSVView(CSVMixIn, View):
         writer.writerow(labels)
         for psc2, data in iter(sorted(table.iteritems())):
             writer.writerow(data.values())
+
+
+###############################################################################
+# Interact with jtable js
+###############################################################################
 
 @ajaxfunc(output_type="json")
 def get_open_answers_data(self):
@@ -770,7 +784,7 @@ def get_open_answers_data(self):
 
     # Get all the questionnaire runs and associated subjects
     rql = ("Any ID, QR {0} "
-           "Where QR is QuestionnaireRun, QR instance_of Q, Q name '{1}', "
+           "Where QR is QuestionnaireRun, QR questionnaire Q, Q name '{1}', "
            "QR subject S, S code_in_study ID, QR in_assessment A, "
            "A timepoint '{2}'".format(jtsort, qname, timepoint))
     rset = self._cw.execute(rql)
@@ -835,6 +849,8 @@ def get_questionnaires_data(self):
         pattern to search in the ID column.
     labels: list of str
         the table column names.
+    qtype: str
+        the requested questionnaires type.
 
     Returns
     -------
@@ -847,6 +863,7 @@ def get_questionnaires_data(self):
     jtpagesize = int(self._cw.form['iDisplayLength'])
     id_pattern = self._cw.form['sSearch']
     labels = json.loads(self._cw.form['labels'])
+    qtype = self._cw.form['qtype']
     column_to_filter = int(self._cw.form['iSortCol_0'])
 
     # Only the ID column can be filtered
@@ -855,12 +872,12 @@ def get_questionnaires_data(self):
                         "'get_questionnaires_data' ajax callback.")
 
     # Choose the questionnaire rendering view:
-    # > case 1: the answers are inserted in the database (OpenAnswer).
-    # > case 2: one line of answers inserted per subject (File)
-    rql = "Any QR Where QR is QuestionnaireRun, EXISTS(QR result F)"
+    # > case 1: one line of answers inserted per subject (File)
+    # > case 2: the answers are inserted in the database (OpenAnswer).
+    rql = "Any QR Where QR is QuestionnaireRun, EXISTS(QR file F)"
     rset = self._cw.execute(rql)
     if rset.rowcount > 0:
-        vid = "file.answer.table"
+        vid = "file-answer-table"
     else:
         vid = "jtable-table"
 
@@ -870,8 +887,8 @@ def get_questionnaires_data(self):
     # Get all the questionnaire and associated timepoints
     rql = ("DISTINCT Any ID, T {0} "
            "Where Q is Questionnaire, QR is QuestionnaireRun, "
-           "QR instance_of Q, QR in_assessment A, Q name ID, "
-           "A timepoint T".format(jtsort))
+           "QR questionnaire Q, Q type '{1}', QR in_assessment A, Q name ID, "
+           "A timepoint T".format(jtsort, qtype))
     rset = self._cw.execute(rql)
 
     # Get the total number of rows (without filtering)
@@ -945,9 +962,11 @@ def get_questionnaires_data(self):
 ###############################################################################
 
 def registration_callback(vreg):
-    vreg.register(JtableView)
-    vreg.register(JHugetableView)
-    vreg.register(FileAnswerTableView)
-    vreg.register(get_open_answers_data)
-    vreg.register(get_questionnaires_data)
-    vreg.register(PiwsCSVView)
+
+    for tclass in [JtableView, JHugetableView, FileAnswerTableView,
+                   PIWSCSVView]:
+        vreg.register(tclass)
+
+    for ajax in [get_questionnaires_data, get_open_answers_data]:
+        vreg.register(ajax)
+

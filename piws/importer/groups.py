@@ -31,7 +31,7 @@ class CWGroups(Base):
             if True use an SQLGenObjectStore, otherwise the session.
         """
         # Inheritance
-        super(CWGroups, self).__init__(session, use_store)
+        super(CWGroups, self).__init__(session, True, True, use_store, False)
 
         # Class parameters
         self.list_group_names = list_group_names
@@ -50,12 +50,13 @@ class CWGroups(Base):
         """
         # Go through the goup names
         nb_of_groups = float(len(self.list_group_names))
+        maxsize = max([len(name) for name in self.list_group_names])
         for cnt_group, group_name in enumerate(self.list_group_names):
 
             # Print a progress bar
             self._progress_bar((cnt_group + 1) / nb_of_groups,
-                               title="{0}(groups):".format(group_name),
-                               bar_length=40)
+                               title="{0}(groups)".format(group_name),
+                               bar_length=40, maxsize=maxsize + 8)
 
             # Create the group if necessary
             group_entity, _ = self._get_or_create_unique_entity(

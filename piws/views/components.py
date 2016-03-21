@@ -14,28 +14,35 @@ from cubicweb.predicates import anonymous_user
 from cubicweb.predicates import one_line_rset
 from cubicweb.predicates import match_view
 from cubicweb.predicates import match_kwargs
+from cubicweb.web.views.basecomponents import AnonUserStatusLink
+from cubicweb.web.views.basecomponents import ApplLogo
+from cubicweb.web.views.ibreadcrumbs import BreadCrumbEntityVComponent
+from cubicweb.web.views.ibreadcrumbs import BreadCrumbLinkToVComponent
+from cubicweb.web.views.ibreadcrumbs import BreadCrumbAnyRSetVComponent
+from cubicweb.web.views.ibreadcrumbs import BreadCrumbETypeVComponent
+from logilab.common.decorators import monkeypatch
 
 # Cubes import
-from cubes.brainomics.views.components import BrainomicsLinksCenters
-from cubes.brainomics.views.components import BrainomicsEditBox
-from cubes.brainomics.views.components import BrainomicsDownloadBox
 from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
+from cubicweb.web.views.boxes import EditBox
+from cubes.rql_upload.views.components import CWUploadBox
+from cubes.rql_upload.views.utils import load_forms
+
 
 ###############################################################################
 # Navigation Box
 ###############################################################################
 
-
-class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
+class PIWSAuthenticatedUserStatus(BSAuthenticatedUserStatus):
     """
     Overrride bootstrap user-status component.
     In all-in-one.conf:
-    If show-user-status=no : display nothing.
-    If show-user-status=yes and enable-apache-logout=no: display the default
+    If show_user_status=no : display nothing.
+    If show_user_status=yes and enable-apache-logout=no: display the default
     bootstrap cube component.
-    If show-user-status=yes and enable-apache-logout=yes: display a logout
+    If show_user_status=yes and enable-apache-logout=yes: display a logout
     button next to the search field.
-    If show-user-status=yes and enable-apache-logout=no and
+    If show_user_status=yes and enable-apache-logout=no and
     apache-cleanup-session-time is not empty: raise an error.
     """
     def render(self, w):
@@ -45,24 +52,31 @@ class PiwsAuthenticatedUserStatus(BSAuthenticatedUserStatus):
                 w(u"<a href='{0}' class='button'>Logout</a>".format(
                     self._cw.base_url() + 'logout'))
             else:
-                if config.get('apache-cleanup-session-time', None) is not None:
-                    raise NotImplementedError("Session expiration with Apache "
-                                              "is not yet available due to "
-                                              "cross browsers compatibility "
-                                              "issues")
+                if config.get("apache-cleanup-session-time", None) is not None:
+                    raise NotImplementedError(
+                        "Session expiration with Apache is not yet available "
+                        "due to cross browsers compatibility issues.")
                 else:
-                    super(PiwsAuthenticatedUserStatus, self).render(w)
+                    super(PIWSAuthenticatedUserStatus, self).render(w)
         else:
             w(u"")
 
 
-class NSNavigationtBox(component.CtxComponent):
+class PIWSNavigationtBox(component.CtxComponent):
     """ Display a box containing navigation shortcuts.
+
+    To add documentation to the 'All Questionnaires' documentation main button,
+    add a 'All Questionnaires.rst' file in instance all-in-one
+    'documentation_folder' parameter configuration file.
+
+    Set the 'display_assessment' to False to remove the 'Assessments'
+    button.
     """
     __regid__ = "nav_box"
     context = "left"
     title = _("Navigation")
     order = 0
+    display_assessment = True
 
     def render_body(self, w):
         """ Create the diifferent item of the navigation box
@@ -75,44 +89,86 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'Subjects</a>')
         w(u'</div></div><br/>')
 
-        # Exams
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any A Where A is Assessment")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Exams</a>')
-        w(u'</div></div><br/>')
+        # Assessments
+        if self.display_assessment:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            href = self._cw.build_url(rql="Any A Where A is Assessment")
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'Assessments</a>')
+            w(u'</div></div><br/>')
 
         # Scan
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         href = self._cw.build_url(rql="Any S Where S is Scan")
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Images</a>')
-        w(u'</div></div><br/>')
-
-        # ProcessingRun
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any PR Where PR is ProcessingRun")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Processings</a>')
+        w(u'Scans</a>')
         w(u'</div></div><br/>')
 
         # QuestionnaireRun
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
         ajaxcallback = "get_questionnaires_data"
         rql_labels = ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
                       "A timepoint T")
-        href = self._cw.build_url(
-            "view", vid="jtable-table",
-            rql_labels=rql_labels, ajaxcallback=ajaxcallback,
-            title="All Questionnaires", elts_to_sort=["ID"],
-            tooltip_name="Questionnaire_general_doc")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Questionnaires</a>')
-        w(u'</div></div><br/>')
+        rql_types = ("DISTINCT Any T ORDERBY T WHERE Q is Questionnaire, "
+                      "Q type T")
+        rset = self._cw.execute(rql_types)
+        types = [line[0] for line in rset.rows]
+        if len(types) > 0:
+            # > main button
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            w(u'<a class="btn btn-info"'
+               'data-toggle="collapse" data-target="#questionnaires">')
+            w(u'Tables</a>')
+            w(u'</div></div>')
+            # > typed buttons container
+            w(u'<div id="questionnaires" class="collapse">')
+            w(u'<div class="panel-body">')
+            w(u'<hr>')
+            # > typed buttons
+            for qtype in types:
+                href = self._cw.build_url(
+                    "view", vid="jtable-table",
+                    rql_labels=rql_labels, ajaxcallback=ajaxcallback,
+                    title="All Questionnaires", elts_to_sort=["ID"],
+                    tooltip_name="All Questionnaires", qtype=qtype)
+                w(u'<div class="btn-toolbar">')
+                w(u'<div class="btn-group-vertical btn-block">')
+                w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+                w(u'{0}</a>'.format(qtype.title()))
+                w(u'</div></div><br/>')
+            w(u'<hr>')
+            w(u'</div></div><br/>')
+
+        # ProcessingRun
+        rql_types = ("DISTINCT Any T ORDERBY T WHERE P is ProcessingRun, "
+                      "P type T")
+        rset = self._cw.execute(rql_types)
+        types = [line[0] for line in rset.rows]
+        if len(types) > 0:
+            # > main button
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            w(u'<a class="btn btn-info"'
+               'data-toggle="collapse" data-target="#processings">')
+            w(u'Processed data</a>')
+            w(u'</div></div>')
+            # > typed buttons container
+            w(u'<div id="processings" class="collapse">')
+            w(u'<div class="panel-body">')
+            w(u'<hr>')
+            # > typed buttons
+            for ptype in types:
+                href = self._cw.build_url(rql="Any P Where P is ProcessingRun, "
+                                              "P type '{0}'".format(ptype))
+                w(u'<div class="btn-toolbar">')
+                w(u'<div class="btn-group-vertical btn-block">')
+                w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+                w(u'{0}</a>'.format(ptype.title()))
+                w(u'</div></div><br/>')
+            w(u'<hr>')
+            w(u'</div></div><br/>')
 
         # GenomicMeasures
         w(u'<div class="btn-toolbar">')
@@ -133,19 +189,22 @@ class NSNavigationtBox(component.CtxComponent):
         w(u'</div></div><br/>')
 
         # CWUpload
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any U Where U is CWUpload")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'My uploads</a>')
-        w(u'</div></div><br/>')
+        config = load_forms(self._cw.vreg.config)
+        if config > 0:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            href = self._cw.build_url(rql="Any U Where U is CWUpload")
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'<span class="glyphicon glyphicon glyphicon-cloud-upload">'
+                '</span> My uploads</a>')
+            w(u'</div></div><br/>')
 
 
 ###############################################################################
 # Statistic boxes
 ###############################################################################
 
-class NSSubjectStatistics(component.CtxComponent):
+class PIWSSubjectStatistics(component.CtxComponent):
     """ Display a box containing links to statistics on the cw entities.
     """
     __regid__ = "subject_statistics"
@@ -191,7 +250,7 @@ class NSSubjectStatistics(component.CtxComponent):
         w(u'</div></div><br/>')
 
 
-class NSAssessmentStatistics(component.CtxComponent):
+class PIWSAssessmentStatistics(component.CtxComponent):
     """ Display a box containing links to statistics on the cw entities.
     """
     __regid__ = "assessment_statistics"
@@ -219,7 +278,7 @@ class NSAssessmentStatistics(component.CtxComponent):
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
             rql="Any A WHERE A is Assessment", title="Processing status",
-            relations="related_processing", subject_attr="timepoint",
+            relations="processing_runs", subject_attr="timepoint",
             object_attr="tool")
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
@@ -245,8 +304,7 @@ class NSAssessmentStatistics(component.CtxComponent):
 
 AUTHORIZED_IMAGE_EXT = [".nii", ".nii.gz"]
 
-
-class NSImageViewers(component.CtxComponent):
+class PIWSImageViewers(component.CtxComponent):
     """ Display a box containing links to image viewers.
     """
     __regid__ = "image_viewers"
@@ -259,20 +317,21 @@ class NSImageViewers(component.CtxComponent):
         """ Method to create the image box content.
         """
         # 3D image viewer
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        efentries = self.cw_rset.get_entity(0, 0).results_files[0].file_entries
+        efentries = self.cw_rset.get_entity(0, 0).filesets[0].external_files
         imagefiles = [e.filepath for e in efentries
                       if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
         limagefiles = len(imagefiles)
         if limagefiles > 0:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
             href = self._cw.build_url(
                 "view", vid="brainbrowser-image-viewer", imagefiles=imagefiles,
                 __message=(u"Found '{0}' image(s) that can be "
                             "displayed.".format(limagefiles)))
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Triplanar</a>')
-        w(u'</div></div><br/>')
+            w(u'<a class="btn btn-primary" href="{0}" target=_blank>'.format(
+                href))
+            w(u'Triplanar</a>')
+            w(u'</div></div><br/>')
 
 
 ###############################################################################
@@ -309,16 +368,36 @@ class RelationBox(component.CtxComponent):
         w(u"<br/><div><a href='{0}'>&#8634; see more</a></div>".format(href))
 
 
-def registration_callback(vreg):
+###############################################################################
+# Change logo
+###############################################################################
 
-    # Update components
-    vreg.register_and_replace(PiwsAuthenticatedUserStatus,
-                              BSAuthenticatedUserStatus)
+@monkeypatch(ApplLogo)
+def render(self, w):
+    w(u'<a class="navbar-brand" href="%s"><img id="logo" src="%s" '
+      'alt="logo"/></a>' % (
+            self._cw.base_url(),
+            self._cw.data_url(self._cw.vreg.config.get("logo"))))
+
+
+###############################################################################
+# Registry
+###############################################################################
+
+def registration_callback(vreg):
+    vreg.register_and_replace(
+        PIWSAuthenticatedUserStatus, BSAuthenticatedUserStatus)
     vreg.register(RelationBox)
-    vreg.register(NSNavigationtBox)
-    vreg.register(NSSubjectStatistics)
-    vreg.register(NSAssessmentStatistics)
-    vreg.register(NSImageViewers)
-    vreg.unregister(BrainomicsLinksCenters)
-    vreg.unregister(BrainomicsEditBox)
-    vreg.unregister(BrainomicsDownloadBox)
+    vreg.register(PIWSNavigationtBox)
+    vreg.register(PIWSSubjectStatistics)
+    vreg.register(PIWSAssessmentStatistics)
+    vreg.register(PIWSImageViewers)
+    vreg.unregister(EditBox)
+    vreg.unregister(BreadCrumbEntityVComponent)
+    vreg.unregister(BreadCrumbAnyRSetVComponent)
+    vreg.unregister(BreadCrumbETypeVComponent)
+    vreg.unregister(BreadCrumbLinkToVComponent)
+    vreg.unregister(AnonUserStatusLink)
+    config = load_forms(vreg.config)
+    if config < 0:
+        vreg.unregister(CWUploadBox)

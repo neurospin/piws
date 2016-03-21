@@ -62,10 +62,15 @@
 		    <ul class="dropdown-menu">
 	          <li class="link-title">PIWS</li>
 			  <li class="divider"></li>
+			  <li><a href="{{ pathto('rights') }}">Rights management</a></li>
 			  <li><a href="{{ pathto('views') }}">Views</a></li>
 			  <li><a href="{{ pathto('features') }}">Features documentation</a></li>
 			  <li class="divider"></li>
 			  <li><a href="{{ pathto('scripts') }}">Importation procedures</a></li>
+			  <li><a href="{{ pathto('parsers') }}">Standard parsers</a></li>
+			  <li class="divider"></li>
+			  <li><a href="{{ pathto('download') }}">Download</a></li>
+			  <li><a href="{{ pathto('upload') }}">Upload</a></li>
 		    </ul>
 		  </div>
         </li>
@@ -80,13 +85,71 @@
 <!-- Banner -->
 <div class="container banner-container">
 
-  <div id="nsap_synopsis" class="span6">
-    <h1>Population Imaging Web Service</h1>
-    <h2>Powered by NeuroSpin</h2>
-    <ul>Package that provides.
-    <li>A cube for neuroimaging genetic study.</li>
-    <li>Unified insertion procedures.</li>
-    <li>A demonstrator.</li></ul>
+  <div class="row-fluid banner-inner">
+    <div class="hidden-phone">
+      <div class="span6">
+	    <div class="row-fluid">
+          <div class="offset2 span8">
+          <div id="index_carousel_tn" class="thumbnail">
+	        <div id="examples_carousel" class="carousel slide" data-interval="false">
+		      <ol id="nsap_index_indicators" class="carousel-indicators">
+		        <li data-target="#examples_carousel" data-slide-to="0" class="active"></li>
+		        <li data-target="#examples_carousel" data-slide-to="1"></li>
+		        <li data-target="#examples_carousel" data-slide-to="2"></li>
+		        <li data-target="#examples_carousel" data-slide-to="3"></li>
+		        <li data-target="#examples_carousel" data-slide-to="4"></li>
+		      </ol>
+		      <!-- Carousel items -->
+		      <div class="carousel-inner">
+		        <div class="active item">
+		          <a href="{{pathto('index')}}">
+		            <div class="crop-wrapper" style="width: 550px; height: 200px; overflow: hidden">
+			          <img src="{{ pathto("_static/sds.png", 1) }}"
+			         style="max-height: 200px; max-width: 629px; margin-left: 60px;">
+                    </div>
+                  </a>
+		        </div>
+		        <div class="item">
+		          <a href="{{pathto('index')}}">
+		            <img src="{{ pathto("_static/dbschema.png", 1) }}">
+                  </a>
+		        </div>
+		        <div class="item">
+		          <a href="{{pathto('index')}}">
+		            <img src="{{ pathto("_static/table.png", 1) }}">
+                  </a>
+		        </div>
+		        <div class="item">
+		          <a href="{{pathto('index')}}">
+		            <img src="{{ pathto("_static/views.png", 1) }}">
+                  </a>
+		        </div>
+		        <div class="item">
+		          <a href="{{pathto('index')}}">
+		            <img src="{{ pathto("_static/rights.png", 1) }}">
+                  </a>
+		        </div>
+		      </div>
+		      <!-- Carousel nav -->
+		      <a class="carousel-control left" href="#examples_carousel" data-slide="prev">&lsaquo;</a>
+		      <a class="carousel-control right" href="#examples_carousel" data-slide="next">&rsaquo;</a>
+	        </div>
+	      </div>
+	      </div>
+        </div>
+	  </div>
+    </div>
+
+	<!-- Synopsis -->
+    <div id="nsap_synopsis" class="span6">
+      <h1>Population Imaging Web Service</h1>
+      <h2>Powered by NeuroSpin</h2>
+      <ul>Package that provides.
+      <li>A cube for neuroimaging genetic study.</li>
+      <li>Unified insertion procedures.</li>
+      <li>Unified way to access all the data.</li></ul>
+    </div>
+
   </div>
 
 </div>
@@ -110,9 +173,8 @@
           </p>
         {%- endif %}
         <p class="citing">
-          If you use the software, please do not esitate to 
-          <a &mdash; <a href="https://github.com/neurospin/piws.git">
-          Report a Bug</a>.
+          If you use the software, please do not hesitate to 
+          <a href="https://github.com/neurospin/piws">report a bug</a>.
         </p>
 
       <!-- toc tree -->
@@ -149,5 +211,3 @@
 {%- endif %}
 </div>
 {%- endblock %}
-
-

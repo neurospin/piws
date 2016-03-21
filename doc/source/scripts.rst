@@ -41,7 +41,7 @@ leveraged. By executing the 'generate_toy_dataset.py' function, a toy neuroimagi
 genetic data is created on your local file system.
 
 The 'import_to_dataset.py' then inserts the generated data in a cubicweb
-database using the presented unified insertion procedures.
+database using the previously presented unified insertion procedures.
     
 
 

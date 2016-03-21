@@ -1,7 +1,0 @@
-{
-    "age": "the subject age.",
-    "gender": "the subject gender.",
-    "mood": "the mood the the subject: scale from 1 to 10.",
-    "start position": "the snp start position.",
-    "Snps": "the snp name."
-}

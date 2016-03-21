@@ -25,10 +25,13 @@ from piws.importer.subjects import Subjects
 from piws.importer.scans import Scans
 from piws.importer.questionnaires import Questionnaires
 from piws.importer.genetics import Genetics
+from cubes.piws.importer.processings import Processings
+from parse_toy_data import freesurfer_parser
 from parse_toy_data import subject_parser
 from parse_toy_data import scan_parser
 from parse_toy_data import questionnaire_parser
 from parse_toy_data import genetic_parser
+from cubes.piws.parser.freesurfer import RQL_T1
 
 
 # Ask for instance & login information
@@ -78,23 +81,27 @@ subjects = subject_parser(demo_path, STUDY_NAME)
 scans = scan_parser(demo_path, STUDY_NAME)
 questionnaires = questionnaire_parser(demo_path, STUDY_NAME)
 genetics = genetic_parser(demo_path, STUDY_NAME)
+processings = freesurfer_parser(demo_path, STUDY_NAME)
 
 # Define all the importers
 db_grp_importer = CWGroups(session, ["toy_V0", "toy_V1", "toy"],
-                         use_store=True)
+                           use_store=False)
 db_user_importer = CWUsers(session, USERS)
 db_subject_importer = Subjects(
-    session, STUDY_NAME, subjects, use_store=True)
+    session, STUDY_NAME, subjects, use_store=False)
 db_scan_importer = Scans(
     session, STUDY_NAME, CENTER_NAME, scans, can_read=True, can_update=False,
-    data_filepath=demo_path, use_store=True)
+    data_filepath=demo_path, use_store=False)
 db_questionnaire_importer = Questionnaires(
-    session, STUDY_NAME, CENTER_NAME, questionnaires, can_read=True,
-    can_update=False, data_filepath=demo_path, use_store=True,
+    session, STUDY_NAME, CENTER_NAME, questionnaires, "Clinical",
+    can_read=True, can_update=False, data_filepath=demo_path, use_store=False,
     use_openanswer=True)
 db_genetic_importer = Genetics(
     session, STUDY_NAME, CENTER_NAME, genetics, can_read=True,
-    can_update=False, data_filepath=demo_path, use_store=True)
+    can_update=False, data_filepath=demo_path, use_store=False)
+db_processings_importer = Processings(
+    session, STUDY_NAME, CENTER_NAME, processings, "FreeSurfer", can_read=True,
+    can_update=False, data_filepath=demo_path, use_store=False)
 
 # Execute in the appropriate order the importation scripts
 # > groups
@@ -115,6 +122,9 @@ db_questionnaire_importer.cleanup()
 # > genetics
 db_genetic_importer.import_data()
 db_genetic_importer.cleanup()
+# > processings
+db_processings_importer.import_data()
+db_processings_importer.cleanup()
 
 # Commit
 session.commit()

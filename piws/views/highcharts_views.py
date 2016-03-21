@@ -21,6 +21,7 @@ class HighChartsBasicPieView(View):
     """ Create a basic pie chart using highcharts.
     """
     __regid__ = "highcharts-basic-pie"
+    title = _("HighCharts")
     paginable = False
     div_id = "highcharts-basic-pie"
 
@@ -132,6 +133,7 @@ class HighChartsRelationSummaryView(View):
     """ Create a basic table view that summarized an entity relation.
     """
     __regid__ = "highcharts-relation-summary-view"
+    title = _("HighCharts")
     paginable = False
     div_id = "highcharts-relation-summary-view"
 
@@ -266,6 +268,7 @@ class HighChartsRelationSummaryView(View):
             return -1
 
         # Get the highcharts string representation of the data
+        data = self.rset_to_data(rset, relations, subject_attr, object_attr)
         try:
             data = self.rset_to_data(rset, relations, subject_attr, object_attr)
         except:
@@ -352,6 +355,7 @@ class HighChartsBasicPlotView(View):
     """ Create a basic plot using highcharts.
     """
     __regid__ = "highcharts-basic-plot"
+    title = _("HighCharts")
     paginable = False
     div_id = "highcharts-basic-plot"
 

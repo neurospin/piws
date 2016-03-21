@@ -24,8 +24,9 @@ if not os.path.isdir(dir_name):
     raise ValueError("'{0}' is not a valid folder.".format(dir_name))
 dir_name = os.path.join(dir_name, "demo")
 if os.path.isdir(dir_name):
-    raise ValueError("'{0}' already exists, please specify another root "
-                     "directory or remove manually this folder.".format(dir_name))
+    raise ValueError(
+        "'{0}' already exists, please specify another root directory or "
+        "remove manually this folder.".format(dir_name))
 else:
     os.makedirs(dir_name)
 
@@ -57,15 +58,19 @@ PLATFORM = {
 }
 
 
-# Generate the demo scans questionnaires dataset for all timepoints
+# Generate the demo scans questionnaires processings datasets for all
+# timepoints
+fsdirs = ["label", "mri", "scripts", "stats", "surf", "touch"]
 for timepoint in TIMEPOINTS:
 
     # Go through all subjects
     for subject in SUBJECTS:
 
-        # Create the scans
+        # Create the scans and t1 associated freesurfer processings
         for cnt, modality in enumerate(MODALITITES):
             if random.randint(0, 4) != 2:
+
+                # Generate scan
                 modality_path = os.path.join(
                     dir_name, timepoint, subject, "images", modality)
                 os.makedirs(modality_path)
@@ -79,6 +84,20 @@ for timepoint in TIMEPOINTS:
                     fname = os.path.join(modality_path, "paradigm.json")
                     with open(fname, "w") as open_file:
                         json.dump(["My Paradigm"], open_file, indent=4)
+
+                # Generate freesurfer like processing
+                if modality == "t1":
+                    subject_fsdir = os.path.join(
+                        dir_name, timepoint, "processed", "freesurfer", subject)
+                    for dirname in fsdirs:
+                        datadir = os.path.join(subject_fsdir, dirname)
+                        os.makedirs(datadir)
+                        data = numpy.ones((2, 2, 2))
+                        affine = numpy.eye(4)
+                        affine[:3, :3] += numpy.eye(3)
+                        image = nibabel.Nifti1Image(data, affine)
+                        nibabel.save(
+                            image, os.path.join(datadir, dirname + ".nii.gz"))
 
         # Create the questionnaires
         questionnaires_path = os.path.join(
@@ -121,3 +140,4 @@ for timepoint in TIMEPOINTS:
     fname = os.path.join(genetic_path, "genetic" + ".json")
     with open(fname, "w") as open_file:
         json.dump(genetics, open_file, indent=4)
+            

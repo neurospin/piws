@@ -45,27 +45,33 @@ class Base(object):
         ("CWGroup", "can_update", "Assessment")
     ]
     fileset_relations = [
-        ["ParentEntitiyName", "results_files", "FileSet"],
+        ["ParentEntitiyName", "filesets", "FileSet"],
         ("FileSet", "in_assessment", "Assessment"),
-        ("FileSet", "file_entries", "ExternalFile"),
+        ("FileSet", "external_files", "ExternalFile"),
+        ("ExternalFile", "fileset", "FileSet"),
         ("ExternalFile", "in_assessment", "Assessment")
     ]
 
-    def __init__(self, session, use_store=True, piws_security_model=True):
+    def __init__(self, session, can_read=True, can_update=False,
+                 use_store=True, piws_security_model=True):
         """ Initialize the SeniorData class.
 
         Parameters
         ----------
         session: Session (mandatory)
             a cubicweb session.
-        list_group_names: list of str (mandatory)
-            the name of the different groups
+        can_read: bool (optional, default True)
+            set the read permission to the imported data.
+        can_update: bool (optional, default False)
+            set the update permission to the imported data.
         use_store: bool (optional, default True)
             if True use an SQLGenObjectStore, otherwise the session.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
         """
         # CW parameters
+        self.can_read = can_read
+        self.can_update = can_update
         self.use_store = use_store
         self.session = session
         if self.use_store:
@@ -87,6 +93,8 @@ class Base(object):
         # Send the new entities to the db
         if self.use_store:
             self.store.flush()
+        else:
+            self.session.commit()
 
     def import_data(self):
         """ Method that import the data in cw.
@@ -155,10 +163,10 @@ class Base(object):
             the input hashed string.
         """
         m = hashlib.md5()
-        m.update(path)
+        m.update(path.encode("utf-8"))
         return m.hexdigest()
 
-    def _progress_bar(self, ratio, title="", bar_length=40):
+    def _progress_bar(self, ratio, title="", bar_length=40, maxsize=20):
         """ Method to generate a progress bar.
 
         Parameters
@@ -169,10 +177,13 @@ class Base(object):
             a title to identify the progress bar.
         bar_length: int (optional)
             the length of the bar that will be ploted.
+        maxsize: int (optional)
+            use to justify title.
         """
         progress = int(ratio * 100.)
         block = int(round(bar_length * ratio))
-        text = "\r{2} in Progress: [{0}] {1}%".format(
+        title = title.ljust(maxsize, " ")
+        text = "\r[{0}] {1}% {2}".format(
             "=" * block + " " * (bar_length - block), progress, title)
         sys.stdout.write(text)
         sys.stdout.flush()
@@ -318,7 +329,7 @@ class Base(object):
                     check_unicity=False)
                 self._set_unique_relation(
                     assessment_eid, "subjects", subject_eid,
-                    check_unicity=False, subjtype="Assessment")
+                    check_unicity=False)
             # > add relation with the center
             self._set_unique_relation(
                 center_eid, "assessments", assessment_eid, check_unicity=False)
@@ -350,7 +361,7 @@ class Base(object):
                         self._set_unique_relation(
                             group_eid, "can_update", assessment_eid)
             else:
-                for group_name in ('users', 'guests'):
+                for group_name in ("users", "guests"):
                     group_eid = groups[group_name]
 
                     # > add relation with group
@@ -375,8 +386,9 @@ class Base(object):
             **fset_struct)
         # > add relation with the parent
         self._set_unique_relation(parent_eid,
-            "results_files", fset_entity.eid,
-            check_unicity=False)
+            "filesets", fset_entity.eid, check_unicity=False)
+        self._set_unique_relation(fset_entity.eid,
+            "containers", parent_eid, check_unicity=False)
         # > add relation with the assessment
         self._set_unique_relation(fset_entity.eid,
             "in_assessment", assessment_eid,
@@ -391,7 +403,10 @@ class Base(object):
                 **extfile_struct)
             # > add relation with the file set
             self._set_unique_relation(fset_entity.eid,
-                "file_entries", file_entity.eid,
+                "external_files", file_entity.eid,
+                check_unicity=False)
+            self._set_unique_relation(file_entity.eid,
+                "fileset", fset_entity.eid,
                 check_unicity=False)
             # > add relation with the assessment
             self._set_unique_relation(file_entity.eid,

@@ -6,28 +6,39 @@
 # for details.
 ##########################################################################
 
+# System import
+import json
+import types
+
 # Cubicweb import
+from cubicweb.web.views.primary import PrimaryView
+from cubicweb.predicates import is_instance
 from cubicweb.web.views.primary import PrimaryView
 
 # Cubes import
-from cubes.brainomics.views.primary import BrainomicsPrimaryView
 from cubes.piws.views.components import RelationBox
 
 
-class PiwsPrimaryView(PrimaryView):
+# Add summary method for 3.20 compatibility.
+def summary(self, entity):
+    return u""
+PrimaryView.summary= types.MethodType(summary, PrimaryView)
+
+
+class PIWSPrimaryView(PrimaryView):
+    """ Default primary view rendering.
+    """
     __regid__ = "primary"
-    title = _("primary")
+    title = _("Primary")
+    # Renders the attribute label next to the attribute value
     show_attr_label = True
+    # Renders the relation label next to the relation value
     show_rel_label = True
     rsection = None
     display_ctrl = None
+    # Renders the relations of the entity
     main_related_section = True
     allowed_relations = ["subject"]
-
-    def summary(self, entity):
-        """ Add method for 3.20 compatibility.
-        """
-        return
 
     def render_entity_attributes(self, entity):
         """ Renders all attributes and relations in the 'attributes' section.
@@ -41,10 +52,23 @@ class PiwsPrimaryView(PrimaryView):
         # Select only entity attributes
         display_attributes = []
         for rschema, _, role, dispctrl in self._section_def(entity, "attributes"):
-            if rschema.final and rschema.type != "identifier":
+            vid = dispctrl.get("vid", "reledit")
+            if ((not self.main_related_section and not rschema.final) or 
+                    rschema.type == "identifier"):
+                continue
+            if rschema.final:
                 value = entity.cw_attr_cache.get(rschema.type)
-                if value is not None and value != "":
-                    display_attributes.append((rschema, role, dispctrl, value))
+            elif vid == "reledit":
+                if role in self.allowed_relations:
+                    value = entity.view(
+                        vid, rtype=rschema.type, role=role,
+                        initargs={"dispctrl": dispctrl})
+                else:
+                    value = None
+            else:
+                value = None
+            if value is not None and value != "":
+                display_attributes.append((rschema, role, dispctrl, value))
 
         # Display the selected attributes in a table and add a documentation
         # item if available
@@ -54,8 +78,9 @@ class PiwsPrimaryView(PrimaryView):
                 label = self._rel_label(entity, rschema, role, dispctrl)
                 self.render_attribute(label, value, table=True)
             if tooltip_name is not None:
-                tiphref = self._cw.build_url("view", vid="piws-documentation",
-                                             tooltip_name=tooltip_name, _notemplate=True)
+                tiphref = self._cw.build_url(
+                    "view", vid="piws-documentation",
+                    tooltip_name=tooltip_name, _notemplate=True)
                 tipbutton = (
                     "<a href='{0}' target=_blank class='btn btn-warning' "
                     "type='button'>Doc &#9735;</a>".format(
@@ -66,8 +91,12 @@ class PiwsPrimaryView(PrimaryView):
     def _prepare_side_boxes(self, entity):
         """ Create the right relation boxes to display.
 
+        This is a common functionality to learn the schema by browsing the
+        database content that will enalbe the users to phrase direct RQL to
+        get their data.
+
         In the case of 'FileSet' object, go directly to the associated
-        'FileEntries'.
+        'ExternalResource' if only one 'FileSet' has been specified.
         """
         sideboxes = []
         boxesreg = self._cw.vreg["ctxcomponents"]
@@ -98,24 +127,29 @@ class PiwsPrimaryView(PrimaryView):
 
             # Construct rql depending on entity role
             if role == "subject":
-                rql = "Any X WHERE X is {0}, E eid '{1}', E {2} X".format(target_etype,
-                    entity.eid, rschema.type)
+                rql = "Any X WHERE X is {0}, E eid '{1}', E {2} X".format(
+                    target_etype, entity.eid, rschema.type)
             else:
-                rql = "Any X WHERE X is {0}, E eid '{1}', X {2} E".format(target_etype,
-                    entity.eid, rschema.type)
+                rql = "Any X WHERE X is {0}, E eid '{1}', X {2} E".format(
+                    target_etype, entity.eid, rschema.type)
+
 
             # FileSet special case
-            if target_etype == "FileSet":
-                rql += ", X file_entries F"
-                pos = rql.find("X")
-                rql = rql[:pos] + "F" + rql[pos + 1:]
-                label += (
-                    u"<a class='btn btn-info active' href='#' data-toggle='tooltip' "
-                    "title='file_entries'>&#8594;</a> ExternalFile")
-                inner_rset = []
-                for fs_entity in rset.entities():
-                    inner_rset.extend(fs_entity.file_entries)
-                rset = inner_rset
+            if target_etype == "FileSet" and entity.cw_etype != "ExternalFile":
+                entities = [e for e in rset.entities()]
+                nb_fsets = len(entities)
+                if nb_fsets == 1:
+                    rql += ", X external_files F"
+                    pos = rql.find("X")
+                    rql = rql[:pos] + "F" + rql[pos + 1:]
+                    label += (
+                        u"<a class='btn btn-info active' href='#' "
+                        "data-toggle='tooltip' "
+                        "title='external_files'>&#8594;</a> ExternalFile")
+                    inner_rset = []
+                    for fs_entity in entities:
+                        inner_rset.extend(fs_entity.external_files)
+                    rset = inner_rset
 
             # Construct the relation box
             box = boxesreg.select("relationbox", self._cw, rset=rset, rql=rql,
@@ -133,7 +167,39 @@ class PiwsPrimaryView(PrimaryView):
         return sorted(sideboxes, key=get_order)
 
 
+class PIWSFilePrimaryView(PrimaryView):
+    """ Specific view for File entities where binary content has to be
+    displayed.
+    """
+    __select__ = PrimaryView.__select__ & is_instance("File")
+
+    def call(self, rset=None, separator=";"):
+        entity = self.cw_rset.get_entity(0, 0)
+        if "json" in entity.data_format:
+            data = json.loads(entity.data.getvalue())
+            data = unicode(json.dumps(data, indent=4))
+        elif "comma-separated-values" in entity.data_format:
+            rset = entity.data.getvalue().split("\n")
+            labels = rset[0].split(separator)
+            records = []
+            for index, line in enumerate(rset[1:]):
+                elements = line.split(separator)
+                if len(elements) == len(labels):
+                    elements.insert(0, str(index))
+                    records.append(elements)
+
+            self.wview("jtable-hugetable-clientside", None, "null",
+                       labels=labels, records=records, csv_export=True,
+                       title=entity.data_format, elts_to_sort="ID")
+            return
+        else:
+            data = unicode(entity.data.getvalue())
+        self.w(u"<h1>{0}</h1>".format(entity.data_format))
+        self.w(data.replace("\n", "<br/>").replace(" ", "&nbsp"))
+
+
 def registration_callback(vreg):
     """ Update  primary views
     """
-    vreg.register_and_replace(PiwsPrimaryView, BrainomicsPrimaryView)
+    vreg.register_and_replace(PIWSPrimaryView, PrimaryView)
+    vreg.register(PIWSFilePrimaryView)
