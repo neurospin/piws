@@ -92,6 +92,9 @@ class Processings(Base):
                             "name": u"p1", "label": u"segmentation",
                             "tool": u"spm", "version": u"8.1",
                             "parameters": u"{'a': 1, 'r': 'mypath'}"}
+                    } ]
+                } ]
+            }
 
 
         Depreciated example:
@@ -273,6 +276,9 @@ class Processings(Base):
                         fset_structs = current_processing["FileSets"]
                         extfiles_structs = current_processing[
                             "ExternalResources"]
+                    if len(fset_structs) != len(extfiles_structs):
+                        raise ValueError("For each filset a list of external "
+                                         "files is required.")
                     scores = current_processing.get("Scores", None)
                     processing_id = processing_struct["identifier"]
 
