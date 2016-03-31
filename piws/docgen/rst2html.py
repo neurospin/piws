@@ -31,7 +31,7 @@ def rst2html(rstfile, data_url):
         the corresponding html documentation.
     """
     with open(rstfile, "r") as openfile:
-        rststr = "".join(openfile.readlines())
+        rststr = openfile.read()
         doc = publish_parts(rststr, writer_name="html")["html_body"]
     doc = set_data_url(data_url, doc)
     return doc
