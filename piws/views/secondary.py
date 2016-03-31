@@ -176,7 +176,7 @@ class OutOfContextScanView(BaseOutOfContextView):
         desc["Repetition time"] = dtype_entity.tr
         desc["Echo time"] = dtype_entity.te
         desc["Scanner field"] = dtype_entity.field
-        #desc["Related subject"] = subject.view("incontext")
+        # desc["Related subject"] = subject.view("incontext")
         return desc
 
 
@@ -315,7 +315,6 @@ class OutOfContextQuestionView(BaseOutOfContextView):
         desc = {}
         desc["Related questionnaire"] = questionnaire.view("incontext")
         return desc
-
 
 
 ###############################################################################
@@ -520,4 +519,3 @@ def registration_callback(vreg):
                   OutOfContextRestrictedFileView,
                   OutOfContextGenomicMeasureView]:
         vreg.register(klass)
-

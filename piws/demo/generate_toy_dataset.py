@@ -140,4 +140,3 @@ for timepoint in TIMEPOINTS:
     fname = os.path.join(genetic_path, "genetic" + ".json")
     with open(fname, "w") as open_file:
         json.dump(genetics, open_file, indent=4)
-            

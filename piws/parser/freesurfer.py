@@ -218,5 +218,3 @@ def freesurfer(fsdirs, study_name, subject_pattern, tool_version,
             json.dump(processings, openfile, indent=4, sort_keys=True)
 
     return processings
-
-

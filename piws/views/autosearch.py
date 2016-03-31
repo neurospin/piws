@@ -27,8 +27,9 @@ class AutoSearchForm(FieldsForm):
     __regid__ = "auto-search-form"
 
     form_buttons = [
-        formwidgets.SubmitButton(label="> continue", cwaction="apply")]
-        #formwidgets.Button(label=u"Filter entity parameters", cwaction="apply")]
+        formwidgets.SubmitButton(label="> continue", cwaction="apply"),
+        #formwidgets.Button(label=u"Filter entity parameters", cwaction="apply")
+    ]
     auorsearch_rql = formfields.StringField(
         name="rql", label="rql", required=False, value="")
 

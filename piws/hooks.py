@@ -136,7 +136,7 @@ class PiwsApacheDeauthenticationHook(hook.Hook):
                 # of the specified cleanup time T. This implies a maximum
                 # uncertainty in each session expiration of T/3.
                 # If T > 3h we arbitrary fix this period to 1h.
-                cleanup_session_interval = min(60*60,
+                cleanup_session_interval = min(60 * 60,
                                                self.repo.
                                                piws_cleanup_session_time / 3)
                 assert self.repo._tasks_manager is not None, ("This Repository "

@@ -90,7 +90,7 @@ class Samples(Base):
         for subject_id, sample_item in self.dataset.iteritems():
 
             # Print a progress bar
-            self._progress_bar(cnt_subject/nb_of_subjects,
+            self._progress_bar(cnt_subject / nb_of_subjects,
                                title="{0}(samples)".format(subject_id),
                                bar_length=40)
             cnt_subject += 1

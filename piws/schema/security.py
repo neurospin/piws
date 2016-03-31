@@ -174,4 +174,3 @@ def post_build_callback(schema):
     for entity in entities:
         if entity.type not in entity_names:
             entity.permissions = MANAGER_PERMISSIONS
-

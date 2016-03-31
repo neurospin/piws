@@ -76,4 +76,4 @@ for eclass in RESTRICTED_ENTITIES:
     uicfg.primaryview_section.tag_subject_of(
         (eclass.__name__, "in_assessment", "Assessment"), "sideboxes")
 
-#uicfg.primaryview_section.tag_attribute(("File", "data_format"), "attributes")
+# uicfg.primaryview_section.tag_attribute(("File", "data_format"), "attributes")

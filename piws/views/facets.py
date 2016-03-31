@@ -225,4 +225,3 @@ def registration_callback(vreg):
                    ProcessingRunNameFacet, LabelFacet, NameFacet,
                    ProcessingRunSubjectFacet]:
         vreg.register(eclass)
-
