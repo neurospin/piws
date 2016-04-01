@@ -81,9 +81,6 @@ class QuestionnaireLongitudinalView(View):
                     questionnaires[q_entity.name][entity.question[0].text][
                         timepoint] = entity.value
 
-
-
-
         # Create a selector
         html = "<h1>Select a question to follow:</h1>"
         html += "<select class='selectpicker' data-live-search='true'>"

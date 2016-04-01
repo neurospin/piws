@@ -574,7 +574,7 @@ class JtableView(View):
         html += "'fnServerParams': function (aoData) {"
         html += "aoData.push("
         html += "{ name: 'labels', "
-        html += "value: '{0}'".format(json.dumps(["ID"]+labels))
+        html += "value: '{0}'".format(json.dumps(["ID"] + labels))
         html += "}, "
         for key, value in kwargs.items():
             if isinstance(value, basestring):
@@ -969,4 +969,3 @@ def registration_callback(vreg):
 
     for ajax in [get_questionnaires_data, get_open_answers_data]:
         vreg.register(ajax)
-
