@@ -60,23 +60,6 @@ class CreateDocumentation(hook.Hook):
         with self.repo.internal_cnx() as cnx:
             data_url = os.path.join(cnx.base_url(), "data/")
 
-        # BEWARE! BEWARE! BEWARE!
-        #
-        # It looks like docutils crashes:
-        # * in debug mode (cubicweb-ctl start -D) with os.chdir()
-        # * in release mode (cubicweb-ctl start) without os.chdir()
-        #
-        # At least this is true of version 0.6 which we currently use
-        # instead of more recent version 0.12, probably because this
-        # specific version gets pulled as a dependency of some other
-        # package.
-        #
-        # For now please comment/uncomment according to debug/release
-        # mode.
-        #
-        #if "VIRTUAL_ENV" in os.environ:
-        #    os.chdir(os.environ["VIRTUAL_ENV"])
-
         # Get the documentation
         doc_folder = self.repo.vreg.config["documentation_folder"]
         if doc_folder:
