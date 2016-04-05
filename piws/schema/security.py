@@ -144,7 +144,7 @@ UNTRACK_ENTITIES = ["CWUser", "CWGroup", "CWSource", "Study", "Center",
                     "Device", "Question", "Questionnaire", "Subject",
                     "GenomicPlatform", "Snp", "CWDataImport", "CWProperty",
                     "Workflow", "State", "BaseTransition", "Transition",
-                    "Card"]
+                    "Card", "EmailAddress"]
 UNTRACK_ENTITIES += ["Assessment", "CWSearch", "File", "CWUpload",
                      "UploadForm", "UploadFile"]
 
