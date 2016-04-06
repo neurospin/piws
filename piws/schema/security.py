@@ -20,6 +20,7 @@ from cubes.brainomics2.schema.medicalexp import Assessment
 from cubes.brainomics2.schema.medicalexp import Subject
 from cubes.brainomics2.schema.medicalexp import FileSet
 from cubes.brainomics2.schema.medicalexp import ExternalFile
+from cubes.brainomics2.schema.medicalexp import ScoreDefinition
 from cubes.brainomics2.schema.medicalexp import ScoreValue
 from cubes.brainomics2.schema.medicalexp import ProcessingRun
 from cubes.brainomics2.schema.medicalexp import Center
@@ -86,7 +87,7 @@ class in_assessment(RelationType):
 
 RESTRICTED_ENTITIES = [
     Scan, FMRIData, DMRIData, PETData, MRIData, EEGData, ETData, FileSet,
-    ExternalFile, ScoreValue, ProcessingRun, QuestionnaireRun, OpenAnswer,
+    ExternalFile, ScoreDefinition, ScoreValue, ProcessingRun, QuestionnaireRun, OpenAnswer,
     GenomicMeasure, RestrictedFile]
 
 PUBLIC_ENTITIES = [

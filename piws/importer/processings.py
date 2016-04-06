@@ -238,9 +238,15 @@ class Processings(Base):
                 assessment_struct = subj_processings["Assessment"]
                 assessment_id = assessment_struct["identifier"]
 
+                rql = "Any A Where A is Assessment, A identifier '{0}'".format(
+                    assessment_id)
+                rset = self.session.execute(rql)
+
                 # Check if this item has already been inserted
-                if assessment_id in self.inserted_assessments:
-                    assessment_eid = self.inserted_assessments[assessment_id]
+                if assessment_id in self.inserted_assessments \
+                        or rset.rowcount > 0:
+                    assessment_eid = (self.inserted_assessments.get(
+                        assessment_id, None) or rset[0][0])
 
                     # > add relation with the subject if not already set
                     self._set_unique_relation(

@@ -336,7 +336,8 @@ class JHugetableView(View):
             # > create the csv string
             html += "var csv_headers = {0};".format(
                     json.dumps([u"ID"] + labels))
-            html += "var csv_tooltips = {0};".format(json.dumps(tooltips))
+            html += "var csv_tooltips = {0};".format(
+                json.dumps([tooltip.replace(";", "") for tooltip in tooltips]))
             html += ("var csv_rows = [csv_headers.join(';'), "
                      "csv_tooltips.join(';')];")
             html += "for(var i=0, l=all_data.length; i<l; ++i){"
