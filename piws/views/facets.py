@@ -109,12 +109,24 @@ class StudyFacet(facet.RQLPathFacet):
 class SubjectFacet(facet.RQLPathFacet):
     """ Filter on subject code (from the 'Subject' entity).
 
-    This filter can is applied on 'Scan', 'QuestionnaireRun' and
-    'GenomicMeasure' entities.
+    This filter can is applied on 'Scan', 'QuestionnaireRun' entities.
     """
     __regid__ = "subject-facet"
-    __select__ = is_instance("Scan", "QuestionnaireRun", "GenomicMeasure")
-    path = ["X in_assessment A", "A subjects S", "S code_in_study C"]
+    __select__ = is_instance("Scan", "QuestionnaireRun")
+    path = ["X subject S", "S code_in_study C"]
+    order = 3
+    filter_variable = "C"
+    title = _("Subjects")
+
+
+class SubjectsFacet(facet.RQLPathFacet):
+    """ Filter on subject code (from the 'Subject' entity).
+
+    This filter can is applied on 'GenomicMeasure' entity.
+    """
+    __regid__ = "subjects-facet"
+    __select__ = is_instance("GenomicMeasure")
+    path = ["X subjects S", "S code_in_study C"]
     order = 3
     filter_variable = "C"
     title = _("Subjects")
