@@ -85,7 +85,8 @@ class QuestionnaireLongitudinalView(View):
 
 
         # Create a selector
-        html = "<h1>Select a question to follow:</h1>"
+        html = ("<h1>Please select a measure to follow accross the timepoints "
+                "in this list:</h1>")
         html += "<select class='selectpicker' data-live-search='true'>"
         html += "<option></option>"
         for questionnaire_name, questions in questionnaires.iteritems():
