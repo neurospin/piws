@@ -10,7 +10,7 @@
 modname = 'piws'
 distname = 'cubicweb-piws'
 
-numversion = (2, 0, 0)
+numversion = (2, 0, 1)
 version = '.'.join(str(num) for num in numversion)
 
 license = 'CeCILL-B'
