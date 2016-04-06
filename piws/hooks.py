@@ -60,10 +60,6 @@ class CreateDocumentation(hook.Hook):
         with self.repo.internal_cnx() as cnx:
             data_url = os.path.join(cnx.base_url(), "data/")
 
-        # Go to the virtualenv root folder
-        #if "VIRTUAL_ENV" in os.environ:
-        #    os.chdir(os.environ["VIRTUAL_ENV"])
-
         # Get the documentation
         doc_folder = self.repo.vreg.config["documentation_folder"]
         if doc_folder:
