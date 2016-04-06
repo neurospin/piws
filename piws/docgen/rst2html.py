@@ -57,9 +57,9 @@ def create_html_doc(directory, data_url):
         html documentation.
     """
     return {
-        os.path.splitext(rstfile)[0]: rst2html(os.path.join(directory, rstfile), data_url))
+        os.path.splitext(rstfile)[0]: rst2html(os.path.join(directory, rstfile), data_url)
         for rstfile in os.listdir(directory)
-        if os.path.splitext(rstfile)[1] == ".rst")
+        if os.path.splitext(rstfile)[1] == ".rst"
     }
 
 

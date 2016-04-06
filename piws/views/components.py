@@ -304,6 +304,7 @@ class PIWSAssessmentStatistics(component.CtxComponent):
 
 AUTHORIZED_IMAGE_EXT = [".nii", ".nii.gz"]
 
+
 class PIWSImageViewers(component.CtxComponent):
     """ Display a box containing links to image viewers.
     """
