@@ -87,8 +87,8 @@ class in_assessment(RelationType):
 
 RESTRICTED_ENTITIES = [
     Scan, FMRIData, DMRIData, PETData, MRIData, EEGData, ETData, FileSet,
-    ExternalFile, ScoreDefinition, ScoreValue, ProcessingRun, QuestionnaireRun, OpenAnswer,
-    GenomicMeasure, RestrictedFile]
+    ExternalFile, ScoreDefinition, ScoreValue, ProcessingRun, QuestionnaireRun,
+    OpenAnswer, GenomicMeasure, RestrictedFile]
 
 PUBLIC_ENTITIES = [
     Subject, Center, Study, Questionnaire, Question, Card]
