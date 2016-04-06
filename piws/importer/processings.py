@@ -38,7 +38,8 @@ class Processings(Base):
 
     def __init__(self, session, project_name, center_name, processings,
                  processing_type, can_read=True, can_update=False,
-                 data_filepath=None, use_store=True, piws_security_model=True):
+                 data_filepath=None, use_store=True, piws_security_model=True,
+                 check_assessment_unicity=False):
         """ Initialize the Processings class.
 
         Parameters
@@ -133,6 +134,7 @@ class Processings(Base):
         self.project_name = project_name
         self.center_name = center_name
         self.processing_type = processing_type
+        self.check_assessment_unicity = check_assessment_unicity
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -238,15 +240,9 @@ class Processings(Base):
                 assessment_struct = subj_processings["Assessment"]
                 assessment_id = assessment_struct["identifier"]
 
-                rql = "Any A Where A is Assessment, A identifier '{0}'".format(
-                    assessment_id)
-                rset = self.session.execute(rql)
-
                 # Check if this item has already been inserted
-                if assessment_id in self.inserted_assessments \
-                        or rset.rowcount > 0:
-                    assessment_eid = (self.inserted_assessments.get(
-                        assessment_id, None) or rset[0][0])
+                if assessment_id in self.inserted_assessments:
+                    assessment_eid = self.inserted_assessments[assessment_id]
 
                     # > add relation with the subject if not already set
                     self._set_unique_relation(
@@ -258,10 +254,28 @@ class Processings(Base):
 
                 # Create the assessment
                 else:
-                    assessment_eid = self._create_assessment(
-                        assessment_struct, subject_eid, study_eid, center_eid,
-                        groups)
-                    self.inserted_assessments[assessment_id] = assessment_eid
+                    if self.check_assessment_unicity:
+                        rql = ("Any ID Where A is Assessment, "
+                               "A identifier '{0}', A eid ID".format(
+                            assessment_id))
+                        rset = self.session.execute(rql)
+                        rows = rset.rows
+                        if len(rows) > 0:
+                            assessment_eid = rows[0][0]
+                            # > add relation with the subject if not already set
+                            self._set_unique_relation(
+                                subject_eid, "assessments", assessment_eid,
+                                check_unicity=True)
+                            self._set_unique_relation(
+                                assessment_eid, "subjects", subject_eid,
+                                check_unicity=True, subjtype="Assessment")
+                            self.inserted_assessments[
+                                assessment_id] = assessment_eid
+                    else:
+                        assessment_eid = self._create_assessment(
+                            assessment_struct, subject_eid, study_eid, center_eid,
+                            groups)
+                        self.inserted_assessments[assessment_id] = assessment_eid
 
                 ###############################################################
                 # Go through the processings - scores
