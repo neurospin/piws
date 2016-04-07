@@ -11,9 +11,17 @@
 import os
 import re
 
-# Docutils import
+# Docutils is broken: it initializes paths relatively to the current directory.
+# Relative paths are nonsensical in a library because any subsequent os.chdir()
+# will result in crashes in the library. This bug has been recently fixed but
+# current releases still lack the fix (latest release is 0.12 at the time of
+# this writing):
+#   https://sourceforge.net/p/docutils/code/7795/
+# Unless started in debug mode, CubicWeb calls a daemonize() function that
+# resets the current directory using os.chdir('/'). It also imports docutils
+# early on. Subsequent use of docutils results in crashes.
+reload(docutils)
 from docutils.core import publish_parts
-
 
 def rst2html(rstfile, data_url):
     """ Create a html documentation from a rst description.
