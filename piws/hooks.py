@@ -19,6 +19,7 @@ from cubicweb.server import hook
 from cubicweb.predicates import is_instance
 
 # PIWS import
+_docutils_initial_cwd = os.getcwd()  # work around docutils bug
 from cubes.piws.docgen.rst2html import create_html_doc
 
 
@@ -59,6 +60,18 @@ class CreateDocumentation(hook.Hook):
         # Get the data url
         with self.repo.internal_cnx() as cnx:
             data_url = os.path.join(cnx.base_url(), "data/")
+
+        # Docutils initializes paths relatively to the current directory.
+        # Relative paths are nonsensical in a library because any subsequent
+        # os.chdir() will result in crashes in the library. This bug has been
+        # recently fixed but current releases still lack the fix (latest
+        # release is 0.12 at the time of this writing):
+        #   https://sourceforge.net/p/docutils/code/7795/
+        # Unless started in debug mode, CubicWeb calls a daemonize() function
+        # that resets the current directory using os.chdir('/'). It also
+        # imports docutils early on. Subsequent use of docutils results in
+        # crashes unless we os.chdir() back to the initial directory.
+        os.chdir(_docutils_initial_cwd)
 
         # Get the documentation
         doc_folder = self.repo.vreg.config["documentation_folder"]
