@@ -14,14 +14,14 @@ numversion = (2, 0, 2)
 version = '.'.join(str(num) for num in numversion)
 
 license = 'CeCILL-B'
-author = 'nsap'
+author = 'NSAp'
 author_email = 'antoine.grigis@cea.fr'
 description = 'piws'
 web = 'https://github.com/neurospin/piws'
 
 __depends__ = {
     'cubicweb': '>= 3.20.9',
-    'cubicweb-rql_download': '>= 2.0.0',
+    'cubicweb-rql_download': '>= 2.0.1',
     'cubicweb-rql_upload': '>= 2.0.0',
     'cubicweb-brainomics2': '>= 1.0.0',
     'cubicweb-bootstrap': '>= 0.6.0',
