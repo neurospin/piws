@@ -235,6 +235,6 @@ def registration_callback(vreg):
                    SubjectFacet, ScanFieldFacet, ScanFormatFacet,
                    AssessmentTimepointFacet, AssessmentSubjectFacet,
                    ProcessingRunNameFacet, LabelFacet, NameFacet,
-                   ProcessingRunSubjectFacet]:
+                   ProcessingRunSubjectFacet, SubjectsFacet]:
         vreg.register(eclass)
 
