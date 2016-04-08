@@ -19,6 +19,7 @@ from cubicweb.server import hook
 from cubicweb.predicates import is_instance
 
 # PIWS import
+_docutils_initial_cwd = os.getcwd()  # work around docutils bug
 from cubes.piws.docgen.rst2html import create_html_doc
 
 
@@ -60,9 +61,17 @@ class CreateDocumentation(hook.Hook):
         with self.repo.internal_cnx() as cnx:
             data_url = os.path.join(cnx.base_url(), "data/")
 
-        # Go to the virtualenv root folder
-        #if "VIRTUAL_ENV" in os.environ:
-        #    os.chdir(os.environ["VIRTUAL_ENV"])
+        # Docutils initializes paths relatively to the current directory.
+        # Relative paths are nonsensical in a library because any subsequent
+        # os.chdir() will result in crashes in the library. This bug has been
+        # recently fixed but current releases still lack the fix (latest
+        # release is 0.12 at the time of this writing):
+        #   https://sourceforge.net/p/docutils/code/7795/
+        # Unless started in debug mode, CubicWeb calls a daemonize() function
+        # that resets the current directory using os.chdir('/'). It also
+        # imports docutils early on. Subsequent use of docutils results in
+        # crashes unless we os.chdir() back to the initial directory.
+        os.chdir(_docutils_initial_cwd)
 
         # Get the documentation
         doc_folder = self.repo.vreg.config["documentation_folder"]
@@ -123,7 +132,7 @@ class PiwsApacheDeauthenticationHook(hook.Hook):
                 # of the specified cleanup time T. This implies a maximum
                 # uncertainty in each session expiration of T/3.
                 # If T > 3h we arbitrary fix this period to 1h.
-                cleanup_session_interval = min(60*60,
+                cleanup_session_interval = min(60 * 60,
                                                self.repo.
                                                piws_cleanup_session_time / 3)
                 assert self.repo._tasks_manager is not None, ("This Repository "

@@ -27,14 +27,13 @@ def rst2html(rstfile, data_url):
 
     Returns
     -------
-    doc: str
+    str
         the corresponding html documentation.
     """
     with open(rstfile, "r") as openfile:
-        rststr = "".join(openfile.readlines())
-        doc = publish_parts(rststr, writer_name="html")["html_body"]
-    doc = set_data_url(data_url, doc)
-    return doc
+        rststr = openfile.read()
+    doc = publish_parts(rststr, writer_name="html")["html_body"]
+    return set_data_url(data_url, doc)
 
 
 def create_html_doc(directory, data_url):
@@ -53,14 +52,15 @@ def create_html_doc(directory, data_url):
 
     Returns
     -------
-    docmap: dict
+    dict
         a mapping with the expected CW entity label as key, associated with the
         html documentation.
     """
-    docmap = dict((rstfile.split(".")[0], rst2html(os.path.join(directory, rstfile), data_url))
-                  for rstfile in os.listdir(directory)
-                  if rstfile.endswith(".rst"))
-    return docmap
+    return {
+        os.path.splitext(rstfile)[0]: rst2html(os.path.join(directory, rstfile), data_url)
+        for rstfile in os.listdir(directory)
+        if os.path.splitext(rstfile)[1] == ".rst"
+    }
 
 
 def set_data_url(data_url, doc):

@@ -34,6 +34,7 @@ class PETData(AnyEntity):
     def dc_title(self):
         return "PET data"
 
+
 class MRIData(AnyEntity):
     __regid__ = "MRIData"
 
@@ -320,5 +321,3 @@ class Study(AnyEntity):
 
     def dc_title(self):
         return self.name
-
-

@@ -65,4 +65,3 @@ def title(self):
     return display_name(self._cw, etype, form='plural')
 
 SameETypeListView.title = title
-

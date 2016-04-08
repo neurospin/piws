@@ -81,9 +81,6 @@ class QuestionnaireLongitudinalView(View):
                     questionnaires[q_entity.name][entity.question[0].text][
                         timepoint] = entity.value
 
-
-
-
         # Create a selector
         html = ("<h1>Please select a measure to follow accross the timepoints "
                 "in this list:</h1>")

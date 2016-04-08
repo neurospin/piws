@@ -402,6 +402,6 @@ class Questionnaires(Base):
                     check_unicity=False, subjtype="QuestionnaireRun")
                 self._set_unique_relation(
                     f_entity.eid, "in_assessment", assessment_eid,
-                    check_unicity=False)
+                    check_unicity=False, subjtype="RestrictedFile")
 
         return qr_entity.eid

@@ -10,18 +10,18 @@
 modname = 'piws'
 distname = 'cubicweb-piws'
 
-numversion = (2, 0, 2)
+numversion = (2, 1, 0)
 version = '.'.join(str(num) for num in numversion)
 
 license = 'CeCILL-B'
-author = 'nsap'
+author = 'NSAp'
 author_email = 'antoine.grigis@cea.fr'
 description = 'piws'
 web = 'https://github.com/neurospin/piws'
 
 __depends__ = {
     'cubicweb': '>= 3.20.9',
-    'cubicweb-rql_download': '>= 2.0.0',
+    'cubicweb-rql_download': '>= 2.0.1',
     'cubicweb-rql_upload': '>= 2.0.0',
     'cubicweb-brainomics2': '>= 1.0.0',
     'cubicweb-bootstrap': '>= 0.6.0',
@@ -34,7 +34,7 @@ classifiers = [
     'Framework :: CubicWeb',
     'Programming Language :: Python',
     'Programming Language :: JavaScript',
-    ]
+]
 
 from os import listdir as _listdir
 from os.path import join, isdir
@@ -52,7 +52,7 @@ def listdir(dirpath):
 data_files = [
     # common files
     [THIS_CUBE_DIR, [fname for fname in glob('*.py') if fname != 'setup.py']],
-    ]
+]
 # check for possible extended cube layout
 for dname in ('entities', 'views', 'sobjects', 'hooks', 'schema', 'data', 'wdoc', 'i18n', 'migration'):
     if isdir(dname):

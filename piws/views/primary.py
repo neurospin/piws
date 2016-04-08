@@ -22,7 +22,7 @@ from cubes.piws.views.components import RelationBox
 # Add summary method for 3.20 compatibility.
 def summary(self, entity):
     return u""
-PrimaryView.summary= types.MethodType(summary, PrimaryView)
+PrimaryView.summary = types.MethodType(summary, PrimaryView)
 
 
 class PIWSPrimaryView(PrimaryView):
@@ -53,7 +53,7 @@ class PIWSPrimaryView(PrimaryView):
         display_attributes = []
         for rschema, _, role, dispctrl in self._section_def(entity, "attributes"):
             vid = dispctrl.get("vid", "reledit")
-            if ((not self.main_related_section and not rschema.final) or 
+            if ((not self.main_related_section and not rschema.final) or
                     rschema.type == "identifier"):
                 continue
             if rschema.final:
@@ -132,7 +132,6 @@ class PIWSPrimaryView(PrimaryView):
             else:
                 rql = "Any X WHERE X is {0}, E eid '{1}', X {2} E".format(
                     target_etype, entity.eid, rschema.type)
-
 
             # FileSet special case
             if target_etype == "FileSet" and entity.cw_etype != "ExternalFile":

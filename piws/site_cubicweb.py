@@ -30,7 +30,7 @@ options = (
         "level": 1,
     }),
     ('apache-cleanup-session-time',
-     {'type' : 'time',
+     {'type': 'time',
       'default': None,
       'help': ('Duration of inactivity after which an apache de-authentication'
                'will be triggered'),
@@ -38,7 +38,7 @@ options = (
       'level': 1,
       }),
     ('deauthentication-redirection-url',
-     {'type' : 'string',
+     {'type': 'string',
       'default': None,
       'help': 'Redirection url after apache deauthentication occured.',
       'group': 'piws',

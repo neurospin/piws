@@ -41,4 +41,3 @@ Questionnaires.schema(outfname=os.path.join(out_dir, "questionnaires.png"))
 Genetics.schema(outfname=os.path.join(out_dir, "genetics.png"))
 # > processings
 Processings.schema(outfname=os.path.join(out_dir, "processings.png"))
-

@@ -317,7 +317,6 @@ class OutOfContextQuestionView(BaseOutOfContextView):
         return desc
 
 
-
 ###############################################################################
 # Questionnaire
 ###############################################################################
@@ -520,4 +519,3 @@ def registration_callback(vreg):
                   OutOfContextRestrictedFileView,
                   OutOfContextGenomicMeasureView]:
         vreg.register(klass)
-
