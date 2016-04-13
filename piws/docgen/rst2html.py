@@ -27,7 +27,7 @@ def rst2html(rstfile, data_url):
 
     Returns
     -------
-    str
+    doc: str
         the corresponding html documentation.
     """
     with open(rstfile, "r") as openfile:
@@ -52,15 +52,15 @@ def create_html_doc(directory, data_url):
 
     Returns
     -------
-    dict
+    docmap: dict
         a mapping with the expected CW entity label as key, associated with the
         html documentation.
     """
-    return {
-        os.path.splitext(rstfile)[0]: rst2html(os.path.join(directory, rstfile), data_url)
-        for rstfile in os.listdir(directory)
-        if os.path.splitext(rstfile)[1] == ".rst"
-    }
+    docmap = dict((rstfile.split(".")[0], rst2html(os.path.join(directory, rstfile), data_url))
+                  for rstfile in os.listdir(directory)
+                  if rstfile.endswith(".rst"))
+
+    return docmap
 
 
 def set_data_url(data_url, doc):
