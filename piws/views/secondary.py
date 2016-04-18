@@ -101,6 +101,8 @@ class BaseOutOfContextView(EntityView):
         self.w(entity_desc)
         self.w(u"</div>")
         # > third element: the see more button
+        self.w(u"<div class='col-md-4'>")
+        self.w(u"<div class='secondary-buttons'>")
         self.w(u"<button class='btn btn-danger' type='button' "
                "style='margin-top:8px' data-toggle='collapse' "
                "data-target='#info-{0}'>".format(row))
@@ -126,6 +128,8 @@ class BaseOutOfContextView(EntityView):
                    "type='button' style='margin-top:8px'>".format(tiphref))
             self.w(u"&#9735;")
             self.w(u"</a>")
+        self.w(u"</div>")
+        self.w(u"</div>")
 
         # Close row item
         self.w(u'</div>')
