@@ -82,8 +82,10 @@ class QuestionnaireLongitudinalView(View):
                         timepoint] = entity.value
 
         # Create a selector
-        html = ("<h1>Please select a measure to follow accross the timepoints "
-                "in this list:</h1>")
+        html = "<h1>Longitudinal scores follow up</h1>"
+        html += "<hr>"
+        html += ("<h2>Please select a measure to follow accross the "
+                 "timepoints in this list:</h2>")
         html += "<select class='selectpicker' data-live-search='true'>"
         html += "<option></option>"
         for questionnaire_name, questions in questionnaires.iteritems():

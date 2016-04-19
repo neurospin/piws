@@ -102,7 +102,7 @@ class HighChartsBasicPieView(View):
         self.w(u'chart: {plotBackgroundColor: null, plotBorderWidth: 1, '
                'plotShadow: false}, ')
         # > configure title
-        self.w(u'title: {{text: "{0}"}}, '.format(title))
+        self.w(u'title: {{text: " "}}, '.format(title))
         # > configure tooltip
         self.w(u'tooltip: {pointFormat: "{series.name}: '
                '<b>{point.percentage:.1f}%</b>" }, ')
@@ -121,6 +121,8 @@ class HighChartsBasicPieView(View):
         self.w(u'</script>')
 
         # Add a container in the body to display the pie chart
+        self.w(u'<h1>{0}</h1>'.format(title))
+        self.w(u'<hr>')
         self.w(u'<div id="hc_container" style="min-width: 310px; height: 400px; '
                 'max-width: 600px; margin: 0 auto"></div>')
 
@@ -268,7 +270,6 @@ class HighChartsRelationSummaryView(View):
             return -1
 
         # Get the highcharts string representation of the data
-        data = self.rset_to_data(rset, relations, subject_attr, object_attr)
         try:
             data = self.rset_to_data(rset, relations, subject_attr, object_attr)
         except:
@@ -313,7 +314,7 @@ class HighChartsRelationSummaryView(View):
         # > configure chart
         self.w(u'chart: {type: "heatmap", marginTop: 40, marginBottom: 40}, ')
         # > configure title
-        self.w(u'title: {{text: "{0}"}}, '.format(title))
+        self.w(u'title: {{text: " "}}, '.format(title))
         # > configure axis
         self.w(u'xAxis: {{categories: {0}}}, '.format(data["x"]))
         self.w(u'yAxis: {{categories: {0}, title: null}}, '.format(data["y"]))
@@ -336,13 +337,16 @@ class HighChartsRelationSummaryView(View):
         self.w(u'}); ')
         self.w(u'</script>')
 
-        # Add a container in the body to display the pie chart. Try to estimate
-        # the cell size
-        width = 100 + len(data["x"]) * 20
+        # Add a container in the body to display the pie chart. Adapt cell size
+        # manually
+        ylabels_maxsize = max([len(elem) for elem in eval(data["y"])])
+        width = (ylabels_maxsize + len(data["x"]) * 10) / 150. * 100.
         height = len(data["y"]) * 5
-        self.w(u'<div style="max-height:700px; overflow: auto; '
-                'max-width: 800px;"> ')
-        self.w(u'<div id="hc_container" style="width: {0}px; '
+        self.w(u'<h1>{0}</h1>'.format(title))
+        self.w(u'<hr>'.format(title))
+        self.w(u'<div style="height:700px; overflow: auto; '
+                'width: 100%;"> ')
+        self.w(u'<div id="hc_container" style="width: {0}%; '
                 'height: {1}px; margin: 0 auto"></div>'.format(width, height))
         self.w(u'</div>')
 
@@ -457,7 +461,7 @@ class HighChartsBasicPlotView(View):
         # > configure credit
         self.w(u'credits : {enabled : false}, ')
         # > configure title
-        self.w(u'title: {{text: "{0}"}}, '.format(title))
+        self.w(u'title: {{text: " "}}, '.format(title))
         # > configure axis
         self.w(u'xAxis: {{categories: {0}}}, '.format(data["x"]))
         self.w(u'yAxis: {{title: {{text: "{0}"}}}}, '.format(y_label))
@@ -474,5 +478,7 @@ class HighChartsBasicPlotView(View):
         self.w(u'</script>')
 
         # Add a container in the body to display the pie chart
+        self.w(u'<h1>{0}</h1>'.format(title))
+        self.w(u'<hr>')
         self.w(u'<div id="{0}" style="min-width: 310px; height: 400px; '
                 'max-width: 600px; margin: 0 auto"></div>'.format(tag))
