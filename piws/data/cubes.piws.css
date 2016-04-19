@@ -30,6 +30,10 @@ a.navbar-brand img {
     width: 50%;
 }
 
+.navbar-nav > li > .dropdown-menu {
+    width: 100%;
+}
+
 
 /* -- Container ----------------------------------------------------------- */
 
