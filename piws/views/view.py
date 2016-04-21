@@ -29,7 +29,7 @@ def page_title(self):
         try:
             entity = rset.complete_entity(0, 0)
             title = entity.cw_etype
-        except NotAnEntity:
+        except:
             title = _("NotAnEntity")
     elif hasattr(self, "title"):
         title = self.title
