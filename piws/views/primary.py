@@ -166,14 +166,23 @@ class PIWSPrimaryView(PrimaryView):
         return sorted(sideboxes, key=get_order)
 
 
-class PIWSFilePrimaryView(PrimaryView):
+class PIWSFilePrimaryView(PIWSPrimaryView):
     """ Specific view for File entities where binary content has to be
     displayed.
     """
-    __select__ = PrimaryView.__select__ & is_instance("File")
+    __select__ = PIWSPrimaryView.__select__ & is_instance("File", "RestrictedFile")
+    allowed_relations = ["subject", "object"]
 
-    def call(self, rset=None, separator=";"):
-        entity = self.cw_rset.get_entity(0, 0)
+    def render_entity_attributes(self, entity, separator=";"):
+        """ Renders all attributes and relations in the 'attributes' section.
+        Unwrap binary field.
+
+        Parameters
+        ----------
+        separator: str (optional, default ';')
+            the CSV cell separator.
+        """
+        super(PIWSPrimaryView, self).render_entity_attributes(entity)
         if "json" in entity.data_format:
             data = json.loads(entity.data.getvalue())
             data = unicode(json.dumps(data, indent=4))
@@ -189,11 +198,10 @@ class PIWSFilePrimaryView(PrimaryView):
 
             self.wview("jtable-hugetable-clientside", None, "null",
                        labels=labels, records=records, csv_export=True,
-                       title=entity.data_format, elts_to_sort="ID")
+                       title="", elts_to_sort="ID")
             return
         else:
             data = unicode(entity.data.getvalue())
-        self.w(u"<h1>{0}</h1>".format(entity.data_format))
         self.w(data.replace("\n", "<br/>").replace(" ", "&nbsp"))
 
 
