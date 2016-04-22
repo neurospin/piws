@@ -433,8 +433,8 @@ class JtableView(View):
         labels: list of string (xor rql_labels)
             a rql that will be executed to get the columns labels.
         ajaxcallback: @func (mandatory)
-            a function thaty will be called by jtable to create dynamically the
-            data to display: do not foget the decorator @ajaxfunc.
+            a function that will be called by jtable to create dynamically the
+            data to display: do not forget the decorator @ajaxfunc.
         csv_export: bool (optional)
             if True an export button will be available.
         title: string (optional, default '')
