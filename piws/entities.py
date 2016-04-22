@@ -25,21 +25,21 @@ class FMRIData(AnyEntity):
     def dc_title(self):
         """Define the FMRIData entity title.
         """
-        return "FMRI data"
+        return u"FMRI data"
 
 
 class PETData(AnyEntity):
     __regid__ = "PETData"
 
     def dc_title(self):
-        return "PET data"
+        return u"PET data"
 
 
 class MRIData(AnyEntity):
     __regid__ = "MRIData"
 
     def dc_title(self):
-        return "MRI data"
+        return u"MRI data"
 
 
 class DMRIData(AnyEntity):
@@ -53,7 +53,7 @@ class Scan(AnyEntity):
     __regid__ = "Scan"
 
     def dc_title(self):
-        return "{0} ({1}): {2}".format(
+        return u"{0} ({1}): {2}".format(
             self.label, self.in_assessment[0].timepoint,
             self.subject[0].code_in_study)
 
@@ -80,7 +80,7 @@ class Assessment(AnyEntity):
             relations.append("QuestionnaireRun")
         if self.genomic_measures:
             relations.append("GenomicMeasure")
-        return "{0}: {1} {2}".format(
+        return u"{0}: {1} {2}".format(
             self.timepoint, self.subjects[0].code_in_study,
             "..." if len(self.subjects) > 1 else "")
 
@@ -116,7 +116,7 @@ class QuestionnaireRun(AnyEntity):
     __regid__ = "QuestionnaireRun"
 
     def dc_title(self):
-        return "{0} ({1}): {2}".format(
+        return u"{0} ({1}): {2}".format(
             self.questionnaire[0].name, self.in_assessment[0].timepoint,
             self.subject[0].code_in_study)
 
@@ -131,7 +131,7 @@ class ProcessingRun(AnyEntity):
     def dc_title(self):
         """Define the processing run entity title.
         """
-        return "{0} ({1}): {2} {3}".format(
+        return u"{0} ({1}): {2} {3}".format(
             self.label, self.in_assessment[0].timepoint,
             self.subjects[0].code_in_study,
             "..." if len(self.subjects) > 1 else "")
@@ -155,7 +155,7 @@ class GenomicMeasure(AnyEntity):
     __regid__ = "GenomicMeasure"
 
     def dc_title(self):
-        return "{0} ({1}): {2} {3}".format(
+        return u"{0} ({1}): {2} {3}".format(
             self.label, self.in_assessment[0].timepoint,
             self.subjects[0].code_in_study,
             "..." if len(self.subjects) > 1 else "")
@@ -170,7 +170,7 @@ class Question(AnyEntity):
     __bootstap_glyph__ = True
 
     def dc_title(self):
-        return self.questionnaire[0].name + ": " + self.text
+        return unicode(self.questionnaire[0].name + ": " + self.text)
 
     @property
     def symbol(self):
@@ -194,7 +194,7 @@ class OpenAnswer(AnyEntity):
     __bootstap_glyph__ = True
 
     def dc_title(self):
-        return self.question[0].dc_title() + ": " + self.value
+        return unicode(self.question[0].dc_title() + ": " + self.value)
 
     @property
     def symbol(self):
@@ -302,7 +302,7 @@ class CWUpload(AnyEntity):
     __bootstap_glyph__ = True
 
     def dc_title(self):
-        return "{0} ({1})".format(self.title, self.form_name)
+        return u"{0} ({1})".format(self.title, self.form_name)
 
     @property
     def symbol(self):
