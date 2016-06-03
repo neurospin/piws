@@ -22,10 +22,12 @@ def render_table_headers(self, w, colrenderers):
     labels = []
     for colrenderer in colrenderers:
         labels.append(colrenderer.header)
-    href = self._cw.build_url(rql=self.cw_rset.printable_rql(),
-                              vid="tablecsvexport", labels=labels)
-    w(u'<a class="btn btn-default" role="button" id="table_csv_button" '
-      u'href="{0}">CSV Export &#187</a>'.format(href))
+    # > all labels must be different than None:
+    if None not in labels:
+        href = self._cw.build_url(rql=self.cw_rset.printable_rql(),
+                                  vid="tablecsvexport", labels=labels)
+        w(u'<a class="btn btn-default" role="button" id="table_csv_button" '
+          u'href="{0}">CSV Export &#187</a>'.format(href))
 
     # Default rendering + get the header labels
     w(u'<thead><tr>')
