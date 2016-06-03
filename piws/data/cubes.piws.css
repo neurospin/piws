@@ -30,7 +30,15 @@ a.navbar-brand img {
     width: 50%;
 }
 
+input[id=norql] {
+    width: 100%;
+}
+
 .navbar-nav > li > .dropdown-menu {
+    width: 100%;
+}
+
+search_box > input {
     width: 100%;
 }
 
@@ -116,6 +124,12 @@ div.vocabularyFacet {
 }
 
 /* -- Misk ----------------------------------------------------------- */
+
+
+.form-horizontal .form-group {
+    margin-right: 0;
+    margin-left: 0;
+}
 
 .fake-link {
     color: blue;
