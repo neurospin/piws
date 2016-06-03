@@ -23,7 +23,7 @@ __depends__ = {
     'cubicweb': '>= 3.20.9',
     'cubicweb-rql_download': '>= 2.1.0',
     'cubicweb-rql_upload': '>= 2.0.1',
-    'cubicweb-brainomics2': '>= 1.0.0',
+    'cubicweb-brainomics2': '>= 1.1.0',
     'cubicweb-bootstrap': '>= 0.6.0',
     'cubicweb-squareui': '>= 0.3.0',
 }
