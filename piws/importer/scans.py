@@ -29,7 +29,8 @@ class Scans(Base):
             (dtype, "scan", "PETData"),
             (dtype, "in_assessment", "Assessment")])
     relations = (
-        Base.fileset_relations + Base.assessment_relations + [
+        Base.fileset_relations + Base.assessment_relations + 
+        Base.device_relations + [
             ("Scan", "study", "Study"),
             ("Study", "study_scans", "Scan"),
             ("Scan", "subject", "Subject"),
@@ -37,6 +38,8 @@ class Scans(Base):
             ("Assessment", "scans", "Scan"),
             ("Scan", "in_assessment", "Assessment"),
             ("Scan", "score_values", "ScoreValue"),
+            ("Assessment", "device", "Device"),
+            ("Device", "device_assessments", "Assessment"),
             ("ScoreValue", "in_assessment", "Assessment")] + has_data
     )
     relations[0][0] = "Scan"
@@ -77,11 +80,11 @@ class Scans(Base):
         ::
 
             scans = {
-                "subjects1": [ {
+                "subjects1": [{
                     "Assessment": {
                         "age_of_subject": 27, "identifier": u"toy_V1_subject1",
                         "timepoint": u"V1"},
-                    "Scans": [ {
+                    "Scans": [{
                         "TypeData": {
                             "fov_y": 0, "fov_x": 0, "voxel_res_y": 2.0,
                             "voxel_res_x": 2.0, "voxel_res_z": 2.0,
@@ -99,7 +102,34 @@ class Scans(Base):
                             "identifier": u"toy_V1_subject1_t1",
                             "type": u"MRIData"}
                     }]
-                } ]
+                }]
+            }
+
+        Note that an optional filed can be set in order to specify the
+        scan acquisition device.
+
+        ::
+
+            scans = {
+                "subjects1": [ {
+                    "Assessment": {
+                    ..
+                    },
+                    "Device": {
+                        "ExternalResources": [{
+                            "absolute_path": true, 
+                            "filepath": "/my/path/examcard.pdf", 
+                            "identifier": "EXAM_CARD_TIEMPOINT_CENTER", 
+                            "name": "EXAM_CARD_TIEMPOINT_CENTER"
+                        }], 
+                        "identifier": "31be53546754dc5f04ab2d9db6bed7cf", 
+                        "manufacturer": "SIEMENS", 
+                        "model": "Verio", 
+                        "serialnum": "xxxxx", 
+                        "software_version": "xxxxxx"
+                    }
+                    ...
+                }]
             }
         """
         # Inheritance
@@ -113,7 +143,6 @@ class Scans(Base):
         self.center_name = center_name
 
         # Speed up parameters
-        self.inserted_assessments = {}
         self.inserted_scans = {}
 
     ###########################################################################
@@ -223,17 +252,53 @@ class Scans(Base):
                 # Get the assessment identifier
                 assessment_struct = subj_scans["Assessment"]
                 assessment_id = assessment_struct["identifier"]
+                assessment_exists = False
 
                 # Check if this item has already been inserted
                 if assessment_id in self.inserted_assessments:
                     assessment_eid = self.inserted_assessments[assessment_id]
+                    assessment_exists = True
 
                 # Create the assessment
                 else:
                     assessment_eid = self._create_assessment(
                         assessment_struct, subject_eid, study_eid, center_eid,
                         groups)
-                    self.inserted_assessments[assessment_id] = assessment_eid
+
+                ###############################################################
+                # Create the device if possible
+                ###############################################################
+
+                # If the device is specified
+                device_struct = subj_scans.get("Device", None)
+                if device_struct is not None:
+
+                    # Get the device identifier
+                    device_id = device_struct["identifier"]
+
+                    # Check if this item has already been inserted
+                    if device_id in self.inserted_devices:
+                        device_eid = self.inserted_devices[device_id]
+                        
+
+                    # Create the device
+                    else:
+                        device_eid = self._create_device(
+                            device_struct, center_eid, assessment_eid,
+                            self.center_name)
+
+                    # Add relation with the assessment
+                    if not assessment_exists:
+                        self._set_unique_relation(
+                            assessment_eid, "device", device_eid,
+                            check_unicity=False)
+                        self._set_unique_relation(
+                            device_eid, "device_assessments", assessment_eid,
+                            check_unicity=False)
+                
+                # Otherwise device eid is None
+                else:
+                    device_eid = None
 
                 ###############################################################
                 # Go through the scans - processings - scores

@@ -25,6 +25,7 @@ from cubes.brainomics2.schema.medicalexp import ScoreValue
 from cubes.brainomics2.schema.medicalexp import ProcessingRun
 from cubes.brainomics2.schema.medicalexp import Center
 from cubes.brainomics2.schema.medicalexp import Study
+from cubes.brainomics2.schema.medicalexp import Device
 from cubes.brainomics2.schema.neuroimaging import Scan
 from cubes.brainomics2.schema.neuroimaging import DMRIData
 from cubes.brainomics2.schema.neuroimaging import EEGData
@@ -91,7 +92,7 @@ RESTRICTED_ENTITIES = [
     OpenAnswer, GenomicMeasure, RestrictedFile]
 
 PUBLIC_ENTITIES = [
-    Subject, Center, Study, Questionnaire, Question, Card]
+    Device, Subject, Center, Study, Questionnaire, Question, Card]
 
 ENTITIES = RESTRICTED_ENTITIES + PUBLIC_ENTITIES + [
     Assessment, CWSearch, File, CWUpload, UploadForm, UploadFile]
@@ -142,7 +143,7 @@ MANAGER_PERMISSIONS = {
 }
 
 UNTRACK_ENTITIES = ["CWUser", "CWGroup", "CWSource", "Study", "Center",
-                    "Device", "Question", "Questionnaire", "Subject",
+                    "Question", "Questionnaire", "Subject", "Device",
                     "GenomicPlatform", "Snp", "CWDataImport", "CWProperty",
                     "Workflow", "State", "BaseTransition", "Transition",
                     "Card", "EmailAddress"]

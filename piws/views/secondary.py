@@ -506,6 +506,24 @@ class OutOfContextRestrictedFileView(BaseOutOfContextView):
 
 
 ###############################################################################
+# Device
+###############################################################################
+
+class OutOfContextDeviceView(BaseOutOfContextView):
+    """ Device secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("Device")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the Device description.
+        """
+        desc = {}
+        desc["Manufacturer"] = entity.manufacturer
+        desc["Model"] = entity.model
+        return desc
+
+
+###############################################################################
 # Register views
 ###############################################################################
 
@@ -521,5 +539,5 @@ def registration_callback(vreg):
                   OutOfContextExternalFileView, OutOfContextCWSearchView,
                   OutOfContextFileView, OutOfContextUploadFileView,
                   OutOfContextRestrictedFileView,
-                  OutOfContextGenomicMeasureView]:
+                  OutOfContextGenomicMeasureView, OutOfContextDeviceView]:
         vreg.register(klass)

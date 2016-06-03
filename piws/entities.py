@@ -321,3 +321,15 @@ class Study(AnyEntity):
 
     def dc_title(self):
         return self.name
+
+
+class Device(AnyEntity):
+    __regid__ = "Device"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return u"{0} ({1})".format(self.manufacturer, self.center[0].name)
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-facetime-video'></span>"
