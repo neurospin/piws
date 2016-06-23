@@ -13,6 +13,7 @@ from cubicweb.entities import AnyEntity
 
 # Cubes import
 from cubes.medicalexp.config import ASSESSMENT_CONTAINER
+from cubes.rql_upload.entities import EntityUploadFile
 
 
 ##############################################################################
@@ -261,7 +262,7 @@ class File(AnyEntity):
         return "<span class='glyphicon glyphicon-file'></span>"
 
 
-class UploadFile(AnyEntity):
+class UploadFile(EntityUploadFile):
     __regid__ = "UploadFile"
     __bootstap_glyph__ = True
 
