@@ -46,10 +46,15 @@ def display_name(req, key, form="", context=None):
     relation name) in a given form.
     """
     assert form in ("", "plural", "subject", "object")
+    if key.startswith("CW"):
+        key = key[2:]
     if form == "subject":
         form = ""
     elif form == "plural":
-        key = key + "s"
+        if key.endswith("y"):
+            key = key[:-1] + "ies"
+        else:
+            key = key + "s"
     elif form:
         key = key + "_" + form
     # ensure unicode
