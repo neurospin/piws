@@ -91,7 +91,8 @@ class JHugetableView(View):
     div_id = "jhugetable-table"
 
     def call(self, labels, records, csv_export=True, title="", timepoint="",
-             elts_to_sort=None, tooltip_name=None, use_scroller=False):
+             elts_to_sort=None, tooltip_name=None, use_scroller=False,
+             index=0):
         """ Method that will create a table with client-side processing only.
          It is useful for huge datasets (million of entries).
 
@@ -120,6 +121,9 @@ class JHugetableView(View):
             the piws documentation tooltip name.
         use_scroller: bool (optional default False)
             if True do not use pagination.
+        index: int (optional, default 0)
+            increment this parameter to insert multiple tables in the same
+            page.
         """
 
         if elts_to_sort is None:
@@ -198,7 +202,7 @@ class JHugetableView(View):
         html += "var sort_dir = 'asc';"
 
         # > create the table
-        html += "var table = $('#the_table').dataTable( { "
+        html += "var table = $('#the_table_{0}').dataTable( {{ ".format(index)
         html += "serverSide: true,"
 
         # > set the ajax callback to fill dynamically the table
@@ -373,7 +377,7 @@ class JHugetableView(View):
         html += "<h1>{0}</h1>".format(title)
 
         # > display the table in the body
-        html += "<table id='the_table' class='cell-border display'>"
+        html += "<table id='the_table_{0}' class='cell-border display'>".format(index)
         html += "<thead></thead>"
         html += "<tbody></tbody>"
         html += "</table>"
