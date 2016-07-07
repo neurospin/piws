@@ -47,9 +47,10 @@ from cubes.brainomics2.schema.card import Card
 from cubes.rql_download.schema import CWSearch
 from cubes.rql_download.schema import File
 from cubes.rql_upload.schema import CWUpload
-from cubes.rql_upload.schema import UploadForm
+from cubes.rql_upload.schema import UploadField
 from cubes.rql_upload.schema import UploadFile
 from cubes.rql_upload.schema import UPLOAD_PERMISSIONS
+from cubes.rql_upload.schema import UPLOAD_RELATION_PERMISSIONS
 
 
 ###############################################################################
@@ -72,6 +73,7 @@ for group_name in authorized_upload_groups:
     BASE_GROUPS.add(group_name)
 authorized_upload_groups.add("managers")
 UPLOAD_PERMISSIONS["add"] = tuple(authorized_upload_groups)
+UPLOAD_RELATION_PERMISSIONS["add"] = UPLOAD_PERMISSIONS["add"]
 UPLOAD_PUBLIC_ENTITIES = []
 if enable_upload:
     UPLOAD_PUBLIC_ENTITIES = ["CWUser", "CWGroup"]
@@ -125,7 +127,7 @@ PUBLIC_ENTITIES = [
     Device, Subject, Center, Study, Questionnaire, Question, Card]
 
 ENTITIES = RESTRICTED_ENTITIES + PUBLIC_ENTITIES + [
-    Assessment, CWSearch, File, CWUpload, UploadForm, UploadFile]
+    Assessment, CWSearch, File, CWUpload, UploadField, UploadFile]
 
 
 PUBLIC_PERMISSIONS = {
@@ -178,7 +180,7 @@ UNTRACK_ENTITIES = ["CWUser", "CWGroup", "CWSource", "Study", "Center",
                     "Workflow", "State", "BaseTransition", "Transition",
                     "Card", "EmailAddress"]
 UNTRACK_ENTITIES += ["Assessment", "CWSearch", "File", "CWUpload",
-                     "UploadForm", "UploadFile"]
+                     "UploadField", "UploadFile"]
 
 
 # Set known entities permissions

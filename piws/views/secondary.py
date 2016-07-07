@@ -443,8 +443,9 @@ class OutOfContextCWUploadView(BaseOutOfContextView):
         """ Generate a dictionary with the CWUpload description.
         """
         desc = {}
-        desc["Tile"] = entity.title
         desc["Form"] = entity.form_name
+        desc["Status"] = entity.status
+        desc["Error"] = entity.error
         return desc
 
 
@@ -480,9 +481,26 @@ class OutOfContextUploadFileView(BaseOutOfContextView):
         """ Generate a dictionary with the UploadFile description.
         """
         desc = {}
-        desc["Title"] = entity.title
         desc["Format"] = entity.data_extension
         desc["SHA1"] = entity.data_sha1hex
+        return desc
+
+
+###############################################################################
+# UploadField
+###############################################################################
+
+class OutOfContextUploadFieldView(BaseOutOfContextView):
+    """ UploadField secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("UploadField")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the UploadField description.
+        """
+        desc = {}
+        desc["Name"] = entity.name
+        desc["Value"] = entity.value
         return desc
 
 
@@ -539,5 +557,6 @@ def registration_callback(vreg):
                   OutOfContextExternalFileView, OutOfContextCWSearchView,
                   OutOfContextFileView, OutOfContextUploadFileView,
                   OutOfContextRestrictedFileView,
-                  OutOfContextGenomicMeasureView, OutOfContextDeviceView]:
+                  OutOfContextGenomicMeasureView, OutOfContextDeviceView,
+                  OutOfContextUploadFieldView]:
         vreg.register(klass)
