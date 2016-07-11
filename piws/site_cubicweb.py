@@ -82,4 +82,11 @@ options = (
       'group': 'piws',
       'level': 1,
       }),
+    ('share_group_uploads',
+     {'type': 'yn',
+      'default': False,
+      'help': 'If true, share uploads between the memebers of a group.',
+      'group': 'piws',
+      'level': 1,
+      })
 )

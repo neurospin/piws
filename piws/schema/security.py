@@ -67,6 +67,7 @@ for cnt, frame in enumerate(inspect.stack()):
         break
 instance_name = config.appid
 enable_upload = config["enable-upload"]
+share_group_uploads = config["share_group_uploads"]
 authorized_upload_groups = config["authorized-upload-groups"]
 authorized_upload_groups = set(authorized_upload_groups)
 for group_name in authorized_upload_groups:
@@ -77,6 +78,11 @@ UPLOAD_RELATION_PERMISSIONS["add"] = UPLOAD_PERMISSIONS["add"]
 UPLOAD_PUBLIC_ENTITIES = []
 if enable_upload:
     UPLOAD_PUBLIC_ENTITIES = ["CWUser", "CWGroup"]
+if share_group_uploads:
+    UPLOAD_PERMISSIONS["read"] = (
+        "managers",
+        ERQLExpression(("X created_by Y, Y in_group GY, NOT GY name 'users', "
+                        "U in_group GY")))
 
 
 ###############################################################################
