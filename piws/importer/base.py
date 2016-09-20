@@ -42,7 +42,9 @@ class Base(object):
         ("Center", "assessments", "Assessment"),
         ("Assessment", "center", "Center"),
         ("CWGroup", "can_read", "Assessment"),
-        ("CWGroup", "can_update", "Assessment")
+        ("CWGroup", "can_update", "Assessment"),
+        ("Assessment", "device", "Device"),
+        ("Device", "device_assessments", "Assessment")
     ]
     fileset_relations = [
         ["ParentEntitiyName", "filesets", "FileSet"],
@@ -51,6 +53,10 @@ class Base(object):
         ("ExternalFile", "fileset", "FileSet"),
         ("ExternalFile", "in_assessment", "Assessment")
     ]
+    device_relations = fileset_relations + [
+        ("Device", "center", "Center")
+    ]
+    device_relations[0][0] = "Device"
 
     def __init__(self, session, can_read=True, can_update=False,
                  use_store=True, piws_security_model=True):
@@ -82,6 +88,10 @@ class Base(object):
             self.relate_method = self.session.add_relation
             self.create_entity_method = self.session.create_entity
         self.piws_security_model = piws_security_model
+
+        # Speed up parameters
+        self.inserted_assessments = {}
+        self.inserted_devices = {}
 
     ###########################################################################
     #   Public Methods
@@ -285,6 +295,38 @@ class Base(object):
             is_created = True
 
         return entity, is_created
+
+    def _create_device(self, device_struct, center_eid, assessment_eid,
+                       center_name):
+        """ Create a device and its associated relations.
+        """
+        # Create the device
+        device_id = device_struct["identifier"]
+        extfiles = device_struct.pop("ExternalResources")
+        device_entity, is_created = self._get_or_create_unique_entity(
+            rql=("Any X Where X is Device, X identifier "
+                 "'{0}'".format(device_id)),
+            check_unicity=True,
+            entity_name="Device",
+            **device_struct)
+        device_eid = device_entity.eid
+        self.inserted_devices[device_id] = device_eid
+
+        # If we just create the device, relate the entity
+        if is_created:
+            # > add relation with the center
+            self._set_unique_relation(
+                device_eid, "center", center_eid, check_unicity=False)
+            # > add relation with the exam cards
+            if len(extfiles) > 0:
+                fset_struct = {
+                    "identifier": device_id,
+                    "name": u"{0} exam {1} card".format(
+                        center_name, device_struct["manufacturer"])}
+                self._import_file_set(fset_struct, extfiles, device_eid,
+                                      assessment_eid)
+
+        return device_eid 
 
     def _create_assessment(self, assessment_struct, subject_eids, study_eid,
                            center_eid, groups):

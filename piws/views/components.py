@@ -279,7 +279,7 @@ class PIWSAssessmentStatistics(component.CtxComponent):
             "view", vid="highcharts-relation-summary-view",
             rql="Any A WHERE A is Assessment", title="Processing status",
             relations="processing_runs", subject_attr="timepoint",
-            object_attr="tool")
+            object_attr="label")
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))

@@ -101,6 +101,8 @@ class BaseOutOfContextView(EntityView):
         self.w(entity_desc)
         self.w(u"</div>")
         # > third element: the see more button
+        self.w(u"<div class='col-md-4'>")
+        self.w(u"<div class='secondary-buttons'>")
         self.w(u"<button class='btn btn-danger' type='button' "
                "style='margin-top:8px' data-toggle='collapse' "
                "data-target='#info-{0}'>".format(row))
@@ -126,6 +128,8 @@ class BaseOutOfContextView(EntityView):
                    "type='button' style='margin-top:8px'>".format(tiphref))
             self.w(u"&#9735;")
             self.w(u"</a>")
+        self.w(u"</div>")
+        self.w(u"</div>")
 
         # Close row item
         self.w(u'</div>')
@@ -230,7 +234,7 @@ class OutOfContextSubjectView(BaseOutOfContextView):
             "view", vid="highcharts-relation-summary-view",
             rql="Any A WHERE S eid '{0}', S assessments A".format(entity.eid),
             relations="processing_runs", subject_attr="timepoint",
-            object_attr="tool", title="Processing status: {0}".format(
+            object_attr="label", title="Processing status: {0}".format(
                 entity.code_in_study))
         desc["Processing summary"] = "<a href='{0}'>status</a>".format(href)
         href = self._cw.build_url(
@@ -439,8 +443,9 @@ class OutOfContextCWUploadView(BaseOutOfContextView):
         """ Generate a dictionary with the CWUpload description.
         """
         desc = {}
-        desc["Tile"] = entity.title
         desc["Form"] = entity.form_name
+        desc["Status"] = entity.status
+        desc["Error"] = entity.error
         return desc
 
 
@@ -476,9 +481,26 @@ class OutOfContextUploadFileView(BaseOutOfContextView):
         """ Generate a dictionary with the UploadFile description.
         """
         desc = {}
-        desc["Title"] = entity.title
         desc["Format"] = entity.data_extension
         desc["SHA1"] = entity.data_sha1hex
+        return desc
+
+
+###############################################################################
+# UploadField
+###############################################################################
+
+class OutOfContextUploadFieldView(BaseOutOfContextView):
+    """ UploadField secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("UploadField")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the UploadField description.
+        """
+        desc = {}
+        desc["Name"] = entity.name
+        desc["Value"] = entity.value
         return desc
 
 
@@ -502,6 +524,24 @@ class OutOfContextRestrictedFileView(BaseOutOfContextView):
 
 
 ###############################################################################
+# Device
+###############################################################################
+
+class OutOfContextDeviceView(BaseOutOfContextView):
+    """ Device secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("Device")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the Device description.
+        """
+        desc = {}
+        desc["Manufacturer"] = entity.manufacturer
+        desc["Model"] = entity.model
+        return desc
+
+
+###############################################################################
 # Register views
 ###############################################################################
 
@@ -517,5 +557,6 @@ def registration_callback(vreg):
                   OutOfContextExternalFileView, OutOfContextCWSearchView,
                   OutOfContextFileView, OutOfContextUploadFileView,
                   OutOfContextRestrictedFileView,
-                  OutOfContextGenomicMeasureView]:
+                  OutOfContextGenomicMeasureView, OutOfContextDeviceView,
+                  OutOfContextUploadFieldView]:
         vreg.register(klass)

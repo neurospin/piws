@@ -48,6 +48,20 @@ FacetFilterMixIn.generate_form = generate_form
 # FACETS
 ############################################################################
 
+
+class StatusFacet(facet.RQLPathFacet):
+    """ Filter on status.
+
+    This filter is applied on 'CWUpload'.
+    """
+    __regid__ = "status-facet"
+    __select__ = is_instance("CWUpload")
+    path = ["X status S"]
+    order = 1
+    filter_variable = "S"
+    title = _("Status")
+
+
 class TimepointFacet(facet.RQLPathFacet):
     """ Filter on timepoint (form the 'Assessment' entity).
 
@@ -235,5 +249,5 @@ def registration_callback(vreg):
                    SubjectFacet, ScanFieldFacet, ScanFormatFacet,
                    AssessmentTimepointFacet, AssessmentSubjectFacet,
                    ProcessingRunNameFacet, LabelFacet, NameFacet,
-                   ProcessingRunSubjectFacet]:
+                   ProcessingRunSubjectFacet, StatusFacet]:
         vreg.register(eclass)

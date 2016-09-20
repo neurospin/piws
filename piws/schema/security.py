@@ -6,7 +6,11 @@
 # for details.
 ##########################################################################
 
+# System import
+import inspect
+
 # CubicWeb import
+from yams import BASE_GROUPS
 from yams.buildobjs import SubjectRelation
 from yams.buildobjs import RelationDefinition
 from cubicweb.schema import ERQLExpression
@@ -25,6 +29,7 @@ from cubes.brainomics2.schema.medicalexp import ScoreValue
 from cubes.brainomics2.schema.medicalexp import ProcessingRun
 from cubes.brainomics2.schema.medicalexp import Center
 from cubes.brainomics2.schema.medicalexp import Study
+from cubes.brainomics2.schema.medicalexp import Device
 from cubes.brainomics2.schema.neuroimaging import Scan
 from cubes.brainomics2.schema.neuroimaging import DMRIData
 from cubes.brainomics2.schema.neuroimaging import EEGData
@@ -42,8 +47,42 @@ from cubes.brainomics2.schema.card import Card
 from cubes.rql_download.schema import CWSearch
 from cubes.rql_download.schema import File
 from cubes.rql_upload.schema import CWUpload
-from cubes.rql_upload.schema import UploadForm
+from cubes.rql_upload.schema import UploadField
 from cubes.rql_upload.schema import UploadFile
+from cubes.rql_upload.schema import UPLOAD_PERMISSIONS
+from cubes.rql_upload.schema import UPLOAD_RELATION_PERMISSIONS
+
+
+###############################################################################
+# Deal with upload
+###############################################################################
+
+# TODO: try to get the configuration directly from cubicweb.cwconfig
+# For the moment use inspect to get the config from a parent frame.
+import inspect
+for cnt, frame in enumerate(inspect.stack()):
+    _, _, _, values = inspect.getargvalues(frame[0])
+    if "config" in values:
+        config = values["config"]
+        break
+instance_name = config.appid
+enable_upload = config["enable-upload"]
+share_group_uploads = config["share_group_uploads"]
+authorized_upload_groups = config["authorized-upload-groups"]
+authorized_upload_groups = set(authorized_upload_groups)
+for group_name in authorized_upload_groups:
+    BASE_GROUPS.add(group_name)
+authorized_upload_groups.add("managers")
+UPLOAD_PERMISSIONS["add"] = tuple(authorized_upload_groups)
+UPLOAD_RELATION_PERMISSIONS["add"] = UPLOAD_PERMISSIONS["add"]
+UPLOAD_PUBLIC_ENTITIES = []
+if enable_upload:
+    UPLOAD_PUBLIC_ENTITIES = ["CWUser", "CWGroup"]
+if share_group_uploads:
+    UPLOAD_PERMISSIONS["read"] = (
+        "managers",
+        ERQLExpression(("X created_by Y, Y in_group GY, NOT GY name 'users', "
+                        "U in_group GY")))
 
 
 ###############################################################################
@@ -91,10 +130,10 @@ RESTRICTED_ENTITIES = [
     OpenAnswer, GenomicMeasure, RestrictedFile]
 
 PUBLIC_ENTITIES = [
-    Subject, Center, Study, Questionnaire, Question, Card]
+    Device, Subject, Center, Study, Questionnaire, Question, Card]
 
 ENTITIES = RESTRICTED_ENTITIES + PUBLIC_ENTITIES + [
-    Assessment, CWSearch, File, CWUpload, UploadForm, UploadFile]
+    Assessment, CWSearch, File, CWUpload, UploadField, UploadFile]
 
 
 PUBLIC_PERMISSIONS = {
@@ -142,12 +181,12 @@ MANAGER_PERMISSIONS = {
 }
 
 UNTRACK_ENTITIES = ["CWUser", "CWGroup", "CWSource", "Study", "Center",
-                    "Device", "Question", "Questionnaire", "Subject",
+                    "Question", "Questionnaire", "Subject", "Device",
                     "GenomicPlatform", "Snp", "CWDataImport", "CWProperty",
                     "Workflow", "State", "BaseTransition", "Transition",
                     "Card", "EmailAddress"]
 UNTRACK_ENTITIES += ["Assessment", "CWSearch", "File", "CWUpload",
-                     "UploadForm", "UploadFile"]
+                     "UploadField", "UploadFile"]
 
 
 # Set known entities permissions
@@ -171,7 +210,7 @@ def post_build_callback(schema):
             schema.del_relation_def(entity.type, "in_assessment", "Assessment")
 
     # Set strict default permissions for unknown entities
-    entity_names = [e.__name__ for e in ENTITIES]
+    entity_names = [e.__name__ for e in ENTITIES] + UPLOAD_PUBLIC_ENTITIES
     for entity in entities:
         if entity.type not in entity_names:
             entity.permissions = MANAGER_PERMISSIONS

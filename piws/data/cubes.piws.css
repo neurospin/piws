@@ -1,25 +1,139 @@
 
-.fake-link {
-    color: blue;
-    cursor: pointer;
+/* -- Navbar ----------------------------------------------------------- */
+
+a.navbar-brand img {
+    max-width: 100%;
 }
 
+.navbar-header {
+    width: 20%;
+}
 
-.search-query {
-    margin-top: 20px;
-    width: 800px;;
+.navbar-toggle {
+    position: absolute;
+    float: right;
+    top:0;
+    right:0;
+}
+
+.navbar-collapse {
+    padding-left: 20%;
+    width: 100%;
+    padding-right: 3%;
 }
 
 .navbar-nav {
-    float: left !important;
+    width: 100%;
 }
 
-.navbar-right {
-    float: left !important;
+.navbar-nav > li {
+    width: 50%;
 }
 
-th, td {
-    white-space: nowrap;
+input[id=norql] {
+    width: 100%;
+}
+
+.navbar-nav > li > .dropdown-menu {
+    width: 100%;
+}
+
+search_box > input {
+    width: 100%;
+}
+
+
+/* -- Container ----------------------------------------------------------- */
+
+.container {
+    width: 100%;
+    padding-right: 2%;
+    padding-left: 2%;
+}
+
+.table {
+    table-layout: fixed;
+    width: 100%;
+    word-wrap: break-word;
+    border-collapse: separate;
+}
+
+.cw-table-primary-entity th {
+    width: 20%
+}
+
+.cw-table-primary-entity td {
+    width: 80%
+}
+
+
+/* -- Facets ----------------------------------------------------------- */
+
+.cw_search_box > .btn-toolbar > .btn-block > .btn {
+    margin-left: 0;
+}
+
+fieldset {
+    display: table-cell; /* FF facet selector width*/
+    min-width: auto; /* Chrome facet selector width*/
+}
+
+.facet {
+    overflow: auto; /* Chrome facet selector width*/
+}
+
+.facetValueDisabled span, div.facetCheckBox span {
+    display: block;
+    padding-left: 10%;
+    width: 100%;
+	white-space: nowrap;
+}
+.facetCheckBox {
+    padding-left: 0;
+    height: 2em;
+}
+
+div.vocabularyFacet {
+    overflow-x: auto !important;
+}
+
+.facetCheckBox {
+    background: url("img/facet_unselected.png") 0% 0% no-repeat !important;
+}
+
+
+/* -- List secondary ---------------------------------------------------- */
+
+.ooview .well{
+    padding: 5px;
+    webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+.ooview .glyphicon{
+    font-size: 30px;
+}
+
+.ooview .well p.text-center{
+    margin: 0 0 0;
+}
+
+.secondary-buttons {
+    float: right;
+}
+
+/* -- Misk ----------------------------------------------------------- */
+
+
+.form-horizontal .form-group {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.fake-link {
+    color: blue;
+    cursor: pointer;
 }
 
 div.dataTables_wrapper {
@@ -72,25 +186,6 @@ div.DTFC_LeftBodyLiner {
 .thumbnails {
     list-style: none outside none;
     margin-left: -20px;
-}
-
-.navbar-nav {
-    padding-left: 15%;
-}
-
-.ooview .well{
-    padding: 5px;
-    webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
-}
-
-.ooview .glyphicon{
-    font-size: 30px;
-}
-
-.ooview .well p.text-center{
-    margin: 0 0 0px;
 }
 
 ul.list-striped li {

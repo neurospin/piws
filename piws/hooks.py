@@ -24,9 +24,8 @@ from cubes.piws.docgen.rst2html import create_html_doc
 
 
 class ServerStartupHook(hook.Hook):
-    """
-        Update repository cache with groups from indexation to ease LDAP
-        synchronisation
+    """ Update repository cache with groups from indexation to ease LDAP
+    synchronisation.
     """
     __regid__ = 'piws.update_cache_hook'
     events = ('server_startup', 'server_maintenance')
@@ -103,8 +102,7 @@ def piws_clean_sessions(self):
 
 
 class PiwsApacheDeauthenticationHook(hook.Hook):
-    """
-        Add piws_clean_sessions to server looping tasks
+    """ Add piws_clean_sessions to server looping tasks.
     """
     __regid__ = 'piws.apache_deauthentication'
     events = ('server_startup', 'server_maintenance')

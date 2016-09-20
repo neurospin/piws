@@ -55,7 +55,7 @@ USERS = {
     "user1": {
         "login": "user1",
         "password": "user1",
-        "group_names": ["toy_V0", "users"]
+        "group_names": ["toy_V0", "users", "uploaders"]
     },
     "user2": {
         "login": "user2",
@@ -84,7 +84,7 @@ genetics = genetic_parser(demo_path, STUDY_NAME)
 processings = freesurfer_parser(demo_path, STUDY_NAME)
 
 # Define all the importers
-db_grp_importer = CWGroups(session, ["toy_V0", "toy_V1", "toy"],
+db_grp_importer = CWGroups(session, ["toy_V0", "toy_V1", "toy", "uploaders"],
                            use_store=False)
 db_user_importer = CWUsers(session, USERS)
 db_subject_importer = Subjects(

@@ -29,7 +29,7 @@ def page_title(self):
         try:
             entity = rset.complete_entity(0, 0)
             title = entity.cw_etype
-        except NotAnEntity:
+        except:
             title = _("NotAnEntity")
     elif hasattr(self, "title"):
         title = self.title
@@ -46,10 +46,15 @@ def display_name(req, key, form="", context=None):
     relation name) in a given form.
     """
     assert form in ("", "plural", "subject", "object")
+    if key.startswith("CW"):
+        key = key[2:]
     if form == "subject":
         form = ""
     elif form == "plural":
-        key = key + "s"
+        if key.endswith("y"):
+            key = key[:-1] + "ies"
+        else:
+            key = key + "s"
     elif form:
         key = key + "_" + form
     # ensure unicode
