@@ -59,7 +59,7 @@ class CreateDocumentation(hook.Hook):
         """
         # Get the data url
         with self.repo.internal_cnx() as cnx:
-            data_url = os.path.join(cnx.base_url(), "data/")
+            site_url = cnx.base_url()
 
         # Docutils initializes paths relatively to the current directory.
         # Relative paths are nonsensical in a library because any subsequent
@@ -76,7 +76,7 @@ class CreateDocumentation(hook.Hook):
         # Get the documentation
         doc_folder = self.repo.vreg.config["documentation_folder"]
         if doc_folder:
-            self.repo.vreg.docmap = create_html_doc(doc_folder, data_url)
+            self.repo.vreg.docmap = create_html_doc(doc_folder, site_url)
         else:
             self.repo.vreg.docmap = {}
 

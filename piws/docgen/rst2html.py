@@ -15,28 +15,28 @@ import re
 from docutils.core import publish_parts
 
 
-def rst2html(rstfile, data_url):
+def rst2html(rstfile, site_url):
     """ Create a html documentation from a rst description.
 
     Parameters
     ----------
     rstfile: str (mandatory)
         the documentation rst description.
-    data_url: str (mandatory)
-        the server data url.
+    site_url: str (mandatory)
+        the server url.
 
     Returns
     -------
-    str
+    doc: str
         the corresponding html documentation.
     """
     with open(rstfile, "r") as openfile:
         rststr = openfile.read()
     doc = publish_parts(rststr, writer_name="html")["html_body"]
-    return set_data_url(data_url, doc)
+    return set_data_url(site_url, doc)
 
 
-def create_html_doc(directory, data_url):
+def create_html_doc(directory, site_url):
     """ Create the html documentation from the rst files available in the
     input directory.
 
@@ -47,23 +47,23 @@ def create_html_doc(directory, data_url):
     ----------
     directory: str (mandatory)
         the input documentation directory: where we are looking for rst files.
-    data_url: str (mandatory)
-        the server data url.
+    site_url: str (mandatory)
+        the server url.
 
     Returns
     -------
-    dict
+    docmap: dict
         a mapping with the expected CW entity label as key, associated with the
         html documentation.
     """
-    return {
-        os.path.splitext(rstfile)[0]: rst2html(os.path.join(directory, rstfile), data_url)
-        for rstfile in os.listdir(directory)
-        if os.path.splitext(rstfile)[1] == ".rst"
-    }
+    docmap = dict((rstfile.split(".")[0], rst2html(os.path.join(directory, rstfile), site_url))
+                  for rstfile in os.listdir(directory)
+                  if rstfile.endswith(".rst"))
+
+    return docmap
 
 
-def set_data_url(data_url, doc):
+def set_data_url(site_url, doc):
     """ Transform the image source.
 
     Note that all the images or resources have to be placed in the cube data
@@ -71,8 +71,8 @@ def set_data_url(data_url, doc):
 
     Parameters
     ----------
-    data_url: str (mandatory)
-        the server data url.
+    site_url: str (mandatory)
+        the server url.
     doc: str
         an html documentation.
 
@@ -81,9 +81,7 @@ def set_data_url(data_url, doc):
     doc: str
         the formatted html documentation.
     """
-    matches = re.findall("<img.*/>", doc)
-    for imgtag in matches:
-        index = imgtag.index("src=") + 5
-        newimgtag = imgtag[:index] + data_url + imgtag[index:]
-        doc = doc.replace(imgtag, newimgtag)
+
+    # find specific tag for internal link
+    doc = doc.replace("{siteURL}", site_url)
     return doc
