@@ -237,18 +237,6 @@ class PIWSSubjectStatistics(component.CtxComponent):
         w(u'Subject handedness repartition</a>')
         w(u'</div></div><br/>')
 
-        # Create a view to see the db subject status
-        href = self._cw.build_url(
-            "view", vid="highcharts-relation-summary-view",
-            rql="Any A WHERE A is Assessment", title="Insertion status",
-            relations="subjects", subject_attr="timepoint",
-            object_attr="identifier")
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Insertion status</a>')
-        w(u'</div></div><br/>')
-
 
 class PIWSAssessmentStatistics(component.CtxComponent):
     """ Display a box containing links to statistics on the cw entities.
