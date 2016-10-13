@@ -232,8 +232,8 @@ class OutOfContextSubjectView(BaseOutOfContextView):
         desc["Acquisition summary"] = "<a href='{0}'>status</a>".format(href)
         href = self._cw.build_url(
             "view", vid="highcharts-relation-summary-view",
-            rql="Any A WHERE S eid '{0}', S assessments A".format(entity.eid),
-            relations="processing_runs", subject_attr="timepoint",
+            rql="Any S WHERE S eid '{0}'".format(entity.eid),
+            relations="subject_processing_runs", subject_attr="code_in_study",
             object_attr="label", title="Processing status: {0}".format(
                 entity.code_in_study))
         desc["Processing summary"] = "<a href='{0}'>status</a>".format(href)
