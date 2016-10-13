@@ -96,6 +96,8 @@ class QuestionnaireLongitudinalView(View):
                 # Get the plot data
                 data = sorted(question_item.items())
                 values = [p[1] for p in data]
+                if len(values) == 0:
+                    continue
 
                 # Check if we are dealing with numbers
                 control_value = values[0].replace(".", "", 1)
@@ -118,6 +120,8 @@ class QuestionnaireLongitudinalView(View):
                 # Get the plot data
                 data = sorted(question_item.items())
                 values = [p[1] for p in data]
+                if len(values) == 0:
+                    continue
 
                 # Check if we are dealing with numbers
                 control_value = values[0].replace(".", "", 1)
