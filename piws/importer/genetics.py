@@ -109,8 +109,12 @@ class Genetics(Base):
 
         """
         # Inheritance
-        super(Genetics, self).__init__(session, use_store,
-                                       piws_security_model)
+        super(Genetics, self).__init__(
+            session=session,
+            can_read=can_read,
+            can_update=can_update,
+            use_store=use_store,
+            piws_security_model=piws_security_model)
 
         # Parse the file system
         self.genetics = genetics

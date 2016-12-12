@@ -114,8 +114,12 @@ class Questionnaires(Base):
             }
         """
         # Inheritance
-        super(Questionnaires, self).__init__(session, can_read, can_update,
-                                             use_store, piws_security_model)
+        super(Questionnaires, self).__init__(
+            session=session,
+            can_read=can_read,
+            can_update=can_update,
+            use_store=use_store,
+            piws_security_model=piws_security_model)
 
         # Define QuestionnaireRuns insertion strategy
         self.use_openanswer = use_openanswer
