@@ -28,7 +28,7 @@ FREESURFER = [
     "FREESURFER"]
 
 RQL_T1 = ("Any SC Where S is Subject, S code_in_study '{0}', "
-          "S scans SC, SC in_assessment A, A timepoint '{1}', "
+          "S subject_scans SC, SC in_assessment A, A timepoint '{1}', "
           "SC label 'ADNI_MPRAGE'")
 
 

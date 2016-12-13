@@ -133,8 +133,12 @@ class Scans(Base):
             }
         """
         # Inheritance
-        super(Scans, self).__init__(session, can_read, can_update, use_store,
-                                    piws_security_model)
+        super(Scans, self).__init__(
+            session=session,
+            can_read=can_read,
+            can_update=can_update,
+            use_store=use_store,
+            piws_security_model=piws_security_model)
 
         # Class parameters
         self.scans = scans

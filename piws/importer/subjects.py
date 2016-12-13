@@ -64,7 +64,12 @@ class Subjects(Base):
             }
         """
         # Inheritance
-        super(Subjects, self).__init__(session, True, True, use_store, False)
+        super(Subjects, self).__init__(
+            session=session,
+            can_read=True,
+            can_update=True,
+            use_store=use_store,
+            piws_security_model=False)
 
         # Class parameters
         self.subjects = subjects
