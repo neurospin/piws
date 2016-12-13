@@ -144,10 +144,14 @@ class ProcessingRun(AnyEntity):
             return "images/dmri.png"
         elif self.label == "1KG_snps_indels_EUR":
             return "images/gchip.png"
+        elif self.label.lower() == "morphologist":
+            return "images/morphologist.png"
+        elif self.label.lower() == "connectomist":
+            return "images/tracto.png"
         elif self.label.lower() == "freesurfer":
-            return "images/mri.jpg"
+            return "images/freesurfer.png"
         elif self.label in ["SPM preproc EPI_mid", "SPM preproc EPI_faces",
-                           "SPM preproc EPI_stop_signal"]:
+                            "SPM preproc EPI_stop_signal"]:
             return "images/fmri.jpg"
         return "images/processing.png"
 
