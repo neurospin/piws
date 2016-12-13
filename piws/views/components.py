@@ -6,6 +6,9 @@
 # for details.
 ##########################################################################
 
+# System import
+import json
+
 # Cubicweb import
 from cubicweb.web import component
 from cubicweb.predicates import is_instance
@@ -14,8 +17,10 @@ from cubicweb.predicates import anonymous_user
 from cubicweb.predicates import one_line_rset
 from cubicweb.predicates import match_view
 from cubicweb.predicates import match_kwargs
+from cubicweb.predicates import authenticated_user
 from cubicweb.web.views.basecomponents import AnonUserStatusLink
 from cubicweb.web.views.basecomponents import ApplLogo
+from cubicweb.web.views.basecomponents import HeaderComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbEntityVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbLinkToVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbAnyRSetVComponent
@@ -27,6 +32,34 @@ from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
 from cubicweb.web.views.boxes import EditBox
 from cubes.rql_upload.views.components import CWUploadBox
 from cubes.rql_upload.views.utils import load_forms
+
+
+
+##############################################################################
+# Time left
+##############################################################################
+
+class TimeLeft(HeaderComponent):
+    """ Build a time left before session expiration display in the header.
+    """
+    __regid__ = "time-left"
+    __select__ = authenticated_user()
+    context = u"header-right"
+    order = 3
+
+    def render(self, w):
+        hours, remainder = divmod(
+            self._cw.vreg.config.get("cleanup-session-time"), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        timeleft = {
+            "hours": int(hours),
+            "minutes": int(minutes),
+            "seconds": int(seconds),
+            "redirecturl": self._cw.build_url("logout")
+        }
+        w(u'<script>var timeleft = {0}</script>'.format(json.dumps(timeleft)))
+        w(u'Auto logout in: <b id="timeh">00</b>:<b id="timem">00</b>:'
+           '<b id="times">00</b>')
 
 
 ###############################################################################
@@ -237,18 +270,6 @@ class PIWSSubjectStatistics(component.CtxComponent):
         w(u'Subject handedness repartition</a>')
         w(u'</div></div><br/>')
 
-        # Create a view to see the db subject status
-        href = self._cw.build_url(
-            "view", vid="highcharts-relation-summary-view",
-            rql="Any A WHERE A is Assessment", title="Insertion status",
-            relations="subjects", subject_attr="timepoint",
-            object_attr="identifier")
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Insertion status</a>')
-        w(u'</div></div><br/>')
-
 
 class PIWSAssessmentStatistics(component.CtxComponent):
     """ Display a box containing links to statistics on the cw entities.
@@ -389,6 +410,7 @@ def registration_callback(vreg):
     vreg.register_and_replace(
         PIWSAuthenticatedUserStatus, BSAuthenticatedUserStatus)
     vreg.register(RelationBox)
+    vreg.register(TimeLeft)
     vreg.register(PIWSNavigationtBox)
     vreg.register(PIWSSubjectStatistics)
     vreg.register(PIWSAssessmentStatistics)
