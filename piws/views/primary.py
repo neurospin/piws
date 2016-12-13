@@ -117,7 +117,14 @@ class PIWSPrimaryView(PrimaryView):
             # Construct the box label
             if role == "subject":
                 source_etype = entity.cw_etype
-                target_etype = getattr(entity, rschema.type)[0].cw_etype
+                target_etypes = set()
+                entities = getattr(entity, rschema.type)
+                for e in entities:
+                    target_etypes.add(e.cw_etype)
+                if len(target_etypes) == 1:
+                    target_etype = target_etypes.pop()
+                else:
+                    target_etype = " - ".join(list(target_etypes))
             else:
                 source_etype = getattr(entity, "reverse_" + rschema.type)[0].cw_etype
                 target_etype = entity.cw_etype
@@ -125,12 +132,11 @@ class PIWSPrimaryView(PrimaryView):
                      "data-toggle='tooltip' title='{2}'>&#8594;</a> "
                      "{1}".format(source_etype, target_etype, rschema.type))
 
-            # Construct rql depending on entity role
             if role == "subject":
-                rql = "Any X WHERE X is {0}, E eid '{1}', E {2} X".format(
+                rql = "Any X WHERE E eid '{1}', E {2} X".format(
                     target_etype, entity.eid, rschema.type)
             else:
-                rql = "Any X WHERE X is {0}, E eid '{1}', X {2} E".format(
+                rql = "Any X WHERE E eid '{1}', X {2} E".format(
                     target_etype, entity.eid, rschema.type)
 
             # FileSet special case
