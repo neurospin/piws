@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -130,8 +130,6 @@
 <span class="c1">##########################################################################</span>
 
 <span class="c1"># System import</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c1"># Piws import</span>
@@ -161,7 +159,8 @@
 
 <div class="viewcode-block" id="Processings.__init__"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.processings.Processings.html#cubes.piws.importer.processings.Processings.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">center_name</span><span class="p">,</span> <span class="n">processings</span><span class="p">,</span>
                  <span class="n">processing_type</span><span class="p">,</span> <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                 <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+                 <span class="n">data_filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                 <span class="n">check_assessment_with_rql</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the Processings class.</span>
 
 <span class="sd">        Parameters</span>
@@ -190,6 +189,8 @@
 <span class="sd">            if True use an SQLGenObjectStore, otherwise the session.</span>
 <span class="sd">        piws_security_model: bool (optional, default True)</span>
 <span class="sd">            if True apply the PIWS security model.</span>
+<span class="sd">        check_assessment_with_rql: bool (optional, default False)</span>
+<span class="sd">            if True check if the Assessment entity already exists using an rql.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -247,8 +248,12 @@
 <span class="sd">            }</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Inheritance</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Processings</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">can_read</span><span class="p">,</span> <span class="n">can_update</span><span class="p">,</span>
-                                          <span class="n">use_store</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Processings</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+            <span class="n">can_read</span><span class="o">=</span><span class="n">can_read</span><span class="p">,</span>
+            <span class="n">can_update</span><span class="o">=</span><span class="n">can_update</span><span class="p">,</span>
+            <span class="n">use_store</span><span class="o">=</span><span class="n">use_store</span><span class="p">,</span>
+            <span class="n">piws_security_model</span><span class="o">=</span><span class="n">piws_security_model</span><span class="p">)</span>
 
         <span class="c1"># Class parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processings</span> <span class="o">=</span> <span class="n">processings</span>
@@ -256,6 +261,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">project_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">center_name</span> <span class="o">=</span> <span class="n">center_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processing_type</span> <span class="o">=</span> <span class="n">processing_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_assessment_with_rql</span> <span class="o">=</span> <span class="n">check_assessment_with_rql</span>
 
         <span class="c1"># Speed up parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span> <span class="o">=</span> <span class="p">{}</span>
@@ -361,10 +367,29 @@
                 <span class="n">assessment_struct</span> <span class="o">=</span> <span class="n">subj_processings</span><span class="p">[</span><span class="s2">&quot;Assessment&quot;</span><span class="p">]</span>
                 <span class="n">assessment_id</span> <span class="o">=</span> <span class="n">assessment_struct</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">]</span>
 
+                <span class="n">assessment_eid</span> <span class="o">=</span> <span class="bp">None</span>
                 <span class="c1"># Check if this item has already been inserted</span>
                 <span class="k">if</span> <span class="n">assessment_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">:</span>
                     <span class="n">assessment_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span><span class="n">assessment_id</span><span class="p">]</span>
+                <span class="c1"># Check with an rql if this item already exists</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_assessment_with_rql</span><span class="p">:</span>
+                    <span class="n">rql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Any ID Where A is Assessment, &quot;</span>
+                           <span class="s2">&quot;A identifier &#39;{0}&#39;, A eid ID&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                               <span class="n">assessment_id</span><span class="p">))</span>
+                    <span class="n">rset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rql</span><span class="p">)</span>
+                    <span class="n">rows</span> <span class="o">=</span> <span class="n">rset</span><span class="o">.</span><span class="n">rows</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">assessment_eid</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span>
+                            <span class="n">assessment_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">assessment_eid</span>
 
+                <span class="k">if</span> <span class="n">assessment_eid</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="c1"># Create the assessment</span>
+                    <span class="n">assessment_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_assessment</span><span class="p">(</span>
+                        <span class="n">assessment_struct</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">center_eid</span><span class="p">,</span>
+                        <span class="n">groups</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span><span class="n">assessment_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">assessment_eid</span>
+                <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># &gt; add relation with the subject if not already set</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                         <span class="n">subject_eid</span><span class="p">,</span> <span class="s2">&quot;assessments&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
@@ -372,13 +397,6 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
                         <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;subjects&quot;</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span>
                         <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">subjtype</span><span class="o">=</span><span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
-
-                <span class="c1"># Create the assessment</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">assessment_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_assessment</span><span class="p">(</span>
-                        <span class="n">assessment_struct</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">center_eid</span><span class="p">,</span>
-                        <span class="n">groups</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span><span class="n">assessment_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">assessment_eid</span>
 
                 <span class="c1">###############################################################</span>
                 <span class="c1"># Go through the processings - scores</span>
@@ -488,7 +506,7 @@
             <span class="k">for</span> <span class="n">score_struct</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">:</span>
 
                 <span class="c1"># Create the entity</span>
-                <span class="n">score_entity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+                <span class="n">score_entity</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
                     <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                     <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                     <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;ScoreValue&quot;</span><span class="p">,</span>

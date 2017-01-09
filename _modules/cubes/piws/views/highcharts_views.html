@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -225,7 +225,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;chart: {plotBackgroundColor: null, plotBorderWidth: 1, &#39;</span>
                <span class="s1">&#39;plotShadow: false}, &#39;</span><span class="p">)</span>
         <span class="c1"># &gt; configure title</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot;{0}&quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot; &quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
         <span class="c1"># &gt; configure tooltip</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;tooltip: {pointFormat: &quot;{series.name}: &#39;</span>
                <span class="s1">&#39;&lt;b&gt;{point.percentage:.1f}%&lt;/b&gt;&quot; }, &#39;</span><span class="p">)</span>
@@ -244,6 +244,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/script&gt;&#39;</span><span class="p">)</span>
 
         <span class="c1"># Add a container in the body to display the pie chart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;h1&gt;{0}&lt;/h1&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;hr&gt;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div id=&quot;hc_container&quot; style=&quot;min-width: 310px; height: 400px; &#39;</span>
                 <span class="s1">&#39;max-width: 600px; margin: 0 auto&quot;&gt;&lt;/div&gt;&#39;</span><span class="p">)</span></div></div>
 
@@ -391,7 +393,6 @@
             <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="c1"># Get the highcharts string representation of the data</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rset_to_data</span><span class="p">(</span><span class="n">rset</span><span class="p">,</span> <span class="n">relations</span><span class="p">,</span> <span class="n">subject_attr</span><span class="p">,</span> <span class="n">object_attr</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rset_to_data</span><span class="p">(</span><span class="n">rset</span><span class="p">,</span> <span class="n">relations</span><span class="p">,</span> <span class="n">subject_attr</span><span class="p">,</span> <span class="n">object_attr</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
@@ -436,7 +437,7 @@
         <span class="c1"># &gt; configure chart</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;chart: {type: &quot;heatmap&quot;, marginTop: 40, marginBottom: 40}, &#39;</span><span class="p">)</span>
         <span class="c1"># &gt; configure title</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot;{0}&quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot; &quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
         <span class="c1"># &gt; configure axis</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;xAxis: {{categories: {0}}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;yAxis: {{categories: {0}, title: null}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]))</span>
@@ -459,13 +460,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;}); &#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/script&gt;&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Add a container in the body to display the pie chart. Try to estimate</span>
-        <span class="c1"># the cell size</span>
-        <span class="n">width</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">20</span>
+        <span class="c1"># Add a container in the body to display the pie chart. Adapt cell size</span>
+        <span class="c1"># manually</span>
+        <span class="n">ylabels_maxsize</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">eval</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])])</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="p">(</span><span class="n">ylabels_maxsize</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span> <span class="o">/</span> <span class="mf">150.</span> <span class="o">*</span> <span class="mf">100.</span>
         <span class="n">height</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">5</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div style=&quot;max-height:700px; overflow: auto; &#39;</span>
-                <span class="s1">&#39;max-width: 800px;&quot;&gt; &#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div id=&quot;hc_container&quot; style=&quot;width: {0}px; &#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;h1&gt;{0}&lt;/h1&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;hr&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div style=&quot;height:700px; overflow: auto; &#39;</span>
+                <span class="s1">&#39;width: 100%;&quot;&gt; &#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div id=&quot;hc_container&quot; style=&quot;width: {0}%; &#39;</span>
                 <span class="s1">&#39;height: {1}px; margin: 0 auto&quot;&gt;&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span></div></div>
 
@@ -580,7 +584,7 @@
         <span class="c1"># &gt; configure credit</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;credits : {enabled : false}, &#39;</span><span class="p">)</span>
         <span class="c1"># &gt; configure title</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot;{0}&quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;title: {{text: &quot; &quot;}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
         <span class="c1"># &gt; configure axis</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;xAxis: {{categories: {0}}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;yAxis: {{title: {{text: &quot;{0}&quot;}}}}, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y_label</span><span class="p">))</span>
@@ -597,6 +601,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/script&gt;&#39;</span><span class="p">)</span>
 
         <span class="c1"># Add a container in the body to display the pie chart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;h1&gt;{0}&lt;/h1&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;hr&gt;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;div id=&quot;{0}&quot; style=&quot;min-width: 310px; height: 400px; &#39;</span>
                 <span class="s1">&#39;max-width: 600px; margin: 0 auto&quot;&gt;&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span></div></div>
 </pre></div>

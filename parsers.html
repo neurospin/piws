@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -99,7 +99,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -133,7 +133,7 @@ of the unified importation procedures.</p>
 <span id="freesurfer-parsers"></span><h2>FreeSurfer parsers<a class="headerlink" href="#module-cubes.piws.parser.freesurfer" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="cubes.piws.parser.freesurfer.freesurfer">
-<code class="descclassname">cubes.piws.parser.freesurfer.</code><code class="descname">freesurfer</code><span class="sig-paren">(</span><em>fsdirs</em>, <em>study_name</em>, <em>subject_pattern</em>, <em>tool_version</em>, <em>tool_parameters=None</em>, <em>savedir=None</em>, <em>rql_template=&quot;Any SC Where S is Subject</em>, <em>S code_in_study '{0}'</em>, <em>S scans SC</em>, <em>SC in_assessment A</em>, <em>A timepoint '{1}'</em>, <em>SC label 'ADNI_MPRAGE'&quot;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/parser/freesurfer.html#freesurfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.parser.freesurfer.freesurfer" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">cubes.piws.parser.freesurfer.</code><code class="descname">freesurfer</code><span class="sig-paren">(</span><em>fsdirs</em>, <em>study_name</em>, <em>subject_pattern</em>, <em>tool_version</em>, <em>tool_parameters=None</em>, <em>savedir=None</em>, <em>rql_template=&quot;Any SC Where S is Subject</em>, <em>S code_in_study '{0}'</em>, <em>S subject_scans SC</em>, <em>SC in_assessment A</em>, <em>A timepoint '{1}'</em>, <em>SC label 'ADNI_MPRAGE'&quot;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/parser/freesurfer.html#freesurfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.parser.freesurfer.freesurfer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the freesurfer files and create a structure that
 fulfill the processing importer synthax.</p>
 <table class="docutils field-list" frame="void" rules="none">

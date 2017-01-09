@@ -28,6 +28,7 @@ cubes.piws.importer.genetics.Genetics
     .. autosummary::
     
       ~Genetics.assessment_relations
+      ~Genetics.device_relations
       ~Genetics.fileset_relations
       ~Genetics.relations
     

@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -214,7 +214,8 @@
     <span class="n">div_id</span> <span class="o">=</span> <span class="s2">&quot;jhugetable-table&quot;</span>
 
 <div class="viewcode-block" id="JHugetableView.call"><a class="viewcode-back" href="../../../../generated/table/cubes.piws.views.table_views.JHugetableView.html#cubes.piws.views.table_views.JHugetableView.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">records</span><span class="p">,</span> <span class="n">csv_export</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">timepoint</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-             <span class="n">elts_to_sort</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">tooltip_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_scroller</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+             <span class="n">elts_to_sort</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">tooltip_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">use_scroller</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+             <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Method that will create a table with client-side processing only.</span>
 <span class="sd">         It is useful for huge datasets (million of entries).</span>
 
@@ -243,6 +244,9 @@
 <span class="sd">            the piws documentation tooltip name.</span>
 <span class="sd">        use_scroller: bool (optional default False)</span>
 <span class="sd">            if True do not use pagination.</span>
+<span class="sd">        index: int (optional, default 0)</span>
+<span class="sd">            increment this parameter to insert multiple tables in the same</span>
+<span class="sd">            page.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">elts_to_sort</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -321,7 +325,7 @@
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var sort_dir = &#39;asc&#39;;&quot;</span>
 
         <span class="c1"># &gt; create the table</span>
-        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var table = $(&#39;#the_table&#39;).dataTable( { &quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var table = $(&#39;#the_table_{0}&#39;).dataTable( {{ &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;serverSide: true,&quot;</span>
 
         <span class="c1"># &gt; set the ajax callback to fill dynamically the table</span>
@@ -459,7 +463,8 @@
             <span class="c1"># &gt; create the csv string</span>
             <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var csv_headers = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">u&quot;ID&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">labels</span><span class="p">))</span>
-            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var csv_tooltips = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">tooltips</span><span class="p">))</span>
+            <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;var csv_tooltips = {0};&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="n">tooltip</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">tooltip</span> <span class="ow">in</span> <span class="n">tooltips</span><span class="p">]))</span>
             <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;var csv_rows = [csv_headers.join(&#39;;&#39;), &quot;</span>
                      <span class="s2">&quot;csv_tooltips.join(&#39;;&#39;)];&quot;</span><span class="p">)</span>
             <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;for(var i=0, l=all_data.length; i&lt;l; ++i){&quot;</span>
@@ -495,7 +500,7 @@
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;h1&gt;{0}&lt;/h1&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
 
         <span class="c1"># &gt; display the table in the body</span>
-        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;table id=&#39;the_table&#39; class=&#39;cell-border display&#39;&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;table id=&#39;the_table_{0}&#39; class=&#39;cell-border display&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;thead&gt;&lt;/thead&gt;&quot;</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;tbody&gt;&lt;/tbody&gt;&quot;</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/table&gt;&quot;</span>
@@ -555,8 +560,8 @@
 <span class="sd">        labels: list of string (xor rql_labels)</span>
 <span class="sd">            a rql that will be executed to get the columns labels.</span>
 <span class="sd">        ajaxcallback: @func (mandatory)</span>
-<span class="sd">            a function thaty will be called by jtable to create dynamically the</span>
-<span class="sd">            data to display: do not foget the decorator @ajaxfunc.</span>
+<span class="sd">            a function that will be called by jtable to create dynamically the</span>
+<span class="sd">            data to display: do not forget the decorator @ajaxfunc.</span>
 <span class="sd">        csv_export: bool (optional)</span>
 <span class="sd">            if True an export button will be available.</span>
 <span class="sd">        title: string (optional, default &#39;&#39;)</span>
@@ -697,7 +702,7 @@
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&#39;fnServerParams&#39;: function (aoData) {&quot;</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;aoData.push(&quot;</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;{ name: &#39;labels&#39;, &quot;</span>
-        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;value: &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span><span class="o">+</span><span class="n">labels</span><span class="p">))</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;value: &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([</span><span class="s2">&quot;ID&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">labels</span><span class="p">))</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;}, &quot;</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
@@ -1092,7 +1097,6 @@
 
     <span class="k">for</span> <span class="n">ajax</span> <span class="ow">in</span> <span class="p">[</span><span class="n">get_questionnaires_data</span><span class="p">,</span> <span class="n">get_open_answers_data</span><span class="p">]:</span>
         <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ajax</span><span class="p">)</span>
-
 </pre></div>
 
           </div>

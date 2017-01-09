@@ -69,8 +69,8 @@ setup to collect and serve data of two european projects
 (IMAGEN and EUAIMS). Some capabilities of the tool are illustrated in these
 videos:
 
-* `Download tutorial <ftp://ftp.cea.fr/pub/unati/brainomics/euaims/download_euaims_data.mp4>`_
-* `Navigation tutorial <ftp://ftp.cea.fr/pub/unati/brainomics/euaims/navigate_euaims_database.mp4>`_
+* `Download tutorial <ftp://ftp.cea.fr/pub/unati/euaims/download_euaims_data.mp4>`_
+* `Navigation tutorial <ftp://ftp.cea.fr/pub/unati/euaims/navigate_euaims_database.mp4>`_
 
 |
 

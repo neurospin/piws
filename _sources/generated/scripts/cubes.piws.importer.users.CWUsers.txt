@@ -28,6 +28,7 @@ cubes.piws.importer.users.CWUsers
     .. autosummary::
     
       ~CWUsers.assessment_relations
+      ~CWUsers.device_relations
       ~CWUsers.fileset_relations
       ~CWUsers.relations
     

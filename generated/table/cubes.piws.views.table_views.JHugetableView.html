@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -99,7 +99,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -268,7 +268,7 @@
 
 <dl class="method">
 <dt id="cubes.piws.views.table_views.JHugetableView.call">
-<code class="descname">call</code><span class="sig-paren">(</span><em>labels</em>, <em>records</em>, <em>csv_export=True</em>, <em>title=''</em>, <em>timepoint=''</em>, <em>elts_to_sort=None</em>, <em>tooltip_name=None</em>, <em>use_scroller=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#JHugetableView.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.JHugetableView.call" title="Permalink to this definition">¶</a></dt>
+<code class="descname">call</code><span class="sig-paren">(</span><em>labels</em>, <em>records</em>, <em>csv_export=True</em>, <em>title=''</em>, <em>timepoint=''</em>, <em>elts_to_sort=None</em>, <em>tooltip_name=None</em>, <em>use_scroller=False</em>, <em>index=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/views/table_views.html#JHugetableView.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.table_views.JHugetableView.call" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Method that will create a table with client-side processing only.</dt>
 <dd>It is useful for huge datasets (million of entries).</dd>
@@ -311,8 +311,13 @@ contain the corresponding &#8216;ID&#8217; values.</p>
 <div><p>the piws documentation tooltip name.</p>
 </div></blockquote>
 <p><strong>use_scroller: bool (optional default False)</strong> :</p>
-<blockquote class="last">
+<blockquote>
 <div><p>if True do not use pagination.</p>
+</div></blockquote>
+<p><strong>index: int (optional, default 0)</strong> :</p>
+<blockquote class="last">
+<div><p>increment this parameter to insert multiple tables in the same
+page.</p>
 </div></blockquote>
 </td>
 </tr>

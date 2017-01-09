@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -129,7 +129,11 @@
 <span class="c1"># for details.</span>
 <span class="c1">##########################################################################</span>
 
+<span class="c1"># System import</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+
 <span class="c1"># CubicWeb import</span>
+<span class="kn">from</span> <span class="nn">yams</span> <span class="kn">import</span> <span class="n">BASE_GROUPS</span>
 <span class="kn">from</span> <span class="nn">yams.buildobjs</span> <span class="kn">import</span> <span class="n">SubjectRelation</span>
 <span class="kn">from</span> <span class="nn">yams.buildobjs</span> <span class="kn">import</span> <span class="n">RelationDefinition</span>
 <span class="kn">from</span> <span class="nn">cubicweb.schema</span> <span class="kn">import</span> <span class="n">ERQLExpression</span>
@@ -143,10 +147,12 @@
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">Subject</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">FileSet</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">ExternalFile</span>
+<span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">ScoreDefinition</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">ScoreValue</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">ProcessingRun</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">Center</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">Study</span>
+<span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.medicalexp</span> <span class="kn">import</span> <span class="n">Device</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.neuroimaging</span> <span class="kn">import</span> <span class="n">Scan</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.neuroimaging</span> <span class="kn">import</span> <span class="n">DMRIData</span>
 <span class="kn">from</span> <span class="nn">cubes.brainomics2.schema.neuroimaging</span> <span class="kn">import</span> <span class="n">EEGData</span>
@@ -164,8 +170,43 @@
 <span class="kn">from</span> <span class="nn">cubes.rql_download.schema</span> <span class="kn">import</span> <span class="n">CWSearch</span>
 <span class="kn">from</span> <span class="nn">cubes.rql_download.schema</span> <span class="kn">import</span> <span class="n">File</span>
 <span class="kn">from</span> <span class="nn">cubes.rql_upload.schema</span> <span class="kn">import</span> <span class="n">CWUpload</span>
-<span class="kn">from</span> <span class="nn">cubes.rql_upload.schema</span> <span class="kn">import</span> <span class="n">UploadForm</span>
+<span class="kn">from</span> <span class="nn">cubes.rql_upload.schema</span> <span class="kn">import</span> <span class="n">UploadField</span>
 <span class="kn">from</span> <span class="nn">cubes.rql_upload.schema</span> <span class="kn">import</span> <span class="n">UploadFile</span>
+<span class="kn">from</span> <span class="nn">cubes.rql_upload.schema</span> <span class="kn">import</span> <span class="n">UPLOAD_PERMISSIONS</span>
+<span class="kn">from</span> <span class="nn">cubes.rql_upload.schema</span> <span class="kn">import</span> <span class="n">UPLOAD_RELATION_PERMISSIONS</span>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Deal with upload</span>
+<span class="c1">###############################################################################</span>
+
+<span class="c1"># TODO: try to get the configuration directly from cubicweb.cwconfig</span>
+<span class="c1"># For the moment use inspect to get the config from a parent frame.</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()):</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getargvalues</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s2">&quot;config&quot;</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]</span>
+        <span class="k">break</span>
+<span class="k">if</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">instance_name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">appid</span>
+    <span class="n">enable_upload</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;enable-upload&quot;</span><span class="p">]</span>
+    <span class="n">share_group_uploads</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;share_group_uploads&quot;</span><span class="p">]</span>
+    <span class="n">authorized_upload_groups</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;authorized-upload-groups&quot;</span><span class="p">]</span>
+    <span class="n">authorized_upload_groups</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">authorized_upload_groups</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="n">authorized_upload_groups</span><span class="p">:</span>
+        <span class="n">BASE_GROUPS</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
+    <span class="n">authorized_upload_groups</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;managers&quot;</span><span class="p">)</span>
+    <span class="n">UPLOAD_PERMISSIONS</span><span class="p">[</span><span class="s2">&quot;add&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">authorized_upload_groups</span><span class="p">)</span>
+    <span class="n">UPLOAD_RELATION_PERMISSIONS</span><span class="p">[</span><span class="s2">&quot;add&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">UPLOAD_PERMISSIONS</span><span class="p">[</span><span class="s2">&quot;add&quot;</span><span class="p">]</span>
+    <span class="n">UPLOAD_PUBLIC_ENTITIES</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">enable_upload</span><span class="p">:</span>
+        <span class="n">UPLOAD_PUBLIC_ENTITIES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CWUser&quot;</span><span class="p">,</span> <span class="s2">&quot;CWGroup&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">share_group_uploads</span><span class="p">:</span>
+        <span class="n">UPLOAD_PERMISSIONS</span><span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;managers&quot;</span><span class="p">,</span>
+            <span class="n">ERQLExpression</span><span class="p">((</span><span class="s2">&quot;X created_by Y, Y in_group GY, NOT GY name &#39;users&#39;, &quot;</span>
+                            <span class="s2">&quot;U in_group GY&quot;</span><span class="p">)))</span>
 
 
 <span class="c1">###############################################################################</span>
@@ -197,7 +238,7 @@
     <span class="sd">&quot;&quot;&quot; Relate entities to an assessment with this relation in order to apply</span>
 <span class="sd">    the proposed simplified rights management mechanism.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">inlined</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">inlined</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">cardinality</span> <span class="o">=</span> <span class="s2">&quot;1*&quot;</span>
     <span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
     <span class="nb">object</span> <span class="o">=</span> <span class="s2">&quot;Assessment&quot;</span></div>
@@ -209,14 +250,14 @@
 
 <span class="n">RESTRICTED_ENTITIES</span> <span class="o">=</span> <span class="p">[</span>
     <span class="n">Scan</span><span class="p">,</span> <span class="n">FMRIData</span><span class="p">,</span> <span class="n">DMRIData</span><span class="p">,</span> <span class="n">PETData</span><span class="p">,</span> <span class="n">MRIData</span><span class="p">,</span> <span class="n">EEGData</span><span class="p">,</span> <span class="n">ETData</span><span class="p">,</span> <span class="n">FileSet</span><span class="p">,</span>
-    <span class="n">ExternalFile</span><span class="p">,</span> <span class="n">ScoreValue</span><span class="p">,</span> <span class="n">ProcessingRun</span><span class="p">,</span> <span class="n">QuestionnaireRun</span><span class="p">,</span> <span class="n">OpenAnswer</span><span class="p">,</span>
-    <span class="n">GenomicMeasure</span><span class="p">,</span> <span class="n">RestrictedFile</span><span class="p">]</span>
+    <span class="n">ExternalFile</span><span class="p">,</span> <span class="n">ScoreDefinition</span><span class="p">,</span> <span class="n">ScoreValue</span><span class="p">,</span> <span class="n">ProcessingRun</span><span class="p">,</span> <span class="n">QuestionnaireRun</span><span class="p">,</span>
+    <span class="n">OpenAnswer</span><span class="p">,</span> <span class="n">GenomicMeasure</span><span class="p">,</span> <span class="n">RestrictedFile</span><span class="p">]</span>
 
 <span class="n">PUBLIC_ENTITIES</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">Subject</span><span class="p">,</span> <span class="n">Center</span><span class="p">,</span> <span class="n">Study</span><span class="p">,</span> <span class="n">Questionnaire</span><span class="p">,</span> <span class="n">Question</span><span class="p">,</span> <span class="n">Card</span><span class="p">]</span>
+    <span class="n">Device</span><span class="p">,</span> <span class="n">Subject</span><span class="p">,</span> <span class="n">Center</span><span class="p">,</span> <span class="n">Study</span><span class="p">,</span> <span class="n">Questionnaire</span><span class="p">,</span> <span class="n">Question</span><span class="p">,</span> <span class="n">Card</span><span class="p">]</span>
 
 <span class="n">ENTITIES</span> <span class="o">=</span> <span class="n">RESTRICTED_ENTITIES</span> <span class="o">+</span> <span class="n">PUBLIC_ENTITIES</span> <span class="o">+</span> <span class="p">[</span>
-    <span class="n">Assessment</span><span class="p">,</span> <span class="n">CWSearch</span><span class="p">,</span> <span class="n">File</span><span class="p">,</span> <span class="n">CWUpload</span><span class="p">,</span> <span class="n">UploadForm</span><span class="p">,</span> <span class="n">UploadFile</span><span class="p">]</span>
+    <span class="n">Assessment</span><span class="p">,</span> <span class="n">CWSearch</span><span class="p">,</span> <span class="n">File</span><span class="p">,</span> <span class="n">CWUpload</span><span class="p">,</span> <span class="n">UploadField</span><span class="p">,</span> <span class="n">UploadFile</span><span class="p">]</span>
 
 
 <span class="n">PUBLIC_PERMISSIONS</span> <span class="o">=</span> <span class="p">{</span>
@@ -264,12 +305,12 @@
 <span class="p">}</span>
 
 <span class="n">UNTRACK_ENTITIES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CWUser&quot;</span><span class="p">,</span> <span class="s2">&quot;CWGroup&quot;</span><span class="p">,</span> <span class="s2">&quot;CWSource&quot;</span><span class="p">,</span> <span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;Center&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Device&quot;</span><span class="p">,</span> <span class="s2">&quot;Question&quot;</span><span class="p">,</span> <span class="s2">&quot;Questionnaire&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Question&quot;</span><span class="p">,</span> <span class="s2">&quot;Questionnaire&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Device&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;GenomicPlatform&quot;</span><span class="p">,</span> <span class="s2">&quot;Snp&quot;</span><span class="p">,</span> <span class="s2">&quot;CWDataImport&quot;</span><span class="p">,</span> <span class="s2">&quot;CWProperty&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;Workflow&quot;</span><span class="p">,</span> <span class="s2">&quot;State&quot;</span><span class="p">,</span> <span class="s2">&quot;BaseTransition&quot;</span><span class="p">,</span> <span class="s2">&quot;Transition&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Card&quot;</span><span class="p">]</span>
+                    <span class="s2">&quot;Card&quot;</span><span class="p">,</span> <span class="s2">&quot;EmailAddress&quot;</span><span class="p">,</span> <span class="s2">&quot;TrInfo&quot;</span><span class="p">]</span>
 <span class="n">UNTRACK_ENTITIES</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;CWSearch&quot;</span><span class="p">,</span> <span class="s2">&quot;File&quot;</span><span class="p">,</span> <span class="s2">&quot;CWUpload&quot;</span><span class="p">,</span>
-                     <span class="s2">&quot;UploadForm&quot;</span><span class="p">,</span> <span class="s2">&quot;UploadFile&quot;</span><span class="p">]</span>
+                     <span class="s2">&quot;UploadField&quot;</span><span class="p">,</span> <span class="s2">&quot;UploadFile&quot;</span><span class="p">]</span>
 
 
 <span class="c1"># Set known entities permissions</span>
@@ -293,11 +334,10 @@
             <span class="n">schema</span><span class="o">.</span><span class="n">del_relation_def</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
 
     <span class="c1"># Set strict default permissions for unknown entities</span>
-    <span class="n">entity_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">__name__</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ENTITIES</span><span class="p">]</span>
+    <span class="n">entity_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">__name__</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ENTITIES</span><span class="p">]</span> <span class="o">+</span> <span class="n">UPLOAD_PUBLIC_ENTITIES</span>
     <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">entity</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">entity_names</span><span class="p">:</span>
             <span class="n">entity</span><span class="o">.</span><span class="n">permissions</span> <span class="o">=</span> <span class="n">MANAGER_PERMISSIONS</span>
-
 </pre></div>
 
           </div>

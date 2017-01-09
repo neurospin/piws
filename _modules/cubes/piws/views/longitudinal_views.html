@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -204,11 +204,11 @@
                     <span class="n">questionnaires</span><span class="p">[</span><span class="n">q_entity</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="n">entity</span><span class="o">.</span><span class="n">question</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">][</span>
                         <span class="n">timepoint</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">value</span>
 
-
-
-
         <span class="c1"># Create a selector</span>
-        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;h1&gt;Select a question to follow:&lt;/h1&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&lt;h1&gt;Longitudinal scores follow up&lt;/h1&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;hr&gt;&quot;</span>
+        <span class="n">html</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;&lt;h2&gt;Please select a measure to follow accross the &quot;</span>
+                 <span class="s2">&quot;timepoints in this list:&lt;/h2&gt;&quot;</span><span class="p">)</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;select class=&#39;selectpicker&#39; data-live-search=&#39;true&#39;&gt;&quot;</span>
         <span class="n">html</span> <span class="o">+=</span> <span class="s2">&quot;&lt;option&gt;&lt;/option&gt;&quot;</span>
         <span class="k">for</span> <span class="n">questionnaire_name</span><span class="p">,</span> <span class="n">questions</span> <span class="ow">in</span> <span class="n">questionnaires</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
@@ -219,6 +219,8 @@
                 <span class="c1"># Get the plot data</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">question_item</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
 
                 <span class="c1"># Check if we are dealing with numbers</span>
                 <span class="n">control_value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -241,6 +243,8 @@
                 <span class="c1"># Get the plot data</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">question_item</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
 
                 <span class="c1"># Check if we are dealing with numbers</span>
                 <span class="n">control_value</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>

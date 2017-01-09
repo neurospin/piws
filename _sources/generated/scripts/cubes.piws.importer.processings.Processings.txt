@@ -28,6 +28,7 @@ cubes.piws.importer.processings.Processings
     .. autosummary::
     
       ~Processings.assessment_relations
+      ~Processings.device_relations
       ~Processings.fileset_relations
       ~Processings.relations
     

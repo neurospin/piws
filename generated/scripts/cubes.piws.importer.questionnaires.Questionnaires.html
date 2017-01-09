@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -99,7 +99,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -254,10 +254,13 @@ else using the File entity.</p>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">assessment_relations</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">fileset_relations</span></code></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">device_relations</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.questionnaires.Questionnaires.relations" title="cubes.piws.importer.questionnaires.Questionnaires.relations"><code class="xref py py-obj docutils literal"><span class="pre">relations</span></code></a></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fileset_relations</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.importer.questionnaires.Questionnaires.relations" title="cubes.piws.importer.questionnaires.Questionnaires.relations"><code class="xref py py-obj docutils literal"><span class="pre">relations</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -294,7 +297,7 @@ been inserted in the database.</p>
 
 <dl class="attribute">
 <dt id="cubes.piws.importer.questionnaires.Questionnaires.relations">
-<code class="descname">relations</code><em class="property"> = [('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('Question', 'questionnaire', 'Questionnaire'), ('Questionnaire', 'questions', 'Question'), ('QuestionnaireRun', 'questionnaire', 'Questionnaire'), ('Questionnaire', 'questionnaire_questionnaire_runs', 'QuestionnaireRun'), ('Assessment', 'questionnaire_runs', 'QuestionnaireRun'), ('QuestionnaireRun', 'in_assessment', 'Assessment'), ('QuestionnaireRun', 'study', 'Study'), ('Study', 'study_questionnaire_runs', 'QuestionnaireRun'), ('QuestionnaireRun', 'subject', 'Subject'), ('Subject', 'subject_questionnaire_runs', 'QuestionnaireRun'), ('OpenAnswer', 'question', 'Question'), ('Question', 'question_open_answers', 'OpenAnswer'), ('OpenAnswer', 'questionnaire_run', 'QuestionnaireRun'), ('QuestionnaireRun', 'open_answers', 'OpenAnswer'), ('OpenAnswer', 'in_assessment', 'Assessment'), ('QuestionnaireRun', 'file', 'RestrictedFile')]</em><a class="headerlink" href="#cubes.piws.importer.questionnaires.Questionnaires.relations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">relations</code><em class="property"> = [('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('Assessment', 'device', 'Device'), ('Device', 'device_assessments', 'Assessment'), ('Question', 'questionnaire', 'Questionnaire'), ('Questionnaire', 'questions', 'Question'), ('QuestionnaireRun', 'questionnaire', 'Questionnaire'), ('Questionnaire', 'questionnaire_questionnaire_runs', 'QuestionnaireRun'), ('Assessment', 'questionnaire_runs', 'QuestionnaireRun'), ('QuestionnaireRun', 'in_assessment', 'Assessment'), ('QuestionnaireRun', 'study', 'Study'), ('Study', 'study_questionnaire_runs', 'QuestionnaireRun'), ('QuestionnaireRun', 'subject', 'Subject'), ('Subject', 'subject_questionnaire_runs', 'QuestionnaireRun'), ('OpenAnswer', 'question', 'Question'), ('Question', 'question_open_answers', 'OpenAnswer'), ('OpenAnswer', 'questionnaire_run', 'QuestionnaireRun'), ('QuestionnaireRun', 'open_answers', 'OpenAnswer'), ('OpenAnswer', 'in_assessment', 'Assessment'), ('QuestionnaireRun', 'file', 'RestrictedFile')]</em><a class="headerlink" href="#cubes.piws.importer.questionnaires.Questionnaires.relations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

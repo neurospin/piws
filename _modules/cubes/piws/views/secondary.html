@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -224,6 +224,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">entity_desc</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
         <span class="c1"># &gt; third element: the see more button</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;div class=&#39;col-md-4&#39;&gt;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;div class=&#39;secondary-buttons&#39;&gt;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;button class=&#39;btn btn-danger&#39; type=&#39;button&#39; &quot;</span>
                <span class="s2">&quot;style=&#39;margin-top:8px&#39; data-toggle=&#39;collapse&#39; &quot;</span>
                <span class="s2">&quot;data-target=&#39;#info-{0}&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
@@ -249,6 +251,8 @@
                    <span class="s2">&quot;type=&#39;button&#39; style=&#39;margin-top:8px&#39;&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tiphref</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&amp;#9735;&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/a&gt;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;/div&gt;&quot;</span><span class="p">)</span>
 
         <span class="c1"># Close row item</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s1">u&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
@@ -351,9 +355,9 @@
         <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Acquisition summary&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;a href=&#39;{0}&#39;&gt;status&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
         <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
             <span class="s2">&quot;view&quot;</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="s2">&quot;highcharts-relation-summary-view&quot;</span><span class="p">,</span>
-            <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;Any A WHERE S eid &#39;{0}&#39;, S assessments A&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">eid</span><span class="p">),</span>
-            <span class="n">relations</span><span class="o">=</span><span class="s2">&quot;processing_runs&quot;</span><span class="p">,</span> <span class="n">subject_attr</span><span class="o">=</span><span class="s2">&quot;timepoint&quot;</span><span class="p">,</span>
-            <span class="n">object_attr</span><span class="o">=</span><span class="s2">&quot;tool&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Processing status: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">rql</span><span class="o">=</span><span class="s2">&quot;Any S WHERE S eid &#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">eid</span><span class="p">),</span>
+            <span class="n">relations</span><span class="o">=</span><span class="s2">&quot;subject_processing_runs&quot;</span><span class="p">,</span> <span class="n">subject_attr</span><span class="o">=</span><span class="s2">&quot;code_in_study&quot;</span><span class="p">,</span>
+            <span class="n">object_attr</span><span class="o">=</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Processing status: {0}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">entity</span><span class="o">.</span><span class="n">code_in_study</span><span class="p">))</span>
         <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Processing summary&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;a href=&#39;{0}&#39;&gt;status&lt;/a&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">href</span><span class="p">)</span>
         <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="o">.</span><span class="n">build_url</span><span class="p">(</span>
@@ -438,7 +442,6 @@
         <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Related questionnaire&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">questionnaire</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;incontext&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">desc</span></div></div>
-
 
 
 <span class="c1">###############################################################################</span>
@@ -563,8 +566,9 @@
         <span class="sd">&quot;&quot;&quot; Generate a dictionary with the CWUpload description.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Tile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">title</span>
         <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Form&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">form_name</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">status</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">error</span>
         <span class="k">return</span> <span class="n">desc</span></div></div>
 
 
@@ -600,9 +604,26 @@
         <span class="sd">&quot;&quot;&quot; Generate a dictionary with the UploadFile description.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Title&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">title</span>
         <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_extension</span>
         <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;SHA1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_sha1hex</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># UploadField</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextUploadFieldView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextUploadFieldView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextUploadFieldView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; UploadField secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;UploadField&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextUploadFieldView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextUploadFieldView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the UploadField description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">desc</span></div></div>
 
 
@@ -626,6 +647,24 @@
 
 
 <span class="c1">###############################################################################</span>
+<span class="c1"># Device</span>
+<span class="c1">###############################################################################</span>
+
+<div class="viewcode-block" id="OutOfContextDeviceView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextDeviceView">[docs]</a><span class="k">class</span> <span class="nc">OutOfContextDeviceView</span><span class="p">(</span><span class="n">BaseOutOfContextView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Device secondary rendering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">EntityView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Device&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OutOfContextDeviceView.entity_description"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.secondary.OutOfContextDeviceView.entity_description">[docs]</a>    <span class="k">def</span> <span class="nf">entity_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate a dictionary with the Device description.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Manufacturer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">manufacturer</span>
+        <span class="n">desc</span><span class="p">[</span><span class="s2">&quot;Model&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">model</span>
+        <span class="k">return</span> <span class="n">desc</span></div></div>
+
+
+<span class="c1">###############################################################################</span>
 <span class="c1"># Register views</span>
 <span class="c1">###############################################################################</span>
 
@@ -641,9 +680,9 @@
                   <span class="n">OutOfContextExternalFileView</span><span class="p">,</span> <span class="n">OutOfContextCWSearchView</span><span class="p">,</span>
                   <span class="n">OutOfContextFileView</span><span class="p">,</span> <span class="n">OutOfContextUploadFileView</span><span class="p">,</span>
                   <span class="n">OutOfContextRestrictedFileView</span><span class="p">,</span>
-                  <span class="n">OutOfContextGenomicMeasureView</span><span class="p">]:</span>
+                  <span class="n">OutOfContextGenomicMeasureView</span><span class="p">,</span> <span class="n">OutOfContextDeviceView</span><span class="p">,</span>
+                  <span class="n">OutOfContextUploadFieldView</span><span class="p">]:</span>
         <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">klass</span><span class="p">)</span></div>
-
 </pre></div>
 
           </div>

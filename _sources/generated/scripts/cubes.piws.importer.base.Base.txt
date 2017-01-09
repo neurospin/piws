@@ -28,6 +28,7 @@ cubes.piws.importer.base.Base
     .. autosummary::
     
       ~Base.assessment_relations
+      ~Base.device_relations
       ~Base.fileset_relations
       ~Base.relations
     

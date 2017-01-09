@@ -28,6 +28,7 @@ cubes.piws.importer.groups.CWGroups
     .. autosummary::
     
       ~CWGroups.assessment_relations
+      ~CWGroups.device_relations
       ~CWGroups.fileset_relations
       ~CWGroups.relations
     

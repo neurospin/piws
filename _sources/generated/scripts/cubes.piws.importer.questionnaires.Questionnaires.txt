@@ -28,6 +28,7 @@ cubes.piws.importer.questionnaires.Questionnaires
     .. autosummary::
     
       ~Questionnaires.assessment_relations
+      ~Questionnaires.device_relations
       ~Questionnaires.fileset_relations
       ~Questionnaires.relations
     

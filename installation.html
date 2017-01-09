@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -108,16 +108,13 @@
       <!-- toc tree -->
       <ul>
 <li><a class="reference internal" href="#">Installing <cite>PIWS</cite></a><ul>
-<li><a class="reference internal" href="#install-piws">Installing piws</a><ul>
-<li><a class="reference internal" href="#installing-the-current-version">Installing the current version</a><ul>
-<li><a class="reference internal" href="#install-from-github">Install from <em>github</em></a></li>
+<li><a class="reference internal" href="#installing-a-dss-from-scratch">Installing a DSS from scratch</a><ul>
+<li><a class="reference internal" href="#setup-environment">Setup environment</a></li>
+<li><a class="reference internal" href="#instance-creation-and-configuration">Instance creation and configuration</a></li>
+<li><a class="reference internal" href="#generating-and-importing-a-toy-dataset">Generating and importing a toy dataset</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#make-sure-the-cube-is-in-cubicweb-s-path">Make sure the cube is in CubicWeb&#8217;s path</a></li>
-<li><a class="reference internal" href="#create-an-instance-of-the-cube">Create an instance of the cube</a></li>
-<li><a class="reference internal" href="#change-configuration">Change configuration</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#running-a-virtual-machine">Running a virtual machine</a></li>
 </ul>
 </li>
 </ul>
@@ -135,59 +132,243 @@
             
   <div class="section" id="installing-piws">
 <span id="install-guid"></span><h1>Installing <cite>PIWS</cite><a class="headerlink" href="#installing-piws" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial will walk you through the process of installing the Population
-Imaging Web Service (PIWS) cube:</p>
-<blockquote>
-<div><ul class="simple">
-<li><strong>piws</strong>: a cube that can only be instanciated
-if <a class="reference external" href="https://docs.cubicweb.org/admin/setup">cubicweb is installed</a>.</li>
+<p>This tutorial walk you through the process of installing a data sharing
+service (DSS) based on the the Population Imaging Web Service (PIWS) cube.
+Two strategies are proposed: create a demonstrator DSS by
+<a class="reference internal" href="#install-scratch"><span>installing the CW environement from scratch</span></a> or by
+<a class="reference internal" href="#install-vm"><span>running a virtual machine</span></a>. For testing, we recommand the
+second option.</p>
+<div class="section" id="installing-a-dss-from-scratch">
+<span id="install-scratch"></span><h2>Installing a DSS from scratch<a class="headerlink" href="#installing-a-dss-from-scratch" title="Permalink to this headline">¶</a></h2>
+<p>The CW environment needs to be installed in order to setup the demonstrator.
+This tutorial was tested with CW 3.20.9. Please visit the
+<a class="reference external" href="https://docs.cubicweb.org">CW website</a> for a
+detailed procedure on how to install CW.
+In addition &#8216;postgresql&#8217; and &#8216;postgresql-plpython&#8217; must be installed. Notice
+that a PostgreSQL account is required:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">whoami</span>
+<span class="go">me</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sudo</span> <span class="o">-</span><span class="n">u</span> <span class="n">postgres</span> <span class="n">createuser</span> <span class="o">-</span><span class="n">P</span> <span class="o">-</span><span class="n">s</span> <span class="n">me</span>
+</pre></div>
+</div>
+<p>Then configure CW by changing the resource mode and augmenting the default
+search path for cubes:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>&gt;&gt;&gt; mkdir -p $HOME/cw/cubes
+&gt;&gt;&gt; mkdir -p $HOME/cw/repositories
+&gt;&gt;&gt; export CW_MODE=user
+&gt;&gt;&gt; export CW_CUBES_PATH=$HOME/cw/cubes
+&gt;&gt;&gt; export PYTHONPATH=$PYTHONPATH:$HOME/cw
+</pre></div>
+</div>
+<div class="section" id="setup-environment">
+<h3>Setup environment<a class="headerlink" href="#setup-environment" title="Permalink to this headline">¶</a></h3>
+<p>A CW instance is made of several base cubes. A helper package is proposed to
+import the required PIWS cube dependencies. First install the helper package:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">piws_setup</span>
+</pre></div>
+</div>
+<p>Since the helper package has been installed using the user scheme in the
+previous section, you may have to update the path to executable files:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>&gt;&gt;&gt; export PATH=$PATH:$HOME/.local/bin
+</pre></div>
+</div>
+<p>If you have root privileges on the machine, you may use a standard
+installation (without the &#8211;user option) to avoid the previous step.
+Then execute the setup script:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>&gt;&gt;&gt; piws_setup -d $HOME/cw/repositories
+</pre></div>
+</div>
+<p>Select the appropriate configuration depending on the installed version of CW.
+This information can be accessed by typing:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cubicweb</span><span class="o">-</span><span class="n">ctl</span> <span class="nb">list</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="instance-creation-and-configuration">
+<h3>Instance creation and configuration<a class="headerlink" href="#instance-creation-and-configuration" title="Permalink to this headline">¶</a></h3>
+<p>Create a PIWS instance named &#8216;toy_instance&#8217;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cubicweb</span><span class="o">-</span><span class="n">ctl</span> <span class="n">create</span> <span class="n">piws</span> <span class="n">toy_instance</span>
+</pre></div>
+</div>
+<p>To be compliant with following documentation, we recommend to authorize
+anonymous access to the database.
+Four specific items must be configured when a DSS is created: the WEB, PIWS,
+RQL_UPLOAD and RQL_DOWNLOAD features.
+They can be configured during the instance creation or by editing the instance
+associated &#8216;all-in-one.conf&#8217; configuration file (see its location below).
+The different basic configurations are reviewed in the following paragraphs:</p>
+<ul>
+<li><p class="first"><strong>Web configuration:</strong> In order to access the CW instance through a web
+browser, a port has to be defined. It is also possible to control the
+maximum length of an HTTP/HTTPS request. This latter option will be critical
+when large files are uploaded with the proposed system. To set up the previous
+options, modify the configuration file
+&#8216;$HOME/etc/cubicweb.d/toy_instance/all-in-one.conf&#8217; as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>[WEB]
+
+# http server port number (default to 8080)
+port=8080
+
+# maximum length of HTTP request. Default to 100 MB.
+max-post-length=200MB
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>PIWS configuration:</strong> In the instance configuration file located here
+&#8216;$HOME/etc/cubicweb.d/toy_instance/all-in-one.conf&#8217;, set the following options
+to activate the login/logout:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">PIWS</span><span class="p">]</span>
+
+<span class="c1"># Show or not the user status link on the website.</span>
+<span class="n">show_user_status</span><span class="o">=</span><span class="n">yes</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Upload configuration:</strong> In the instance configuration file located here
+&#8216;$HOME/etc/cubicweb.d/toy_instance/all-in-one.conf&#8217;, set the following options
+to activate the upload functionality:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>[RQL_UPLOAD]
+
+# base directory in which files are uploaded.
+upload_directory=/tmp/upload
+
+# JSON file describing the different upload entities.
+upload_structure_json=/home/me/cw/repositories/rql_upload/demo/demo.json
+
+[PIWS]
+
+# If true enable the upload, ie relax security on user and group entities.
+enable-upload=yes
+
+# A list of groups that will be able to upload data.
+authorized-upload-groups=uploaders
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>Twisted server (recommended):</strong> In the instance configuration file located at
+&#8216;$HOME/etc/cubicweb.d/toy_instance/all-in-one.conf&#8217;, set the following options
+to activate the Twisted sFTP server that will expose the content of each CW
+search:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>[RQL_DOWNLOAD]
+
+# specifies expiration delay of CWSearch (in days)
+default_expiration_delay=1
+
+# base directory in which files are stored (this option is given to the ftp
+# server and fuse processes)
+basedir=/tmp
+
+# if true cubicweb will start automatically sftp server (you need to set
+# properly the configuration file: see the documentation)
+start_sftp_server=yes
+</pre></div>
+</div>
+<p>A configuration file defining where the Twisted server is listening and which
+CW instance(s) is(are) concerned must be set at location
+&#8216;$HOME/.config/rsetftp&#8217;:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>[rsetftp]
+
+cubicweb-instance=toy_instance
+port=9191
+private-key=/home/me/.ssh/id_rsa
+public-key=/home/me/.ssh/id_rsa.pub
+unix-username=me
+</pre></div>
+</div>
+<p>The authentication key can be generated with the &#8216;ssh-keygen&#8217; command.</p>
+</li>
+<li><p class="first"><strong>Fuse virtual folders:</strong> In the instance configuration file located here
+&#8216;$HOME/etc/cubicweb.d/toy_instance/all-in-one.conf&#8217;, set the following options
+to activate the Fuse virtual folders creation from CW searches:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>[RQL_DOWNLOAD]
+
+# specifies expiration delay of CWSearch (in days)
+default_expiration_delay=1
+
+# base directory in which files are stored (this option is given to the ftp
+# server and fuse processes)
+basedir=/tmp
+
+# base directory in which fuse will mount the user virtual directories
+mountdir=/home/me/tmp/fuse
+
+# if true cubicweb will start automatically a fuse mount per user when the user
+# has some CWSearch entities.
+start_user_fuse=yes
+</pre></div>
+</div>
+<p>In the &#8216;mountdir&#8217;, a specific hierarchy for each CW user (here &#8216;me&#8217;) has to be
+defined:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>- - me
+    |
+     - - toy_instance
+</pre></div>
+</div>
+</li>
 </ul>
-</div></blockquote>
-<div class="section" id="install-piws">
-<span id="id1"></span><h2>Installing piws<a class="headerlink" href="#install-piws" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="installing-the-current-version">
-<h3>Installing the current version<a class="headerlink" href="#installing-the-current-version" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="install-from-github">
-<h4>Install from <em>github</em><a class="headerlink" href="#install-from-github" title="Permalink to this headline">¶</a></h4>
-<p><strong>Clone the project</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>cd $CLONEDIR
-git clone https://github.com/neurospin/piws.git
+</div>
+<div class="section" id="generating-and-importing-a-toy-dataset">
+<h3>Generating and importing a toy dataset<a class="headerlink" href="#generating-and-importing-a-toy-dataset" title="Permalink to this headline">¶</a></h3>
+<p>A script is proposed in the PIWS cube to create a toy dataset (use the proposed
+default values):</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>&gt;&gt;&gt; python $HOME/cw/repositories/piws/piws/demo/generate_toy_dataset.py
+Enter a valid folder [default: /tmp]:
+Enter the number of subject for the demo [10, 50]: 10
 </pre></div>
 </div>
-<p><strong>Update your CW_CUBES_PATH</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>export CW_CUBES_PATH=$CLONE_DIR/piws:$CW_CUBES_PATH
+<p>The demonstration dataset has been generated in the &#8216;/tmp/demo&#8217; folder. This
+latter can be imported in the previously created &#8216;toy_instance&#8217; instance using
+PIWS uniformed insertion procedure:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>&gt;&gt;&gt; python $HOME/cw/repositories/piws/piws/demo/import_toy_dataset.py
+Enter the instance name [default: toy_instance]:
+Enter where are the demo data [default: /tmp/demo]:
+Enter the &#39;toy_instance&#39; login [default: anon]:
+Enter the &#39;toy_instance&#39; password [default: anon]:
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="make-sure-the-cube-is-in-cubicweb-s-path">
-<h3>Make sure the cube is in CubicWeb&#8217;s path<a class="headerlink" href="#make-sure-the-cube-is-in-cubicweb-s-path" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python"><div class="highlight"><pre><span></span>cubicweb-ctl list
-</pre></div>
-</div>
-</div>
-<div class="section" id="create-an-instance-of-the-cube">
-<h3>Create an instance of the cube<a class="headerlink" href="#create-an-instance-of-the-cube" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python"><div class="highlight"><pre><span></span>cubicweb-ctl create piws toy_instance
-</pre></div>
-</div>
-<p>You can then run the instance in debug mode:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>cubicweb-ctl start -D toy_instance
-</pre></div>
-</div>
-<p>The last line of the prompt will indicate which url the
-instance can be reached by:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>(cubicweb.twisted) INFO: instance started on http://url:port/
+<p>The CW instance can be started and access via a web browser at the configured
+port (here the default 8080 port):</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cubicweb</span><span class="o">-</span><span class="n">ctl</span> <span class="n">start</span> <span class="n">toy_instance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">firefox</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8080</span><span class="o">/</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="change-configuration">
-<h3>Change configuration<a class="headerlink" href="#change-configuration" title="Permalink to this headline">¶</a></h3>
-<p>The configuration file is stored on your system:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">...</span> <span class="n">etc</span><span class="o">/</span><span class="n">cubicweb</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">toy_instance</span><span class="o">/</span><span class="nb">all</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">one</span><span class="o">.</span><span class="n">conf</span>
-</pre></div>
 </div>
-</div>
+<div class="section" id="running-a-virtual-machine">
+<span id="install-vm"></span><h2>Running a virtual machine<a class="headerlink" href="#running-a-virtual-machine" title="Permalink to this headline">¶</a></h2>
+<p>We propose an Oracle VirtualBox VDI image <a class="reference external" href="ftp://ftp.cea.fr/pub/unati/nsap/virtualbox/PIWS-DEMO.vdi">here</a> with a PIWS DSS installed on
+an Ubuntu 16.04LTS operating system.
+This DSS highlights the collect and publication functionalities of the proposed
+framework.
+When the VM is started, a service start automatically the DSS.
+Launch Firefox using the left launch bar to access the DSS login prompt.
+Three users have been registered in the system with different access rights:</p>
+<ul>
+<li><dl class="first docutils">
+<dt>login: user1 - password: user1:</dt>
+<dd><p class="first last">have an access to the timepoint V0 data and can upload some data to the
+system.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>login: user2 - password: user2:</dt>
+<dd><p class="first last">have an access to the timepoint V1 data.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>login: user3 - password: user3</dt>
+<dd><p class="first last">have an access to all the data.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The saved searches can be downloaded using FileZilla.
+Launch FileZilla using the left launch bar.
+On the FileZilla main frame, select the top left toolbar icon: &#8216;Open the Site
+Manager&#8217;.
+Three sites have been registered to access the searches of each user.</p>
 </div>
 </div>
 

@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -165,7 +165,9 @@
         <span class="p">(</span><span class="s2">&quot;Center&quot;</span><span class="p">,</span> <span class="s2">&quot;assessments&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;Center&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;CWGroup&quot;</span><span class="p">,</span> <span class="s2">&quot;can_read&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;CWGroup&quot;</span><span class="p">,</span> <span class="s2">&quot;can_update&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="s2">&quot;CWGroup&quot;</span><span class="p">,</span> <span class="s2">&quot;can_update&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="s2">&quot;Device&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Device&quot;</span><span class="p">,</span> <span class="s2">&quot;device_assessments&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
     <span class="p">]</span>
     <span class="n">fileset_relations</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">[</span><span class="s2">&quot;ParentEntitiyName&quot;</span><span class="p">,</span> <span class="s2">&quot;filesets&quot;</span><span class="p">,</span> <span class="s2">&quot;FileSet&quot;</span><span class="p">],</span>
@@ -174,6 +176,10 @@
         <span class="p">(</span><span class="s2">&quot;ExternalFile&quot;</span><span class="p">,</span> <span class="s2">&quot;fileset&quot;</span><span class="p">,</span> <span class="s2">&quot;FileSet&quot;</span><span class="p">),</span>
         <span class="p">(</span><span class="s2">&quot;ExternalFile&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)</span>
     <span class="p">]</span>
+    <span class="n">device_relations</span> <span class="o">=</span> <span class="n">fileset_relations</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;Device&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;Center&quot;</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">device_relations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Device&quot;</span>
 
 <div class="viewcode-block" id="Base.__init__"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">can_read</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">can_update</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                  <span class="n">use_store</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">piws_security_model</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
@@ -204,7 +210,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">relate_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add_relation</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">create_entity_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">create_entity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">piws_security_model</span> <span class="o">=</span> <span class="n">piws_security_model</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">piws_security_model</span> <span class="o">=</span> <span class="n">piws_security_model</span>
+
+        <span class="c1"># Speed up parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_devices</span> <span class="o">=</span> <span class="p">{}</span></div>
 
     <span class="c1">###########################################################################</span>
     <span class="c1">#   Public Methods</span>
@@ -408,6 +418,38 @@
             <span class="n">is_created</span> <span class="o">=</span> <span class="bp">True</span>
 
         <span class="k">return</span> <span class="n">entity</span><span class="p">,</span> <span class="n">is_created</span></div>
+
+<div class="viewcode-block" id="Base._create_device"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base._create_device">[docs]</a>    <span class="k">def</span> <span class="nf">_create_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_struct</span><span class="p">,</span> <span class="n">center_eid</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+                       <span class="n">center_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a device and its associated relations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create the device</span>
+        <span class="n">device_id</span> <span class="o">=</span> <span class="n">device_struct</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">]</span>
+        <span class="n">extfiles</span> <span class="o">=</span> <span class="n">device_struct</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ExternalResources&quot;</span><span class="p">)</span>
+        <span class="n">device_entity</span><span class="p">,</span> <span class="n">is_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_unique_entity</span><span class="p">(</span>
+            <span class="n">rql</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Any X Where X is Device, X identifier &quot;</span>
+                 <span class="s2">&quot;&#39;{0}&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device_id</span><span class="p">)),</span>
+            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;Device&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">device_struct</span><span class="p">)</span>
+        <span class="n">device_eid</span> <span class="o">=</span> <span class="n">device_entity</span><span class="o">.</span><span class="n">eid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_devices</span><span class="p">[</span><span class="n">device_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_eid</span>
+
+        <span class="c1"># If we just create the device, relate the entity</span>
+        <span class="k">if</span> <span class="n">is_created</span><span class="p">:</span>
+            <span class="c1"># &gt; add relation with the center</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                <span class="n">device_eid</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">center_eid</span><span class="p">,</span> <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="c1"># &gt; add relation with the exam cards</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extfiles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">fset_struct</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">,</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">u&quot;{0} exam {1} card&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">center_name</span><span class="p">,</span> <span class="n">device_struct</span><span class="p">[</span><span class="s2">&quot;manufacturer&quot;</span><span class="p">])}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_import_file_set</span><span class="p">(</span><span class="n">fset_struct</span><span class="p">,</span> <span class="n">extfiles</span><span class="p">,</span> <span class="n">device_eid</span><span class="p">,</span>
+                                      <span class="n">assessment_eid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">device_eid</span> </div>
 
 <div class="viewcode-block" id="Base._create_assessment"><a class="viewcode-back" href="../../../../generated/scripts/cubes.piws.importer.base.Base.html#cubes.piws.importer.base.Base._create_assessment">[docs]</a>    <span class="k">def</span> <span class="nf">_create_assessment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">assessment_struct</span><span class="p">,</span> <span class="n">subject_eids</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span>
                            <span class="n">center_eid</span><span class="p">,</span> <span class="n">groups</span><span class="p">):</span>

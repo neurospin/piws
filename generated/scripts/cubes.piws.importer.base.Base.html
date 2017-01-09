@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -99,7 +99,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -212,10 +212,13 @@
 <tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.assessment_relations" title="cubes.piws.importer.base.Base.assessment_relations"><code class="xref py py-obj docutils literal"><span class="pre">assessment_relations</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.fileset_relations" title="cubes.piws.importer.base.Base.fileset_relations"><code class="xref py py-obj docutils literal"><span class="pre">fileset_relations</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.device_relations" title="cubes.piws.importer.base.Base.device_relations"><code class="xref py py-obj docutils literal"><span class="pre">device_relations</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.relations" title="cubes.piws.importer.base.Base.relations"><code class="xref py py-obj docutils literal"><span class="pre">relations</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.fileset_relations" title="cubes.piws.importer.base.Base.fileset_relations"><code class="xref py py-obj docutils literal"><span class="pre">fileset_relations</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.importer.base.Base.relations" title="cubes.piws.importer.base.Base.relations"><code class="xref py py-obj docutils literal"><span class="pre">relations</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -239,6 +242,12 @@ item and the concatenation of the two first items.</li>
 with the corresponding groups.</li>
 </ul>
 </div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="cubes.piws.importer.base.Base._create_device">
+<code class="descname">_create_device</code><span class="sig-paren">(</span><em>device_struct</em>, <em>center_eid</em>, <em>assessment_eid</em>, <em>center_name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/base.html#Base._create_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.base.Base._create_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a device and its associated relations.</p>
 </dd></dl>
 
 <dl class="method">
@@ -376,7 +385,7 @@ if &#8216;check_unicity&#8217; is True.</p>
 
 <dl class="attribute">
 <dt id="cubes.piws.importer.base.Base.assessment_relations">
-<code class="descname">assessment_relations</code><em class="property"> = [('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment')]</em><a class="headerlink" href="#cubes.piws.importer.base.Base.assessment_relations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">assessment_relations</code><em class="property"> = [('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('Assessment', 'device', 'Device'), ('Device', 'device_assessments', 'Assessment')]</em><a class="headerlink" href="#cubes.piws.importer.base.Base.assessment_relations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -384,6 +393,11 @@ if &#8216;check_unicity&#8217; is True.</p>
 <code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cubes/piws/importer/base.html#Base.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.importer.base.Base.cleanup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to cleanup temporary items and to commit changes.</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="cubes.piws.importer.base.Base.device_relations">
+<code class="descname">device_relations</code><em class="property"> = [['Scan', 'filesets', 'FileSet'], ('FileSet', 'in_assessment', 'Assessment'), ('FileSet', 'external_files', 'ExternalFile'), ('ExternalFile', 'fileset', 'FileSet'), ('ExternalFile', 'in_assessment', 'Assessment'), ('Device', 'center', 'Center')]</em><a class="headerlink" href="#cubes.piws.importer.base.Base.device_relations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="cubes.piws.importer.base.Base.fileset_relations">

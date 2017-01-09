@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -99,7 +99,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -182,11 +182,11 @@ Assessment) that contains the entities parameter decriptions.</p>
 <p class="rubric">Notes</p>
 <p>Here is an axemple of the definiton of the &#8216;scans&#8217; parameter:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">scans</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;subjects1&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">{</span>
+    <span class="s2">&quot;subjects1&quot;</span><span class="p">:</span> <span class="p">[{</span>
         <span class="s2">&quot;Assessment&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;age_of_subject&quot;</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">u&quot;toy_V1_subject1&quot;</span><span class="p">,</span>
             <span class="s2">&quot;timepoint&quot;</span><span class="p">:</span> <span class="s2">u&quot;V1&quot;</span><span class="p">},</span>
-        <span class="s2">&quot;Scans&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">{</span>
+        <span class="s2">&quot;Scans&quot;</span><span class="p">:</span> <span class="p">[{</span>
             <span class="s2">&quot;TypeData&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s2">&quot;fov_y&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;fov_x&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;voxel_res_y&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
                 <span class="s2">&quot;voxel_res_x&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s2">&quot;voxel_res_z&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
@@ -204,8 +204,33 @@ Assessment) that contains the entities parameter decriptions.</p>
                 <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">u&quot;toy_V1_subject1_t1&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">u&quot;MRIData&quot;</span><span class="p">}</span>
         <span class="p">}]</span>
-    <span class="p">}</span> <span class="p">]</span>
+    <span class="p">}]</span>
 <span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that an optional filed can be set in order to specify the
+scan acquisition device.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>scans = {
+    &quot;subjects1&quot;: [ {
+        &quot;Assessment&quot;: {
+        ..
+        },
+        &quot;Device&quot;: {
+            &quot;ExternalResources&quot;: [{
+                &quot;absolute_path&quot;: true, 
+                &quot;filepath&quot;: &quot;/my/path/examcard.pdf&quot;, 
+                &quot;identifier&quot;: &quot;EXAM_CARD_TIEMPOINT_CENTER&quot;, 
+                &quot;name&quot;: &quot;EXAM_CARD_TIEMPOINT_CENTER&quot;
+            }], 
+            &quot;identifier&quot;: &quot;31be53546754dc5f04ab2d9db6bed7cf&quot;, 
+            &quot;manufacturer&quot;: &quot;SIEMENS&quot;, 
+            &quot;model&quot;: &quot;Verio&quot;, 
+            &quot;serialnum&quot;: &quot;xxxxx&quot;, 
+            &quot;software_version&quot;: &quot;xxxxxx&quot;
+        }
+        ...
+    }]
+}
 </pre></div>
 </div>
 </dd></dl>
@@ -241,16 +266,19 @@ Assessment) that contains the entities parameter decriptions.</p>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">assessment_relations</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.importer.scans.Scans.dtype" title="cubes.piws.importer.scans.Scans.dtype"><code class="xref py py-obj docutils literal"><span class="pre">dtype</span></code></a></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">device_relations</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fileset_relations</span></code></td>
+<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.scans.Scans.dtype" title="cubes.piws.importer.scans.Scans.dtype"><code class="xref py py-obj docutils literal"><span class="pre">dtype</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.importer.scans.Scans.has_data" title="cubes.piws.importer.scans.Scans.has_data"><code class="xref py py-obj docutils literal"><span class="pre">has_data</span></code></a></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">fileset_relations</span></code></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.scans.Scans.relations" title="cubes.piws.importer.scans.Scans.relations"><code class="xref py py-obj docutils literal"><span class="pre">relations</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#cubes.piws.importer.scans.Scans.has_data" title="cubes.piws.importer.scans.Scans.has_data"><code class="xref py py-obj docutils literal"><span class="pre">has_data</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#cubes.piws.importer.scans.Scans.relations" title="cubes.piws.importer.scans.Scans.relations"><code class="xref py py-obj docutils literal"><span class="pre">relations</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -304,7 +332,7 @@ been inserted in the database.</p>
 
 <dl class="attribute">
 <dt id="cubes.piws.importer.scans.Scans.relations">
-<code class="descname">relations</code><em class="property"> = [['Scan', 'filesets', 'FileSet'], ('FileSet', 'in_assessment', 'Assessment'), ('FileSet', 'external_files', 'ExternalFile'), ('ExternalFile', 'fileset', 'FileSet'), ('ExternalFile', 'in_assessment', 'Assessment'), ('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('Scan', 'study', 'Study'), ('Study', 'study_scans', 'Scan'), ('Scan', 'subject', 'Subject'), ('Subject', 'subject_scans', 'Scan'), ('Assessment', 'scans', 'Scan'), ('Scan', 'in_assessment', 'Assessment'), ('Scan', 'score_values', 'ScoreValue'), ('ScoreValue', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'MRIData'), ('MRIData', 'scan', 'PETData'), ('MRIData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'DMRIData'), ('DMRIData', 'scan', 'PETData'), ('DMRIData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'FMRIData'), ('FMRIData', 'scan', 'PETData'), ('FMRIData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'EEGData'), ('EEGData', 'scan', 'PETData'), ('EEGData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'ETData'), ('ETData', 'scan', 'PETData'), ('ETData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'PETData'), ('PETData', 'scan', 'PETData'), ('PETData', 'in_assessment', 'Assessment')]</em><a class="headerlink" href="#cubes.piws.importer.scans.Scans.relations" title="Permalink to this definition">¶</a></dt>
+<code class="descname">relations</code><em class="property"> = [['Scan', 'filesets', 'FileSet'], ('FileSet', 'in_assessment', 'Assessment'), ('FileSet', 'external_files', 'ExternalFile'), ('ExternalFile', 'fileset', 'FileSet'), ('ExternalFile', 'in_assessment', 'Assessment'), ('Assessment', 'study', 'Study'), ('Study', 'assessments', 'Assessment'), ('Subject', 'assessments', 'Assessment'), ('Assessment', 'subjects', 'Subject'), ('Center', 'assessments', 'Assessment'), ('Assessment', 'center', 'Center'), ('CWGroup', 'can_read', 'Assessment'), ('CWGroup', 'can_update', 'Assessment'), ('Assessment', 'device', 'Device'), ('Device', 'device_assessments', 'Assessment'), ['Scan', 'filesets', 'FileSet'], ('FileSet', 'in_assessment', 'Assessment'), ('FileSet', 'external_files', 'ExternalFile'), ('ExternalFile', 'fileset', 'FileSet'), ('ExternalFile', 'in_assessment', 'Assessment'), ('Device', 'center', 'Center'), ('Scan', 'study', 'Study'), ('Study', 'study_scans', 'Scan'), ('Scan', 'subject', 'Subject'), ('Subject', 'subject_scans', 'Scan'), ('Assessment', 'scans', 'Scan'), ('Scan', 'in_assessment', 'Assessment'), ('Scan', 'score_values', 'ScoreValue'), ('Assessment', 'device', 'Device'), ('Device', 'device_assessments', 'Assessment'), ('ScoreValue', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'MRIData'), ('MRIData', 'scan', 'PETData'), ('MRIData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'DMRIData'), ('DMRIData', 'scan', 'PETData'), ('DMRIData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'FMRIData'), ('FMRIData', 'scan', 'PETData'), ('FMRIData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'EEGData'), ('EEGData', 'scan', 'PETData'), ('EEGData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'ETData'), ('ETData', 'scan', 'PETData'), ('ETData', 'in_assessment', 'Assessment'), ('Scan', 'has_data', 'PETData'), ('PETData', 'scan', 'PETData'), ('PETData', 'in_assessment', 'Assessment')]</em><a class="headerlink" href="#cubes.piws.importer.scans.Scans.relations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

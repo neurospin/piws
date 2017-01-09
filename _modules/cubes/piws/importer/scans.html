@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -152,7 +152,8 @@
             <span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">&quot;scan&quot;</span><span class="p">,</span> <span class="s2">&quot;PETData&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)])</span>
     <span class="n">relations</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">Base</span><span class="o">.</span><span class="n">fileset_relations</span> <span class="o">+</span> <span class="n">Base</span><span class="o">.</span><span class="n">assessment_relations</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">Base</span><span class="o">.</span><span class="n">fileset_relations</span> <span class="o">+</span> <span class="n">Base</span><span class="o">.</span><span class="n">assessment_relations</span> <span class="o">+</span> 
+        <span class="n">Base</span><span class="o">.</span><span class="n">device_relations</span> <span class="o">+</span> <span class="p">[</span>
             <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="s2">&quot;Study&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Study&quot;</span><span class="p">,</span> <span class="s2">&quot;study_scans&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Subject&quot;</span><span class="p">),</span>
@@ -160,6 +161,8 @@
             <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;scans&quot;</span><span class="p">,</span> <span class="s2">&quot;Scan&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;score_values&quot;</span><span class="p">,</span> <span class="s2">&quot;ScoreValue&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="s2">&quot;Device&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Device&quot;</span><span class="p">,</span> <span class="s2">&quot;device_assessments&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">),</span>
             <span class="p">(</span><span class="s2">&quot;ScoreValue&quot;</span><span class="p">,</span> <span class="s2">&quot;in_assessment&quot;</span><span class="p">,</span> <span class="s2">&quot;Assessment&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="n">has_data</span>
     <span class="p">)</span>
     <span class="n">relations</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Scan&quot;</span>
@@ -200,11 +203,11 @@
 <span class="sd">        ::</span>
 
 <span class="sd">            scans = {</span>
-<span class="sd">                &quot;subjects1&quot;: [ {</span>
+<span class="sd">                &quot;subjects1&quot;: [{</span>
 <span class="sd">                    &quot;Assessment&quot;: {</span>
 <span class="sd">                        &quot;age_of_subject&quot;: 27, &quot;identifier&quot;: u&quot;toy_V1_subject1&quot;,</span>
 <span class="sd">                        &quot;timepoint&quot;: u&quot;V1&quot;},</span>
-<span class="sd">                    &quot;Scans&quot;: [ {</span>
+<span class="sd">                    &quot;Scans&quot;: [{</span>
 <span class="sd">                        &quot;TypeData&quot;: {</span>
 <span class="sd">                            &quot;fov_y&quot;: 0, &quot;fov_x&quot;: 0, &quot;voxel_res_y&quot;: 2.0,</span>
 <span class="sd">                            &quot;voxel_res_x&quot;: 2.0, &quot;voxel_res_z&quot;: 2.0,</span>
@@ -222,12 +225,43 @@
 <span class="sd">                            &quot;identifier&quot;: u&quot;toy_V1_subject1_t1&quot;,</span>
 <span class="sd">                            &quot;type&quot;: u&quot;MRIData&quot;}</span>
 <span class="sd">                    }]</span>
-<span class="sd">                } ]</span>
+<span class="sd">                }]</span>
+<span class="sd">            }</span>
+
+<span class="sd">        Note that an optional filed can be set in order to specify the</span>
+<span class="sd">        scan acquisition device.</span>
+
+<span class="sd">        ::</span>
+
+<span class="sd">            scans = {</span>
+<span class="sd">                &quot;subjects1&quot;: [ {</span>
+<span class="sd">                    &quot;Assessment&quot;: {</span>
+<span class="sd">                    ..</span>
+<span class="sd">                    },</span>
+<span class="sd">                    &quot;Device&quot;: {</span>
+<span class="sd">                        &quot;ExternalResources&quot;: [{</span>
+<span class="sd">                            &quot;absolute_path&quot;: true, </span>
+<span class="sd">                            &quot;filepath&quot;: &quot;/my/path/examcard.pdf&quot;, </span>
+<span class="sd">                            &quot;identifier&quot;: &quot;EXAM_CARD_TIEMPOINT_CENTER&quot;, </span>
+<span class="sd">                            &quot;name&quot;: &quot;EXAM_CARD_TIEMPOINT_CENTER&quot;</span>
+<span class="sd">                        }], </span>
+<span class="sd">                        &quot;identifier&quot;: &quot;31be53546754dc5f04ab2d9db6bed7cf&quot;, </span>
+<span class="sd">                        &quot;manufacturer&quot;: &quot;SIEMENS&quot;, </span>
+<span class="sd">                        &quot;model&quot;: &quot;Verio&quot;, </span>
+<span class="sd">                        &quot;serialnum&quot;: &quot;xxxxx&quot;, </span>
+<span class="sd">                        &quot;software_version&quot;: &quot;xxxxxx&quot;</span>
+<span class="sd">                    }</span>
+<span class="sd">                    ...</span>
+<span class="sd">                }]</span>
 <span class="sd">            }</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Inheritance</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Scans</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">can_read</span><span class="p">,</span> <span class="n">can_update</span><span class="p">,</span> <span class="n">use_store</span><span class="p">,</span>
-                                    <span class="n">piws_security_model</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Scans</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
+            <span class="n">can_read</span><span class="o">=</span><span class="n">can_read</span><span class="p">,</span>
+            <span class="n">can_update</span><span class="o">=</span><span class="n">can_update</span><span class="p">,</span>
+            <span class="n">use_store</span><span class="o">=</span><span class="n">use_store</span><span class="p">,</span>
+            <span class="n">piws_security_model</span><span class="o">=</span><span class="n">piws_security_model</span><span class="p">)</span>
 
         <span class="c1"># Class parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="n">scans</span>
@@ -236,7 +270,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">center_name</span> <span class="o">=</span> <span class="n">center_name</span>
 
         <span class="c1"># Speed up parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inserted_scans</span> <span class="o">=</span> <span class="p">{}</span></div>
 
     <span class="c1">###########################################################################</span>
@@ -346,17 +379,53 @@
                 <span class="c1"># Get the assessment identifier</span>
                 <span class="n">assessment_struct</span> <span class="o">=</span> <span class="n">subj_scans</span><span class="p">[</span><span class="s2">&quot;Assessment&quot;</span><span class="p">]</span>
                 <span class="n">assessment_id</span> <span class="o">=</span> <span class="n">assessment_struct</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">]</span>
+                <span class="n">assessment_exists</span> <span class="o">=</span> <span class="bp">False</span>
 
                 <span class="c1"># Check if this item has already been inserted</span>
                 <span class="k">if</span> <span class="n">assessment_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">:</span>
                     <span class="n">assessment_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span><span class="n">assessment_id</span><span class="p">]</span>
+                    <span class="n">assessment_exists</span> <span class="o">=</span> <span class="bp">True</span>
 
                 <span class="c1"># Create the assessment</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">assessment_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_assessment</span><span class="p">(</span>
                         <span class="n">assessment_struct</span><span class="p">,</span> <span class="n">subject_eid</span><span class="p">,</span> <span class="n">study_eid</span><span class="p">,</span> <span class="n">center_eid</span><span class="p">,</span>
                         <span class="n">groups</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">inserted_assessments</span><span class="p">[</span><span class="n">assessment_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">assessment_eid</span>
+
+                <span class="c1">###############################################################</span>
+                <span class="c1"># Create the device if possible</span>
+                <span class="c1">###############################################################</span>
+
+                <span class="c1"># If the device is specified</span>
+                <span class="n">device_struct</span> <span class="o">=</span> <span class="n">subj_scans</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Device&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">device_struct</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+
+                    <span class="c1"># Get the device identifier</span>
+                    <span class="n">device_id</span> <span class="o">=</span> <span class="n">device_struct</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">]</span>
+
+                    <span class="c1"># Check if this item has already been inserted</span>
+                    <span class="k">if</span> <span class="n">device_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_devices</span><span class="p">:</span>
+                        <span class="n">device_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inserted_devices</span><span class="p">[</span><span class="n">device_id</span><span class="p">]</span>
+                        
+
+                    <span class="c1"># Create the device</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">device_eid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_device</span><span class="p">(</span>
+                            <span class="n">device_struct</span><span class="p">,</span> <span class="n">center_eid</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">center_name</span><span class="p">)</span>
+
+                    <span class="c1"># Add relation with the assessment</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">assessment_exists</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                            <span class="n">assessment_eid</span><span class="p">,</span> <span class="s2">&quot;device&quot;</span><span class="p">,</span> <span class="n">device_eid</span><span class="p">,</span>
+                            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_set_unique_relation</span><span class="p">(</span>
+                            <span class="n">device_eid</span><span class="p">,</span> <span class="s2">&quot;device_assessments&quot;</span><span class="p">,</span> <span class="n">assessment_eid</span><span class="p">,</span>
+                            <span class="n">check_unicity</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                
+                <span class="c1"># Otherwise device eid is None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">device_eid</span> <span class="o">=</span> <span class="bp">None</span>
 
                 <span class="c1">###############################################################</span>
                 <span class="c1"># Go through the scans - processings - scores</span>

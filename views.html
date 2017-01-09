@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -99,7 +99,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -286,6 +286,25 @@ paging, sorting, ....).</p>
 <em class="property">class </em><code class="descclassname">cubes.piws.views.primary.</code><code class="descname">PIWSFilePrimaryView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/primary.html#PIWSFilePrimaryView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.primary.PIWSFilePrimaryView" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specific view for File entities where binary content has to be
 displayed.</p>
+<dl class="method">
+<dt id="cubes.piws.views.primary.PIWSFilePrimaryView.render_entity_attributes">
+<code class="descname">render_entity_attributes</code><span class="sig-paren">(</span><em>entity</em>, <em>separator=';'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/primary.html#PIWSFilePrimaryView.render_entity_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.primary.PIWSFilePrimaryView.render_entity_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders all attributes and relations in the &#8216;attributes&#8217; section.
+Unwrap binary field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>separator: str (optional, default &#8216;;&#8217;)</strong> :</p>
+<blockquote class="last">
+<div><p>the CSV cell separator.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -372,6 +391,18 @@ each returned entity is displayed with a secondary view.</p>
 <dt id="cubes.piws.views.secondary.OutOfContextCWUploadView.entity_description">
 <code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextCWUploadView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextCWUploadView.entity_description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a dictionary with the CWUpload description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextDeviceView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextDeviceView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextDeviceView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextDeviceView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Device secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextDeviceView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextDeviceView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextDeviceView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the Device description.</p>
 </dd></dl>
 
 </dd></dl>
@@ -528,6 +559,18 @@ each returned entity is displayed with a secondary view.</p>
 <dt id="cubes.piws.views.secondary.OutOfContextSubjectView.entity_description">
 <code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextSubjectView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextSubjectView.entity_description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a dictionary with the Subject description.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cubes.piws.views.secondary.OutOfContextUploadFieldView">
+<em class="property">class </em><code class="descclassname">cubes.piws.views.secondary.</code><code class="descname">OutOfContextUploadFieldView</code><span class="sig-paren">(</span><em>req=None</em>, <em>rset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextUploadFieldView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextUploadFieldView" title="Permalink to this definition">¶</a></dt>
+<dd><p>UploadField secondary rendering.</p>
+<dl class="method">
+<dt id="cubes.piws.views.secondary.OutOfContextUploadFieldView.entity_description">
+<code class="descname">entity_description</code><span class="sig-paren">(</span><em>entity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cubes/piws/views/secondary.html#OutOfContextUploadFieldView.entity_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cubes.piws.views.secondary.OutOfContextUploadFieldView.entity_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary with the UploadField description.</p>
 </dd></dl>
 
 </dd></dl>

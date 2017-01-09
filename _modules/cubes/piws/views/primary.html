@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -145,7 +145,7 @@
 <span class="c1"># Add summary method for 3.20 compatibility.</span>
 <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">):</span>
     <span class="k">return</span> <span class="s2">u&quot;&quot;</span>
-<span class="n">PrimaryView</span><span class="o">.</span><span class="n">summary</span><span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">PrimaryView</span><span class="p">)</span>
+<span class="n">PrimaryView</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">PrimaryView</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="PIWSPrimaryView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.primary.PIWSPrimaryView">[docs]</a><span class="k">class</span> <span class="nc">PIWSPrimaryView</span><span class="p">(</span><span class="n">PrimaryView</span><span class="p">):</span>
@@ -176,7 +176,7 @@
         <span class="n">display_attributes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">rschema</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">role</span><span class="p">,</span> <span class="n">dispctrl</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_section_def</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s2">&quot;attributes&quot;</span><span class="p">):</span>
             <span class="n">vid</span> <span class="o">=</span> <span class="n">dispctrl</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vid&quot;</span><span class="p">,</span> <span class="s2">&quot;reledit&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">((</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_related_section</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rschema</span><span class="o">.</span><span class="n">final</span><span class="p">)</span> <span class="ow">or</span> 
+            <span class="k">if</span> <span class="p">((</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_related_section</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">rschema</span><span class="o">.</span><span class="n">final</span><span class="p">)</span> <span class="ow">or</span>
                     <span class="n">rschema</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;identifier&quot;</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">rschema</span><span class="o">.</span><span class="n">final</span><span class="p">:</span>
@@ -240,7 +240,14 @@
             <span class="c1"># Construct the box label</span>
             <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;subject&quot;</span><span class="p">:</span>
                 <span class="n">source_etype</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">cw_etype</span>
-                <span class="n">target_etype</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">rschema</span><span class="o">.</span><span class="n">type</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cw_etype</span>
+                <span class="n">target_etypes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                <span class="n">entities</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="n">rschema</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
+                    <span class="n">target_etypes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">cw_etype</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_etypes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">target_etype</span> <span class="o">=</span> <span class="n">target_etypes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">target_etype</span> <span class="o">=</span> <span class="s2">&quot; - &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">target_etypes</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">source_etype</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s2">&quot;reverse_&quot;</span> <span class="o">+</span> <span class="n">rschema</span><span class="o">.</span><span class="n">type</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cw_etype</span>
                 <span class="n">target_etype</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">cw_etype</span>
@@ -248,14 +255,12 @@
                      <span class="s2">&quot;data-toggle=&#39;tooltip&#39; title=&#39;{2}&#39;&gt;&amp;#8594;&lt;/a&gt; &quot;</span>
                      <span class="s2">&quot;{1}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source_etype</span><span class="p">,</span> <span class="n">target_etype</span><span class="p">,</span> <span class="n">rschema</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
 
-            <span class="c1"># Construct rql depending on entity role</span>
             <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;subject&quot;</span><span class="p">:</span>
-                <span class="n">rql</span> <span class="o">=</span> <span class="s2">&quot;Any X WHERE X is {0}, E eid &#39;{1}&#39;, E {2} X&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">rql</span> <span class="o">=</span> <span class="s2">&quot;Any X WHERE E eid &#39;{1}&#39;, E {2} X&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">target_etype</span><span class="p">,</span> <span class="n">entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="n">rschema</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">rql</span> <span class="o">=</span> <span class="s2">&quot;Any X WHERE X is {0}, E eid &#39;{1}&#39;, X {2} E&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">rql</span> <span class="o">=</span> <span class="s2">&quot;Any X WHERE E eid &#39;{1}&#39;, X {2} E&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">target_etype</span><span class="p">,</span> <span class="n">entity</span><span class="o">.</span><span class="n">eid</span><span class="p">,</span> <span class="n">rschema</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-
 
             <span class="c1"># FileSet special case</span>
             <span class="k">if</span> <span class="n">target_etype</span> <span class="o">==</span> <span class="s2">&quot;FileSet&quot;</span> <span class="ow">and</span> <span class="n">entity</span><span class="o">.</span><span class="n">cw_etype</span> <span class="o">!=</span> <span class="s2">&quot;ExternalFile&quot;</span><span class="p">:</span>
@@ -290,14 +295,23 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sideboxes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">get_order</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="PIWSFilePrimaryView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.primary.PIWSFilePrimaryView">[docs]</a><span class="k">class</span> <span class="nc">PIWSFilePrimaryView</span><span class="p">(</span><span class="n">PrimaryView</span><span class="p">):</span>
+<div class="viewcode-block" id="PIWSFilePrimaryView"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.primary.PIWSFilePrimaryView">[docs]</a><span class="k">class</span> <span class="nc">PIWSFilePrimaryView</span><span class="p">(</span><span class="n">PIWSPrimaryView</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Specific view for File entities where binary content has to be</span>
 <span class="sd">    displayed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">__select__</span> <span class="o">=</span> <span class="n">PrimaryView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;File&quot;</span><span class="p">)</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">PIWSPrimaryView</span><span class="o">.</span><span class="n">__select__</span> <span class="o">&amp;</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;File&quot;</span><span class="p">,</span> <span class="s2">&quot;RestrictedFile&quot;</span><span class="p">)</span>
+    <span class="n">allowed_relations</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rset</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
-        <span class="n">entity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cw_rset</span><span class="o">.</span><span class="n">get_entity</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<div class="viewcode-block" id="PIWSFilePrimaryView.render_entity_attributes"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.primary.PIWSFilePrimaryView.render_entity_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">render_entity_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Renders all attributes and relations in the &#39;attributes&#39; section.</span>
+<span class="sd">        Unwrap binary field.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        separator: str (optional, default &#39;;&#39;)</span>
+<span class="sd">            the CSV cell separator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PIWSPrimaryView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">render_entity_attributes</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
         <span class="k">if</span> <span class="s2">&quot;json&quot;</span> <span class="ow">in</span> <span class="n">entity</span><span class="o">.</span><span class="n">data_format</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
             <span class="n">data</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
@@ -313,12 +327,11 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">wview</span><span class="p">(</span><span class="s2">&quot;jtable-hugetable-clientside&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="s2">&quot;null&quot;</span><span class="p">,</span>
                        <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">records</span><span class="o">=</span><span class="n">records</span><span class="p">,</span> <span class="n">csv_export</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                       <span class="n">title</span><span class="o">=</span><span class="n">entity</span><span class="o">.</span><span class="n">data_format</span><span class="p">,</span> <span class="n">elts_to_sort</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
+                       <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">elts_to_sort</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="s2">u&quot;&lt;h1&gt;{0}&lt;/h1&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">data_format</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;br/&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;nbsp&quot;</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;br/&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;nbsp&quot;</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="registration_callback"><a class="viewcode-back" href="../../../../views.html#cubes.piws.views.primary.registration_callback">[docs]</a><span class="k">def</span> <span class="nf">registration_callback</span><span class="p">(</span><span class="n">vreg</span><span class="p">):</span>

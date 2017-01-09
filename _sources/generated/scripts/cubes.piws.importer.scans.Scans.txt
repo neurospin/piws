@@ -28,6 +28,7 @@ cubes.piws.importer.scans.Scans
     .. autosummary::
     
       ~Scans.assessment_relations
+      ~Scans.device_relations
       ~Scans.dtype
       ~Scans.fileset_relations
       ~Scans.has_data

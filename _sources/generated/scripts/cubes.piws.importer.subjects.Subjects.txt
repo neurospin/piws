@@ -28,6 +28,7 @@ cubes.piws.importer.subjects.Subjects
     .. autosummary::
     
       ~Subjects.assessment_relations
+      ~Subjects.device_relations
       ~Subjects.fileset_relations
       ~Subjects.relations
     

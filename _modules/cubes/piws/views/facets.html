@@ -20,7 +20,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.0.0',
+        VERSION:     '2.2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -100,7 +100,7 @@
 
         <!-- info setup -->
           <p class="doc-version">
-           This documentation is for Population Imaging Web Service Cube <strong>version 2.0.0</strong>
+           This documentation is for Population Imaging Web Service Cube <strong>version 2.2.0</strong>
           </p>
         <p class="citing">
           If you use the software, please do not hesitate to 
@@ -171,6 +171,20 @@
 <span class="c1"># FACETS</span>
 <span class="c1">############################################################################</span>
 
+
+<div class="viewcode-block" id="StatusFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.StatusFacet">[docs]</a><span class="k">class</span> <span class="nc">StatusFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter on status.</span>
+
+<span class="sd">    This filter is applied on &#39;CWUpload&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;status-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;CWUpload&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X status S&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;S&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Status&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="TimepointFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.TimepointFacet">[docs]</a><span class="k">class</span> <span class="nc">TimepointFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Filter on timepoint (form the &#39;Assessment&#39; entity).</span>
 
@@ -232,12 +246,24 @@
 <div class="viewcode-block" id="SubjectFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.SubjectFacet">[docs]</a><span class="k">class</span> <span class="nc">SubjectFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Filter on subject code (from the &#39;Subject&#39; entity).</span>
 
-<span class="sd">    This filter can is applied on &#39;Scan&#39;, &#39;QuestionnaireRun&#39; and</span>
-<span class="sd">    &#39;GenomicMeasure&#39; entities.</span>
+<span class="sd">    This filter can is applied on &#39;Scan&#39;, &#39;QuestionnaireRun&#39; entities.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;subject-facet&quot;</span>
-    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">,</span> <span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">)</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X in_assessment A&quot;</span><span class="p">,</span> <span class="s2">&quot;A subjects S&quot;</span><span class="p">,</span> <span class="s2">&quot;S code_in_study C&quot;</span><span class="p">]</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;QuestionnaireRun&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X subject S&quot;</span><span class="p">,</span> <span class="s2">&quot;S code_in_study C&quot;</span><span class="p">]</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;C&quot;</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Subjects&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubjectsFacet"><a class="viewcode-back" href="../../../../features.html#cubes.piws.views.facets.SubjectsFacet">[docs]</a><span class="k">class</span> <span class="nc">SubjectsFacet</span><span class="p">(</span><span class="n">facet</span><span class="o">.</span><span class="n">RQLPathFacet</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Filter on subject code (from the &#39;Subject&#39; entity).</span>
+
+<span class="sd">    This filter can is applied on &#39;GenomicMeasure&#39; entity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">__regid__</span> <span class="o">=</span> <span class="s2">&quot;subjects-facet&quot;</span>
+    <span class="n">__select__</span> <span class="o">=</span> <span class="n">is_instance</span><span class="p">(</span><span class="s2">&quot;GenomicMeasure&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;X subjects S&quot;</span><span class="p">,</span> <span class="s2">&quot;S code_in_study C&quot;</span><span class="p">]</span>
     <span class="n">order</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">filter_variable</span> <span class="o">=</span> <span class="s2">&quot;C&quot;</span>
     <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Subjects&quot;</span><span class="p">)</span></div>
@@ -346,9 +372,8 @@
                    <span class="n">SubjectFacet</span><span class="p">,</span> <span class="n">ScanFieldFacet</span><span class="p">,</span> <span class="n">ScanFormatFacet</span><span class="p">,</span>
                    <span class="n">AssessmentTimepointFacet</span><span class="p">,</span> <span class="n">AssessmentSubjectFacet</span><span class="p">,</span>
                    <span class="n">ProcessingRunNameFacet</span><span class="p">,</span> <span class="n">LabelFacet</span><span class="p">,</span> <span class="n">NameFacet</span><span class="p">,</span>
-                   <span class="n">ProcessingRunSubjectFacet</span><span class="p">]:</span>
+                   <span class="n">ProcessingRunSubjectFacet</span><span class="p">,</span> <span class="n">StatusFacet</span><span class="p">]:</span>
         <span class="n">vreg</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">eclass</span><span class="p">)</span>
-
 </pre></div>
 
           </div>
