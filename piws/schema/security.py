@@ -187,6 +187,7 @@ UNTRACK_ENTITIES = ["CWUser", "CWGroup", "CWSource", "Study", "Center",
                     "Card", "EmailAddress", "TrInfo"]
 UNTRACK_ENTITIES += ["Assessment", "CWSearch", "File", "CWUpload",
                      "UploadField", "UploadFile"]
+UNTRACK_ENTITIES += ["Snp", "CpG", "Gene", "Chromosome"]
 
 
 # Set known entities permissions
