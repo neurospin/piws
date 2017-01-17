@@ -70,7 +70,7 @@ class PIWSCardView(PrimaryView):
             "database-image": self._cw.data_url(
                 "images/dreamstime_s_32994616.jpg"),
             "nsap-image": self._cw.data_url("images/nsap.png"),
-            "nsap-url": "https://bioproj.extra.cea.fr/redmine/projects/nsap",
+            "nsap-url": "http://i2bm.cea.fr/drf/i2bm/Pages/NeuroSpin/UNATI/nsap.aspx",
         }
 
         # Update card links links to content
