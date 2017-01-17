@@ -340,6 +340,31 @@ class OutOfContextQuestionnaireView(BaseOutOfContextView):
 
 
 ###############################################################################
+# Chromosome
+###############################################################################
+
+class OutOfContextChromosomeView(BaseOutOfContextView):
+    """ Chromosome secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("Chromosome")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the Chromosome description.
+        """
+        desc = {}
+        href = self._cw.build_url(
+            "view", rql="Any G WHERE G is Gene, G gene_chromosome C, "
+                        "C eid '{0}'".format(entity.eid))
+        desc["Genes"] = "<a href='{0}'>link to associated genes</a>".format(
+            href)
+        href = self._cw.build_url(
+            "view", rql="Any G WHERE G is CpG, G cpg_chromosome C, "
+                        "C eid '{0}'".format(entity.eid))
+        desc["Cpgs"] = "<a href='{0}'>link to associated CpGs</a>".format(href)
+        return desc
+
+
+###############################################################################
 # Snp
 ###############################################################################
 
@@ -353,6 +378,45 @@ class OutOfContextSnpView(BaseOutOfContextView):
         """
         desc = {}
         desc["Identifier"] = entity.rs_id
+        desc["Start position"] = entity.start_position
+        desc["End position"] = entity.end_position
+        desc["Minor allele frquency"] = entity.maf
+        return desc
+
+
+###############################################################################
+# Gene
+###############################################################################
+
+class OutOfContextGeneView(BaseOutOfContextView):
+    """ Gene secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("Gene")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the Gene description.
+        """
+        desc = {}
+        desc["URI"] = entity.uri
+        desc["Start position"] = entity.start_position
+        desc["End position"] = entity.end_position
+        desc["Type"] = entity.type
+        return desc
+
+
+###############################################################################
+# CpG
+###############################################################################
+
+class OutOfContextCpGView(BaseOutOfContextView):
+    """ CpG secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("CpG")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the CpG description.
+        """
+        desc = {}
         desc["Position"] = entity.position
         return desc
 
@@ -558,5 +622,6 @@ def registration_callback(vreg):
                   OutOfContextFileView, OutOfContextUploadFileView,
                   OutOfContextRestrictedFileView,
                   OutOfContextGenomicMeasureView, OutOfContextDeviceView,
-                  OutOfContextUploadFieldView]:
+                  OutOfContextUploadFieldView, OutOfContextChromosomeView,
+                  OutOfContextGeneView, OutOfContextCpGView]:
         vreg.register(klass)
