@@ -208,14 +208,46 @@ class OpenAnswer(AnyEntity):
 
 class Snp(AnyEntity):
     __regid__ = "Snp"
-    __bootstap_glyph__ = True
 
     def dc_title(self):
         return self.rs_id
 
     @property
     def symbol(self):
-        return "<span class='glyphicon glyphicon-plus'></span>"
+        return "images/snps.png"
+
+
+class Chromosome(AnyEntity):
+    __regid__ = "Chromosome"
+
+    def dc_title(self):
+        return self.name
+
+    @property
+    def symbol(self):
+        return "images/chromosome.png"
+
+
+class Gene(AnyEntity):
+    __regid__ = "Gene"
+
+    def dc_title(self):
+        return self.gene_id
+
+    @property
+    def symbol(self):
+        return "images/gene.png"
+
+
+class CpG(AnyEntity):
+    __regid__ = "CpG"
+
+    def dc_title(self):
+        return self.cg_id
+
+    @property
+    def symbol(self):
+        return "images/cpg.png"
 
 
 class GenomicPlatform(AnyEntity):
