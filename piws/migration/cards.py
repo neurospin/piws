@@ -16,9 +16,7 @@ HERE = osp.abspath(osp.dirname(__file__))
 ###############################################################################
 HTMLS = {
     u"index": open(osp.join(HERE, "static_pages/index.html")).read().decode("utf8"),
-    u"license": open(osp.join(HERE, "static_pages/license.html")).read().decode("utf8"),
-    u"legal": open(osp.join(HERE, "static_pages/legal.html")).read().decode("utf8"),
-    u"poweredby": open(osp.join(HERE, "static_pages/piws.html")).read().decode("utf8"),
+    u"license": open(osp.join(HERE, "static_pages/piws.html")).read().decode("utf8")
 }
 
 
@@ -28,7 +26,7 @@ HTMLS = {
 def create_or_update_static_cards(session):
     """ Create or update the cards for static pages
     """
-    for _id, html in HTMLS.iteritems():
+    for _id, html in HTMLS.items():
         rset = session.execute("Any X WHERE X is Card, X title '{0}'".format(_id))
         if rset:
             session.execute("SET X content '{0}' WHERE X is Card, X title "

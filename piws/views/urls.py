@@ -14,10 +14,6 @@ class PiwsReqRewriter(SimpleReqRewriter):
     """ Associate a request that generate a view with a specific url.
     """
     rules = [
-        (rgx('/piws'),
-         dict(rql=r'Any X WHERE X is Card, X title "piws"')),
         (rgx('/license'),
          dict(rql=r'Any X WHERE X is Card, X title "license"')),
-        (rgx('/legal'),
-         dict(rql=r'Any X WHERE X is Card, X title "legal"')),
     ]
