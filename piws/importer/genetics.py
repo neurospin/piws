@@ -377,7 +377,9 @@ class Genetics(Base):
                         check_unicity=True,
                         entity_name="Snp",
                         rs_id=unicode(rs_id),
-                        position=-9)
+                        start_position=-9,
+                        end_position=-9,
+                        maf=-9)
                     snp_eid = snp_entity.eid
                     self.inserted_snps[rs_id] = snp_eid
                 self._set_unique_relation(
