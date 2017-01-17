@@ -104,12 +104,16 @@ class PIWSNavigationtBox(component.CtxComponent):
 
     Set the 'display_assessment' to False to remove the 'Assessments'
     button.
+
+    Set the 'display_metagen' to False to remove the 'MetaGen'
+    button.
     """
     __regid__ = "nav_box"
     context = "left"
     title = _("Navigation")
     order = 0
     display_assessment = True
+    display_metagen = True
 
     def render_body(self, w):
         """ Create the diifferent item of the navigation box
@@ -210,6 +214,15 @@ class PIWSNavigationtBox(component.CtxComponent):
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Genomic measures</a>')
         w(u'</div></div><br/>')
+
+        # MetaGen
+        if self.display_metagen:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            href = self._cw.build_url(rql="Any C Where C is Chromosome")
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'MetaGen (hg20 dbsnp138)</a>')
+            w(u'</div></div><br/>')
 
         # CWSearch
         w(u'<hr>')
