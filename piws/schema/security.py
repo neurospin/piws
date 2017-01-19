@@ -42,6 +42,10 @@ from cubes.brainomics2.schema.questionnaire import OpenAnswer
 from cubes.brainomics2.schema.questionnaire import Questionnaire
 from cubes.brainomics2.schema.questionnaire import Question
 from cubes.brainomics2.schema.genomics import GenomicMeasure
+from cubes.brainomics2.schema.genomics import Snp
+from cubes.brainomics2.schema.genomics import CpG
+from cubes.brainomics2.schema.genomics import Gene
+from cubes.brainomics2.schema.genomics import Chromosome
 from cubes.brainomics2.schema.file import RestrictedFile
 from cubes.brainomics2.schema.card import Card
 from cubes.rql_download.schema import CWSearch
@@ -130,7 +134,8 @@ RESTRICTED_ENTITIES = [
     OpenAnswer, GenomicMeasure, RestrictedFile]
 
 PUBLIC_ENTITIES = [
-    Device, Subject, Center, Study, Questionnaire, Question, Card]
+    Device, Subject, Center, Study, Questionnaire, Question, Card, Snp,
+    CpG, Gene, Chromosome]
 
 ENTITIES = RESTRICTED_ENTITIES + PUBLIC_ENTITIES + [
     Assessment, CWSearch, File, CWUpload, UploadField, UploadFile]
