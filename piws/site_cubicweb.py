@@ -88,5 +88,12 @@ options = (
       'help': 'If true, share uploads between the memebers of a group.',
       'group': 'piws',
       'level': 1,
-      })
+      }),
+    ("metagen_url", {
+        "type": "string",
+        "default": None,
+        "help": "the URL to the metagen bioresource.",
+        "group": "piws",
+        "level": 1,
+    }),
 )
