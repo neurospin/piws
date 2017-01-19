@@ -372,9 +372,8 @@ class Genetics(Base):
                 # Create the Snp
                 else:
                     snp_entity, is_created = self._get_or_create_unique_entity(
-                        rql=("Any X Where X is Snp, S rs_id '{0}'".format(
-                            rs_id)),
-                        check_unicity=True,
+                        rql=("Any S Where S is Snp, S rs_id '{0}'".format(
+                             rs_id)),
                         entity_name="Snp",
                         rs_id=unicode(rs_id),
                         start_position=-9,
