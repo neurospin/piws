@@ -208,6 +208,7 @@ class MetaGen(Base):
             # Create entity
             snp_entity, is_created = self._get_or_create_unique_entity(
                 rql=("Any X Where X is Snp, X rs_id '{0}'".format(rs_id)),
+                check_unicity=True,
                 entity_name="Snp",
                 rs_id=unicode(rs_id),
                 start_position=start,
