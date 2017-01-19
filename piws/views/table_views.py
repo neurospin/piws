@@ -117,7 +117,7 @@ class JHugetableView(View):
             the timepoint.
         elts_to_sort: list (optional, default [])
             labels of the columns to be sorted
-        tooltip_name: string (optional, default '')
+        tooltip_name: string (optional, default None)
             the piws documentation tooltip name.
         use_scroller: bool (optional default False)
             if True do not use pagination.
