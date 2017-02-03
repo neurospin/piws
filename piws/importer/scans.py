@@ -367,18 +367,13 @@ class Scans(Base):
             self._import_file_set(fset_struct, extfiles, scan_eid, assessment_eid)
 
             # Specialize the scan: set the data type
-            from pprint import pprint
-            pprint(scantype_struct)
             if "type" in scantype_struct:
-                print "------------------->",
                 dtype = scantype_struct.pop("type")
-                print dtype,
                 dtype_entity, _ = self._get_or_create_unique_entity(
                     rql="",
                     check_unicity=False,
                     entity_name=dtype,
                     **scantype_struct)
-                print dtype_entity.eid
                 # > add relation with the scan
                 self._set_unique_relation(
                     scan_eid, "has_data", dtype_entity.eid, check_unicity=False)

@@ -142,11 +142,10 @@ class PiwsApacheDeauthenticationHook(hook.Hook):
 
 
 class PiwsCWUsersWatcher(hook.Hook):
+    """ Sends an email message on CWUser creation/deletion, using all-in-one
+    parameters of the [MAIL] section.
     """
-        Sends an email message on CWUser creation/deletion, using all-in-one
-        parameters of the [MAIL] section.
-    """
-    __regid__ = 'piws.cwusers_watcher'
+    __regid__ = "piws.cwusers_watcher"
     __select__ = hook.Hook.__select__ & is_instance('CWUser')
     events = ('after_add_entity', 'before_delete_entity')
     mandatory_params = ['sender-name', 'sender-addr', 'supervising-addrs',
