@@ -92,6 +92,7 @@ class Base(object):
         # Speed up parameters
         self.inserted_assessments = {}
         self.inserted_devices = {}
+        self.already_related_subjects = {}
 
     ###########################################################################
     #   Public Methods
@@ -346,14 +347,31 @@ class Base(object):
 
         # Create the assessment
         assessment_id = assessment_struct["identifier"]
-        assessment_entity, is_created = self._get_or_create_unique_entity(
-            rql=("Any X Where X is Assessment, X identifier "
-                 "'{0}'".format(assessment_id)),
-            check_unicity=True,
-            entity_name="Assessment",
-            **assessment_struct)
-        assessment_eid = assessment_entity.eid
-        self.inserted_assessments[assessment_id] = assessment_eid
+        if assessment_id in self.inserted_assessments:
+            assessment_eid = self.inserted_assessments[assessment_id]
+            is_created = False
+        else:
+            assessment_entity, is_created = self._get_or_create_unique_entity(
+                rql=("Any X Where X is Assessment, X identifier "
+                     "'{0}'".format(assessment_id)),
+                check_unicity=True,
+                entity_name="Assessment",
+                **assessment_struct)
+            assessment_eid = assessment_entity.eid
+            self.already_related_subjects[assessment_eid] = [
+                e.eid for e in assessment_entity.subjects]
+            self.inserted_assessments[assessment_id] = assessment_eid
+
+        # Add relation with the subject
+        for subject_eid in subject_eids:
+            if subject_eid not in self.already_related_subjects[assessment_eid]:
+                self._set_unique_relation(
+                    subject_eid, "assessments", assessment_eid,
+                    check_unicity=False)
+                self._set_unique_relation(
+                    assessment_eid, "subjects", subject_eid,
+                    check_unicity=False)
+                self.already_related_subjects[assessment_eid].append(subject_eid)
 
         # If we just create the assessment, relate the entity
         if is_created:
@@ -364,14 +382,6 @@ class Base(object):
             self._set_unique_relation(
                 study_eid, "assessments", assessment_eid, check_unicity=False,
                 subjtype="Assessment")
-            # > add relation with the subject
-            for subject_eid in subject_eids:
-                self._set_unique_relation(
-                    subject_eid, "assessments", assessment_eid,
-                    check_unicity=False)
-                self._set_unique_relation(
-                    assessment_eid, "subjects", subject_eid,
-                    check_unicity=False)
             # > add relation with the center
             self._set_unique_relation(
                 center_eid, "assessments", assessment_eid, check_unicity=False)

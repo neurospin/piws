@@ -22,7 +22,15 @@ class Subjects(Base):
     # Define the relations involved
     relations = [
         ("Subjects", "study", "Study"),
-        ("Study", "subjects", "Subjects")]
+        ("Study", "subjects", "Subjects"),
+        ("Subjects", "subjectgroups", "SubjectGroup"),
+        ("SubjectGroup", "subjects", "Subjects"),
+        ("Subjects", "dignostic", "Diagnostic"),
+        ("Diagnostic", "subjects", "Subjects"),
+        ("Subjects", "subject_protocol", "Protocol"),
+        ("Protocol", "subjects", "Subjects"),
+        ("Protocol", "study", "Study"),
+        ("Study", "protocols", "Protocol")]
 
     def __init__(self, session, project_name, subjects, data_filepath=None,
                  use_store=True):
@@ -53,7 +61,10 @@ class Subjects(Base):
                     "code_in_study": "subject1",
                     "identifier": "toy_subject1",
                     "gender": "male",
-                    "handedness": "right"
+                    "handedness": "right",
+                    "groups": ["grp1", "grp2"],
+                    "diagnostic": "normal",
+                    "protocols": ["proto1", "proto2"]
                 },
                 "subject2": {
                     "code_in_study": "subject2",
@@ -75,6 +86,11 @@ class Subjects(Base):
         self.subjects = subjects
         self.project_name = project_name
         self.data_filepath = data_filepath or ""
+
+        # Speed up parameters
+        self.inserted_groups = {}
+        self.inserted_diagnostics = {}
+        self.inserted_protocol = {}
 
     ###########################################################################
     #   Public Methods
@@ -131,6 +147,11 @@ class Subjects(Base):
                                bar_length=40, maxsize=maxsize + 9)
             cnt_subject += 1.
 
+            # Remove relation arguments from the subject structure
+            diagnostic = subject_parameter.pop("diagnostic", None)
+            groups = subject_parameter.pop("groups", None)
+            protocols = subject_parameter.pop("protocols", None)           
+
             # Create the subject if necessary
             subject_entity, is_created = self._get_or_create_unique_entity(
                 rql=("Any X Where X is Subject, X code_in_study "
@@ -138,6 +159,7 @@ class Subjects(Base):
                 check_unicity=True,
                 entity_name="Subject",
                 **subject_parameter)
+            subject_eid = subject_entity.eid
 
             # If we just create the scan, specify and relate the entity
             if is_created:
@@ -145,7 +167,122 @@ class Subjects(Base):
                 self._set_unique_relation(
                     subject_entity.eid, "study", study_eid, check_unicity=False)
                 self._set_unique_relation(
-                    study_eid, "subjects", subject_entity.eid,
-                    check_unicity=False)
+                    study_eid, "subjects", subject_eid, check_unicity=False)
+
+                # > add relation with groups (optional)
+                if groups is not None:
+                    self._create_subject_groups(groups, subject_eid, study_eid)
+
+                # > add relation with diagnostic (optional)
+                if diagnostic is not None:
+                    self._create_subject_diagnostic(diagnostic, subject_eid)
+
+                # > add relation with protocols (optional)
+                if protocols is not None:
+                    self._create_subject_protocols(
+                        protocols, subject_eid, study_eid)
 
         print  # new line after last progress bar update
+
+    ###########################################################################
+    #   Private Methods
+    ###########################################################################
+
+    def _create_subject_groups(self, groups, subject_eid, study_eid):
+        """ Link the subject with different groups.
+        """
+        # Go through each group
+        for group_name in groups:
+
+            # create the group if necessary
+            if group_name in self.inserted_groups:
+                subjectgroup_eid = self.inserted_groups[group_name]
+            else:
+                subjectgroup_entity, is_created = self._get_or_create_unique_entity(
+                    rql=("Any X Where X is SubjectGroup, X name "
+                         "'{0}'".format(group_name)),
+                    check_unicity=True,
+                    entity_name="SubjectGroup",
+                    name=unicode(group_name))
+                subjectgroup_eid = subjectgroup_entity.eid
+                self.inserted_groups[group_name] = subjectgroup_eid
+
+                # add relation with study
+                if is_created:
+                    self._set_unique_relation(
+                        subjectgroup_eid, "study", study_eid,
+                        check_unicity=False)
+                    self._set_unique_relation(
+                        study_eid, "study_subjectgroups", subjectgroup_eid,
+                        check_unicity=False)
+
+            # add relation with subject
+            self._set_unique_relation(
+                subject_eid, "subjectgroups", subjectgroup_eid,
+                check_unicity=False)
+            self._set_unique_relation(
+                subjectgroup_eid, "subjects", subject_eid,
+                check_unicity=False)
+
+    def _create_subject_diagnostic(self, diagnostic, subject_eid):
+        """ Link the subject with a diagnostic.
+        """
+
+        # Create the diagnostic if necessary
+        if diagnostic in self.inserted_diagnostics:
+            diagnostic_eid = self.inserted_diagnostics[diagnostic]
+        else:
+            diagnostic_entity, is_created = self._get_or_create_unique_entity(
+                rql=("Any X Where X is Diagnostic, X conclusion '{0}'".format(
+                    diagnostic)),
+                check_unicity=True,
+                entity_name="Diagnostic",
+                conclusion=unicode(diagnostic))
+            diagnostic_eid = diagnostic_entity.eid
+            self.inserted_diagnostics[diagnostic] = diagnostic_eid
+
+        # Add relation with subject
+        self._set_unique_relation(
+            subject_eid, "diagnostic", diagnostic_eid, check_unicity=False)
+        self._set_unique_relation(
+            diagnostic_eid, "subjects", subject_eid, check_unicity=False)
+
+
+    def _create_subject_protocols(self, protocols, subject_eid, study_eid):
+        """ Link the subject with different protocols.
+        """
+        # Go through each protocol
+        for protocol_name in protocols:
+
+            # protocol in memory
+            if protocol_name in self.inserted_protocol:
+                protocol_eid = self.inserted_protocol[protocol_name]
+
+            # create the protocol if necessary
+            else:
+                protocol_entity, is_created = self._get_or_create_unique_entity(
+                    rql=("Any X Where X is Protocol, X name "
+                         "'{0}'".format(protocol_name)),
+                    check_unicity=True,
+                    entity_name="Protocol",
+                    name=unicode(protocol_name))
+                protocol_eid = protocol_entity.eid
+                self.inserted_protocol[protocol_name] = protocol_eid
+
+                # add relation with study
+                if is_created:
+                    self._set_unique_relation(
+                        protocol_eid, "study", study_eid,
+                        check_unicity=False)
+                    self._set_unique_relation(
+                        study_eid, "protocols", protocol_eid,
+                        check_unicity=False)
+
+            # add relation with subject
+            self._set_unique_relation(
+                subject_eid, "subject_protocol", protocol_eid,
+                check_unicity=False)
+            self._set_unique_relation(
+                protocol_eid, "subjects", subject_eid,
+                check_unicity=False)
+

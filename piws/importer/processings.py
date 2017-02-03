@@ -36,8 +36,7 @@ class Processings(Base):
 
     def __init__(self, session, project_name, center_name, processings,
                  processing_type, can_read=True, can_update=False,
-                 data_filepath=None, use_store=True, piws_security_model=True,
-                 check_assessment_with_rql=False):
+                 data_filepath=None, use_store=True, piws_security_model=True):
         """ Initialize the Processings class.
 
         Parameters
@@ -66,8 +65,6 @@ class Processings(Base):
             if True use an SQLGenObjectStore, otherwise the session.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
-        check_assessment_with_rql: bool (optional, default False)
-            if True check if the Assessment entity already exists using an rql.
 
         Notes
         -----
@@ -92,7 +89,11 @@ class Processings(Base):
                             "identifier": u"toy_V1_subject1_p1",
                             "name": u"p1", "label": u"segmentation",
                             "tool": u"spm", "version": u"8.1",
-                            "parameters": u"{'a': 1, 'r': 'mypath'}"}
+                            "parameters": u"{'a': 1, 'r': 'mypath'}"},
+                        "Scores": [ {
+                            "text": "my_score",
+                            "value": my_score_value"}
+                        ]
                     } ]
                 } ]
             }
@@ -138,7 +139,6 @@ class Processings(Base):
         self.project_name = project_name
         self.center_name = center_name
         self.processing_type = processing_type
-        self.check_assessment_with_rql = check_assessment_with_rql
 
         # Speed up parameters
         self.inserted_assessments = {}
@@ -216,7 +216,7 @@ class Processings(Base):
 
             # Print a progress bar
             self._progress_bar(cnt_subject / nb_of_subjects,
-                               title="{0}(processings):".format(subject_id),
+                               title="{0}(processings)".format(subject_id),
                                bar_length=40)
             cnt_subject += 1.
 
@@ -244,36 +244,10 @@ class Processings(Base):
                 assessment_struct = subj_processings["Assessment"]
                 assessment_id = assessment_struct["identifier"]
 
-                assessment_eid = None
-                # Check if this item has already been inserted
-                if assessment_id in self.inserted_assessments:
-                    assessment_eid = self.inserted_assessments[assessment_id]
-                # Check with an rql if this item already exists
-                elif self.check_assessment_with_rql:
-                    rql = ("Any ID Where A is Assessment, "
-                           "A identifier '{0}', A eid ID".format(
-                               assessment_id))
-                    rset = self.session.execute(rql)
-                    rows = rset.rows
-                    if len(rows) > 0:
-                        assessment_eid = rows[0][0]
-                        self.inserted_assessments[
-                            assessment_id] = assessment_eid
-
-                if assessment_eid is None:
-                    # Create the assessment
-                    assessment_eid = self._create_assessment(
-                        assessment_struct, subject_eid, study_eid, center_eid,
-                        groups)
-                    self.inserted_assessments[assessment_id] = assessment_eid
-                else:
-                    # > add relation with the subject if not already set
-                    self._set_unique_relation(
-                        subject_eid, "assessments", assessment_eid,
-                        check_unicity=True)
-                    self._set_unique_relation(
-                        assessment_eid, "subjects", subject_eid,
-                        check_unicity=True, subjtype="Assessment")
+                # Create the assessment
+                assessment_eid = self._create_assessment(
+                    assessment_struct, subject_eid, study_eid, center_eid,
+                    groups)
 
                 ###############################################################
                 # Go through the processings - scores
@@ -376,24 +350,24 @@ class Processings(Base):
                 self._import_file_set(fset_struct, extfiles, processing_eid,
                                       assessment_eid)
 
-        # Check if their is some scores attached to the current processing
-        if scores is not None:
+            # Check if their is some scores attached to the current processing
+            if scores is not None:
 
-            # Go through all the scores attached to the scan
-            for score_struct in scores:
+                # Go through all the processing attached scores
+                for score_struct in scores:
 
-                # Create the entity
-                score_entity, _ = self._get_or_create_unique_entity(
-                    rql="",
-                    check_unicity=False,
-                    entity_name="ScoreValue",
-                    **score_struct)
-                # > add relation with the processing
-                self._set_unique_relation(
-                    processing_eid, "score_values", score_entity.eid)
-                # > add relation with the assessment
-                self._set_unique_relation(
-                    score_entity.eid, "in_assessment", assessment_eid,
-                    subjtype="ScoreValue")
+                    # Create the entity
+                    score_entity, _ = self._get_or_create_unique_entity(
+                        rql="",
+                        check_unicity=False,
+                        entity_name="ScoreValue",
+                        **score_struct)
+                    # > add relation with the processing
+                    self._set_unique_relation(
+                        processing_eid, "score_values", score_entity.eid)
+                    # > add relation with the assessment
+                    self._set_unique_relation(
+                        score_entity.eid, "in_assessment", assessment_eid,
+                        subjtype="ScoreValue")
 
         return processing_eid

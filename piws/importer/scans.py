@@ -26,7 +26,7 @@ class Scans(Base):
     for dtype in SCAN_DATA:
         has_data.extend([
             ("Scan", "has_data", dtype),
-            (dtype, "scan", "PETData"),
+            (dtype, "scan", "Scan"),
             (dtype, "in_assessment", "Assessment")])
     relations = (
         Base.fileset_relations + Base.assessment_relations + 
@@ -305,7 +305,7 @@ class Scans(Base):
                     device_eid = None
 
                 ###############################################################
-                # Go through the scans - processings - scores
+                # Go through the scans - scores
                 ###############################################################
 
                 for current_scan in subj_scans["Scans"]:
@@ -367,13 +367,18 @@ class Scans(Base):
             self._import_file_set(fset_struct, extfiles, scan_eid, assessment_eid)
 
             # Specialize the scan: set the data type
+            from pprint import pprint
+            pprint(scantype_struct)
             if "type" in scantype_struct:
+                print "------------------->",
                 dtype = scantype_struct.pop("type")
+                print dtype,
                 dtype_entity, _ = self._get_or_create_unique_entity(
                     rql="",
                     check_unicity=False,
                     entity_name=dtype,
                     **scantype_struct)
+                print dtype_entity.eid
                 # > add relation with the scan
                 self._set_unique_relation(
                     scan_eid, "has_data", dtype_entity.eid, check_unicity=False)
@@ -384,24 +389,24 @@ class Scans(Base):
                     dtype_entity.eid, "in_assessment", assessment_eid,
                     check_unicity=False, subjtype=dtype)
 
-        # Check if their is some scores attached to the current scan
-        if scores is not None:
+            # Check if their is some scores attached to the current scan
+            if scores is not None:
 
-            # Go through all the scores attached to the scan
-            for score_struct in scores:
+                # Go through all the scores attached to the scan
+                for score_struct in scores:
 
-                # Create the entity
-                score_entity, _ = self._get_or_create_unique_entity(
-                    rql="",
-                    check_unicity=False,
-                    entity_name="ScoreValue",
-                    **score_struct)
-                # > add relation with the scan
-                self._set_unique_relation(
-                    scan_eid, "score_values", score_entity.eid)
-                # > add relation with the assessment
-                self._set_unique_relation(
-                    score_entity.eid, "in_assessment", assessment_eid,
-                    subjtype="ScoreValue")
+                    # Create the entity
+                    score_entity, _ = self._get_or_create_unique_entity(
+                        rql="",
+                        check_unicity=False,
+                        entity_name="ScoreValue",
+                        **score_struct)
+                    # > add relation with the scan
+                    self._set_unique_relation(
+                        scan_eid, "score_values", score_entity.eid)
+                    # > add relation with the assessment
+                    self._set_unique_relation(
+                        score_entity.eid, "in_assessment", assessment_eid,
+                        subjtype="ScoreValue")
 
         return scan_eid

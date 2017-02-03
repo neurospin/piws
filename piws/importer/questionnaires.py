@@ -205,8 +205,11 @@ class Questionnaires(Base):
             for dquestionnaires in subject_questionnaires:
                 for qname, question_struct in dquestionnaires[
                                             "Questionnaires"].iteritems():
-                    qstructure.setdefault(qname, []).extend(
-                        question_struct.keys())
+                    if qname not in qstructure:
+                        qstructure[qname] = []
+                    for question_name in question_struct:
+                        if question_name not in qstructure[qname]:
+                            qstructure[qname].append(question_name)
 
         # Then fill the questionnaire form
         questionnaire_eids = {}
@@ -226,7 +229,7 @@ class Questionnaires(Base):
             question_eids[qname] = {}
 
             # Create corresponding questions
-            for question_name in set(question_names):
+            for index, question_name in enumerate(question_names):
                 question_id = self._md5_sum(qname + "_" + question_name)
                 question_entity, _ = self._get_or_create_unique_entity(
                     rql=("Any X Where X is Question, X identifier "
@@ -234,7 +237,8 @@ class Questionnaires(Base):
                     check_unicity=True,
                     entity_name = "Question",
                     identifier=unicode(question_id),
-                    text=unicode(question_name)
+                    text=unicode(question_name),
+                    position=index
                 )
                 question_eids[qname][question_name] = question_entity.eid
                 # > add relation with the questionnaire form
