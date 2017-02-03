@@ -127,7 +127,7 @@ class MetaGenSearchView(View):
                 self.error(msg)
             else:
                 self.w(unicode(json.dumps({"error": msg})))
-            return  
+            return 
 
         # Load the plink and the
         try:
