@@ -50,6 +50,34 @@ class DMRIData(AnyEntity):
         return "DMRI data"
 
 
+class SPECTROData(AnyEntity):
+    __regid__ = "SPECTROData"
+
+    def dc_title(self):
+        return "SPECTRO data"
+
+
+class EEGData(AnyEntity):
+    __regid__ = "EEGData"
+
+    def dc_title(self):
+        return "EEG data"
+
+
+class ETData(AnyEntity):
+    __regid__ = "ETData"
+
+    def dc_title(self):
+        return "Eye Tracking data"
+
+
+class PETData(AnyEntity):
+    __regid__ = "PETData"
+
+    def dc_title(self):
+        return "PET data"
+
+
 class Scan(AnyEntity):
     __regid__ = "Scan"
 
@@ -67,6 +95,14 @@ class Scan(AnyEntity):
             return "images/fmri.jpg"
         elif dtype.__class__.__name__ == "MRIData":
             return "images/mri.jpg"
+        elif dtype.__class__.__name__ == "PETData":
+            return "images/pet.png"
+        elif dtype.__class__.__name__ == "EEGData":
+            return "images/eeg.jpg"
+        elif dtype.__class__.__name__ == "ETData":
+            return "images/eye-tracking.jpg"
+        elif dtype.__class__.__name__ == "SPECTROData":
+            return "images/spectro.png"
 
 
 class Assessment(AnyEntity):
