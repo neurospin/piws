@@ -30,6 +30,9 @@ from cubes.brainomics2.schema.medicalexp import ProcessingRun
 from cubes.brainomics2.schema.medicalexp import Center
 from cubes.brainomics2.schema.medicalexp import Study
 from cubes.brainomics2.schema.medicalexp import Device
+from cubes.brainomics2.schema.medicalexp import SubjectGroup
+from cubes.brainomics2.schema.medicalexp import Protocol
+from cubes.brainomics2.schema.medicalexp import Diagnostic
 from cubes.brainomics2.schema.neuroimaging import Scan
 from cubes.brainomics2.schema.neuroimaging import DMRIData
 from cubes.brainomics2.schema.neuroimaging import EEGData
@@ -37,6 +40,7 @@ from cubes.brainomics2.schema.neuroimaging import ETData
 from cubes.brainomics2.schema.neuroimaging import PETData
 from cubes.brainomics2.schema.neuroimaging import MRIData
 from cubes.brainomics2.schema.neuroimaging import FMRIData
+from cubes.brainomics2.schema.neuroimaging import SPECTROData
 from cubes.brainomics2.schema.questionnaire import QuestionnaireRun
 from cubes.brainomics2.schema.questionnaire import OpenAnswer
 from cubes.brainomics2.schema.questionnaire import Questionnaire
@@ -131,11 +135,11 @@ class in_assessment(RelationType):
 RESTRICTED_ENTITIES = [
     Scan, FMRIData, DMRIData, PETData, MRIData, EEGData, ETData, FileSet,
     ExternalFile, ScoreDefinition, ScoreValue, ProcessingRun, QuestionnaireRun,
-    OpenAnswer, GenomicMeasure, RestrictedFile]
+    OpenAnswer, GenomicMeasure, RestrictedFile, SPECTROData]
 
 PUBLIC_ENTITIES = [
     Device, Subject, Center, Study, Questionnaire, Question, Card, Snp,
-    CpG, Gene, Chromosome]
+    CpG, Gene, Chromosome, SubjectGroup, Diagnostic, Protocol]
 
 ENTITIES = RESTRICTED_ENTITIES + PUBLIC_ENTITIES + [
     Assessment, CWSearch, File, CWUpload, UploadField, UploadFile]
@@ -189,7 +193,8 @@ UNTRACK_ENTITIES = ["CWUser", "CWGroup", "CWSource", "Study", "Center",
                     "Question", "Questionnaire", "Subject", "Device",
                     "GenomicPlatform", "Snp", "CWDataImport", "CWProperty",
                     "Workflow", "State", "BaseTransition", "Transition",
-                    "Card", "EmailAddress", "TrInfo"]
+                    "Card", "EmailAddress", "TrInfo", "Protocol",
+                    "SubjectGroup", "Diagnostic"]
 UNTRACK_ENTITIES += ["Assessment", "CWSearch", "File", "CWUpload",
                      "UploadField", "UploadFile"]
 UNTRACK_ENTITIES += ["Snp", "CpG", "Gene", "Chromosome"]
