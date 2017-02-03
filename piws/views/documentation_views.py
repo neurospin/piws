@@ -9,12 +9,14 @@
 # Cubicweb import
 from cubicweb.view import View
 from cubicweb.web.views.baseviews import NullView
+from cubicweb.predicates import authenticated_user
 
 
 class DisplayDocumentation(NullView):
     """ Create a view to display the documentation.
     """
     __regid__ = "piws-documentation"
+    __select__ = authenticated_user()
     templatable = False
     div_id = "piws-documentation"
     default_message = "Documentation has not been provided yet."
