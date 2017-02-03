@@ -105,8 +105,15 @@ class PIWSNavigationtBox(component.CtxComponent):
     Set the 'display_assessment' to False to remove the 'Assessments'
     button.
 
-    Set the 'display_metagen' to False to remove the 'MetaGen'
-    button.
+    Set the 'display_metagen' to False to remove the 'MetaGen' button.
+
+    Set the 'display_scan' to False to remove the 'Scans' button.
+
+    Set the 'display_genomic' to False to remove the 'Genomic' button.
+
+    Set the 'display_score' to False to remove the 'Quality Scores' button.
+
+    Set the 'display_study' to True to display the 'Study' tab.
     """
     __regid__ = "nav_box"
     context = "left"
@@ -114,14 +121,70 @@ class PIWSNavigationtBox(component.CtxComponent):
     order = 0
     display_assessment = True
     display_metagen = True
+    display_scan = True
+    display_genomic = True
+    display_study = False
+    display_score = True
+    auto_disable_qc = False
 
     def render_body(self, w):
-        """ Create the diifferent item of the navigation box
+        """ Create the different item of the navigation box.
         """
+        # Study
+        studies = []
+        if self.display_study:
+
+            # Request all the available studies
+            studies = [row[0] for row in self._cw.session.execute(
+                "DISTINCT Any SN ORDERBY SN Where S is Study, S name SN")]
+
+            # Display a study selection tab bar
+            w(u'<ul class="nav nav-tabs piws-nav">')
+            w(u'<li class="active"><a href="#studytab1">ALL</a></li>')
+            for i, study in enumerate(studies, start=2):
+              w(u'<li><a href="#studytab{0}">{1}</a></li>'.format(i, study))
+            w(u'</ul>')
+
+            # Add a script to manage the tab bar selection
+            w(u'<script>')
+            w(u'if (!("name" in window)) {')
+            w(u'window.name = "studytab1";')
+            w(u'}')
+            w(u'$(document).ready(function(){')
+            w(u'$(".piws-nav a").each(function(){')
+            w(u'if ($(this).attr("href") == window.name) {')
+            w(u'$(this).tab("show");')
+            w(u'}')
+            w(u'});')
+            w(u'$(".piws-nav a").click(function(){')
+            w(u'$(this).tab("show");')
+            w(u'window.name = $(this).attr("href");') 
+            w(u'});')
+            w(u'});')
+            w(u'</script>')
+
+        # Study navigation
+        w(u'<div class="tab-content">')
+        w(u'<div id="studytab1" class="tab-pane fade in active">')
+        self.study_nav(w, study=None)
+        w(u'</div>')
+        for i, study in enumerate(studies, start=2):
+            w(u'<div id="studytab{0}" class="tab-pane fade">'.format(i))
+            self.study_nav(w, study=study)
+            w(u'</div>')
+        w(u'</div>')
+
+    def study_nav(self, w, study=None):
+        """ Create the different item of the study navigation box.
+        """
+
         # Subjects
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any S Where S is Subject")
+        rql = "Any S Where S is Subject"
+        if study is not None:
+            rql += ", S study ST, ST name '{0}'".format(study)
+        href = self._cw.build_url(rql=rql)
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
         w(u'Subjects</a>')
         w(u'</div></div><br/>')
@@ -130,37 +193,97 @@ class PIWSNavigationtBox(component.CtxComponent):
         if self.display_assessment:
             w(u'<div class="btn-toolbar">')
             w(u'<div class="btn-group-vertical btn-block">')
-            href = self._cw.build_url(rql="Any A Where A is Assessment")
+            rql = "Any A Where A is Assessment"
+            if study is not None:
+                rql += ", A study ST, ST name '{0}'".format(study)
+            href = self._cw.build_url(rql=rql)
             w(u'<a class="btn btn-primary" href="{0}">'.format(href))
             w(u'Assessments</a>')
             w(u'</div></div><br/>')
 
         # Scan
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any S Where S is Scan")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Scans</a>')
-        w(u'</div></div><br/>')
+        if self.display_scan:
+            rql = "Any S Where S is Scan"
+            if study is not None:
+                rql += ", S study ST, ST name '{0}'".format(study)
+            # > disable QC buttons
+            if self.auto_disable_qc:
+                rql_scores = ("DISTINCT Any T " + rql[5:] +
+                              ", S type T, S score_values V")
+                rset = self._cw.execute(rql_scores)
+                active_types = set(row[0] for row in rset)
+            # > build navigation
+            href = self._cw.build_url(rql=rql)
+            rql_types = "DISTINCT Any T ORDERBY T " + rql[5:] + ", S type T"
+            rset = self._cw.execute(rql_types)
+            types = [line[0] for line in rset.rows]
+            if len(types) > 0:
+                # > main button
+                w(u'<div class="btn-toolbar">')
+                w(u'<div class="btn-group btn-group-justified">')
+                w(u'<a class="btn btn-info"'
+                   'data-toggle="collapse" data-target="#scans{0}" '
+                   'style="width:90%">'.format(study))
+                w(u'Scans</a>')
+                w(u'<a class="btn btn-primary" href="{0}" '
+                   'style="width:10%">'.format(href))
+                w(u'all</a>')
+                w(u'</div></div>')
+                # > typed buttons container
+                w(u'<div id="scans{0}" class="collapse">'.format(study))
+                w(u'<div class="panel-body">')
+                w(u'<hr>')
+                # > typed buttons
+                for ptype in types:
+                    typed_rql = rql + ", S type '{0}'".format(ptype)
+                    href = self._cw.build_url(rql=typed_rql)
+                    w(u'<div class="btn-toolbar">')
+                    w(u'<div class="btn-group btn-group-justified">')
+                    w(u'<a class="btn btn-primary" href="{0}" '
+                       'style="width:80%">'.format(href))
+                    w(u'{0}</a>'.format(ptype))
+                    href = self._cw.build_url(
+                        "view", vid="score-value-table-secondary",
+                        study=study or "", etype="Scan", rtype=ptype,
+                        pname="description", title="QC Scores",
+                        elts_to_sort=["ID"], tooltip_name="QC")
+                    btn_status = "active"
+                    if self.auto_disable_qc and ptype not in active_types:
+                        btn_status = "disabled"
+                    w(u'<a class="btn btn-success {0}" href="{1}" '
+                       'style="width:15%">'.format(btn_status, href))
+                    w(u'QC</a>')
+                    w(u'</div></div><br/>')
+                w(u'<hr>')
+                w(u'</div></div><br/>')
 
         # QuestionnaireRun
         ajaxcallback = "get_questionnaires_data"
         rql_labels = ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
                       "A timepoint T")
-        rql_types = ("DISTINCT Any T ORDERBY T WHERE Q is Questionnaire, "
-                      "Q type T")
+        rql = "Any QR Where QR is QuestionnaireRun"
+        if study is not None:
+            rql += ", QR study ST, ST name '{0}'".format(study)
+            rql_labels += ", A study ST, ST name '{0}'".format(study)
+        href = self._cw.build_url(rql=rql)
+        rql_types = ("DISTINCT Any T ORDERBY T " + rql[6:] +
+                     ", QR questionnaire Q, Q type T")
         rset = self._cw.execute(rql_types)
         types = [line[0] for line in rset.rows]
         if len(types) > 0:
             # > main button
             w(u'<div class="btn-toolbar">')
-            w(u'<div class="btn-group-vertical btn-block">')
+            w(u'<div class="btn-group btn-group-justified">')
             w(u'<a class="btn btn-info"'
-               'data-toggle="collapse" data-target="#questionnaires">')
+               'data-toggle="collapse" data-target="#questionnaires{0}" '
+               'style="width:90%">'.format(study))
             w(u'Tables</a>')
+            w(u'<a class="btn btn-primary" href="{0}" '
+               'style="width:10%">'.format(href))
+            w(u'all</a>')
             w(u'</div></div>')
             # > typed buttons container
-            w(u'<div id="questionnaires" class="collapse">')
+            w(u'<div id="questionnaires{0}" class="collapse">'.format(study))
             w(u'<div class="panel-body">')
             w(u'<hr>')
             # > typed buttons
@@ -173,47 +296,75 @@ class PIWSNavigationtBox(component.CtxComponent):
                 w(u'<div class="btn-toolbar">')
                 w(u'<div class="btn-group-vertical btn-block">')
                 w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-                w(u'{0}</a>'.format(qtype.title()))
+                w(u'{0}</a>'.format(qtype))
                 w(u'</div></div><br/>')
             w(u'<hr>')
             w(u'</div></div><br/>')
 
         # ProcessingRun
-        rql_types = ("DISTINCT Any T ORDERBY T WHERE P is ProcessingRun, "
-                      "P type T")
+        rql = "Any P Where P is ProcessingRun"
+        if study is not None:
+            rql += ", P study ST, ST name '{0}'".format(study)
+        # > disable QC buttons
+        if self.auto_disable_qc:
+            rql_scores = ("DISTINCT Any T " + rql[5:] +
+                          ", P type T, P score_values V")
+            rset = self._cw.execute(rql_scores)
+            active_types = set(row[0] for row in rset)
+        # > build navigation
+        href = self._cw.build_url(rql=rql)
+        rql_types = "DISTINCT Any T ORDERBY T " + rql[5:] + ", P type T"
         rset = self._cw.execute(rql_types)
         types = [line[0] for line in rset.rows]
         if len(types) > 0:
             # > main button
             w(u'<div class="btn-toolbar">')
-            w(u'<div class="btn-group-vertical btn-block">')
+            w(u'<div class="btn-group btn-group-justified">')
             w(u'<a class="btn btn-info"'
-               'data-toggle="collapse" data-target="#processings">')
+               'data-toggle="collapse" data-target="#processings{0}" '
+               'style="width:90%">'.format(study))
             w(u'Processed data</a>')
+            w(u'<a class="btn btn-primary" href="{0}" '
+               'style="width:10%">'.format(href))
+            w(u'all</a>')
             w(u'</div></div>')
             # > typed buttons container
-            w(u'<div id="processings" class="collapse">')
+            w(u'<div id="processings{0}" class="collapse">'.format(study))
             w(u'<div class="panel-body">')
             w(u'<hr>')
             # > typed buttons
             for ptype in types:
-                href = self._cw.build_url(rql="Any P Where P is ProcessingRun, "
-                                              "P type '{0}'".format(ptype))
+                typed_rql = rql + ", P type '{0}'".format(ptype)
+                href = self._cw.build_url(rql=typed_rql)
                 w(u'<div class="btn-toolbar">')
-                w(u'<div class="btn-group-vertical btn-block">')
-                w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-                w(u'{0}</a>'.format(ptype.title()))
+                w(u'<div class="btn-group btn-group-justified">')
+                w(u'<a class="btn btn-primary" href="{0}" style="width:80%">'.format(href))
+                w(u'{0}</a>'.format(ptype))
+                href = self._cw.build_url(
+                    "view", vid="score-value-table-secondary", study=study or "",
+                    etype="ProcessingRun", rtype=ptype, pname="parameters",
+                    title="QC Scores", elts_to_sort=["ID"], tooltip_name="QC")
+                btn_status = "active"
+                if self.auto_disable_qc and ptype not in active_types:
+                    btn_status = "disabled"
+                w(u'<a class="btn btn-success {0}" href="{1}" '
+                   'style="width:15%">'.format(btn_status, href))
+                w(u'QC</a>')
                 w(u'</div></div><br/>')
             w(u'<hr>')
             w(u'</div></div><br/>')
 
         # GenomicMeasures
-        w(u'<div class="btn-toolbar">')
-        w(u'<div class="btn-group-vertical btn-block">')
-        href = self._cw.build_url(rql="Any GM Where GM is GenomicMeasure")
-        w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Genomic measures</a>')
-        w(u'</div></div><br/>')
+        if self.display_genomic:
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            rql = "Any GM Where GM is GenomicMeasure"
+            if study is not None:
+                rql += ", GM study '{0}'".format(study)
+            href = self._cw.build_url(rql=rql)
+            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
+            w(u'Genomic measures</a>')
+            w(u'</div></div><br/>')
 
         # MetaGen
         if self.display_metagen:
@@ -332,6 +483,91 @@ class PIWSAssessmentStatistics(component.CtxComponent):
         w(u'</div></div><br/>')
 
 
+class PIWSSummary(component.CtxComponent):
+    """ Display a summary table of all the available datasets.
+    """
+    __regid__ = "stat_box"
+    contextual = True
+    context = "right"
+    title = ("Database content")
+    order = 0
+    __select__ = match_view("index")
+    categories = ["Scan", "QuestionnaireRun", "ProcessingRun"]
+    nb_types = None
+    categories_mapping = {
+        "Timepoint": "",
+        "Scan": "Scans",
+        "QuestionnaireRun": "Tables",
+        "ProcessingRun": "Processed data"}
+    rql_subjects = "Any S WHERE S is Subject, S study ST, ST name '{0}'"
+
+    def render_body(self, w):
+        """ Method to create the summary table for each study.
+        """
+        # Go through each study
+        studies = [row[0] for row in self._cw.session.execute(
+            "DISTINCT Any SN ORDERBY SN Where S is Study, S name SN")]
+        for study in studies:
+
+            # Display the study name
+            w(u"<strong>Study:</strong> {0}<br/><br/>".format(study))
+
+            # Get all the subjects attached to the current study
+            rql = self.rql_subjects.format(study)
+            nb_subjects = self._cw.session.execute(rql).rowcount
+
+            # Create the table
+            w(u"<table class='table' style='font-size: 10px;'>")
+            w(u"<tr>")
+            for header in ["Timepoint"] + self.categories:
+                w(u"<th>{0}</th>".format(self.categories_mapping[header]))
+            w(u"</tr>")
+
+            # Go through each timepoint (one row per timepoint in the tab)
+            timepoints = [row[0] for row in self._cw.session.execute(
+                ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
+                 "A timepoint T, A study ST, ST name '{0}'".format(study)))]
+            for timepoint in timepoints:
+                
+                # Go through each category (one column per category in the tab)
+                w(u"<tr>")
+                w(u"<td>{0}</td>".format(timepoint))
+                for category in self.categories:
+
+                    # Deal with questionnaire special case
+                    if category == "QuestionnaireRun":
+                        type_name = "label"
+                    else:
+                        type_name = "type"
+                
+                    # Compute the fill ratio
+                    try:
+                        nb_types = self.nb_types[study][category]
+                    except:
+                        rql = (
+                            "DISTINCT Any T WHERE X is {0}, X {1} T, X study ST, "
+                            "ST name '{2}'".format(category, type_name, study))
+                        nb_types = self._cw.session.execute(rql).rowcount
+                    rql = (
+                        "Any X WHERE X is {0}, X study ST, ST name "
+                        "'{1}', X in_assessment A, A timepoint '{2}'".format(
+                            category, study, timepoint))
+                    nb_items = self._cw.session.execute(rql).rowcount
+                    ratio = 0.
+                    if nb_types != 0:
+                        ratio = float(nb_items)  / float(nb_types * nb_subjects)
+
+                    # Display the fill ratio
+                    w(u"<td>")
+                    w(u"<progress value='{0}' max='100' style='width:100%;'>"
+                       "</progress>".format(ratio * 100.))
+                    w(u"</td>")
+
+                w(u"</tr>")
+
+            w(u"</table>")
+
+
 ###############################################################################
 # Image viewers
 ###############################################################################
@@ -428,6 +664,7 @@ def registration_callback(vreg):
     vreg.register(PIWSSubjectStatistics)
     vreg.register(PIWSAssessmentStatistics)
     vreg.register(PIWSImageViewers)
+    vreg.register(PIWSSummary)
     vreg.unregister(EditBox)
     vreg.unregister(BreadCrumbEntityVComponent)
     vreg.unregister(BreadCrumbAnyRSetVComponent)

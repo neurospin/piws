@@ -21,7 +21,140 @@ from logilab.common.registry import yes
 
 
 ###############################################################################
-# Datatables
+# ScoreValue
+###############################################################################
+
+class ScoreValueTableViewSecondary(View):
+    """ Generate an intermediate table to select the score values base on
+    the item type and parameters.
+    """
+    __regid__ = "score-value-table-secondary"
+    title = _("QC Scores")
+
+    def call(self):
+        """ Generate the table view.
+        """
+        # Get the view paremeters
+        study = self._cw.form["study"]
+        rtype = self._cw.form["rtype"]
+        etype = self._cw.form["etype"]
+        pname = self._cw.form["pname"]
+        title = self._cw.form["title"]
+        elts_to_sort = self._cw.form["elts_to_sort"]
+        tooltip_name = self._cw.form["tooltip_name"]
+
+        # Get the row and column labels
+        if study == "":
+            rql = ("DISTINCT Any L, P, T Where X is {0}, X type '{1}', "
+                   "X in_assessment A, A timepoint T, "
+                   "X label L, X {2} P".format(etype, rtype, pname))
+        else:
+            rql = ("DISTINCT Any L, P, T Where X is {0}, X study ST, "
+                   "ST name '{1}', X type '{2}', X in_assessment A, "
+                   "A timepoint T, X label L, "
+                   "X {3} P".format(etype, study, rtype, pname))
+        rset = self._cw.execute(rql)
+        data = {}
+        for row in rset:
+            data.setdefault(row[2] + ": " + row[1], []).append(row)
+        headers = sorted(set([row[0] for row in rset]))
+
+        # Build the record
+        records = []
+        for processing_label, sequences in data.items():
+            record = [processing_label] + [""] * len(headers)
+            for sequence_name, pvalue, timepoint in sequences:
+                index = headers.index(sequence_name) + 1
+                href = self._cw.build_url(
+                    "view", vid="score-value-table-primary", study=study,
+                    etype=etype, rtype=rtype, pname=pname,
+                    title=title, tooltip_name=tooltip_name,
+                    timepoint=timepoint, pvalue=pvalue, label=sequence_name,
+                    elts_to_sort=elts_to_sort, csv_export=True)
+                record[index] = (
+                    "<a href='{0}'>"
+                    "<img src='data/images/blue-arrow.png' "
+                    "alt='Open QC' width='20' "
+                    "height='20' border='0'></a>").format(href)
+            records.append(record)
+
+        # Call JhugetableView for html generation of the table
+        self.wview("jtable-hugetable-clientside", None, "null", labels=headers,
+                   records=records, csv_export=False, title=title,
+                   timepoint="", elts_to_sort=["ID"],
+                   use_scroller=False, tooltip_name=tooltip_name)
+
+
+class ScoreValueTableViewPrimary(View):
+    """
+    """
+    __regid__ = "score-value-table-primary"
+    title = _("QC Scores")
+    default_error_message = "No score value has been provided yet."
+
+    def call(self):
+        """ Get all the score values and associated subjects.
+        """
+        # Get the view parameters
+        study = self._cw.form["study"]
+        rtype = self._cw.form["rtype"]
+        etype = self._cw.form["etype"]
+        pname = self._cw.form["pname"]
+        timepoint = self._cw.form["timepoint"]
+        pvalue = self._cw.form["pvalue"]
+        label = self._cw.form["label"]
+        csv_export = self._cw.form["csv_export"]
+        title = self._cw.form["title"]
+        elts_to_sort = self._cw.form["elts_to_sort"]
+        tooltip_name = self._cw.form["tooltip_name"]
+
+        # Get the score value
+        if study == "":
+            rql = ("Any SID, SCT, SCV Where X is {0}, X type '{1}', "
+                   "X in_assessment A, A timepoint '{2}', X label '{3}', "
+                   "X {4} '{5}', X score_values SC, SC text SCT, "
+                   "SC value SCV, X subjects S, S code_in_study SID".format(
+                        etype, rtype, timepoint, label,  pname, pvalue))
+        else:
+            rql = ("Any SID, SCT, SCV Where X is {0}, X study ST, "
+                   "ST name '{1}', X type '{2}', X in_assessment A, "
+                   "A timepoint '{3}', X label '{4}', X {5} '{6}', "
+                   "X score_values SC, SC text SCT, "
+                   "SC value SCV, X subjects S, S code_in_study SID".format(
+                        etype, study, rtype, timepoint, label,  pname, pvalue))
+        rset = self._cw.execute(rql)
+        data = {}
+        for row in rset:
+            data.setdefault(row[0], []).append(row[1:])
+        headers = sorted(set([row[1] for row in rset]))
+
+        # Empty rset
+        image_url = self._cw.data_url("images/error.png")
+        self.w(u'<div style="align: left; text-align:center;">')
+        self.w(u'<img src="{0}"/>'.format(image_url))
+        self.w(u'<div class="caption"><font size="7">{0}</font>'
+           '</div>'.format(self.default_error_message))
+        self.w(u'</div>')
+        return
+
+        # Build the record
+        records = []
+        for sid, score_data in data.items():
+            record = [sid] + [""] * len(headers)
+            for text, value in score_data:
+                index = headers.index(text) + 1
+                record[index] = value
+            records.append(record)
+
+        # Call JhugetableView for html generation of the table
+        self.wview("jtable-hugetable-clientside", None, "null", labels=headers,
+                   records=records, csv_export=csv_export, title=title,
+                   timepoint=timepoint, elts_to_sort=elts_to_sort,
+                   use_scroller=False, tooltip_name=tooltip_name)
+
+
+###############################################################################
+# QuestionnaireRun
 ###############################################################################
 
 class FileAnswerTableView(View):
@@ -56,10 +189,17 @@ class FileAnswerTableView(View):
                        for sid, sdata in rset]
 
         # Get the table labels (ie headers) that corresponds to the questions
+        rql_labels = ("Any QUT, P ORDERBY QUT WHERE Q is Questionnaire, "
+                      "Q name '{0}', Q questions QU, QU text QUT, "
+                      "QU position P".format(qname))
         labels = set()
         for sid, sdata in loaded_rset:
             labels |= set(sdata.keys())
-        labels = sorted(labels)
+        positions = {}
+        rset_positions = self._cw.execute(rql_labels)
+        for row in rset_positions:
+            positions[row[0]] = row[1]
+        labels = sorted(labels, key=lambda x: positions[x])
 
         # Construct all table rows
         records = []
@@ -81,6 +221,10 @@ class FileAnswerTableView(View):
                    timepoint=timepoint, elts_to_sort=elts_to_sort,
                    tooltip_name=tooltip_name, use_scroller=False)
 
+
+###############################################################################
+# Datatables
+###############################################################################
 
 class JHugetableView(View):
     """ Create a table view with DataTables.
@@ -141,15 +285,15 @@ class JHugetableView(View):
              "jquery-ui.css"), localfile=False)
 
         # Add js resources
-        self._cw.add_js("DataTables-1.10.10/media/js/jquery.js")
+        #self._cw.add_js("DataTables-1.10.10/media/js/jquery.js")
         self._cw.add_js("DataTables-1.10.10/media/js/jquery.dataTables.min.js")
         self._cw.add_js("DataTables-1.10.10/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("DataTables-1.10.10/extensions/Scroller/js/"
                         "dataTables.scroller.min.js")
         self._cw.add_js("DataTables-1.10.10/extensions/fnSetFilteringDelay.js")
-        self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
-                        localfile=False)
+        #self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
+        #                localfile=False)
 
         # Get the instance questionnaire map
         qmap = self._cw.vreg.docmap
@@ -482,13 +626,13 @@ class JtableView(View):
              "jquery-ui.css"), localfile=False)
 
         # Add js resources
-        self._cw.add_js("DataTables-1.10.10/media/js/jquery.js")
+        #self._cw.add_js("DataTables-1.10.10/media/js/jquery.js")
         self._cw.add_js("DataTables-1.10.10/media/js/jquery.dataTables.min.js")
         self._cw.add_js("DataTables-1.10.10/extensions/FixedColumns/js/"
                         "dataTables.fixedColumns.js")
         self._cw.add_js("DataTables-1.10.10/extensions/fnSetFilteringDelay.js")
-        self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
-                        localfile=False)
+        #self._cw.add_js("https://code.jquery.com/ui/1.11.4/jquery-ui.js",
+        #                localfile=False)
 
         # Get table meta information
         if labels is None:
@@ -969,7 +1113,8 @@ def get_questionnaires_data(self):
 def registration_callback(vreg):
 
     for tclass in [JtableView, JHugetableView, FileAnswerTableView,
-                   PIWSCSVView]:
+                   PIWSCSVView, ScoreValueTableViewSecondary,
+                   ScoreValueTableViewPrimary]:
         vreg.register(tclass)
 
     for ajax in [get_questionnaires_data, get_open_answers_data]:
