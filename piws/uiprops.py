@@ -7,11 +7,12 @@
 ##########################################################################
 
 
+# Add again rql_upload style sheet since the boostrap cube reset everything
 STYLESHEETS += [
     data('fullcalendar-2.0.1/fullcalendar.css'),
-    data('cubes.piws.css')
+    data('cubes.piws.css'),
+    data('cubes.rql_upload.css'),
 ]
-
 
 STYLESHEETS_PRINT += [
     data('fullcalendar-2.0.1/fullcalendar.print.css')
