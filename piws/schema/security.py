@@ -8,13 +8,13 @@
 
 # System import
 import inspect
+import copy
 
 # CubicWeb import
 from yams import BASE_GROUPS
 from yams.buildobjs import SubjectRelation
 from yams.buildobjs import RelationDefinition
 from cubicweb.schema import ERQLExpression
-from yams.buildobjs import RelationDefinition
 from yams.buildobjs import RelationType
 from cubicweb.entities.authobjs import CWUser
 from cubicweb.entities.authobjs import CWGroup
@@ -220,8 +220,17 @@ def post_build_callback(schema):
         if entity.type in UNTRACK_ENTITIES or entity.final:
             schema.del_relation_def(entity.type, "in_assessment", "Assessment")
 
-    # Set strict default permissions for unknown entities
+    # Set strict default permissions for unknown entities and more permissive
+    # permission on subject and study when the service is used as an
+    # upload platform
     entity_names = [e.__name__ for e in ENTITIES] + UPLOAD_PUBLIC_ENTITIES
     for entity in entities:
         if entity.type not in entity_names:
             entity.permissions = MANAGER_PERMISSIONS
+        if enable_upload and entity.type == "Subject":
+            entity.permissions = UPLOAD_PERMISSIONS
+        elif enable_upload and entity.type == "Study":
+            perms = copy.deepcopy(UPLOAD_PERMISSIONS)
+            perms["read"] = ("managers", "users")
+            entity.permissions = perms
+
