@@ -245,8 +245,9 @@ class PIWSNavigationtBox(component.CtxComponent):
                     href = self._cw.build_url(
                         "view", vid="score-value-table-secondary",
                         study=study or "", etype="Scan", rtype=ptype,
-                        pname="description", title="QC Scores",
-                        elts_to_sort=["ID"], tooltip_name="QC")
+                        rsubject="subject", pname="description",
+                        title="QC Scores", elts_to_sort=["ID"],
+                        tooltip_name="QC")
                     btn_status = "active"
                     if self.auto_disable_qc and ptype not in active_types:
                         btn_status = "disabled"
@@ -343,7 +344,8 @@ class PIWSNavigationtBox(component.CtxComponent):
                 href = self._cw.build_url(
                     "view", vid="score-value-table-secondary", study=study or "",
                     etype="ProcessingRun", rtype=ptype, pname="parameters",
-                    title="QC Scores", elts_to_sort=["ID"], tooltip_name="QC")
+                    rsubject="subjects", title="QC Scores",
+                    elts_to_sort=["ID"], tooltip_name="QC")
                 btn_status = "active"
                 if self.auto_disable_qc and ptype not in active_types:
                     btn_status = "disabled"
@@ -384,17 +386,6 @@ class PIWSNavigationtBox(component.CtxComponent):
         w(u'<span class="glyphicon glyphicon-shopping-cart"></span> '
           u'My cart</a>')
         w(u'</div></div><br/>')
-
-        # CWUpload
-        config = load_forms(self._cw.vreg.config)
-        if config > 0:
-            w(u'<div class="btn-toolbar">')
-            w(u'<div class="btn-group-vertical btn-block">')
-            href = self._cw.build_url(rql="Any U Where U is CWUpload")
-            w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-            w(u'<span class="glyphicon glyphicon glyphicon-cloud-upload">'
-                '</span> My uploads</a>')
-            w(u'</div></div><br/>')
 
 
 ###############################################################################

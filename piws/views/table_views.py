@@ -36,6 +36,7 @@ class ScoreValueTableViewSecondary(View):
         """
         # Get the view paremeters
         study = self._cw.form["study"]
+        rsubject = self._cw.form["rsubject"]
         rtype = self._cw.form["rtype"]
         etype = self._cw.form["etype"]
         pname = self._cw.form["pname"]
@@ -67,7 +68,7 @@ class ScoreValueTableViewSecondary(View):
                 index = headers.index(sequence_name) + 1
                 href = self._cw.build_url(
                     "view", vid="score-value-table-primary", study=study,
-                    etype=etype, rtype=rtype, pname=pname,
+                    etype=etype, rtype=rtype, pname=pname, rsubject=rsubject,
                     title=title, tooltip_name=tooltip_name,
                     timepoint=timepoint, pvalue=pvalue, label=sequence_name,
                     elts_to_sort=elts_to_sort, csv_export=True)
@@ -97,6 +98,7 @@ class ScoreValueTableViewPrimary(View):
         """
         # Get the view parameters
         study = self._cw.form["study"]
+        rsubject = self._cw.form["rsubject"]
         rtype = self._cw.form["rtype"]
         etype = self._cw.form["etype"]
         pname = self._cw.form["pname"]
@@ -113,15 +115,17 @@ class ScoreValueTableViewPrimary(View):
             rql = ("Any SID, SCT, SCV Where X is {0}, X type '{1}', "
                    "X in_assessment A, A timepoint '{2}', X label '{3}', "
                    "X {4} '{5}', X score_values SC, SC text SCT, "
-                   "SC value SCV, X subjects S, S code_in_study SID".format(
-                        etype, rtype, timepoint, label,  pname, pvalue))
+                   "SC value SCV, X {6} S, S code_in_study SID".format(
+                        etype, rtype, timepoint, label,  pname, pvalue,
+                        rsubject))
         else:
             rql = ("Any SID, SCT, SCV Where X is {0}, X study ST, "
                    "ST name '{1}', X type '{2}', X in_assessment A, "
                    "A timepoint '{3}', X label '{4}', X {5} '{6}', "
                    "X score_values SC, SC text SCT, "
-                   "SC value SCV, X subjects S, S code_in_study SID".format(
-                        etype, study, rtype, timepoint, label,  pname, pvalue))
+                   "SC value SCV, X {7} S, S code_in_study SID".format(
+                        etype, study, rtype, timepoint, label,  pname, pvalue,
+                        rsubject))
         rset = self._cw.execute(rql)
         data = {}
         for row in rset:
@@ -129,13 +133,14 @@ class ScoreValueTableViewPrimary(View):
         headers = sorted(set([row[1] for row in rset]))
 
         # Empty rset
-        image_url = self._cw.data_url("images/error.png")
-        self.w(u'<div style="align: left; text-align:center;">')
-        self.w(u'<img src="{0}"/>'.format(image_url))
-        self.w(u'<div class="caption"><font size="7">{0}</font>'
-           '</div>'.format(self.default_error_message))
-        self.w(u'</div>')
-        return
+        if len(headers) == 0:
+            image_url = self._cw.data_url("images/error.png")
+            self.w(u'<div style="align: left; text-align:center;">')
+            self.w(u'<img src="{0}"/>'.format(image_url))
+            self.w(u'<div class="caption"><font size="7">{0}</font>'
+               '</div>'.format(self.default_error_message))
+            self.w(u'</div>')
+            return
 
         # Build the record
         records = []
