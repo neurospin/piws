@@ -391,12 +391,8 @@ class Base(object):
             # Set the permissions
             # Create/get the related assessment groups
             if self.piws_security_model:
-                assessment_id = assessment_id.split("_")
-                related_groups = [
-                    assessment_id[0],
-                    "_".join(assessment_id[:2])
-                ]
-                for group_name in related_groups:
+
+                for group_name in self._get_security_groups(assessment_id):
 
                     # Check the group is created
                     if group_name in groups:
@@ -425,6 +421,17 @@ class Base(object):
                             group_eid, "can_update", assessment_eid)
 
         return assessment_eid
+
+    def _get_security_groups(self, assessment_id):
+        """ Get the groups that will be associated with this assemssment in
+        the security model.
+        """
+        assessment_id_split = assessment_id.split("_")
+        related_groups = [
+            assessment_id_split[0],
+            "_".join(assessment_id_split[:2])
+        ]
+        return related_groups
 
     def _import_file_set(self, fset_struct, extfiles, parent_eid,
                          assessment_eid):
@@ -464,3 +471,4 @@ class Base(object):
             self._set_unique_relation(file_entity.eid,
                 "in_assessment", assessment_eid,
                 check_unicity=False, subjtype="ExternalFile")
+
