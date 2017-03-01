@@ -8,11 +8,14 @@
 
 # System import
 import os
+import ipdb
 import sys
 import hashlib
+from argparse import Namespace
 
 # Cubicweb import
 from cubicweb.dataimport import SQLGenObjectStore
+from cubicweb.dataimport.massive_store import MassiveObjectStore
 
 
 class Base(object):
@@ -59,7 +62,7 @@ class Base(object):
     device_relations[0][0] = "Device"
 
     def __init__(self, session, can_read=True, can_update=False,
-                 use_store=True, piws_security_model=True):
+                 store_type=None, piws_security_model=True):
         """ Initialize the SeniorData class.
 
         Parameters
@@ -70,20 +73,28 @@ class Base(object):
             set the read permission to the imported data.
         can_update: bool (optional, default False)
             set the update permission to the imported data.
-        use_store: bool (optional, default True)
-            if True use an SQLGenObjectStore, otherwise the session.
+        store_type: str (optional, default None)
+            store_type that must be None to use session, 'sql' to use
+            SQLGenObjectStore, or 'massive' to use MassiveObjectStore.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
         """
         # CW parameters
         self.can_read = can_read
         self.can_update = can_update
-        self.use_store = use_store
+        if store_type is not None:
+            if store_type not in ["sql", "massive"]:
+                raise Exception("store_type must be None, 'sql' or 'massive'.")
+        self.store_type = store_type
         self.session = session
-        if self.use_store:
+        if self.store_type == "sql":
             self.store = SQLGenObjectStore(self.session)
             self.relate_method = self.store.relate
             self.create_entity_method = self.store.create_entity
+        elif self.store_type == "massive":
+            self.store = MassiveObjectStore(self.session)
+            self.relate_method = self.store.prepare_insert_relation
+            self.create_entity_method = self.prepare_insert_entity
         else:
             self.relate_method = self.session.add_relation
             self.create_entity_method = self.session.create_entity
@@ -97,13 +108,21 @@ class Base(object):
     ###########################################################################
     #   Public Methods
     ###########################################################################
+    def prepare_insert_entity(self, *args, **kwargs):
+        entity = Namespace()
+        entity.eid = self.store.prepare_insert_entity(*args, **kwargs)
+        return entity
 
     def cleanup(self):
         """ Method to cleanup temporary items and to commit changes.
         """
         # Send the new entities to the db
-        if self.use_store:
+        if self.store_type == "sql":
             self.store.flush()
+        elif self.store_type == "massive":
+            self.store.flush()
+            self.store.commit()
+            self.store.finish()
         else:
             self.session.commit()
 
@@ -234,7 +253,7 @@ class Base(object):
 
             # The request returns some data -> do nothing
             if rset.rowcount == 0:
-                if self.use_store:
+                if self.store_type == "sql":
                     self.relate_method(source_eid, relation_name,
                                        detination_eid, subjtype=subjtype)
                 else:
@@ -243,7 +262,7 @@ class Base(object):
 
         # Without unicity constrain
         else:
-            if self.use_store:
+            if self.store_type == "sql":
                 self.relate_method(source_eid, relation_name, detination_eid,
                                    subjtype=subjtype)
             else:
@@ -327,7 +346,7 @@ class Base(object):
                 self._import_file_set(fset_struct, extfiles, device_eid,
                                       assessment_eid)
 
-        return device_eid 
+        return device_eid
 
     def _create_assessment(self, assessment_struct, subject_eids, study_eid,
                            center_eid, groups):
@@ -358,8 +377,14 @@ class Base(object):
                 entity_name="Assessment",
                 **assessment_struct)
             assessment_eid = assessment_entity.eid
-            self.already_related_subjects[assessment_eid] = [
-                e.eid for e in assessment_entity.subjects]
+            self.already_related_subjects[assessment_eid] = []
+            if not is_created:
+                rql = ("Any S Where A is Assessment, A eid {}, "
+                       "A subjects S".format(assessment_eid))
+                rset = self.session.execute(rql)
+                for line in rset:
+                    self.already_related_subjects[assessment_eid].append(
+                        line[0])
             self.inserted_assessments[assessment_id] = assessment_eid
 
         # Add relation with the subject
@@ -471,4 +496,3 @@ class Base(object):
             self._set_unique_relation(file_entity.eid,
                 "in_assessment", assessment_eid,
                 check_unicity=False, subjtype="ExternalFile")
-

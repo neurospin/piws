@@ -66,13 +66,13 @@ metagen = metagen_parser(meta_path)
 
 # Define the importer
 db_user_importer = CWUsers(session, USERS)
-db_grp_importer = CWGroups(session, ["TEST_V1", "TEST"], use_store=False)
-db_genetic_importer = MetaGen(session, use_store=False)
+db_grp_importer = CWGroups(session, ["TEST_V1", "TEST"], store_type=None)
+db_genetic_importer = MetaGen(session, store_type=None)
 db_plink_importer = Genetics(
     session, "TEST", "NS", genetics, can_read=True,
-    can_update=False, data_filepath=plink_path, use_store=False)
+    can_update=False, data_filepath=plink_path, store_type=None)
 db_subject_importer = Subjects(
-    session, "TEST", subjects, use_store=False)
+    session, "TEST", subjects, store_type=None)
 
 # Execute in the appropriate order the importation scripts
 # > groups

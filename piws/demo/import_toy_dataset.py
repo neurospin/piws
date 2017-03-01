@@ -15,7 +15,8 @@ import getpass
 
 # CubicWeb import
 from cubicweb import cwconfig
-from cubicweb.dbapi import in_memory_repo_cnx
+# from cubicweb.dbapi import in_memory_repo_cnx
+from cubicweb.utils import admincnx
 
 # Piws import
 sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
@@ -50,6 +51,8 @@ password = getpass.getpass("Enter the '{0}' password [default: anon]: ".format(
 if not password:
     password = "anon"
 
+store_type = None
+
 # Gloabal parameters
 USERS = {
     "user1": {
@@ -71,10 +74,10 @@ USERS = {
 STUDY_NAME = "toy"
 CENTER_NAME = "home"
 
-# Create a cw session
-config = cwconfig.instance_configuration(instance_name)
-repo, cnx = in_memory_repo_cnx(config, login=login, password=password)
-session = repo._get_session(cnx.sessionid)
+# # Create a cw session
+# config = cwconfig.instance_configuration(instance_name)
+# repo, cnx = in_memory_repo_cnx(config, login=login, password=password)
+# session = repo._get_session(cnx.sessionid)
 
 # Parse the file system
 subjects = subject_parser(demo_path, STUDY_NAME)
@@ -83,48 +86,49 @@ questionnaires = questionnaire_parser(demo_path, STUDY_NAME)
 genetics = genetic_parser(demo_path, STUDY_NAME)
 processings = freesurfer_parser(demo_path, STUDY_NAME)
 
-# Define all the importers
-db_grp_importer = CWGroups(session, ["toy_V0", "toy_V1", "toy", "uploaders"],
-                           use_store=False)
-db_user_importer = CWUsers(session, USERS)
-db_subject_importer = Subjects(
-    session, STUDY_NAME, subjects, use_store=False)
-db_scan_importer = Scans(
-    session, STUDY_NAME, CENTER_NAME, scans, can_read=True, can_update=False,
-    data_filepath=demo_path, use_store=False)
-db_questionnaire_importer = Questionnaires(
-    session, STUDY_NAME, CENTER_NAME, questionnaires, "Clinical",
-    can_read=True, can_update=False, data_filepath=demo_path, use_store=False,
-    use_openanswer=True)
-db_genetic_importer = Genetics(
-    session, STUDY_NAME, CENTER_NAME, genetics, can_read=True,
-    can_update=False, data_filepath=demo_path, use_store=False)
-db_processings_importer = Processings(
-    session, STUDY_NAME, CENTER_NAME, processings, "FreeSurfer", can_read=True,
-    can_update=False, data_filepath=demo_path, use_store=False)
+with admincnx(instance_name) as session:
+    # Define all the importers
+    db_grp_importer = CWGroups(session, ["toy_V0", "toy_V1", "toy", "uploaders"],
+                               store_type=store_type)
+    db_user_importer = CWUsers(session, USERS)
+    db_subject_importer = Subjects(
+        session, STUDY_NAME, subjects, store_type=store_type)
+    db_scan_importer = Scans(
+        session, STUDY_NAME, CENTER_NAME, scans, can_read=True, can_update=False,
+        data_filepath=demo_path, store_type=store_type)
+    db_questionnaire_importer = Questionnaires(
+        session, STUDY_NAME, CENTER_NAME, questionnaires, "Clinical",
+        can_read=True, can_update=False, data_filepath=demo_path, store_type=store_type,
+        use_openanswer=True)
+    db_genetic_importer = Genetics(
+        session, STUDY_NAME, CENTER_NAME, genetics, can_read=True,
+        can_update=False, data_filepath=demo_path, store_type=store_type)
+    db_processings_importer = Processings(
+        session, STUDY_NAME, CENTER_NAME, processings, "FreeSurfer", can_read=True,
+        can_update=False, data_filepath=demo_path, store_type=store_type)
 
-# Execute in the appropriate order the importation scripts
-# > groups
-db_grp_importer.import_data()
-db_grp_importer.cleanup()
-# > users
-db_user_importer.import_data()
-db_user_importer.cleanup()
-# > subjects
-db_subject_importer.import_data()
-db_subject_importer.cleanup()
-# > scans
-db_scan_importer.import_data()
-db_scan_importer.cleanup()
-# > questionnaires
-db_questionnaire_importer.import_data()
-db_questionnaire_importer.cleanup()
-# > genetics
-db_genetic_importer.import_data()
-db_genetic_importer.cleanup()
-# > processings
-db_processings_importer.import_data()
-db_processings_importer.cleanup()
+    # Execute in the appropriate order the importation scripts
+    # > groups
+    db_grp_importer.import_data()
+    db_grp_importer.cleanup()
+    # > users
+    db_user_importer.import_data()
+    db_user_importer.cleanup()
+    # > subjects
+    db_subject_importer.import_data()
+    db_subject_importer.cleanup()
+    # > scans
+    db_scan_importer.import_data()
+    db_scan_importer.cleanup()
+    # > questionnaires
+    db_questionnaire_importer.import_data()
+    db_questionnaire_importer.cleanup()
+    # > genetics
+    db_genetic_importer.import_data()
+    db_genetic_importer.cleanup()
+    # > processings
+    db_processings_importer.import_data()
+    db_processings_importer.cleanup()
 
-# Commit
-session.commit()
+    # Commit
+    session.commit()

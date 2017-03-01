@@ -35,7 +35,7 @@ class Genetics(Base):
 
     def __init__(self, session, project_name, center_name, genetics,
                  can_read=True, can_update=True, data_filepath=None,
-                 use_store=True, piws_security_model=True):
+                 store_type=None, piws_security_model=True):
         """ Initialize the Genetics class.
 
         Parameters
@@ -57,8 +57,9 @@ class Genetics(Base):
             set the update permission to the imported data.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
-        use_store: bool (optional, default True)
-            if True use an SQLGenObjectStore, otherwise the session.
+        store_type: str (optional, default None)
+            store_type that must be None to use session, 'sql' to use
+            SQLGenObjectStore, or 'massive' to use MassiveObjectStore.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
 
@@ -113,7 +114,7 @@ class Genetics(Base):
             session=session,
             can_read=can_read,
             can_update=can_update,
-            use_store=use_store,
+            store_type=store_type,
             piws_security_model=piws_security_model)
 
         # Parse the file system
