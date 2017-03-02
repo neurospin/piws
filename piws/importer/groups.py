@@ -18,7 +18,7 @@ from .base import Base
 class CWGroups(Base):
     """ This class enables us to add new user groups in CW.
     """
-    def __init__(self, session, list_group_names, store_type=None):
+    def __init__(self, session, list_group_names, store_type="None"):
         """ Initialize the CWGroups class.
 
         Parameters
@@ -27,9 +27,9 @@ class CWGroups(Base):
             a cubicweb session.
         list_group_names: list of str (mandatory)
             the name of the different groups.
-        store_type: str (optional, default None)
-            store_type that must be None to use session, 'sql' to use
-            SQLGenObjectStore, or 'massive' to use MassiveObjectStore.
+        store_type: str (optional, default 'None')
+            store_type that must be 'None' to use session, 'SQLGenObjectStore',
+            or 'MassiveObjectStore' otherwise.
         """
         # Inheritance
         super(CWGroups, self).__init__(

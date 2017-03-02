@@ -26,7 +26,7 @@ from cubicweb.web.views.ibreadcrumbs import BreadCrumbLinkToVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbAnyRSetVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbETypeVComponent
 from logilab.common.decorators import monkeypatch
-from cubicweb import _
+# from cubicweb import _
 
 # Cubes import
 from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus

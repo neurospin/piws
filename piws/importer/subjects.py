@@ -33,7 +33,7 @@ class Subjects(Base):
         ("Study", "protocols", "Protocol")]
 
     def __init__(self, session, project_name, subjects, data_filepath=None,
-                 store_type=None):
+                 store_type="None"):
         """ Initialize the Subjects class.
 
         Parameters
@@ -47,9 +47,9 @@ class Subjects(Base):
             password.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
-        store_type: str (optional, default None)
-            store_type that must be None to use session, 'sql' to use
-            SQLGenObjectStore, or 'massive' to use MassiveObjectStore.
+        store_type: str (optional, default 'None')
+            store_type that must be 'None' to use session, 'SQLGenObjectStore',
+            or 'MassiveObjectStore' otherwise.
 
         Notes
         -----

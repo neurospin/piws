@@ -13,9 +13,7 @@ import os
 import sys
 import getpass
 
-# CubicWeb import
-from cubicweb import cwconfig
-# from cubicweb.dbapi import in_memory_repo_cnx
+# CW imports
 from cubicweb.utils import admincnx
 
 # Piws import
@@ -42,16 +40,20 @@ if not instance_name:
 demo_path = raw_input("\nEnter where are the demo data [default: /tmp/demo]: ")
 if not demo_path:
     demo_path = "/tmp/demo"
-login = raw_input("\nEnter the '{0}' login [default: anon]: ".format(
-    instance_name))
-if not login:
-    login = "anon"
-password = getpass.getpass("Enter the '{0}' password [default: anon]: ".format(
-    instance_name))
-if not password:
-    password = "anon"
+available_stores = ["None", "SQLGenObjectStore", "MassiveObjectStore"]
+menu = "\nAvailable importation methods: "
+for index, store in enumerate(available_stores):
+    menu += "\n{} ---> {}".format(index, store)
+menu += "\nPlease choose a store type: "
+while True:
+    store_index = raw_input(menu)
+    if store_index in [str(i) for i in range(len(available_stores))]:
+        break
+    else:
+        print("\nInvalid selection")
 
-store_type = None
+store_type = available_stores[int(store_index)]
+print("\nStarting importation with '{}' store...\n".format(store_type))
 
 # Gloabal parameters
 USERS = {
@@ -73,11 +75,6 @@ USERS = {
 }
 STUDY_NAME = "toy"
 CENTER_NAME = "home"
-
-# # Create a cw session
-# config = cwconfig.instance_configuration(instance_name)
-# repo, cnx = in_memory_repo_cnx(config, login=login, password=password)
-# session = repo._get_session(cnx.sessionid)
 
 # Parse the file system
 subjects = subject_parser(demo_path, STUDY_NAME)
