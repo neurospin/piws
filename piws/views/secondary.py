@@ -10,6 +10,7 @@
 import collections
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.predicates import is_instance
 from cubicweb.view import EntityView
 

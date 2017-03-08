@@ -10,6 +10,7 @@
 import json
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.view import View
 
 

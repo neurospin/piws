@@ -7,6 +7,7 @@
 ##########################################################################
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.predicates import is_instance
 from cubicweb.predicates import authenticated_user
 from cubicweb.web.action import Action

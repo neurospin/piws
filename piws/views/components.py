@@ -10,6 +10,7 @@
 import json
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.web import component
 from cubicweb.predicates import is_instance
 from cubicweb.predicates import nonempty_rset

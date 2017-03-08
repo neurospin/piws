@@ -7,6 +7,7 @@
 ##########################################################################
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.predicates import any_rset
 from cubicweb.web.views import tableview
 from logilab.common.decorators import monkeypatch

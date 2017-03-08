@@ -11,6 +11,7 @@ import json
 import types
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.web.views.primary import PrimaryView
 from cubicweb.predicates import is_instance
 from cubicweb.web.views.primary import PrimaryView

@@ -7,6 +7,7 @@
 ##########################################################################
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.web import facet
 from cubicweb.predicates import is_instance
 from cubicweb.web.views.facets import FacetFilterMixIn

@@ -8,6 +8,7 @@
 ##########################################################################
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.web.views.sessions import InMemoryRepositorySessionManager
 from cubicweb.web import LogOut, DirectResponse, Redirect
 from cubicweb.etwist.http import HTTPResponse

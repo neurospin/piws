@@ -14,6 +14,7 @@ import re
 import time
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
 from cubicweb.web.views.csvexport import CSVMixIn

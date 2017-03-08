@@ -75,7 +75,7 @@ class Scans(Base):
 
         Notes
         -----
-        Here is an axemple of the definiton of the 'scans' parameter:
+        Here is an example of the definiton of the 'scans' parameter:
 
         ::
 

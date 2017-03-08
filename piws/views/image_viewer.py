@@ -16,6 +16,7 @@ import StringIO
 import PIL
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
 

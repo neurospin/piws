@@ -16,6 +16,7 @@ import os
 import numpy
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.view import View
 from cubicweb.web.views.json import JsonMixIn
 

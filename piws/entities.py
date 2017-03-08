@@ -12,7 +12,7 @@ from cubicweb.predicates import is_instance
 from cubicweb.entities import AnyEntity
 
 # Cubes import
-from cubes.medicalexp.config import ASSESSMENT_CONTAINER
+from cubes.piws.config import ASSESSMENT_CONTAINER
 from cubes.rql_upload.entities import EntityUploadFile
 
 

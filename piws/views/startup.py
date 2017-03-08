@@ -7,6 +7,7 @@
 ##########################################################################
 
 # Cubicweb import
+from cubicweb import _
 from cubicweb.predicates import is_instance
 from cubicweb.predicates import anonymous_user
 from cubicweb.web.views.startup import IndexView
