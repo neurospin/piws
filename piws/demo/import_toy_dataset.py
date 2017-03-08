@@ -40,7 +40,9 @@ if not instance_name:
 demo_path = raw_input("\nEnter where are the demo data [default: /tmp/demo]: ")
 if not demo_path:
     demo_path = "/tmp/demo"
-available_stores = ["None", "SQLGenObjectStore", "MassiveObjectStore"]
+
+# Select the insertion methode type
+available_stores = ["RQL", "SQL", "MASSIVE"]
 menu = "\nAvailable importation methods: "
 for index, store in enumerate(available_stores):
     menu += "\n{} ---> {}".format(index, store)
@@ -51,7 +53,6 @@ while True:
         break
     else:
         print("\nInvalid selection")
-
 store_type = available_stores[int(store_index)]
 print("\nStarting importation with '{}' store...\n".format(store_type))
 

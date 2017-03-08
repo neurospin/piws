@@ -69,7 +69,7 @@ class CWUsers(Base):
             session=session,
             can_read=True,
             can_update=True,
-            store_type="None",
+            store_type="RQL",
             piws_security_model=False)
 
         # Class parameters

@@ -32,7 +32,7 @@ class MetaGen(Base):
         ("Gene", "gene_snps", "Snp")
     )
 
-    def __init__(self, session, store_type="None"):
+    def __init__(self, session, store_type="RQL"):
         """ Initialize the MetaGen class.
 
         Parameters
@@ -43,9 +43,10 @@ class MetaGen(Base):
             set the read permission to the imported data.
         can_update: bool (optional, default True)
             set the update permission to the imported data.
-        store_type: str (optional, default 'None')
-            store_type that must be 'None' to use session, 'SQLGenObjectStore',
-            or 'MassiveObjectStore' otherwise.
+        store_type: str (optional, default 'RQL')
+            Must be in ['RQL', 'SQL', 'MASSIVE'].
+            'RQL' to use session, 'SQL' to use SQLGenObjectStore, or 'MASSIVE'
+            to use MassiveObjectStore.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
 

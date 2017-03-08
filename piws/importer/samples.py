@@ -20,7 +20,7 @@ class Samples(Base):
     to the cubicweb database
     """
     def __init__(self, session, project_name, center_name, data_path, parser,
-                 can_read=True, can_update=True, store_type="None",
+                 can_read=True, can_update=True, store_type="RQL",
                  piws_security_model=True):
         """ Initialize the Measures class
 
@@ -40,9 +40,10 @@ class Samples(Base):
             set the read permission to the imported data.
         can_update: bool (optional, default True)
             set the update permission to the imported data.
-        store_type: str (optional, default 'None')
-            store_type that must be 'None' to use session, 'SQLGenObjectStore',
-            or 'MassiveObjectStore' otherwise.
+        store_type: str (optional, default 'RQL')
+            Must be in ['RQL', 'SQL', 'MASSIVE'].
+            'RQL' to use session, 'SQL' to use SQLGenObjectStore, or 'MASSIVE'
+            to use MassiveObjectStore.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
         """

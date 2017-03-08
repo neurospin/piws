@@ -122,7 +122,7 @@ class in_assessment(RelationType):
     """ Relate entities to an assessment with this relation in order to apply
     the proposed simplified rights management mechanism.
     """
-    inlined = False
+    inlined = True
     cardinality = "1*"
     subject = "*"
     object = "Assessment"

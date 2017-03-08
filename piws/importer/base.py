@@ -14,6 +14,31 @@ from argparse import Namespace
 
 # Cubicweb import
 from cubicweb.dataimport import SQLGenObjectStore
+from logilab.common.decorators import monkeypatch
+try:
+    from cubicweb.dataimport.stores import NoHookRQLObjectStore
+except ImportError:
+    from cubicweb.dataimport import NoHookRQLObjectStore
+
+
+@monkeypatch(NoHookRQLObjectStore)
+def prepare_insert_relation(self, eid_from, rtype, eid_to, **kwargs):
+        """Insert into the database a  relation ``rtype`` between entities with eids ``eid_from``
+        and ``eid_to``.
+        """
+        assert not rtype.startswith('reverse_')
+        if hasattr(self, "_rschema"):
+            rschema = self._rschema(rtype)
+        else:
+            rschema = self.rschema(rtype)
+        if hasattr(self, "_add_relation"):
+            add_relation = self._add_relation
+        else:
+            add_relation = self.add_relation
+        add_relation(self._cnx, eid_from, rtype, eid_to, rschema.inlined, **kwargs)
+        if rschema.symmetric:
+            add_relation(self._cnx, eid_to, rtype, eid_from, rschema.inlined, **kwargs)
+        self._nb_inserted_relations += 1
 
 
 class Base(object):
@@ -60,7 +85,7 @@ class Base(object):
     device_relations[0][0] = "Device"
 
     def __init__(self, session, can_read=True, can_update=False,
-                 store_type="None", piws_security_model=True):
+                 store_type="RQL", piws_security_model=True):
         """ Initialize the SeniorData class.
 
         Parameters
@@ -71,31 +96,40 @@ class Base(object):
             set the read permission to the imported data.
         can_update: bool (optional, default False)
             set the update permission to the imported data.
-        store_type: str (optional, default 'None')
-            store_type that must be 'None' to use session, 'SQLGenObjectStore',
-            or 'MassiveObjectStore' otherwise.
+        store_type: str (optional, default 'RQL')
+            Must be in ['RQL', 'SQL', 'MASSIVE'].
+            'RQL' to use session, 'SQL' to use SQLGenObjectStore, or 'MASSIVE'
+            to use MassiveObjectStore.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
         """
         # CW parameters
-        self.can_read = can_read
-        self.can_update = can_update
-        if store_type not in ["None", "SQLGenObjectStore", "MassiveObjectStore"]:
-            raise Exception("Store_type must be 'None', 'SQLGenObjectStore' "
-                            "or 'MassiveObjectStore'.")
-        if store_type == "MassiveObjectStore":
+
+        # Check input parameters
+        if store_type not in ["RQL", "SQL", "MASSIVE"]:
+            raise Exception("Store type must be in ['RQL', 'SQL', 'Massive'].")
+        if store_type == "MASSIVE":
             try:
                 from cubicweb.dataimport.massive_store import MassiveObjectStore
             except ImportError:
                 raise Exception("Massive store is not available "
                                 "for Cubicweb < 3.22.")
+
+        self.can_read = can_read
+        self.can_update = can_update
         self.store_type = store_type
         self.session = session
-        if self.store_type == "SQLGenObjectStore":
+        if self.store_type == "SQL":
             self.store = SQLGenObjectStore(self.session)
-            self.relate_method = self.store.relate
-            self.create_entity_method = self.store.create_entity
-        elif self.store_type == "MassiveObjectStore":
+            if hasattr(self.store, "prepare_insert_relation"):
+                self.relate_method = self.store.prepare_insert_relation
+            else:
+                self.relate_method = self.store.relate
+            if hasattr(self.store, "prepare_insert_entity"):
+                self.create_entity_method = self.prepare_insert_entity
+            else:
+                self.create_entity_method = self.store.create_entity
+        elif self.store_type == "MASSIVE":
             self.store = MassiveObjectStore(self.session)
             self.relate_method = self.store.prepare_insert_relation
             self.create_entity_method = self.prepare_insert_entity
@@ -113,6 +147,8 @@ class Base(object):
     #   Public Methods
     ###########################################################################
     def prepare_insert_entity(self, *args, **kwargs):
+        """Returns a dummy CW object with only the eid specified.
+        """
         entity = Namespace()
         entity.eid = self.store.prepare_insert_entity(*args, **kwargs)
         return entity
@@ -121,12 +157,11 @@ class Base(object):
         """ Method to cleanup temporary items and to commit changes.
         """
         # Send the new entities to the db
-        if self.store_type == "SQLGenObjectStore":
-            self.store.flush()
-        elif self.store_type == "MassiveObjectStore":
+        if self.store_type in ["SQL", "MASSIVE"]:
             self.store.flush()
             self.store.commit()
-            self.store.finish()
+            if hasattr(self.store, "finish"):
+                self.store.finish()
         else:
             self.session.commit()
 
@@ -257,7 +292,7 @@ class Base(object):
 
             # The request returns some data -> do nothing
             if rset.rowcount == 0:
-                if self.store_type == "SQLGenObjectStore":
+                if self.store_type == "SQL":
                     self.relate_method(source_eid, relation_name,
                                        detination_eid, subjtype=subjtype)
                 else:
@@ -266,7 +301,7 @@ class Base(object):
 
         # Without unicity constrain
         else:
-            if self.store_type == "SQLGenObjectStore":
+            if self.store_type == "SQL":
                 self.relate_method(source_eid, relation_name, detination_eid,
                                    subjtype=subjtype)
             else:
@@ -381,14 +416,13 @@ class Base(object):
                 entity_name="Assessment",
                 **assessment_struct)
             assessment_eid = assessment_entity.eid
-            self.already_related_subjects[assessment_eid] = []
-            if not is_created:
+            if is_created:
+                self.already_related_subjects[assessment_eid] = []
+            else:
                 rql = ("Any S Where A is Assessment, A eid {}, "
                        "A subjects S".format(assessment_eid))
-                rset = self.session.execute(rql)
-                for line in rset:
-                    self.already_related_subjects[assessment_eid].append(
-                        line[0])
+                self.already_related_subjects[assessment_eid] = [
+                    row[0] for row in self.session.execute(rql)]
             self.inserted_assessments[assessment_id] = assessment_eid
 
         # Add relation with the subject
