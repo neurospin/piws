@@ -29,7 +29,7 @@ class Scans(Base):
             (dtype, "scan", "Scan"),
             (dtype, "in_assessment", "Assessment")])
     relations = (
-        Base.fileset_relations + Base.assessment_relations + 
+        Base.fileset_relations + Base.assessment_relations +
         Base.device_relations + [
             ("Scan", "study", "Study"),
             ("Study", "study_scans", "Scan"),
@@ -46,7 +46,7 @@ class Scans(Base):
 
     def __init__(self, session, project_name, center_name, scans,
                  can_read=True, can_update=False, data_filepath=None,
-                 use_store=True, piws_security_model=True):
+                 store_type="RQL", piws_security_model=True):
         """ Initialize the Scans class.
 
         Parameters
@@ -68,8 +68,10 @@ class Scans(Base):
             set the update permission to the imported data.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
-        use_store: bool (optional, default True)
-            if True use an SQLGenObjectStore, otherwise the session.
+        store_type: str (optional, default 'RQL')
+            Must be in ['RQL', 'SQL', 'MASSIVE'].
+            'RQL' to use session, 'SQL' to use SQLGenObjectStore, or 'MASSIVE'
+            to use MassiveObjectStore.
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
 
@@ -117,15 +119,15 @@ class Scans(Base):
                     },
                     "Device": {
                         "ExternalResources": [{
-                            "absolute_path": true, 
-                            "filepath": "/my/path/examcard.pdf", 
-                            "identifier": "EXAM_CARD_TIEMPOINT_CENTER", 
+                            "absolute_path": true,
+                            "filepath": "/my/path/examcard.pdf",
+                            "identifier": "EXAM_CARD_TIEMPOINT_CENTER",
                             "name": "EXAM_CARD_TIEMPOINT_CENTER"
-                        }], 
-                        "identifier": "31be53546754dc5f04ab2d9db6bed7cf", 
-                        "manufacturer": "SIEMENS", 
-                        "model": "Verio", 
-                        "serialnum": "xxxxx", 
+                        }],
+                        "identifier": "31be53546754dc5f04ab2d9db6bed7cf",
+                        "manufacturer": "SIEMENS",
+                        "model": "Verio",
+                        "serialnum": "xxxxx",
                         "software_version": "xxxxxx"
                     }
                     ...
@@ -137,7 +139,7 @@ class Scans(Base):
             session=session,
             can_read=can_read,
             can_update=can_update,
-            use_store=use_store,
+            store_type=store_type,
             piws_security_model=piws_security_model)
 
         # Class parameters
@@ -283,7 +285,7 @@ class Scans(Base):
                     # Check if this item has already been inserted
                     if device_id in self.inserted_devices:
                         device_eid = self.inserted_devices[device_id]
-                        
+
 
                     # Create the device
                     else:
@@ -299,7 +301,7 @@ class Scans(Base):
                         self._set_unique_relation(
                             device_eid, "device_assessments", assessment_eid,
                             check_unicity=False)
-                
+
                 # Otherwise device eid is None
                 else:
                     device_eid = None

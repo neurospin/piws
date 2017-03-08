@@ -33,7 +33,7 @@ class Subjects(Base):
         ("Study", "protocols", "Protocol")]
 
     def __init__(self, session, project_name, subjects, data_filepath=None,
-                 use_store=True):
+                 store_type="RQL"):
         """ Initialize the Subjects class.
 
         Parameters
@@ -47,8 +47,10 @@ class Subjects(Base):
             password.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
-        use_store: bool (optional, default True)
-            if True use an SQLGenObjectStore, otherwise the session.
+        store_type: str (optional, default 'RQL')
+            Must be in ['RQL', 'SQL', 'MASSIVE'].
+            'RQL' to use session, 'SQL' to use SQLGenObjectStore, or 'MASSIVE'
+            to use MassiveObjectStore.
 
         Notes
         -----
@@ -79,7 +81,7 @@ class Subjects(Base):
             session=session,
             can_read=True,
             can_update=True,
-            use_store=use_store,
+            store_type=store_type,
             piws_security_model=False)
 
         # Class parameters
@@ -150,7 +152,7 @@ class Subjects(Base):
             # Remove relation arguments from the subject structure
             diagnostic = subject_parameter.pop("diagnostic", None)
             groups = subject_parameter.pop("groups", None)
-            protocols = subject_parameter.pop("protocols", None)           
+            protocols = subject_parameter.pop("protocols", None)
 
             # Create the subject if necessary
             subject_entity, is_created = self._get_or_create_unique_entity(

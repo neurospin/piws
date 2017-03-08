@@ -136,7 +136,7 @@ class PIWSNavigationtBox(component.CtxComponent):
         if self.display_study:
 
             # Request all the available studies
-            studies = [row[0] for row in self._cw.session.execute(
+            studies = [row[0] for row in self._cw.execute(
                 "DISTINCT Any SN ORDERBY SN Where S is Study, S name SN")]
 
             # Display a study selection tab bar
@@ -159,7 +159,7 @@ class PIWSNavigationtBox(component.CtxComponent):
             w(u'});')
             w(u'$(".piws-nav a").click(function(){')
             w(u'$(this).tab("show");')
-            w(u'window.name = $(this).attr("href");') 
+            w(u'window.name = $(this).attr("href");')
             w(u'});')
             w(u'});')
             w(u'</script>')
@@ -497,7 +497,7 @@ class PIWSSummary(component.CtxComponent):
         """ Method to create the summary table for each study.
         """
         # Go through each study
-        studies = [row[0] for row in self._cw.session.execute(
+        studies = [row[0] for row in self._cw.execute(
             "DISTINCT Any SN ORDERBY SN Where S is Study, S name SN")]
         for study in studies:
 
@@ -506,7 +506,7 @@ class PIWSSummary(component.CtxComponent):
 
             # Get all the subjects attached to the current study
             rql = self.rql_subjects.format(study)
-            nb_subjects = self._cw.session.execute(rql).rowcount
+            nb_subjects = self._cw.execute(rql).rowcount
 
             # Create the table
             w(u"<table class='table' style='font-size: 10px;'>")
@@ -516,11 +516,11 @@ class PIWSSummary(component.CtxComponent):
             w(u"</tr>")
 
             # Go through each timepoint (one row per timepoint in the tab)
-            timepoints = [row[0] for row in self._cw.session.execute(
+            timepoints = [row[0] for row in self._cw.execute(
                 ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
                  "A timepoint T, A study ST, ST name '{0}'".format(study)))]
             for timepoint in timepoints:
-                
+
                 # Go through each category (one column per category in the tab)
                 w(u"<tr>")
                 w(u"<td>{0}</td>".format(timepoint))
@@ -531,7 +531,7 @@ class PIWSSummary(component.CtxComponent):
                         type_name = "label"
                     else:
                         type_name = "type"
-                
+
                     # Compute the fill ratio
                     try:
                         nb_types = self.nb_types[study][category]
@@ -539,12 +539,12 @@ class PIWSSummary(component.CtxComponent):
                         rql = (
                             "DISTINCT Any T WHERE X is {0}, X {1} T, X study ST, "
                             "ST name '{2}'".format(category, type_name, study))
-                        nb_types = self._cw.session.execute(rql).rowcount
+                        nb_types = self._cw.execute(rql).rowcount
                     rql = (
                         "Any X WHERE X is {0}, X study ST, ST name "
                         "'{1}', X in_assessment A, A timepoint '{2}'".format(
                             category, study, timepoint))
-                    nb_items = self._cw.session.execute(rql).rowcount
+                    nb_items = self._cw.execute(rql).rowcount
                     ratio = 0.
                     if nb_types != 0:
                         ratio = float(nb_items)  / float(nb_types * nb_subjects)
