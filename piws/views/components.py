@@ -86,17 +86,12 @@ class PIWSAuthenticatedUserStatus(BSAuthenticatedUserStatus):
     """
     def render(self, w):
         config = self._cw.vreg.config
-        if config.get("show_user_status", "no") == "yes":
-            if config.get("enable-apache-logout", "no") == "yes":
+        if config.get("show_user_status"):
+            if config.get("enable-apache-logout"):
                 w(u"<a href='{0}' class='button'>Logout</a>".format(
                     self._cw.base_url() + 'logout'))
             else:
-                if config.get("apache-cleanup-session-time", None) is not None:
-                    raise NotImplementedError(
-                        "Session expiration with Apache is not yet available "
-                        "due to cross browsers compatibility issues.")
-                else:
-                    super(PIWSAuthenticatedUserStatus, self).render(w)
+                super(PIWSAuthenticatedUserStatus, self).render(w)
         else:
             w(u"")
 

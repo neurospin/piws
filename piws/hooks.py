@@ -80,31 +80,34 @@ class CreateDocumentation(hook.Hook):
             self.repo.vreg.docmap = {}
 
 
-def piws_clean_sessions(self):
+def apache_clean_sessions(self):
     """tags sessions not used since an amount of time specified in the
     configuration
     """
     # Remove zombies from expired sessions
-    self._piws_expired_sessionids &= set(self._sessions)
+    for sessionid, _ in self._expired_sessionids.iteritems():
+        if sessionid not in self._sessions:
+            del self._expired_sessionids[sessionid]
+
     # System import
     from time import time, strftime, localtime
-    mintime = time() - self.piws_cleanup_session_time
+    mintime = time() - self.a_cleanup_session_time
     self.debug('cleaning session unused since %s',
                strftime('%H:%M:%S', localtime(mintime)))
     nbclosed = 0
     for sessionid, session in self._sessions.iteritems():
         if session.timestamp < mintime:
-            if sessionid not in self._piws_expired_sessionids:
-                self._piws_expired_sessionids.add(sessionid)
-                self.info('session {0} has expired'.format(sessionid))
+            if sessionid not in self._expired_sessionids:
+                self._expired_sessionids[sessionid] = True
+                self.info('session {0} expired'.format(sessionid))
                 nbclosed += 1
     return nbclosed
 
 
 class PiwsApacheDeauthenticationHook(hook.Hook):
-    """ Add piws_clean_sessions to server looping tasks.
+    """ Add apache_clean_sessions to server looping tasks
     """
-    __regid__ = 'piws.apache_deauthentication'
+    __regid__ = 'apache_logout.apache_deauthentication'
     events = ('server_startup', 'server_maintenance')
 
     def __call__(self):
@@ -114,31 +117,25 @@ class PiwsApacheDeauthenticationHook(hook.Hook):
         """
         if not (self.repo.config.creating or self.repo.config.repairing
                 or self.repo.config.quick_start):
-            piws_cleanup_session_time = self.repo.config.get(
-                'apache-cleanup-session-time', None)
-            if piws_cleanup_session_time is not None:
-                raise NotImplementedError("Session expiration with Apache "
-                                          "is not yet available due to "
-                                          "cross browsers compatibility "
-                                          "issues")
-                assert piws_cleanup_session_time > 0
-                self.repo.piws_cleanup_session_time = piws_cleanup_session_time
-                self.repo._piws_expired_sessionids = set()
-                self.repo.piws_clean_sessions = types.MethodType(
-                    piws_clean_sessions, self.repo)
+            a_cleanup_session_time = self.repo.config[
+                'apache-cleanup-session-time']
+            if a_cleanup_session_time:
+                assert a_cleanup_session_time > 0
+                self.repo.a_cleanup_session_time = a_cleanup_session_time
+                self.repo._expired_sessionids = {}
+                self.repo.apache_clean_sessions = types.MethodType(
+                    apache_clean_sessions, self.repo)
                 # Arbitrary define the period to clean sessions as a third
                 # of the specified cleanup time T. This implies a maximum
                 # uncertainty in each session expiration of T/3.
                 # If T > 3h we arbitrary fix this period to 1h.
                 cleanup_session_interval = min(60 * 60,
                                                self.repo.
-                                               piws_cleanup_session_time / 3)
-                assert self.repo._tasks_manager is not None, ("This Repository "
-                                                              "is not intended "
-                                                              "to be used as a "
-                                                              "server")
+                                               a_cleanup_session_time / 3)
+                assert self.repo._tasks_manager is not None, (
+                    "This Repository is not intended to be used as a server.")
                 self.repo._tasks_manager.add_looping_task(
-                    cleanup_session_interval, self.repo.piws_clean_sessions)
+                    cleanup_session_interval, self.repo.apache_clean_sessions)
 
 
 class PiwsCWUsersWatcher(hook.Hook):
