@@ -10,35 +10,36 @@
 import os
 import sys
 import hashlib
+from packaging import version
 from argparse import Namespace
 
 # Cubicweb import
+import cubicweb
 from cubicweb.dataimport import SQLGenObjectStore
 from logilab.common.decorators import monkeypatch
-try:
+
+# In higher cubiweb version pass the kwargs to the 'add_relation' method in the
+# 'prepare_insert_relation' method.
+cw_version = version.parse(cubicweb.__version__)
+if cw_version >= version.parse("3.21.0"):
+
     from cubicweb.dataimport.stores import NoHookRQLObjectStore
-except ImportError:
-    from cubicweb.dataimport import NoHookRQLObjectStore
 
 
-@monkeypatch(NoHookRQLObjectStore)
-def prepare_insert_relation(self, eid_from, rtype, eid_to, **kwargs):
-        """Insert into the database a  relation ``rtype`` between entities with eids ``eid_from``
-        and ``eid_to``.
+    @monkeypatch(NoHookRQLObjectStore)
+    def prepare_insert_relation(self, eid_from, rtype, eid_to, **kwargs):
+        """ Insert into the database a  relation ``rtype`` between entities
+        with eids ``eid_from`` and ``eid_to``.
         """
-        assert not rtype.startswith('reverse_')
-        if hasattr(self, "_rschema"):
-            rschema = self._rschema(rtype)
-        else:
-            rschema = self.rschema(rtype)
-        if hasattr(self, "_add_relation"):
-            add_relation = self._add_relation
-        else:
-            add_relation = self.add_relation
-        add_relation(self._cnx, eid_from, rtype, eid_to, rschema.inlined, **kwargs)
+        assert not rtype.startswith("reverse_")
+        rschema = self._rschema(rtype)
+        self._add_relation(self._cnx, eid_from, rtype, eid_to, rschema.inlined,
+                           **kwargs)
         if rschema.symmetric:
-            add_relation(self._cnx, eid_to, rtype, eid_from, rschema.inlined, **kwargs)
+            self._add_relation(self._cnx, eid_to, rtype, eid_from,
+                               rschema.inlined, **kwargs)
         self._nb_inserted_relations += 1
+
 
 
 class Base(object):
@@ -103,29 +104,30 @@ class Base(object):
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
         """
-        # CW parameters
-
         # Check input parameters
         if store_type not in ["RQL", "SQL", "MASSIVE"]:
             raise Exception("Store type must be in ['RQL', 'SQL', 'Massive'].")
-        if store_type == "MASSIVE":
-            try:
-                from cubicweb.dataimport.massive_store import MassiveObjectStore
-            except ImportError:
-                raise Exception("Massive store is not available "
-                                "for Cubicweb < 3.22.")
 
+        # Massive store is supported for CW version > 3.24
+        if store_type == "MASSIVE":
+            if cw_version < version.parse("3.24.0"):
+                raise ValueError("Massive store not supported for CW version "
+                                 "{0}.".format(cw_version))
+            else:
+                from cubicweb.dataimport.massive_store import MassiveObjectStore
+
+        # CW parameters
         self.can_read = can_read
         self.can_update = can_update
         self.store_type = store_type
         self.session = session
         if self.store_type == "SQL":
             self.store = SQLGenObjectStore(self.session)
-            if hasattr(self.store, "prepare_insert_relation"):
+            if cw_version >= version.parse("3.21.0"):
                 self.relate_method = self.store.prepare_insert_relation
             else:
                 self.relate_method = self.store.relate
-            if hasattr(self.store, "prepare_insert_entity"):
+            if cw_version >= version.parse("3.21.0"):
                 self.create_entity_method = self.prepare_insert_entity
             else:
                 self.create_entity_method = self.store.create_entity

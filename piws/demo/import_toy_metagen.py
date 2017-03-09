@@ -35,8 +35,6 @@ if not instance_name:
 meta_path = os.path.join(os.path.dirname(__file__), "metagen")
 plink_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "plink", "test"))
-login = raw_input("\nEnter the '{0}' login [default: anon]: ".format(
-    instance_name))
 
 # Select the insertion methode type
 available_stores = ["RQL", "SQL", "MASSIVE"]

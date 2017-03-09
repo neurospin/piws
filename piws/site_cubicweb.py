@@ -71,7 +71,8 @@ options = (
      {'type' : 'yn',
       'default': False,
       'help': ('If true enable the upload, ie relax security on user and '
-               'group entities.'),
+               'group entities. The database must be regenerated if this '
+               'option is modified.'),
       'group': 'piws',
       'level': 1,
       }),
@@ -93,6 +94,14 @@ options = (
         "type": "string",
         "default": None,
         "help": "the URL to the metagen bioresource.",
+        "group": "piws",
+        "level": 1,
+    }),
+    ("allow-inline-relations", {
+        "type": "yn",
+        "default": True,
+        "help": ("if False remove inline relations from the schema: inline "
+                 "relations are not compatible with the massive store."),
         "group": "piws",
         "level": 1,
     }),

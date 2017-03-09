@@ -12,9 +12,14 @@ from collections import OrderedDict, defaultdict
 import json
 import re
 import time
+from packaging import version
 
 # Cubicweb import
-from cubicweb import _
+import cubicweb
+cw_version = version.parse(cubicweb.__version__)
+if cw_version >= version.parse("3.21.0"):
+    from cubicweb import _
+
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
 from cubicweb.web.views.csvexport import CSVMixIn
@@ -56,9 +61,14 @@ class ScoreValueTableViewSecondary(View):
                    "A timepoint T, X label L, "
                    "X {3} P".format(etype, study, rtype, pname))
         rset = self._cw.execute(rql)
+        print rset
         data = {}
         for row in rset:
-            data.setdefault(row[2] + ": " + row[1], []).append(row)
+            if row[1] is None:
+                row[1] = ""
+                data.setdefault(row[2], []).append(row)
+            else:
+                data.setdefault(row[2] + ": " + row[1], []).append(row)
         headers = sorted(set([row[0] for row in rset]))
 
         # Build the record

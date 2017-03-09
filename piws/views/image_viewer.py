@@ -14,9 +14,14 @@ import json
 import base64
 import StringIO
 import PIL
+from packaging import version
 
 # Cubicweb import
-from cubicweb import _
+import cubicweb
+cw_version = version.parse(cubicweb.__version__)
+if cw_version >= version.parse("3.21.0"):
+    from cubicweb import _
+
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
 
