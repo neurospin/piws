@@ -17,6 +17,47 @@ from cwbrowser.cw_connection import CWInstanceConnection
 DEFAULT_METAGEN_URL = "http://mart.intra.cea.fr/metagen_hg20_dbsnp138"
 
 
+def get_genes(metagen_connection=None,
+              metagen_url=DEFAULT_METAGEN_URL,
+              timeout=10,
+              nb_tries=3):
+    """
+    Get all the gene names by requesting the Metagen server.
+
+    The user can provide a Metagen connection, otherwise it is created.
+
+    Parameters
+    ----------
+    metagen_connection: CWInstanceConnection, default None
+        A connection to the Metagen instance. Created if not passed.
+    metagen_url: str, default module url
+        Url of the Metagen server. Ignored if a connection to the Metagen
+        server is passed.
+    timeout: int, default 10
+        Max time in seconds to wait for a response from Metagen.
+    nb_tries: int, default 3
+        If the server failed to answer, retry nb_tries-1 times.
+
+    Return
+    ------
+    hgnc_id, chromosome: list
+    """
+
+    # If not passed, create a connection to the Metagen server
+    if metagen_connection is None:
+        metagen_connection = CWInstanceConnection(metagen_url, "anon", "anon")
+
+    rql = ("Any GN, CN Where G is Gene, G hgnc_id GN, G gene_chromosome C, "
+           "C name CN")
+    rset = metagen_connection.execute(rql, timeout=timeout, nb_tries=nb_tries)
+
+    # Return genes as namedtuples to simplify usage
+    Gene = namedtuple("Gene", ["hgnc_id", "chromosome"])
+    genes = [Gene(name, chrom) for name, chrom in rset]
+
+    return genes
+
+
 def get_snps_of_gene(gene_name,
                      metagen_connection=None,
                      metagen_url=DEFAULT_METAGEN_URL,

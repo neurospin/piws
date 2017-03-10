@@ -46,7 +46,7 @@ class QuestionnaireLongitudinalView(View):
         rset = rset or self.cw_rset
 
         # Get the method parameters: if we use 'build_url' method, the data
-        # are in the firm dictionary
+        # are in the form dictionary
         patient_id = patient_id or self._cw.form.get("patient_id", "")
 
         # Add some js resources

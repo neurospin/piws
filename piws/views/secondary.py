@@ -134,6 +134,14 @@ class BaseOutOfContextView(EntityView):
                    "type='button' style='margin-top:8px'>".format(tiphref))
             self.w(u"&#9735;")
             self.w(u"</a>")
+        # last element: the genomic selection button
+        if entity.cw_etype == "GenomicMeasure" and entity.format == "plink":
+            hsearch = self._cw.build_url(
+                "view", vid="metagen-search-auto", measure=entity.label)
+            self.w(u"<a href='{0}' target=_blank class='btn btn-success' "
+                   "type='button' style='margin-top:8px'>".format(hsearch))
+            self.w(u"Search &#9735;")
+            self.w(u"</a>")    
         self.w(u"</div>")
         self.w(u"</div>")
 

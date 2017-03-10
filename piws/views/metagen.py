@@ -24,9 +24,12 @@ if cw_version >= version.parse("3.21.0"):
 
 from cubicweb.view import View
 from cubicweb.web.views.json import JsonMixIn
+from cubicweb.web.views.ajaxcontroller import ajaxfunc
+from cubicweb.predicates import authenticated_user
 
 # Package import
 from cubes.piws.metagen.genotype import genotype_measure
+from cubes.piws.metagen.genotype import get_genes
 
 
 class MetaGenSearchView(View):
@@ -48,11 +51,12 @@ class MetaGenSearchView(View):
       selected filtering options: ...&export=ref&...
     """
     __regid__ = "metagen-search"
+    __select__ = authenticated_user()
     title = _("MetaGen Search")
     div_id = "metagen-search"
     _display = True
 
-    def call(self):
+    def call(self, gene=None, measure=None, subjects=None, export_type=None):
         """ Generate/display the genomic dataset of insterest.
         """
         # Display header
@@ -61,22 +65,16 @@ class MetaGenSearchView(View):
             self.w(u"<hr>")
 
         # Retrieve form parameters from the url
-        genes = self._cw.form.get("gene", None)
+        genes = gene or self._cw.form.get("gene", None)  
         if genes is not None and not isinstance(genes, list):
             genes = [genes]
-        measure = self._cw.form.get("measure", None)
-        subjects = self._cw.form.get("subject", None)
+        measure = measure or self._cw.form.get("measure", None)
+        subjects = subjects or self._cw.form.get("subject", None)
+        if subjects == "all":
+            subjects = None
         if subjects is not None and not isinstance(subjects, list):
             subjects = [subjects]
-        export_type = self._cw.form.get("export", "data")
-
-        # Display search parameters
-        if self._display:
-            self.w(u"<b>Gene Names</b>: {0}<br/>".format("; ".join(genes)))
-            self.w(u"<b>Genomic Measure</b>: {0}<br/>".format(measure))
-            self.w(u"<b>Subject</b>: {0}<br/>".format(
-                "; ".join(subjects) if subjects is not None else "all"))
-            self.w(u"<b>Export Type</b>: {0}<br/>".format(export_type))
+        export_type = export_type or self._cw.form.get("export", "data")
 
         # Check input parameters
         if genes is None or measure is None:
@@ -94,7 +92,15 @@ class MetaGenSearchView(View):
                 self.error(msg)
             else:
                 self.w(unicode(json.dumps({"error": msg})))
-            return       
+            return
+
+        # Display search parameters
+        if self._display:
+            self.w(u"<b>Gene Names</b>: {0}<br/>".format("; ".join(genes)))
+            self.w(u"<b>Genomic Measure</b>: {0}<br/>".format(measure))
+            self.w(u"<b>Subject</b>: {0}<br/>".format(
+                "; ".join(subjects) if subjects is not None else "all"))
+            self.w(u"<b>Export Type</b>: {0}<br/>".format(export_type))     
         
         # Get the genomic measure associated plink files
         rset = self._cw.execute(
@@ -248,7 +254,130 @@ class MetaGenSearchJson(MetaGenSearchView):
     _display = False
 
 
+
+class MetaGenSearchAutoView(View):
+    """ Create a view to filter the PLINK genomic data from a metagen
+    reference.
+    """
+    __regid__ = "metagen-search-auto"
+    __select__ = authenticated_user()
+    title = _("MetaGen Search")
+    paginable = False
+    div_id = "metagen-search-auto"
+
+
+    def call(self, measure=None, **kwargs):
+        """ Method that will create a filtered genomic measures table.
+
+        If no resultset are passed to this method, the current resultset is
+        used.
+
+        Parameters
+        ----------
+        rset: resultset (optional, default None)
+            a  cw resultset
+        patient_id: string (optional, default None)
+            the patient identifier.
+        """
+        # Get the 'measure' parameter: if we use 'build_url' method, the data
+        # are in the form dictionary
+        measure = measure or self._cw.form.get("measure", None)
+
+        # Add css resources
+        self._cw.add_css(
+            "DataTables-1.10.10/media/css/jquery.dataTables.min.css")
+        self._cw.add_css("DataTables-1.10.10/extensions/FixedColumns/css/"
+                         "fixedColumns.dataTables.min.css")
+        self._cw.add_css("DataTables-1.10.10/extensions/Scroller/css/"
+                         "scroller.dataTables.min.css")
+        self._cw.add_css(
+            ("https://code.jquery.com/ui/1.11.4/themes/smoothness/"
+             "jquery-ui.css"), localfile=False)
+
+        # Add js resources
+        self._cw.add_js("DataTables-1.10.10/media/js/jquery.dataTables.min.js")
+        self._cw.add_js("DataTables-1.10.10/extensions/FixedColumns/js/"
+                        "dataTables.fixedColumns.js")
+        self._cw.add_js("DataTables-1.10.10/extensions/fnSetFilteringDelay.js")
+
+        # Create a gene picker
+        genes = get_genes(metagen_url=self._cw.vreg.config["metagen_url"])
+        genes_struct = {}
+        for gene in genes:
+            genes_struct.setdefault(gene.chromosome, []).append(gene.hgnc_id)
+        html = "<h1>PLINK Genomic Measures Search</h1>"
+        html += "<hr>"
+        html += ("<h2>Please select a gene of interest:</h2>")
+        html += "<select class='selectpicker' data-live-search='true'>"
+        html += "<option></option>"
+        for chromosome in sorted(genes_struct.keys()):
+            html += "<optgroup label='{0}' data-icon='glyphicon-heart'>".format(
+                chromosome)
+            for name in sorted(genes_struct[chromosome]):
+                html += "<option value='{0}'>{0}</option>".format(name)
+            html += "</optgroup>"
+        html += "</select>"
+
+        # Ceate a div to display the plots
+        html += "<div id='metagen-search-disp'></div>"
+
+        # Add an event when the selection change
+        search_url = self._cw.build_url(vid="metagen-search", measure=measure)
+        html += "<script type='text/javascript'>"
+        html += "$(function() {"
+        html += "$('.selectpicker').on('change', function(){"
+        html += "var selected = $(this).find('option:selected').val();"
+        html += "if (selected != ''){"
+
+        # > execute the ajax callback
+        html += "var request = $.ajax({"
+        html += "url: 'ajax?fname=get_metagen_search_body',"
+        html += "method: 'POST',"
+        html += "data: {{'measure': '{0}', 'gene': selected}},".format(measure)
+        html += "dataType: 'html'"
+        html += "}).done(function(html){$('#metagen-search-disp').html(html)});"
+
+        html += "}"
+        html += "});"
+        html += "});"
+        html += "</script>"
+
+        # Display the page content
+        self.w(unicode(html))
+
+
+@ajaxfunc(output_type="xhtml")
+def get_metagen_search_body(self):
+    """ Get the MetaGenSearchView view body.
+
+    Attributes
+    ----------
+    measure: str
+        the genomic measure label.
+    gene: str
+        the gene name.
+
+    Returns
+    -------
+    html: str
+        the MetaGenSearchView view body.
+    """
+    # Get parameters
+    measure = self._cw.form["measure"]
+    gene = self._cw.form["gene"]
+
+    # Get the HTML body code
+    view = self._cw.vreg["views"].select("metagen-search", req=self._cw,
+                                         rset=None)
+    html = view.render(measure=measure, gene=gene, export_type="data",
+                       subjects="all")
+
+    return html
+
+
 def registration_callback(vreg):
     vreg.register(MetaGenSearchView)
     vreg.register(MetaGenSearchJson)
+    vreg.register(MetaGenSearchAutoView)
+    vreg.register(get_metagen_search_body)
 
