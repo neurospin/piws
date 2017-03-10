@@ -45,6 +45,7 @@ from cubes.rql_upload.views.utils import load_forms
 # Time left
 ##############################################################################
 
+
 class TimeLeft(HeaderComponent):
     """ Build a time left before session expiration display in the header.
     """
@@ -54,18 +55,33 @@ class TimeLeft(HeaderComponent):
     order = 3
 
     def render(self, w):
-        hours, remainder = divmod(
-            self._cw.vreg.config.get("cleanup-session-time"), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        timeleft = {
-            "hours": int(hours),
-            "minutes": int(minutes),
-            "seconds": int(seconds),
-            "redirecturl": self._cw.build_url("logout")
-        }
-        w(u'<script>var timeleft = {0}</script>'.format(json.dumps(timeleft)))
-        w(u'Auto logout in: <b id="timeh">00</b>:<b id="timem">00</b>:'
-           '<b id="times">00</b>')
+
+        # Get the expiration delay
+        expiration_delay = self._cw.vreg.config.get(
+            "apache-cleanup-session-time")
+        if expiration_delay is None:
+            expiration_delay = self._cw.vreg.config.get(
+                "cleanup-session-time")
+        if expiration_delay is None:
+            return
+
+        # Need an expiration delay in ms
+        expiration_delay = expiration_delay * 1000
+
+        # Define the expiration delay div
+        html = u"<span id='clock'></span>"
+
+        # Define the refresh expiration delay script
+        html += "<script>"
+        html += "$(document).ready(function () {"
+        html += ("session_clock('clock', '{0}clock', {1}, "
+                 "message_format='<b>Auto logout in:</b> %H:%M:%S');".format(
+                    self._cw.session.sessionid, expiration_delay))
+        html += "});"
+        html += "</script>"
+        
+        # Display the clock
+        w(html)
 
 
 ###############################################################################
