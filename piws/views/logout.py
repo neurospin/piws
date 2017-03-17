@@ -14,7 +14,6 @@ from urlparse import urlsplit
 # Cubicweb imports
 from cubicweb.web.views.sessions import InMemoryRepositorySessionManager
 from cubicweb.web import DirectResponse, Redirect
-from cubicweb.etwist.http import HTTPResponse
 from cubicweb.web.controller import Controller
 from cubicweb.web.views.basecontrollers import LogoutController
 from cubicweb.web.request import _CubicWebRequestBase

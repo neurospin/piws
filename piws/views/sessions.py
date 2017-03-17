@@ -11,17 +11,23 @@ import time
 
 # Cubicweb import
 from cubicweb.web.views.sessions import InMemoryRepositorySessionManager
+from cubicweb.etwist.http import HTTPResponse
 
 
 class TimeoutInMemoryRepositorySessionManager(InMemoryRepositorySessionManager):
     """ Add a cookie to the session that trace the last server activity.
     """
     def get_session(self, req, sessionid):
-        session = super(TimeoutInMemoryRepositorySessionManager,
-                        self).get_session(req, sessionid)
+
+        # Define the expiration cookie
         secure = req.https and req.base_url().startswith("https://")
         req.set_cookie("{}clock".format(sessionid), str(time.time()),
                        maxage=None, secure=secure, httponly=False)
+
+        # Inheritance
+        session = super(TimeoutInMemoryRepositorySessionManager,
+                        self).get_session(req, sessionid)
+
         return session
 
 
@@ -94,7 +100,7 @@ class ApacheTimeoutInMemoryRepositorySessionManager(
                     raise DirectResponse(response)
             else:
                 del self.repo._expired_sessionids[sessionid]
-        return super(PiwsInMemoryRepositorySessionManager,
+        return super(ApacheTimeoutInMemoryRepositorySessionManager,
                      self).get_session(req, sessionid)
 
 
