@@ -65,23 +65,13 @@ class TimeLeft(HeaderComponent):
         if expiration_delay is None:
             return
 
-        # Need an expiration delay in ms
-        expiration_delay = expiration_delay * 1000
-
         # Define the expiration delay div
-        html = u"<span id='clock'></span>"
-
-        # Define the refresh expiration delay script
-        html += "<script>"
-        html += "$(document).ready(function () {"
-        html += ("session_clock('clock', '{0}clock', {1}, "
-                 "message_format='<b>Auto logout in:</b> %H:%M:%S');".format(
-                    self._cw.session.sessionid, expiration_delay))
-        html += "});"
-        html += "</script>"
-        
-        # Display the clock
-        w(html)
+        w(u'<script>var cookie_name = "{0}clock";</script>'.format(
+            self._cw.session.sessionid))
+        w(u'<script>var expiration_time = {0};</script>'.format(
+            expiration_delay * 1000))
+        w(u'Auto logout in: <b id="timeh"></b>:<b id="timem"></b>:'
+           '<b id="times"></b>')
 
 
 ###############################################################################

@@ -24,6 +24,7 @@ if cw_version >= version.parse("3.21.0"):
 
 from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
+from cubicweb.predicates import authenticated_user
 
 
 ###############################################################################
@@ -34,6 +35,7 @@ class ImageViewer(View):
     """ Create an image viewer.
     """
     __regid__ = "brainbrowser-image-viewer"
+    __select__ = authenticated_user()
     title = _("Brainbrowser")
     paginable = False
     div_id = "brainbrowser-simple"

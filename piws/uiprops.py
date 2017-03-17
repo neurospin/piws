@@ -21,9 +21,9 @@ STYLESHEETS_PRINT += [
 
 JAVASCRIPTS += [
     data('cubes.piws.js'),
-    data('jquery.countdown.min.js'),
     data('time_left.js'),
     data('fullcalendar-2.0.1/lib/moment.min.js'),
     data('fullcalendar-2.0.1/lib/jquery-ui.custom.min.js'),
     data('fullcalendar-2.0.1/fullcalendar.min.js'),
 ]
+
