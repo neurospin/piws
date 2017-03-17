@@ -670,5 +670,6 @@ def registration_callback(vreg):
     vreg.unregister(BreadCrumbLinkToVComponent)
     vreg.unregister(AnonUserStatusLink)
     config = load_forms(vreg.config)
-    if config < 0:
+    print config
+    if not isinstance(config, dict):
         vreg.unregister(CWUploadBox)
