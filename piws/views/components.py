@@ -17,6 +17,7 @@ if cw_version >= version.parse("3.21.0"):
     from cubicweb import _
 
 from cubicweb.web import component
+from cubicweb.view import EntityView
 from cubicweb.predicates import is_instance
 from cubicweb.predicates import nonempty_rset
 from cubicweb.predicates import anonymous_user
@@ -27,11 +28,13 @@ from cubicweb.predicates import authenticated_user
 from cubicweb.web.views.basecomponents import AnonUserStatusLink
 from cubicweb.web.views.basecomponents import ApplLogo
 from cubicweb.web.views.basecomponents import HeaderComponent
+from cubicweb.web.views.baseviews import MetaDataView
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbEntityVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbLinkToVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbAnyRSetVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbETypeVComponent
 from logilab.common.decorators import monkeypatch
+from cubicweb.utils import admincnx
 
 # Cubes import
 from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
@@ -502,68 +505,74 @@ class PIWSSummary(component.CtxComponent):
     def render_body(self, w):
         """ Method to create the summary table for each study.
         """
-        # Go through each study
-        studies = [row[0] for row in self._cw.execute(
-            "DISTINCT Any SN ORDERBY SN Where S is Study, S name SN")]
-        for study in studies:
+        # Get an admin connection
+        instance_name = self._cw.vreg.schema.name
+        with admincnx(instance_name) as session:
 
-            # Display the study name
-            w(u"<strong>Study:</strong> {0}<br/><br/>".format(study))
+            # Go through each study
+            studies = [row[0] for row in session.execute(
+                "DISTINCT Any SN ORDERBY SN Where S is Study, S name SN")]
+            for study in studies:
 
-            # Get all the subjects attached to the current study
-            rql = self.rql_subjects.format(study)
-            nb_subjects = self._cw.execute(rql).rowcount
+                # Display the study name
+                w(u"<strong>Study:</strong> {0}<br/><br/>".format(study))
 
-            # Create the table
-            w(u"<table class='table' style='font-size: 10px;'>")
-            w(u"<tr>")
-            for header in ["Timepoint"] + self.categories:
-                w(u"<th>{0}</th>".format(self.categories_mapping[header]))
-            w(u"</tr>")
+                # Get all the subjects attached to the current study
+                rql = self.rql_subjects.format(study)
+                nb_subjects = session.execute(rql).rowcount
 
-            # Go through each timepoint (one row per timepoint in the tab)
-            timepoints = [row[0] for row in self._cw.execute(
-                ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
-                 "A timepoint T, A study ST, ST name '{0}'".format(study)))]
-            for timepoint in timepoints:
-
-                # Go through each category (one column per category in the tab)
+                # Create the table
+                w(u"<table class='table' style='font-size: 10px;'>")
                 w(u"<tr>")
-                w(u"<td>{0}</td>".format(timepoint))
-                for category in self.categories:
-
-                    # Deal with questionnaire special case
-                    if category == "QuestionnaireRun":
-                        type_name = "label"
-                    else:
-                        type_name = "type"
-
-                    # Compute the fill ratio
-                    try:
-                        nb_types = self.nb_types[study][category]
-                    except:
-                        rql = (
-                            "DISTINCT Any T WHERE X is {0}, X {1} T, X study ST, "
-                            "ST name '{2}'".format(category, type_name, study))
-                        nb_types = self._cw.execute(rql).rowcount
-                    rql = (
-                        "Any X WHERE X is {0}, X study ST, ST name "
-                        "'{1}', X in_assessment A, A timepoint '{2}'".format(
-                            category, study, timepoint))
-                    nb_items = self._cw.execute(rql).rowcount
-                    ratio = 0.
-                    if nb_types != 0:
-                        ratio = float(nb_items)  / float(nb_types * nb_subjects)
-
-                    # Display the fill ratio
-                    w(u"<td>")
-                    w(u"<progress value='{0}' max='100' style='width:100%;'>"
-                       "</progress>".format(ratio * 100.))
-                    w(u"</td>")
-
+                for header in ["Timepoint"] + self.categories:
+                    w(u"<th>{0}</th>".format(self.categories_mapping[header]))
                 w(u"</tr>")
 
-            w(u"</table>")
+                # Go through each timepoint (one row per timepoint in the tab)
+                timepoints = [row[0] for row in session.execute(
+                    ("DISTINCT Any T ORDERBY T WHERE A is Assessment, "
+                     "A timepoint T, A study ST, ST name '{0}'".format(study)))]
+                for timepoint in timepoints:
+
+                    # Go through each category (one column per category in
+                    # the tab)
+                    w(u"<tr>")
+                    w(u"<td>{0}</td>".format(timepoint))
+                    for category in self.categories:
+
+                        # Deal with questionnaire special case
+                        if category == "QuestionnaireRun":
+                            type_name = "label"
+                        else:
+                            type_name = "type"
+
+                        # Compute the fill ratio
+                        try:
+                            nb_types = self.nb_types[study][category]
+                        except:
+                            rql = ("DISTINCT Any T WHERE X is {0}, X {1} T, "
+                                   "X study ST, ST name '{2}'".format(
+                                        category, type_name, study))
+                            nb_types = session.execute(rql).rowcount
+                        rql = (
+                            "Any X WHERE X is {0}, X study ST, ST name "
+                            "'{1}', X in_assessment A, A timepoint "
+                            "'{2}'".format(category, study, timepoint))
+                        nb_items = session.execute(rql).rowcount
+                        ratio = 0.
+                        if nb_types != 0:
+                            ratio = (float(nb_items)  /
+                                     float(nb_types * nb_subjects))
+
+                        # Display the fill ratio
+                        w(u"<td>")
+                        w(u"<progress value='{0}' max='100' style='width:100%;'>"
+                           "</progress>".format(ratio * 100.))
+                        w(u"</td>")
+
+                    w(u"</tr>")
+
+                w(u"</table>")
 
 
 ###############################################################################
@@ -650,6 +659,28 @@ def render(self, w):
 
 
 ###############################################################################
+# Change footer
+###############################################################################
+
+class FooterView(EntityView):
+    """ Footer content when an entity is displayed"""
+    __regid__ = "metadata"
+    show_eid = True
+
+    def cell_call(self, row, col):
+        _ = self._cw._
+        entity = self.cw_rset.get_entity(row, col)
+        self.w(u"<p class='text-right'><small>")
+        if self.show_eid:
+            self.w(u"{0} #{1} - ".format(entity.dc_type(), entity.eid))
+        if entity.creation_date:
+            self.w(u"<span>created on </span>")
+            self.w(u"<span class='value'>{0}</span>".format(
+                self._cw.format_date(entity.creation_date)))
+        self.w(u"</small></p>")
+
+
+###############################################################################
 # Registry
 ###############################################################################
 
@@ -669,7 +700,7 @@ def registration_callback(vreg):
     vreg.unregister(BreadCrumbETypeVComponent)
     vreg.unregister(BreadCrumbLinkToVComponent)
     vreg.unregister(AnonUserStatusLink)
+    vreg.register_and_replace(FooterView, MetaDataView)
     config = load_forms(vreg.config)
-    print config
     if not isinstance(config, dict):
         vreg.unregister(CWUploadBox)
