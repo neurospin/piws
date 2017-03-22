@@ -22,10 +22,11 @@ options = (
         "group": "piws",
         "level": 1,
     }),
-    ("ldap_base_dn", {
+    ("ldap_groups_dn", {
         "type": "string",
         "default": None,
-        "help": "LDAP base dn for synchronisation",
+        "help": "LDAP groups dn for LDAP groups synchronisation in CW <= 3.20,"
+                "otherwise not required.",
         "group": "piws",
         "level": 1,
     }),
