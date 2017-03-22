@@ -14,8 +14,6 @@ import cubicweb
 from logilab.common.decorators import monkeypatch
 from logilab.common.decorators import cachedproperty
 from cubicweb.sobjects.ldapparser import DataFeedLDAPAdapter
-from cubicweb.sobjects.ldapparser import UserMetaGenerator
-from cubicweb.dataimport import stores
 from cubicweb.server.sources.ldapfeed import LDAPFeedSource
 
 
@@ -29,6 +27,9 @@ this code must be removed in newest release.
 
 cw_version = version.parse(cubicweb.__version__)
 if cw_version >= version.parse("3.21.0"):
+
+    from cubicweb.sobjects.ldapparser import UserMetaGenerator
+    from cubicweb.dataimport import stores
 
     @monkeypatch(DataFeedLDAPAdapter)
     def build_store(self):
