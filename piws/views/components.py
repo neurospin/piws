@@ -34,7 +34,6 @@ from cubicweb.web.views.ibreadcrumbs import BreadCrumbLinkToVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbAnyRSetVComponent
 from cubicweb.web.views.ibreadcrumbs import BreadCrumbETypeVComponent
 from logilab.common.decorators import monkeypatch
-from cubicweb.utils import admincnx
 
 # Cubes import
 from cubes.bootstrap.views.basecomponents import BSAuthenticatedUserStatus
@@ -506,8 +505,7 @@ class PIWSSummary(component.CtxComponent):
         """ Method to create the summary table for each study.
         """
         # Get an admin connection
-        instance_name = self._cw.vreg.schema.name
-        with admincnx(instance_name) as session:
+        with self._cw.session.repo.internal_cnx() as session:
 
             # Go through each study
             studies = [row[0] for row in session.execute(
