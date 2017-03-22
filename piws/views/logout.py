@@ -15,7 +15,6 @@ from urlparse import urlsplit
 from cubicweb.web.views.sessions import InMemoryRepositorySessionManager
 from cubicweb.web import DirectResponse, Redirect
 from cubicweb.web.controller import Controller
-from cubicweb.web.views.basecontrollers import LogoutController
 from cubicweb.web.request import _CubicWebRequestBase
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
 from logilab.common.decorators import monkeypatch
@@ -108,6 +107,7 @@ def registration_callback(vreg):
     Update registry.
     """
     if vreg.config["enable-apache-logout"]:
+        from cubes.trustedauth.views import LogoutController
         vreg.register_and_replace(PiwsLogoutController, LogoutController)
         if vreg.config["apache-cleanup-session-time"] is not None:
             vreg.register(sessionid_unload)
