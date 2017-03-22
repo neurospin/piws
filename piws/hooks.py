@@ -13,35 +13,79 @@ import smtplib
 import time
 import json
 from email.mime.text import MIMEText
+from packaging import version
 
 # CW import
+import cubicweb
 from cubicweb.server import hook
 from cubicweb.predicates import is_instance
+from logilab.common.decorators import monkeypatch
 
 # PIWS import
 _docutils_initial_cwd = os.getcwd()  # work around docutils bug
 from cubes.piws.docgen.rst2html import create_html_doc
 
 
-class ServerStartupHook(hook.Hook):
-    """ Update repository cache with groups from indexation to ease LDAP
-    synchronisation.
-    """
-    __regid__ = 'piws.update_cache_hook'
-    events = ('server_startup', 'server_maintenance')
+cw_version = version.parse(cubicweb.__version__)
 
-    def __call__(self):
-        # get ldap base dn
-        ldap_base_dn = self.repo.vreg.config.get("ldap_base_dn", None)
-        # update repository cache
-        if ldap_base_dn is not None:
-            with self.repo.internal_cnx() as cnx:
-                rset = cnx.execute("Any X WHERE X is CWGroup")
-                for egroup in rset.entities():
-                    if egroup.name in ["guests", "managers", "users", "owners"]:
-                        continue
-                    self.repo._extid_cache['cn={0},{1}'.format(
-                        egroup.name, ldap_base_dn)] = egroup.eid
+
+# Sync the CW and LDAP chache properly
+if cw_version < version.parse("3.24.0"):
+
+    class ServerStartupHook(hook.Hook):
+        """ Update repository cache with groups from indexation to ease LDAP
+        synchronisation.
+        """
+        __regid__ = 'piws.update_cache_hook'
+        events = ('server_startup', 'server_maintenance')
+
+        def __call__(self):
+            # get ldap base dn
+            ldap_groups_dn = self.repo.vreg.config.get("ldap_groups_dn", None)
+            # update repository cache
+            if ldap_groups_dn is not None:
+                with self.repo.internal_cnx() as cnx:
+                    rset = cnx.execute("Any X WHERE X is CWGroup")
+                    for egroup in rset.entities():
+                        if egroup.name in ["guests", "managers", "users",
+                                           "owners"]:
+                            continue
+                        self.repo._extid_cache['cn={0},{1}'.format(
+                            egroup.name, ldap_groups_dn)] = egroup.eid
+
+else:
+
+    from cubicweb.dataimport.importer import ExtEntitiesImporter
+
+    @monkeypatch(ExtEntitiesImporter)
+    def _import_entities(self, ext_entities, queue):
+        """ LDAP synch import groups as external entities and thus the
+        'ExtEntitiesImporter' importer is used.
+
+        To synch LDAP with existing CW groups, check the group existance in
+        CW.
+        """
+        extid2eid = self.extid2eid
+        deferred = {}  # non inlined relations that may be deferred
+        self.import_log.record_debug("importing entities")
+        for ext_entity in self.iter_ext_entities(ext_entities, deferred, queue):
+
+            # Case of groups for LDAP Sync: check group existance
+            if ext_entity.etype == "CWGroup":
+                group_name = ext_entity.values["name"]
+                rql = "Any G Where G is CWGroup, G name '{0}'".format(
+                    group_name)
+                if self.store.rql(rql).rowcount > 0:
+                    continue
+
+            try:
+                eid = extid2eid[ext_entity.extid]
+            except KeyError:
+                self.prepare_insert_entity(ext_entity)
+            else:
+                if ext_entity.values:
+                    self.prepare_update_entity(ext_entity, eid)
+        return deferred
 
 
 class CreateDocumentation(hook.Hook):
@@ -81,8 +125,8 @@ class CreateDocumentation(hook.Hook):
 
 
 def apache_clean_sessions(self):
-    """tags sessions not used since an amount of time specified in the
-    configuration
+    """ Tags sessions not used since an amount of time specified in the
+    configuration.
     """
     # Remove zombies from expired sessions
     for sessionid, _ in self._expired_sessionids.iteritems():
