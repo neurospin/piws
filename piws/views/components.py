@@ -558,7 +558,7 @@ class PIWSSummary(component.CtxComponent):
                             "'{2}'".format(category, study, timepoint))
                         nb_items = session.execute(rql).rowcount
                         ratio = 0.
-                        if nb_types != 0:
+                        if nb_types != 0 and nb_subjects != 0:
                             ratio = (float(nb_items)  /
                                      float(nb_types * nb_subjects))
 

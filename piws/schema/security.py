@@ -18,6 +18,11 @@ from cubicweb.schema import ERQLExpression
 from yams.buildobjs import RelationType
 from cubicweb.entities.authobjs import CWUser
 from cubicweb.entities.authobjs import CWGroup
+from cubicweb.entities.schemaobjs import CWEType
+from cubicweb.entities.schemaobjs import CWAttribute
+from cubicweb.entities.schemaobjs import CWRType
+from cubicweb.entities.schemaobjs import CWRelation
+from cubicweb.entities.wfobjs import Workflow
 
 # Cubes import
 from cubes.brainomics2.schema.medicalexp import Assessment
@@ -140,6 +145,7 @@ RESTRICTED_ENTITIES = [
 PUBLIC_ENTITIES = [
     Device, Subject, Center, Study, Questionnaire, Question, Card, Snp,
     CpG, Gene, Chromosome, SubjectGroup, Diagnostic, Protocol]
+PUBLIC_ENTITIES += [CWEType, CWAttribute, Workflow, CWRType, CWRelation]
 
 ENTITIES = RESTRICTED_ENTITIES + PUBLIC_ENTITIES + [
     Assessment, CWSearch, File, CWUpload, UploadField, UploadFile]
@@ -195,6 +201,7 @@ UNTRACK_ENTITIES = ["CWUser", "CWGroup", "CWSource", "Study", "Center",
                     "Workflow", "State", "BaseTransition", "Transition",
                     "Card", "EmailAddress", "TrInfo", "Protocol",
                     "SubjectGroup", "Diagnostic"]
+UNTRACK_ENTITIES += ["CWEType", "CWAttribute", "CWRType", "CWRelation"]
 UNTRACK_ENTITIES += ["Assessment", "CWSearch", "File", "CWUpload",
                      "UploadField", "UploadFile"]
 UNTRACK_ENTITIES += ["Snp", "CpG", "Gene", "Chromosome"]
