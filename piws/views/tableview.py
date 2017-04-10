@@ -31,7 +31,7 @@ def render_table_headers(self, w, colrenderers):
     for colrenderer in colrenderers:
         labels.append(colrenderer.header)
     # > all labels must be different than None:
-    if None not in labels:
+    if self.cw_rset is not None and None not in labels:
         href = self._cw.build_url(rql=self.cw_rset.printable_rql(),
                                   vid="tablecsvexport", labels=labels)
         w(u'<a class="btn btn-default" role="button" id="table_csv_button" '
