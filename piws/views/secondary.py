@@ -394,7 +394,7 @@ class OutOfContextSnpView(BaseOutOfContextView):
         desc["Identifier"] = entity.rs_id
         desc["Start position"] = entity.start_position
         desc["End position"] = entity.end_position
-        desc["Minor allele frquency"] = entity.maf
+        desc["Minor allele frequency"] = entity.maf
         return desc
 
 
@@ -414,7 +414,7 @@ class OutOfContextGeneView(BaseOutOfContextView):
         desc["URI"] = entity.uri
         desc["Start position"] = entity.start_position
         desc["End position"] = entity.end_position
-        desc["Type"] = entity.type
+        desc["Gene type"] = entity.gene_type
         return desc
 
 
