@@ -230,12 +230,38 @@ class Questionnaire(AnyEntity):
         return "<span class='glyphicon glyphicon-question-sign'></span>"
 
 
-class OpenAnswer(AnyEntity):
-    __regid__ = "OpenAnswer"
+class TextAnswer(AnyEntity):
+    __regid__ = "TextAnswer"
     __bootstap_glyph__ = True
 
     def dc_title(self):
         return unicode(self.question[0].dc_title() + ": " + self.value)
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-plus-sign'></span>"
+
+
+class IntAnswer(AnyEntity):
+    __regid__ = "IntAnswer"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return unicode(
+            self.question[0].dc_title() + ": {0}".format(self.value))
+
+    @property
+    def symbol(self):
+        return "<span class='glyphicon glyphicon-plus-sign'></span>"
+
+
+class FloatAnswer(AnyEntity):
+    __regid__ = "FloatAnswer"
+    __bootstap_glyph__ = True
+
+    def dc_title(self):
+        return unicode(
+            self.question[0].dc_title() + ": {0}".format(self.value))
 
     @property
     def symbol(self):

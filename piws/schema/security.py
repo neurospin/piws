@@ -47,7 +47,9 @@ from cubes.brainomics2.schema.neuroimaging import MRIData
 from cubes.brainomics2.schema.neuroimaging import FMRIData
 from cubes.brainomics2.schema.neuroimaging import SPECTROData
 from cubes.brainomics2.schema.questionnaire import QuestionnaireRun
-from cubes.brainomics2.schema.questionnaire import OpenAnswer
+from cubes.brainomics2.schema.questionnaire import TextAnswer
+from cubes.brainomics2.schema.questionnaire import IntAnswer
+from cubes.brainomics2.schema.questionnaire import FloatAnswer
 from cubes.brainomics2.schema.questionnaire import Questionnaire
 from cubes.brainomics2.schema.questionnaire import Question
 from cubes.brainomics2.schema.genomics import GenomicMeasure
@@ -140,7 +142,8 @@ class in_assessment(RelationType):
 RESTRICTED_ENTITIES = [
     Scan, FMRIData, DMRIData, PETData, MRIData, EEGData, ETData, FileSet,
     ExternalFile, ScoreDefinition, ScoreValue, ProcessingRun, QuestionnaireRun,
-    OpenAnswer, GenomicMeasure, RestrictedFile, SPECTROData]
+    TextAnswer, IntAnswer, FloatAnswer, GenomicMeasure, RestrictedFile,
+    SPECTROData]
 
 PUBLIC_ENTITIES = [
     Device, Subject, Center, Study, Questionnaire, Question, Card, Snp,

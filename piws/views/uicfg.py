@@ -17,10 +17,11 @@ from cubes.piws.schema.security import RESTRICTED_ENTITIES
 uicfg.primaryview_section.tag_subject_of(
     ("Question", "questionnaire", "Questionnaire"), "sideboxes")
 
-uicfg.primaryview_section.tag_subject_of(
-    ("OpenAnswer", "question", "Question"), "sideboxes")
-uicfg.primaryview_section.tag_subject_of(
-    ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"), "sideboxes")
+for atype in ("TextAnswer", "IntAnswer", "FloatAnswer"):
+    uicfg.primaryview_section.tag_subject_of(
+        (atype, "question", "Question"), "sideboxes")
+    uicfg.primaryview_section.tag_subject_of(
+        (atype, "questionnaire_run", "QuestionnaireRun"), "sideboxes")
 
 uicfg.primaryview_section.tag_subject_of(
     ("QuestionnaireRun", "study", "Study"), "sideboxes")

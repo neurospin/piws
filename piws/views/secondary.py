@@ -318,6 +318,52 @@ class OutOfContextQuestionnaireRunView(BaseOutOfContextView):
 
 
 ###############################################################################
+# Answers
+###############################################################################
+
+class OutOfContextTextAnswerView(BaseOutOfContextView):
+    """ TextAnswer secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("TextAnswer")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the TextAnswer description.
+        """
+        question = entity.question[0]
+        desc = {}
+        desc["Related question"] = question.view("incontext")
+        return desc
+
+
+class OutOfContextIntAnswerView(BaseOutOfContextView):
+    """ IntAnswer secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("IntAnswer")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the IntAnswer description.
+        """
+        question = entity.question[0]
+        desc = {}
+        desc["Related question"] = question.view("incontext")
+        return desc
+
+
+class OutOfContextFloatAnswerView(BaseOutOfContextView):
+    """ FloatAnswer secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("FloatAnswer")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the FloatAnswer description.
+        """
+        question = entity.question[0]
+        desc = {}
+        desc["Related question"] = question.view("incontext")
+        return desc
+
+
+###############################################################################
 # Question
 ###############################################################################
 
@@ -637,5 +683,7 @@ def registration_callback(vreg):
                   OutOfContextRestrictedFileView,
                   OutOfContextGenomicMeasureView, OutOfContextDeviceView,
                   OutOfContextUploadFieldView, OutOfContextChromosomeView,
-                  OutOfContextGeneView, OutOfContextCpGView]:
+                  OutOfContextGeneView, OutOfContextCpGView,
+                  OutOfContextTextAnswerView, OutOfContextIntAnswerView,
+                  OutOfContextFloatAnswerView]:
         vreg.register(klass)

@@ -420,7 +420,7 @@ class PIWSSubjectStatistics(component.CtxComponent):
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Subject gender repartition</a>')
+        w(u'Gender repartition</a>')
         w(u'</div></div><br/>')
 
         # Create a view to see the subject handedness repartition in the db
@@ -431,7 +431,7 @@ class PIWSSubjectStatistics(component.CtxComponent):
         w(u'<div class="btn-toolbar">')
         w(u'<div class="btn-group-vertical btn-block">')
         w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-        w(u'Subject handedness repartition</a>')
+        w(u'Handedness repartition</a>')
         w(u'</div></div><br/>')
 
 

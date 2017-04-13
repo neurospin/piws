@@ -78,6 +78,14 @@ search_box > input {
 
 /* -- Facets ----------------------------------------------------------- */
 
+.rangeFacet {
+    overflow: hidden ! important;
+}
+
+.rangeFacet .ui-slider {
+    margin: 1em;
+}
+
 .cw_search_box > .btn-toolbar > .btn-block > .btn {
     margin-left: 0;
 }
@@ -99,15 +107,14 @@ fieldset {
 }
 .facetCheckBox {
     padding-left: 0;
-    height: 2em;
 }
 
 div.vocabularyFacet {
     overflow-x: auto !important;
 }
 
-.facetCheckBox {
-    background: url("img/facet_unselected.png") 0% 0% no-repeat !important;
+.facetValueSelected {
+    background: url("img/facet_selected.png") 0% 0% no-repeat !important;
 }
 
 

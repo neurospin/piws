@@ -24,6 +24,7 @@ from cubicweb.view import View
 from cubicweb.web.views.ajaxcontroller import ajaxfunc
 from cubicweb.web.views.csvexport import CSVMixIn
 from logilab.common.registry import yes
+from cubes.brainomics2.schema.questionnaire import ANSWERS_RTYPE
 
 
 ###############################################################################
@@ -886,18 +887,20 @@ class PIWSCSVView(CSVMixIn, View):
         timepoint = self._cw.form["timepoint"]
         labels = json.loads(self._cw.form["labels"])
 
-        rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
-               "S subject_questionnaire_runs QR, QR questionnaire QU, "
-               "QU name '{0}', QR open_answers O, O value OV, "
-               "O in_assessment A, A timepoint '{1}', O question Q, "
-               "Q text QT".format(qname, timepoint))
-        rset = self._cw.execute(rql)
+        rset = []
+        for rtype in ANSWERS_RTYPE:     
+            rql = ("Any ID, QT, OV Where S is Subject, S code_in_study ID, "
+                   "S subject_questionnaire_runs QR, QR questionnaire QU, "
+                   "QU name '{0}', QR {1}_answers O, O value OV, "
+                   "O in_assessment A, A timepoint '{2}', O question Q, "
+                   "Q text QT".format(qname, rtype, timepoint))
+            rset.extend(self._cw.execute(rql))
 
         table = defaultdict(lambda: OrderedDict.fromkeys(labels, ""))
         for item in rset:
             table[item[0]][item[1]] = item[2]
-        for id, data in table.iteritems():
-            table[id]["ID"] = id
+        for key in table:
+            table[key]["ID"] = key
 
         writer = self.csvwriter()
         writer.writerow(labels)
@@ -973,17 +976,18 @@ def get_open_answers_data(self):
     records = []
     for row_nb in rset_range:
         user_data = OrderedDict.fromkeys(labels, '')
-        user_data['ID'] = filtered_rset[row_nb][0]
+        user_data["ID"] = filtered_rset[row_nb][0]
 
         # Execute an rql to get the subject answers
         questionnaire_run_eid = filtered_rset[row_nb][1]
-        rql = ("Any QN, V Where QR eid '{0}', QR open_answers A, A question Q,"
-               "Q text QN, A value V".format(questionnaire_run_eid))
-        answer_rset = self._cw.execute(rql)
+        for rtype in ANSWERS_RTYPE:     
+            rql = ("Any QN, V Where QR eid '{0}', QR {1}_answers A, A question Q,"
+                   "Q text QN, A value V".format(questionnaire_run_eid, rtype))
+            answer_rset = self._cw.execute(rql)
 
-        # Go through all answers
-        for qname, answer in answer_rset:
-            user_data[qname] = answer
+            # Go through all answers
+            for qname, answer in answer_rset:
+                user_data[qname] = answer
 
         # Store the tabel formated row
         records.append(user_data.values())
@@ -1038,7 +1042,7 @@ def get_questionnaires_data(self):
 
     # Choose the questionnaire rendering view:
     # > case 1: one line of answers inserted per subject (File)
-    # > case 2: the answers are inserted in the database (OpenAnswer).
+    # > case 2: the answers are inserted in the database (open answers).
     rql = "Any QR Where QR is QuestionnaireRun, EXISTS(QR file F)"
     rset = self._cw.execute(rql)
     if rset.rowcount > 0:

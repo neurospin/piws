@@ -275,6 +275,11 @@ def questionnaire_parser(root, project_name):
                     # Load the questionnaire
                     with open(questionnaire_fname) as open_file:
                         data = json.load(open_file)
+                    for question_name, question_type in (
+                            ("mood", "float"), ("age", "int")):
+                        if question_name in data:
+                            attribute_name = question_name + ": " + question_type
+                            data[attribute_name] = data.pop(question_name)    
 
                     subj_questionnaires["Questionnaires"][qname] = data
 

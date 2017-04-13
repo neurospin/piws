@@ -141,6 +141,19 @@ class SubjectFacet(facet.RQLPathFacet):
     title = _("Subjects")
 
 
+class SubjectGenderFacet(facet.RQLPathFacet):
+    """ Filter the subjects genders.
+
+    This filter is applied on 'Subject'.
+    """
+    __regid__ = "subject-gender-facet"
+    __select__ = is_instance("Subject")
+    path = ["X gender G"]
+    order = 1
+    filter_variable = "G"
+    title = _("Gender")
+
+
 class SubjectsFacet(facet.RQLPathFacet):
     """ Filter on subject code (from the 'Subject' entity).
 
@@ -245,6 +258,34 @@ class ProcessingRunSubjectFacet(facet.RQLPathFacet):
     title = _("Subjects")
 
 
+class AssessmentAgeFacet(facet.RangeFacet):
+    __regid__ = "assessment-age-facet"
+    __select__ = is_instance("Assessment")
+    rtype = "age_of_subject"
+    title = _("Age")
+
+
+class SubjectAgeFacet(facet.AbstractRangeRQLPathFacet, facet.RangeFacet):
+    __regid__ = "subject-age-facet"
+    __select__ = is_instance("Subject")
+    path = ["X assessments A", "A age_of_subject G"]
+    order = 3
+    filter_variable = "G"
+
+    title = _("Age")
+
+
+class AgeFacet(facet.AbstractRangeRQLPathFacet, facet.RangeFacet):
+    __regid__ = "age-facet"
+    __select__ = is_instance("Scan", "ProcessingRun", "QuestionnaireRun",
+                             "GenomicMeasure")
+    path = ["X in_assessment A", "A age_of_subject G"]
+    order = 3
+    filter_variable = "G"
+
+    title = _("Age")
+
+
 ###############################################################################
 # Registration callback
 ###############################################################################
@@ -257,5 +298,6 @@ def registration_callback(vreg):
                    SubjectFacet, ScanFieldFacet, ScanFormatFacet,
                    AssessmentTimepointFacet, AssessmentSubjectFacet,
                    ProcessingRunNameFacet, LabelFacet, NameFacet,
-                   ProcessingRunSubjectFacet, StatusFacet]:
+                   ProcessingRunSubjectFacet, StatusFacet, SubjectGenderFacet,
+                   AssessmentAgeFacet, SubjectAgeFacet, AgeFacet]:
         vreg.register(eclass)

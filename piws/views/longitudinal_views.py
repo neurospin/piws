@@ -75,14 +75,15 @@ class QuestionnaireLongitudinalView(View):
             # Get the questionnaire run associated answers and fill the
             # 'questionnaires' structure
             # > case 1: one line of answers inserted per subject (File)
-            # > case 2: the answers are inserted in the database (OpenAnswer).
+            # > case 2: the answers are inserted in the database (open answers)
             if len(qr_entity.file) > 0:
                 answers = json.loads(qr_entity.file[0].data.getvalue())
                 for qname, answer in answers.items():
                     questionnaires[q_entity.name][qname][timepoint] = str(
                         answer)
             else:
-                answer_entities = qr_entity.open_answers
+                answer_entities = (list(qr_entity.int_answers) +
+                                   list(qr_entity.float_answers))
                 for entity in answer_entities:
                     questionnaires[q_entity.name][entity.question[0].text][
                         timepoint] = entity.value
@@ -106,10 +107,8 @@ class QuestionnaireLongitudinalView(View):
                     continue
 
                 # Check if we are dealing with numbers
-                control_value = values[0].replace(".", "", 1)
-                if control_value.isdigit():
-                    html += "<option value='{0}'>{0}</option>".format(
-                        question_name)
+                html += "<option value='{0}'>{0}</option>".format(
+                    question_name)
             html += "</optgroup>"
         html += "</select>"
 
@@ -130,17 +129,15 @@ class QuestionnaireLongitudinalView(View):
                     continue
 
                 # Check if we are dealing with numbers
-                control_value = values[0].replace(".", "", 1)
-                if control_value.isdigit():
-                    html += "var sdata = {};"
-                    html += "sdata['x'] = [];".format(question_name)
-                    html += "sdata['grid'] = [];".format(question_name)
-                    html += "sdata['related_question'] = '{0}';".format(question_name)
-                    html += "sdata['related_questionnaire'] = '{0}';".format(q_name)
-                    for p in data:
-                        html += "sdata['x'].push('{0}');".format(p[0])
-                        html += "sdata['grid'].push({0});".format(p[1])
-                    html += "jdata['{0}'] = sdata;".format(question_name)
+                html += "var sdata = {};"
+                html += "sdata['x'] = [];".format(question_name)
+                html += "sdata['grid'] = [];".format(question_name)
+                html += "sdata['related_question'] = '{0}';".format(question_name)
+                html += "sdata['related_questionnaire'] = '{0}';".format(q_name)
+                for p in data:
+                    html += "sdata['x'].push('{0}');".format(p[0])
+                    html += "sdata['grid'].push({0});".format(p[1])
+                html += "jdata['{0}'] = sdata;".format(question_name)
 
         # Add an event when the selection change
         html += "$(function() {"

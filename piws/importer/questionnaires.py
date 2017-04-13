@@ -14,13 +14,14 @@ import json
 
 # CubicWeb import
 from cubicweb import Binary
+from cubes.brainomics2.schema.questionnaire import ANSWERS_RTYPE
 
 # Piws import
 from .base import Base
 
 
 class Questionnaires(Base):
-    """ This class enables us to load the questionnaire to CW.
+    """ This class enables us to load questionnaires into a CW instance.
     """
     # Define the relations involved
     relations = Base.assessment_relations + [
@@ -34,13 +35,24 @@ class Questionnaires(Base):
         ("Study", "study_questionnaire_runs", "QuestionnaireRun"),
         ("QuestionnaireRun", "subject", "Subject"),
         ("Subject", "subject_questionnaire_runs", "QuestionnaireRun"),
-        ("OpenAnswer", "question", "Question"),
-        ("Question", "question_open_answers", "OpenAnswer"),
-        ("OpenAnswer", "questionnaire_run", "QuestionnaireRun"),
-        ("QuestionnaireRun", "open_answers", "OpenAnswer"),
-        ("OpenAnswer", "in_assessment", "Assessment"),
+        ("TextAnswer", "question", "Question"),
+        ("Question", "question_text_answers", "TextAnswer"),
+        ("TextAnswer", "questionnaire_run", "QuestionnaireRun"),
+        ("QuestionnaireRun", "text_answers", "TextAnswer"),
+        ("TextAnswer", "in_assessment", "Assessment"),
+        ("IntAnswer", "question", "Question"),
+        ("Question", "question_int_answers", "IntAnswer"),
+        ("IntAnswer", "questionnaire_run", "QuestionnaireRun"),
+        ("QuestionnaireRun", "int_answers", "IntAnswer"),
+        ("IntAnswer", "in_assessment", "Assessment"),
+        ("FloatAnswer", "question", "Question"),
+        ("Question", "question_float_answers", "FloatAnswer"),
+        ("FloatAnswer", "questionnaire_run", "QuestionnaireRun"),
+        ("QuestionnaireRun", "float_answers", "FloatAnswer"),
+        ("FloatAnswer", "in_assessment", "Assessment"),
         ("QuestionnaireRun", "file", "RestrictedFile")
     ]
+    annotation_operator = ": "
 
     def __init__(self, session, project_name, center_name, questionnaires,
                  questionnaire_type, can_read=True, can_update=True,
@@ -77,12 +89,15 @@ class Questionnaires(Base):
         piws_security_model: bool (optional, default True)
             if True apply the PIWS security model.
         use_openanswer : bool (optional, default False)
-            if True insert questionnaires using the OpenAnswer entity,
+            if True insert questionnaires using the {{RTYPE}}Answer entity,
             else using the File entity.
 
         Notes
         -----
-        Here is an example of the definition of the 'questionnaires' parameter:
+        Here is an example of the definition of the 'questionnaires' parameter.
+        Note that in the case of open answers, you can specify the type
+        of a question with the ': ' annotation operator. The ': ' is thus
+        reserved and must not be used in question mapings:
 
         ::
 
@@ -103,7 +118,7 @@ class Questionnaires(Base):
                     {
                         "Questionnaires": {
                             "Personal": {u"mood": 5}
-                            "ID": {u"gender": u"male", u"age": 27,
+                            "ID": {u"gender": u"male", u"age: int": 27,
                                    u"handedness": u"right"}
                         }
                         "Assessment": {
@@ -209,9 +224,13 @@ class Questionnaires(Base):
                                             "Questionnaires"].iteritems():
                     if qname not in qstructure:
                         qstructure[qname] = []
-                    for question_name in question_struct:
+                    for question_attribute in question_struct:
+                        question_name, question_type = self._parse_annotation(
+                            question_attribute)
                         if question_name not in qstructure[qname]:
-                            qstructure[qname].append(question_name)
+                            qstructure[qname].append(
+                                {"name": question_name,
+                                 "type": question_type})
 
         # Then fill the questionnaire form
         questionnaire_eids = {}
@@ -231,7 +250,8 @@ class Questionnaires(Base):
             question_eids[qname] = {}
 
             # Create corresponding questions
-            for index, question_name in enumerate(question_names):
+            for index, question_struct in enumerate(question_names):
+                question_name = question_struct["name"]
                 question_id = self._md5_sum(qname + "_" + question_name)
                 question_entity, _ = self._get_or_create_unique_entity(
                     rql=("Any X Where X is Question, X identifier "
@@ -240,8 +260,8 @@ class Questionnaires(Base):
                     entity_name = "Question",
                     identifier=unicode(question_id),
                     text=unicode(question_name),
-                    position=index
-                )
+                    position=index,
+                    type=unicode(question_struct["type"]))
                 question_eids[qname][question_name] = question_entity.eid
                 # > add relation with the questionnaire form
                 self._set_unique_relation(question_entity.eid, "questionnaire",
@@ -317,6 +337,10 @@ class Questionnaires(Base):
 
         print  # new line after last progress bar update
 
+    ###########################################################################
+    #   Private Methods
+    ###########################################################################
+
     def _create_questionnaire(self, questionnaire_name, q_items,
                               identifier_prefix, subject_id, subject_eid,
                               study_eid, assessment_eid, questionnaire_eids,
@@ -366,38 +390,43 @@ class Questionnaires(Base):
 
             if self.use_openanswer:
                 # Go through all answers
-                for question_name, answer in q_items.iteritems():
+                for question_attribute, answer in q_items.iteritems():
+
+                    # Parse question attribute
+                    question_name, rtype = self._parse_annotation(
+                        question_attribute)
+                    etype = "{0}Answer".format(rtype.title())
 
                     # Get the question entity
                     question_eid = question_eids[questionnaire_name][
                         question_name]
 
-                    # Create an open answer
+                    # Create an answer of the good type
                     answer_entity, _ = self._get_or_create_unique_entity(
                         rql="",
                         check_unicity=False,
-                        entity_name="OpenAnswer",
+                        entity_name=etype,
                         identifier=unicode(self._md5_sum(
                             qr_id + "_" + question_name)),
-                        value=unicode(answer))
+                        value=answer)
                     # > add relation with the question
                     self._set_unique_relation(
                         answer_entity.eid, "question", question_eid,
-                        check_unicity=False, subjtype="OpenAnswer")
+                        check_unicity=False, subjtype=etype)
                     self._set_unique_relation(
-                        question_eid, "question_open_answers",
+                        question_eid, "question_{0}_answers".format(rtype),
                         answer_entity.eid, check_unicity=False)
                     # > add relation with the questionnaire run
                     self._set_unique_relation(
                         answer_entity.eid, "questionnaire_run", qr_entity.eid,
-                        check_unicity=False, subjtype="OpenAnswer")
+                        check_unicity=False, subjtype=etype)
                     self._set_unique_relation(
-                        qr_entity.eid, "open_answers", answer_entity.eid,
-                        check_unicity=False)
+                        qr_entity.eid, "{0}_answers".format(rtype),
+                        answer_entity.eid, check_unicity=False)
                     # > add relation with the assessment
                     self._set_unique_relation(
                         answer_entity.eid, "in_assessment", assessment_eid,
-                        check_unicity=False, subjtype="OpenAnswer")
+                        check_unicity=False, subjtype=etype)
             else:
                 f_entity, _ = self._get_or_create_unique_entity(
                     rql="",
@@ -415,3 +444,31 @@ class Questionnaires(Base):
                     check_unicity=False, subjtype="RestrictedFile")
 
         return qr_entity.eid
+
+    def _parse_annotation(self, attribute_name):
+        """ Parse an annotation.
+
+        Parameters
+        ----------
+        attribute_name: str
+            the input string to be parsed.
+
+        Returns
+        -------
+        name: str
+            the attribute name.
+        type: str
+            the attribute type.
+        """
+        attribute_split = attribute_name.split(self.annotation_operator)
+        if len(attribute_split) > 2:
+            raise ValueError("Invalid attribute name '{0}'. '{1}' is a "
+                             "reserved operator.".format(
+                                    attribute_name, self.annotation_operator))
+        elif len(attribute_split) == 1:
+            attribute_split.append("text")
+        if attribute_split[1] not in ANSWERS_RTYPE:
+            raise ValueError("Unsupported question type '{0}'. Defined types "
+                             "are {1}.".format(
+                                    attribute_split[1], ANSWERS_RTYPE))
+        return attribute_split

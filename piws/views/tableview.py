@@ -61,7 +61,10 @@ class CSVRsetView(CSVMixIn, AnyRsetView):
         as the first row of the CSV file.
         """
         writer = self.csvwriter()
-        writer.writerow(self._cw.form["labels"])
+        labels = self._cw.form["labels"]
+        if not isinstance(labels, list):
+            labels = [labels]
+        writer.writerow(labels)
         rset, descr = self.cw_rset, self.cw_rset.description
         eschema = self._cw.vreg.schema.eschema
         for rowindex, row in enumerate(rset):
