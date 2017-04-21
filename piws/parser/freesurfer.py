@@ -32,7 +32,8 @@ RQL_T1 = ("Any SC Where S is Subject, S code_in_study '{0}', "
           "SC label 'ADNI_MPRAGE'")
 
 
-def freesurfer_stats(fsstatdirs, study_name, subject_age_map, savedir=None):
+def freesurfer_stats(fsstatdirs, study_name, subject_age_map, savedir=None,
+                     is_openanswer=False):
     """ Parse the freesurfer stats files and create a structure that
     fulfill the questionnaire importer synthax.
 
@@ -49,6 +50,8 @@ def freesurfer_stats(fsstatdirs, study_name, subject_age_map, savedir=None):
     savedir: str (optional, defafult None)
         if a valid directory is specified write the generated structure as
         a json file.
+    is_openanswer: bool (optional, default False)
+        if True use types open answers.
 
     Returns
     -------
@@ -78,7 +81,7 @@ def freesurfer_stats(fsstatdirs, study_name, subject_age_map, savedir=None):
                     age = subject_age_map[timepoint][subject]
                     qstruct = {
                         "Questionnaires": {
-                            qname: {k: v for k, v in zip(headers[1:], row[1:])}
+                            qname: None
                         },
                         "Assessment": {
                             "age_of_subject": float(age),
@@ -88,6 +91,13 @@ def freesurfer_stats(fsstatdirs, study_name, subject_age_map, savedir=None):
                             "timepoint": unicode(timepoint)
                         }
                     }
+                    if is_openanswer:
+                        qstruct["Questionnaires"][qname] = {
+                            "{0}: float".format(k): float(v)
+                            for k, v in zip(headers[1:], row[1:])}
+                    else:
+                        qstruct["Questionnaires"][qname] = {
+                            k: float(v) for k, v in zip(headers[1:], row[1:])}
                     questionnaires.setdefault(subject, []).append(qstruct)
 
     # Save the generated structure
