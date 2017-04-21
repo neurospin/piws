@@ -11,6 +11,7 @@ import os
 import sys
 import hashlib
 import json
+from collections import OrderedDict
 
 # CubicWeb import
 from cubicweb import Binary
@@ -106,7 +107,7 @@ class Questionnaires(Base):
                     {
                         "Questionnaires": {
                             "Personal": {u"mood": 5}
-                            "ID": {u"gender": u"male", u"age": 27,
+                            "ID": {u"gender": u"male", u"age: int": 27,
                                    u"handedness": u"right"}
                         }
                         "Assessment": {
@@ -219,23 +220,20 @@ class Questionnaires(Base):
         # Get the questionnaire structure
         qstructure = {}
         for subject_questionnaires in self.questionnaires.values():
-            for dquestionnaires in subject_questionnaires:
-                for qname, question_struct in dquestionnaires[
-                                            "Questionnaires"].iteritems():
+            for list_of_questionnaires in subject_questionnaires:
+                for qname, question_struct in list_of_questionnaires[
+                                            "Questionnaires"].items():
                     if qname not in qstructure:
-                        qstructure[qname] = []
-                    for question_attribute in question_struct:
+                        qstructure[qname] = OrderedDict()
+                    for question_name in question_struct:
                         question_name, question_type = self._parse_annotation(
-                            question_attribute)
-                        if question_name not in qstructure[qname]:
-                            qstructure[qname].append(
-                                {"name": question_name,
-                                 "type": question_type})
+                            question_name)
+                        qstructure[qname][question_name] = question_type
 
         # Then fill the questionnaire form
         questionnaire_eids = {}
         question_eids = {}
-        for qname, question_names in qstructure.iteritems():
+        for qname, questions_struct in qstructure.iteritems():
 
             # Create a questionnaire form
             questionnaire_entity, _ = self._get_or_create_unique_entity(
@@ -250,8 +248,8 @@ class Questionnaires(Base):
             question_eids[qname] = {}
 
             # Create corresponding questions
-            for index, question_struct in enumerate(question_names):
-                question_name = question_struct["name"]
+            for index, (question_name, question_type) in enumerate(
+                    questions_struct.items()):
                 question_id = self._md5_sum(qname + "_" + question_name)
                 question_entity, _ = self._get_or_create_unique_entity(
                     rql=("Any X Where X is Question, X identifier "
@@ -261,7 +259,7 @@ class Questionnaires(Base):
                     identifier=unicode(question_id),
                     text=unicode(question_name),
                     position=index,
-                    type=unicode(question_struct["type"]))
+                    type=unicode(question_type))
                 question_eids[qname][question_name] = question_entity.eid
                 # > add relation with the questionnaire form
                 self._set_unique_relation(question_entity.eid, "questionnaire",
@@ -312,16 +310,11 @@ class Questionnaires(Base):
                 assessment_struct = timepoint_questionnaires["Assessment"]
                 assessment_id = assessment_struct["identifier"]
 
-                # Check if this item has already been inserted
-                if assessment_id in self.inserted_assessments:
-                    assessment_eid = self.inserted_assessments[assessment_id]
-
-                # Create the assessment
-                else:
-                    assessment_eid = self._create_assessment(
-                        assessment_struct, subject_eid, study_eid, center_eid,
-                        groups)
-                    self.inserted_assessments[assessment_id] = assessment_eid
+                # Create the assessment, check if this item has already been
+                # inserted
+                assessment_eid, is_created = self._create_assessment(
+                    assessment_struct, subject_eid, study_eid, center_eid,
+                    groups)
 
                 ###############################################################
                 # Insert the patient answers in the db

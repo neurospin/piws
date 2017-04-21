@@ -239,16 +239,11 @@ class Genetics(Base):
                 assessment_struct = tgenetic_item["Assessment"]
                 assessment_id = assessment_struct["identifier"]
 
-                # Check if this item has already been inserted
-                if assessment_id in self.inserted_assessments:
-                    assessment_eid = self.inserted_assessments[assessment_id]
-
-                # Create the assessment
-                else:
-                    assessment_eid = self._create_assessment(
-                        assessment_struct, timepoint_subjects, study_eid,
-                        center_eid, groups)
-                    self.inserted_assessments[assessment_id] = assessment_eid
+                # Create the assessment, check if this item has already been
+                # inserted
+                assessment_eid, is_created = self._create_assessment(
+                    assessment_struct, timepoint_subjects, study_eid,
+                    center_eid, groups)
 
                 ###############################################################
                 # Insert all the genetic measure at this timepoint

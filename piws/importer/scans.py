@@ -258,18 +258,12 @@ class Scans(Base):
                 # Get the assessment identifier
                 assessment_struct = subj_scans["Assessment"]
                 assessment_id = assessment_struct["identifier"]
-                assessment_exists = False
 
-                # Check if this item has already been inserted
-                if assessment_id in self.inserted_assessments:
-                    assessment_eid = self.inserted_assessments[assessment_id]
-                    assessment_exists = True
-
-                # Create the assessment
-                else:
-                    assessment_eid = self._create_assessment(
-                        assessment_struct, subject_eid, study_eid, center_eid,
-                        groups)
+                # Create the assessment, check if this item has already been
+                # inserted
+                assessment_eid, is_created = self._create_assessment(
+                    assessment_struct, subject_eid, study_eid, center_eid,
+                    groups)
 
                 ###############################################################
                 # Create the device if possible
@@ -277,7 +271,7 @@ class Scans(Base):
 
                 # If the device is specified
                 device_struct = subj_scans.get("Device", None)
-                if device_struct is not None:
+                if is_created and device_struct is not None:
 
                     # Get the device identifier
                     device_id = device_struct["identifier"]
@@ -286,7 +280,6 @@ class Scans(Base):
                     if device_id in self.inserted_devices:
                         device_eid = self.inserted_devices[device_id]
 
-
                     # Create the device
                     else:
                         device_eid = self._create_device(
@@ -294,17 +287,12 @@ class Scans(Base):
                             self.center_name)
 
                     # Add relation with the assessment
-                    if not assessment_exists:
-                        self._set_unique_relation(
-                            assessment_eid, "device", device_eid,
-                            check_unicity=False)
-                        self._set_unique_relation(
-                            device_eid, "device_assessments", assessment_eid,
-                            check_unicity=False)
-
-                # Otherwise device eid is None
-                else:
-                    device_eid = None
+                    self._set_unique_relation(
+                        assessment_eid, "device", device_eid,
+                        check_unicity=False)
+                    self._set_unique_relation(
+                        device_eid, "device_assessments", assessment_eid,
+                        check_unicity=False)
 
                 ###############################################################
                 # Go through the scans - scores

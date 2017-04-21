@@ -418,6 +418,7 @@ class Base(object):
                 entity_name="Assessment",
                 **assessment_struct)
             assessment_eid = assessment_entity.eid
+            self.inserted_assessments[assessment_id] = assessment_eid
             if is_created:
                 self.already_related_subjects[assessment_eid] = []
             else:
@@ -425,7 +426,6 @@ class Base(object):
                        "A subjects S".format(assessment_eid))
                 self.already_related_subjects[assessment_eid] = [
                     row[0] for row in self.session.execute(rql)]
-            self.inserted_assessments[assessment_id] = assessment_eid
 
         # Add relation with the subject
         for subject_eid in subject_eids:
@@ -485,7 +485,7 @@ class Base(object):
                         self._set_unique_relation(
                             group_eid, "can_update", assessment_eid)
 
-        return assessment_eid
+        return assessment_eid, is_created
 
     def _get_security_groups(self, assessment_id):
         """ Get the groups that will be associated with this assemssment in

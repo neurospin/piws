@@ -246,8 +246,9 @@ class Processings(Base):
                 assessment_struct = subj_processings["Assessment"]
                 assessment_id = assessment_struct["identifier"]
 
-                # Create the assessment
-                assessment_eid = self._create_assessment(
+                # Create the assessment, check if this item has already been
+                # inserted
+                assessment_eid, is_created = self._create_assessment(
                     assessment_struct, subject_eid, study_eid, center_eid,
                     groups)
 
