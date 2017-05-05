@@ -92,9 +92,9 @@ class Scan(AnyEntity):
         if dtype.__class__.__name__ == "DMRIData":
             return "images/dmri.png"
         elif dtype.__class__.__name__ == "FMRIData":
-            return "images/fmri.jpg"
+            return "images/fmri.png"
         elif dtype.__class__.__name__ == "MRIData":
-            return "images/mri.jpg"
+            return "images/mri.png"
         elif dtype.__class__.__name__ == "PETData":
             return "images/pet.png"
         elif dtype.__class__.__name__ == "EEGData":
@@ -188,7 +188,7 @@ class ProcessingRun(AnyEntity):
             return "images/freesurfer.png"
         elif self.label in ["SPM preproc EPI_mid", "SPM preproc EPI_faces",
                             "SPM preproc EPI_stop_signal"]:
-            return "images/fmri.jpg"
+            return "images/fmri.png"
         return "images/processing.png"
 
 

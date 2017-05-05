@@ -100,7 +100,7 @@ fieldset {
 }
 
 .facetValueDisabled span, div.facetCheckBox span {
-    display: block;
+    /* display: block; */
     padding-left: 10%;
     width: 100%;
 	white-space: nowrap;
@@ -137,6 +137,10 @@ div.vocabularyFacet {
 
 .secondary-buttons {
     float: right;
+}
+
+.secondary-buttons .btn{
+    margin-right: 8px;
 }
 
 /* -- Misk ----------------------------------------------------------- */

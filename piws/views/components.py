@@ -236,7 +236,7 @@ class PIWSNavigationtBox(component.CtxComponent):
                 w(u'Scans</a>')
                 w(u'<a class="btn btn-primary" href="{0}" '
                    'style="width:10%">'.format(href))
-                w(u'all</a>')
+                w(u'&#9735;</a>')
                 w(u'</div></div>')
                 # > typed buttons container
                 w(u'<div id="scans{0}" class="collapse">'.format(study))
@@ -290,7 +290,7 @@ class PIWSNavigationtBox(component.CtxComponent):
             w(u'Tables</a>')
             w(u'<a class="btn btn-primary" href="{0}" '
                'style="width:10%">'.format(href))
-            w(u'all</a>')
+            w(u'&#9735;</a>')
             w(u'</div></div>')
             # > typed buttons container
             w(u'<div id="questionnaires{0}" class="collapse">'.format(study))
@@ -336,7 +336,7 @@ class PIWSNavigationtBox(component.CtxComponent):
             w(u'Processed data</a>')
             w(u'<a class="btn btn-primary" href="{0}" '
                'style="width:10%">'.format(href))
-            w(u'all</a>')
+            w(u'&#9735;</a>')
             w(u'</div></div>')
             # > typed buttons container
             w(u'<div id="processings{0}" class="collapse">'.format(study))
