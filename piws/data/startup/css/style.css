@@ -1,0 +1,184 @@
+
+
+/*--------------------------------------------------------------
+# Body
+--------------------------------------------------------------*/
+
+.default {
+  background: #A7A69F;
+  color: #322B24;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 1.5em;
+  line-height: 1.5em;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+  background: #E2E1DC url("../images/light-bg-texture.jpg");
+  overflow: hidden;
+}
+
+.main {
+  margin-top: 200px;
+  display: block;
+}
+
+
+/*--------------------------------------------------------------
+# Footer
+--------------------------------------------------------------*/
+
+.more {
+  background: #fff;
+  position: relative;
+  height: 500px;
+}
+
+.more:before {
+  display: block;
+  content: '';
+  background: url("../images/white-tear-away.png") top;
+  position: absolute;
+  top: -50px;
+  left: 0;
+  width: 100%;
+  height: 60px;
+}
+
+.more:after {
+  display: block;
+  content: '';
+  background: url("../images/white-tear-away.png") bottom;
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  width: 100%;
+  height: 60px;
+}
+
+.piws {
+  width: 50%;
+  float: left;
+}
+
+.nsap {
+  width: 50%;
+  float: left;
+}
+
+/*--------------------------------------------------------------
+# Forms
+--------------------------------------------------------------*/
+
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"],
+.button {
+  display: inline-block;
+  border: none;
+  border-radius: 0;
+  background: #00A9B8;
+  color: #fff;
+  line-height: 1;
+  padding: .6em 1em .4em;
+  box-shadow: 3px 3px 3px #8b836a;
+  text-decoration: none;
+  font-weight: 600;
+}
+button:hover,
+input[type="button"]:hover,
+input[type="reset"]:hover,
+input[type="submit"]:hover,
+.button:hover {
+  color: #fff;
+  background: #308389;
+}
+
+
+
+/*--------------------------------------------------------------
+# Information
+--------------------------------------------------------------*/
+
+img {
+  border: 0;
+  height: auto;
+  max-width: 100%;
+}
+
+.euaims {
+  margin-bottom: 200px;
+}
+
+.euaims .information {
+  width: 45%;
+  float: right;
+  padding-top: 145px;
+  padding-right: 50px;
+}
+
+.imagen .information {
+  position: relative;
+  top: 10px;
+  width: 45%;
+  text-align: right;
+  padding-left: 80px;
+}
+
+.imagen .background {
+  right: 0;
+  top: 900px;
+  position: absolute;
+  z-index: 1;
+}
+
+
+/*--------------------------------------------------------------
+# Explore
+--------------------------------------------------------------*/
+
+.explore {
+  position: relative;
+  margin-bottom: 5em;
+}
+
+.explore-start {
+  top: 10px;
+  right: 140px;
+  background: url("../images/bg-explore.png") no-repeat;
+  background-size: 187px 50px;
+  width: 187px;
+  height: 50px;
+  color: #322b24;
+  font-family: "Neuton", serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 45px;
+  text-align: center;
+  z-index: 300;
+}
+
+.start-2017 {
+  position: absolute;
+  top: 10px;
+  right: 200px;
+}
+
+.start-2016 {
+  position: absolute;
+  top: 680px;
+  right: 10px;
+}

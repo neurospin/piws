@@ -134,6 +134,7 @@ class PIWSNavigationtBox(component.CtxComponent):
     display_genomic = True
     display_study = False
     display_score = True
+    display_history = True
     auto_disable_qc = False
 
     def render_body(self, w):
@@ -395,6 +396,17 @@ class PIWSNavigationtBox(component.CtxComponent):
         w(u'<span class="glyphicon glyphicon-shopping-cart"></span> '
           u'My cart</a>')
         w(u'</div></div><br/>')
+
+        # History
+        if self.display_history:
+            w(u'<hr>')
+            w(u'<div class="btn-toolbar">')
+            w(u'<div class="btn-group-vertical btn-block">')
+            href = self._cw.build_url(vid="piws-history")
+            w(u'<a class="btn btn-primary" href="{0}" target=_blank>'.format(href))
+            w(u'<span class="glyphicon glyphicon-pushpin"></span> '
+              u'History</a>')
+            w(u'</div></div><br/>')
 
 
 ###############################################################################
