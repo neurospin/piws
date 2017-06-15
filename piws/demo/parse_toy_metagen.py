@@ -76,7 +76,7 @@ def genetic_parser(root, project_name, timepoint):
     for ext in [".bim", ".fam", ".bed"]:
         dataset[ext] = root + ext
         if not os.path.isfile(dataset[ext]):
-            raise valueError("{0} is not a file.".format(dataset[ext]))
+            raise ValueError("{0} is not a file.".format(dataset[ext]))
 
     # Create an assessment
     assessment_id = u"{0}_{1}_{2}".format(project_name, timepoint, "plink")
