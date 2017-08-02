@@ -373,8 +373,7 @@ class Genetics(Base):
                              rs_id)),
                         entity_name="Snp",
                         rs_id=unicode(rs_id),
-                        start_position=-9,
-                        end_position=-9,
+                        position=-9,
                         maf=-9)
                     snp_eid = snp_entity.eid
                     self.inserted_snps[rs_id] = snp_eid
