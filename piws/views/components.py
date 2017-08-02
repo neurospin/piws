@@ -384,7 +384,7 @@ class PIWSNavigationtBox(component.CtxComponent):
             w(u'<div class="btn-group-vertical btn-block">')
             href = self._cw.build_url(rql="Any C Where C is Chromosome")
             w(u'<a class="btn btn-primary" href="{0}">'.format(href))
-            w(u'MetaGen (hg20 dbsnp138)</a>')
+            w(u'MetaGen (hg38 dbsnp149)</a>')
             w(u'</div></div><br/>')
 
         # CWSearch

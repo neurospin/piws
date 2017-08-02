@@ -8,13 +8,11 @@
 
 from collections import namedtuple
 
-import numpy
-
 from pysnptools.snpreader import Bed
 from cwbrowser.cw_connection import CWInstanceConnection
 
 
-DEFAULT_METAGEN_URL = "http://mart.intra.cea.fr/metagen_hg20_dbsnp138"
+DEFAULT_METAGEN_URL = "http://mart.intra.cea.fr/metagen_hg38_dbsnp149"
 
 
 def get_genes(metagen_connection=None,
@@ -208,7 +206,7 @@ def metagen_get_meta_of_snps(snp_ids,
     # request associated genes, because not all snps are associated to genes.
     N = 5000
     common_kwargs = dict(timeout=timeout, nb_tries=nb_tries)
-    for i in xrange(0, len(snp_ids), N):
+    for i in range(0, len(snp_ids), N):
         subset_snp_ids = snp_ids[i: i+N]
         # Note that we use a complicated "' ,'".join() in the rql creation
         # instead of str(tuple()). When there is only one snp id, str(tuple())
