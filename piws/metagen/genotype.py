@@ -8,13 +8,11 @@
 
 from collections import namedtuple
 
-import numpy
-
 from pysnptools.snpreader import Bed
 from cwbrowser.cw_connection import CWInstanceConnection
 
 
-DEFAULT_METAGEN_URL = "http://mart.intra.cea.fr/metagen_hg20_dbsnp138"
+DEFAULT_METAGEN_URL = "http://mart.intra.cea.fr/metagen_hg38_dbsnp149"
 
 
 def get_genes(metagen_connection=None,
@@ -94,7 +92,7 @@ def get_snps_of_gene(gene_name,
 
     rql = ("Any SID, CN, POS Where G is Gene, G hgnc_id '%s', "
            "G gene_snps S, S rs_id SID, S snp_chromosome C, "
-           "C name CN, S start_position POS") % gene_name
+           "C name CN, S position POS") % gene_name
     rset = metagen_connection.execute(rql, timeout=timeout, nb_tries=nb_tries)
 
     # Return snps as namedtuples to simplify usage
@@ -208,14 +206,14 @@ def metagen_get_meta_of_snps(snp_ids,
     # request associated genes, because not all snps are associated to genes.
     N = 5000
     common_kwargs = dict(timeout=timeout, nb_tries=nb_tries)
-    for i in xrange(0, len(snp_ids), N):
+    for i in range(0, len(snp_ids), N):
         subset_snp_ids = snp_ids[i: i+N]
         # Note that we use a complicated "' ,'".join() in the rql creation
         # instead of str(tuple()). When there is only one snp id, str(tuple())
         # introduces a trailing comma which is not allowed in RQL
         rql_1 = ("Any SID, CN, POS WHERE S is Snp, S rs_id IN ('%s'), "
                  "S rs_id SID, S chromosomes C, C name CN, "
-                 "S start_position POS") % "' ,'".join(subset_snp_ids)
+                 "S position POS") % "' ,'".join(subset_snp_ids)
         rset_1 = metagen_connection.execute(rql_1, **common_kwargs)
         for snp_id, chrom, bp_pos in rset_1:
             meta_of_snp[snp_id] = SnpMetadata(chrom, bp_pos, set())

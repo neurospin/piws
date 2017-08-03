@@ -24,13 +24,17 @@ class MetaGen(Base):
         ("Gene", "gene_chromosome", "Chromosome"),
         ("Gene", "gene_cpgs", "CpG"),
         ("Gene", "gene_snps", "Snp"),
+        ("Gene", "gene_cpg_islands", "CpGIsland"),
+        ("Gene", "gene_pathways", "Pathway"),
         ("CpG", "cpg_chromosome", "Chromosme"),
         ("CpG", "cpg_genes", "Gene"),
         ("CpG", "cpg_cpg_island", "CpGIsland"),
         ("Snp", "snp_chromosome", "Chromosome"),
         ("Snp", "snp_genes", "Gene"),
         ("CpGIsland", "cpg_island_chromosome", "Chromosome"),
-        ("CpGIsland", "cpg_island_cpgs", "CpG")
+        ("CpGIsland", "cpg_island_cpgs", "CpG"),
+        ("CpGIsland", "cpg_island_genes", "Gene"),
+        ("Pathway", "pathway_genes", "Gene")
     )
 
     def __init__(self, session, store_type="RQL"):
@@ -65,6 +69,12 @@ class MetaGen(Base):
             raise ValueError("store_type not handled: {}, possible values: {}"
                              .format(store_type, self.STORE_TYPES))
 
+        # Pathways are across chromosomes, but import is done chromosome by
+        # chromosome, we need to keep the mapping <pathway name> -> entity ID
+        # to make relations with genes, and to known which pathways have
+        # already been inserted without making request (too slow).
+        self.eid_of_pathway = dict()
+
     ###########################################################################
     #   Public Methods
     ###########################################################################
@@ -83,7 +93,8 @@ class MetaGen(Base):
         else:
             raise ValueError("store_type not handled: %s." % self.store_type)
 
-    def import_data(self, chromosome_name, genes, cpg_islands, cpgs, snps):
+    def import_data(self, chromosome_name, genes, gene_pathways, cpg_islands,
+                    cpgs, snps):
         """ Method that import one chromsome data in the database.
 
         Parameters
@@ -110,6 +121,7 @@ class MetaGen(Base):
                 :align: center
                 :alt: schema
         """
+
         print("Chromosome %s" % chromosome_name)
 
         #######################################################################
@@ -130,7 +142,7 @@ class MetaGen(Base):
         self.commit_without_finishing()
 
         #######################################################################
-        # Insert all the genes
+        # Insert the genes and related pathways
         #######################################################################
 
         # Keep gene eids to make relations with CpGs and SNPs
@@ -141,7 +153,8 @@ class MetaGen(Base):
         for cnt, gene_struct in enumerate(genes, start=1):
 
             # Unpack
-            gene_id, chrom, start, end, hgnc_name, gene_type = gene_struct
+            (gene_id, chrom, start, end, hgnc_name, gene_type,
+                related_pathways) = gene_struct
             assert chrom == chromosome_name
 
             # Create entity
@@ -156,18 +169,43 @@ class MetaGen(Base):
             gene_eid = gene_entity.eid
             eid_of_gene[gene_id] = gene_eid
 
-            # Create relations
+            # Create relations to chromosome
             assert is_created
             self._set_unique_relation(gene_eid, "gene_chromosome",
                                       chromosome_eid, check_unicity=False)
             self._set_unique_relation(chromosome_eid, "chromosome_genes",
                                       gene_eid, check_unicity=False)
 
+            # Handle related pathways
+            for pathway_name in related_pathways:
+
+                # If pathway has not been inserted (if we don't have entity ID)
+                if pathway_name not in self.eid_of_pathway:
+                    # Create pathway entity
+                    pathway_entity, is_created = \
+                        self._get_or_create_unique_entity(
+                            rql=("Any X Where X is Pathway, X name '%s'"
+                                 % pathway_name),
+                            entity_name="Pathway",
+                            name=unicode(pathway_name),
+                            uri=unicode(gene_pathways[pathway_name]))
+                    assert is_created
+
+                    # Keep mapping: <pathway name> -> <eid>
+                    self.eid_of_pathway[pathway_name] = pathway_entity.eid
+
+                # Relate pathway to gene
+                pathway_eid = self.eid_of_pathway[pathway_name]
+                self._set_unique_relation(gene_eid, "gene_pathways",
+                                          pathway_eid)
+                self._set_unique_relation(pathway_eid, "pathway_genes",
+                                          gene_eid)
+
             # Progress
-            if cnt % 100 == 0 or cnt == nb_genes:
+            if cnt % 10 == 0 or cnt == nb_genes:
                 self._progress_bar(
                     cnt / float(nb_genes),
-                    title="{}/{} {}(genes)".format(cnt, nb_genes, hgnc_name),
+                    title="(genes) %i/%i [%s]" % (cnt, nb_genes, hgnc_name),
                     bar_length=40)
 
         print()  # new line after last progress bar update
@@ -187,7 +225,7 @@ class MetaGen(Base):
         for cnt, cpg_island_struct in enumerate(cpg_islands, start=1):
 
             # Unpack
-            chrom, start, end, = cpg_island_struct
+            chrom, start, end, related_genes = cpg_island_struct
             assert chrom == chromosome_name
             cpg_island_id = "chr%s:%i:%i" % (chrom, start, end)
 
@@ -202,19 +240,26 @@ class MetaGen(Base):
             cpg_island_eid = cpg_island_entity.eid
             eid_of_cpg_island[cpg_island_id] = cpg_island_eid
 
-            # Create relations
+            # Create relations to chromosome
             assert is_created
             self._set_unique_relation(cpg_island_eid, "cpg_island_chromosome",
                                       chromosome_eid, check_unicity=False)
             self._set_unique_relation(chromosome_eid, "chromosome_cpg_islands",
                                       cpg_island_eid, check_unicity=False)
+            # Create relations to genes
+            for gene_id in related_genes:
+                gene_eid = eid_of_gene[gene_id]
+                self._set_unique_relation(cpg_island_eid, "cpg_island_genes",
+                                          gene_eid, check_unicity=False)
+                self._set_unique_relation(gene_eid, "gene_cpg_islands",
+                                          cpg_island_eid, check_unicity=False)
 
             # Progress
             if cnt % 100 == 0 or cnt == nb_cpg_islands:
                 self._progress_bar(
                     cnt / float(nb_cpg_islands),
-                    title="{}/{} {}(CpG islands)".format(cnt, nb_cpg_islands,
-                                                         cpg_island_id),
+                    title="(CpG islands) %i/%i [%s]" % (cnt, nb_cpg_islands,
+                                                        cpg_island_id),
                     bar_length=40)
 
         print()  # new line after last progress bar update
@@ -240,16 +285,18 @@ class MetaGen(Base):
                 position=position)
             cpg_eid = cpg_entity.eid
 
-            # Create relations
+            # Create relations to chromosome
             assert is_created
             self._set_unique_relation(cpg_eid, "cpg_chromosome",
                                       chromosome_eid, check_unicity=False)
             self._set_unique_relation(chromosome_eid, "chromosome_cpgs",
                                       cpg_eid, check_unicity=False)
+            # Create relations to CpGIsland, if a link exists
             if cpg_island_id is not None:
                 cpg_island_eid = eid_of_cpg_island[cpg_island_id]
                 self._set_unique_relation(cpg_eid, "cpg_cpg_island",
                                           cpg_island_eid, check_unicity=False)
+            # Create relations to genes
             for gene_id in related_genes:
                 gene_eid = eid_of_gene[gene_id]
                 self._set_unique_relation(gene_eid, "gene_cpgs", cpg_eid,
@@ -261,7 +308,7 @@ class MetaGen(Base):
             if cnt % 100 == 0 or cnt == nb_cpgs:
                 self._progress_bar(
                     cnt / float(nb_cpgs),
-                    title="{}/{} {}(CpGs)".format(cnt, nb_cpgs, cg_id),
+                    title="(CpGs) %i/%i [%s]" % (cnt, nb_cpgs, cg_id),
                     bar_length=40)
 
             # Regularly flush and/or commit for RAM consumption
@@ -278,7 +325,7 @@ class MetaGen(Base):
         for cnt, snp_struct in enumerate(snps, start=1):
 
             # Unpack
-            rs_id, chrom, start, end, maf, related_genes = snp_struct
+            rs_id, chrom, pos, maf, related_genes = snp_struct
             assert chrom == chromosome_name
 
             # Create entity
@@ -286,17 +333,17 @@ class MetaGen(Base):
                 rql="Any X Where X is Snp, X rs_id '{0}'".format(rs_id),
                 entity_name="Snp",
                 rs_id=unicode(rs_id),
-                start_position=start,
-                end_position=end,
+                position=pos,
                 maf=maf)
             snp_eid = snp_entity.eid
 
-            # Create relations
+            # Create relations to chromosome
             assert is_created
             self._set_unique_relation(snp_eid, "snp_chromosome",
                                       chromosome_eid, check_unicity=False)
             self._set_unique_relation(chromosome_eid, "chromosome_snps",
                                       snp_eid, check_unicity=False)
+            # Create relations to genes
             for gene_id in related_genes:
                 gene_eid = eid_of_gene[gene_id]
                 self._set_unique_relation(gene_eid, "gene_snps", snp_eid,
@@ -308,7 +355,7 @@ class MetaGen(Base):
             if cnt % 100 == 0 or cnt == nb_snps:
                 self._progress_bar(
                     cnt / float(nb_snps),
-                    title="{}/{} {}(SNPs)".format(cnt, nb_snps, rs_id),
+                    title="(SNPs) %i/%i [%s]" % (cnt, nb_snps, rs_id),
                     bar_length=40)
 
             # Regularly flush and/or commit for RAM consumption
