@@ -32,7 +32,7 @@ def rst2html(rstfile, site_url):
     """
     with open(rstfile, "r") as openfile:
         rststr = openfile.read()
-    doc = publish_parts(rststr, writer_name="html")["html_body"]
+    doc = publish_parts(rststr, source_path=rstfile, writer_name="html")["html_body"]
     return set_data_url(site_url, doc)
 
 

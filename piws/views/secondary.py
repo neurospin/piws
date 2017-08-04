@@ -481,6 +481,41 @@ class OutOfContextCpGView(BaseOutOfContextView):
 
 
 ###############################################################################
+# Pathway
+###############################################################################
+
+class OutOfContextPathwayView(BaseOutOfContextView):
+    """ Snp secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("Pathway")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the Pathway description.
+        """
+        desc = {}
+        desc["URI"] = entity.uri
+        return desc
+
+
+###############################################################################
+# CpGIsland
+###############################################################################
+
+class OutOfContextCpGIslandView(BaseOutOfContextView):
+    """ Snp secondary rendering.
+    """
+    __select__ = EntityView.__select__ & is_instance("CpGIsland")
+
+    def entity_description(self, entity):
+        """ Generate a dictionary with the CpGIsland description.
+        """
+        desc = {}
+        desc["Start"] = entity.start_position
+        desc["End"] = entity.end_position
+        return desc
+
+
+###############################################################################
 # GenomicPlatform
 ###############################################################################
 
@@ -684,5 +719,6 @@ def registration_callback(vreg):
                   OutOfContextUploadFieldView, OutOfContextChromosomeView,
                   OutOfContextGeneView, OutOfContextCpGView,
                   OutOfContextTextAnswerView, OutOfContextIntAnswerView,
-                  OutOfContextFloatAnswerView]:
+                  OutOfContextFloatAnswerView, OutOfContextPathwayView,
+                  OutOfContextCpGIslandView]:
         vreg.register(klass)

@@ -168,9 +168,9 @@ class MetaGen(Base):
                 gene_type=unicode(gene_type))
             gene_eid = gene_entity.eid
             eid_of_gene[gene_id] = gene_eid
+            assert is_created
 
             # Create relations to chromosome
-            assert is_created
             self._set_unique_relation(gene_eid, "gene_chromosome",
                                       chromosome_eid, check_unicity=False)
             self._set_unique_relation(chromosome_eid, "chromosome_genes",
@@ -179,16 +179,15 @@ class MetaGen(Base):
             # Handle related pathways
             for pathway_name in related_pathways:
 
-                # If pathway has not been inserted (if we don't have entity ID)
+                # If pathway has not been inserted: create pathway entity
                 if pathway_name not in self.eid_of_pathway:
-                    # Create pathway entity
-                    pathway_entity, is_created = \
+                    pathway_entity, is_created = (
                         self._get_or_create_unique_entity(
                             rql=("Any X Where X is Pathway, X name '%s'"
                                  % pathway_name),
                             entity_name="Pathway",
                             name=unicode(pathway_name),
-                            uri=unicode(gene_pathways[pathway_name]))
+                            uri=unicode(gene_pathways[pathway_name])))
                     assert is_created
 
                     # Keep mapping: <pathway name> -> <eid>

@@ -312,6 +312,28 @@ class CpG(AnyEntity):
         return "images/cpg.png"
 
 
+class CpGIsland(AnyEntity):
+    __regid__ = "CpGIsland"
+
+    def dc_title(self):
+        return self.cpg_island_id
+
+    @property
+    def symbol(self):
+        return "images/cpgisland.png"
+
+
+class Pathway(AnyEntity):
+    __regid__ = "Pathway"
+
+    def dc_title(self):
+        return self.name
+
+    @property
+    def symbol(self):
+        return "images/pathway.png"
+
+
 class GenomicPlatform(AnyEntity):
     __regid__ = "GenomicPlatform"
     __bootstap_glyph__ = True
