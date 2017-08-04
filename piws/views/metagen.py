@@ -29,7 +29,7 @@ from cubicweb.predicates import authenticated_user
 
 # Package import
 from cubes.piws.metagen.genotype import genotype_measure
-from cubes.piws.metagen.genotype import get_genes
+from cubes.piws.metagen.genotype import metagen_get_genes
 
 
 class MetaGenSearchView(View):
@@ -41,7 +41,7 @@ class MetaGenSearchView(View):
     - measure (mandatory): specify the GenomicMeasure entity 'label' that
       contains the PLINK file to be analysed: ...&measure=Chip1&...
     - gene (manadatory): in order to filter the genomic dataset specify at
-      least one gene 'hgnc_id': ...&gene=CAMTA1&gene=EVI5...
+      least one gene 'hgnc_name': ...&gene=CAMTA1&gene=EVI5...
     - subject (optional, default all subjects): used to acces the data of
       specific subjects only: ....&subject=iid1&subject=iid2...
     - export (optional, default 'data'): the data export type: 'data' will
@@ -215,7 +215,7 @@ class MetaGenSearchView(View):
                                elts_to_sort=["ID", "rs_id", "chromosome"],
                                tooltip_name=None, use_scroller=False, index=2)
                 else:
-                    labels = ["hgnc_id"] + labels
+                    labels = ["hgnc_name"] + labels
                     self.w(unicode(json.dumps({"labels": labels,
                                                "records": records})))
             else:
@@ -301,10 +301,11 @@ class MetaGenSearchAutoView(View):
         self._cw.add_js("DataTables-1.10.10/extensions/fnSetFilteringDelay.js")
 
         # Create a gene picker
-        genes = get_genes(metagen_url=self._cw.vreg.config["metagen_url"])
+        genes = metagen_get_genes(
+            metagen_url=self._cw.vreg.config["metagen_url"])
         genes_struct = {}
         for gene in genes:
-            genes_struct.setdefault(gene.chromosome, []).append(gene.hgnc_id)
+            genes_struct.setdefault(gene.chromosome, []).append(gene.hgnc_name)
         html = "<h1>PLINK Genomic Measures Search</h1>"
         html += "<hr>"
         html += ("<h2>Please select a gene of interest:</h2>")
