@@ -1,49 +1,56 @@
 [
     [
-        "ENSG00000214694", 
+        "ENSG00000204792", 
         "2", 
-        38889880, 
-        38975449, 
-        "ARHGEF33", 
+        74918148, 
+        74938418, 
+        "LINC01291", 
+        "lincRNA", 
+        []
+    ], 
+    [
+        "ENSG00000174501", 
+        "2", 
+        95836919, 
+        95991831, 
+        "ANKRD36C", 
+        "protein_coding", 
+        []
+    ], 
+    [
+        "ENSG00000256977", 
+        "2", 
+        109898428, 
+        109924868, 
+        "LIMS3", 
         "protein_coding", 
         [
-            "ROME_INSULIN_TARGETS_IN_MUSCLE_DN"
+            "REACTOME_CELL_CELL_COMMUNICATION", 
+            "REACTOME_CELL_EXTRACELLULAR_MATRIX_INTERACTIONS", 
+            "REACTOME_CELL_JUNCTION_ORGANIZATION", 
+            "ZHOU_INFLAMMATORY_RESPONSE_FIMA_UP", 
+            "ZHOU_INFLAMMATORY_RESPONSE_LPS_UP", 
+            "DAIRKEE_TERT_TARGETS_UP", 
+            "HOELZEL_NF1_TARGETS_UP", 
+            "PEDRIOLI_MIR31_TARGETS_UP"
         ]
     ], 
     [
-        "ENSG00000206973", 
+        "ENSG00000200708", 
         "2", 
-        61605616, 
-        61605722, 
-        "RNU6-1145P", 
-        "snRNA", 
+        133596091, 
+        133596399, 
+        "RN7SKP93", 
+        "misc_RNA", 
         []
     ], 
     [
-        "ENSG00000254157", 
+        "ENSG00000224346", 
         "2", 
-        89128724, 
-        89129483, 
-        "IGKV2-18", 
-        "IG_V_pseudogene", 
-        []
-    ], 
-    [
-        "ENSG00000211623", 
-        "2", 
-        89985922, 
-        89986702, 
-        "IGKV2D-26", 
-        "IG_V_gene", 
-        []
-    ], 
-    [
-        "ENSG00000237412", 
-        "2", 
-        232520463, 
-        232525716, 
-        "PRSS56", 
-        "protein_coding", 
+        200844240, 
+        200845461, 
+        "BICD1P1", 
+        "processed_pseudogene", 
         []
     ]
 ]

@@ -1,47 +1,49 @@
 [
     [
-        "ENSG00000225878", 
+        "ENSG00000234652", 
         "Y", 
-        4801685, 
-        4802848, 
-        "SERBP1P2", 
+        3293808, 
+        3294826, 
+        "AGPAT5P1", 
         "processed_pseudogene", 
         []
     ], 
     [
-        "ENSG00000212856", 
+        "ENSG00000249606", 
         "Y", 
-        6406244, 
-        6424145, 
-        "TTTY2B", 
+        18655520, 
+        18656190, 
+        "TRAPPC2P7", 
+        "unprocessed_pseudogene", 
+        []
+    ], 
+    [
+        "ENSG00000229551", 
+        "Y", 
+        20861337, 
+        20862337, 
+        "GAPDHP17", 
+        "processed_pseudogene", 
+        []
+    ], 
+    [
+        "ENSG00000271123", 
+        "Y", 
+        21631683, 
+        21632015, 
+        "ELOCP5", 
+        "processed_pseudogene", 
+        []
+    ], 
+    [
+        "ENSG00000215560", 
+        "Y", 
+        22296798, 
+        22298876, 
+        "TTTY5", 
         "lincRNA", 
-        []
-    ], 
-    [
-        "ENSG00000231311", 
-        "Y", 
-        18161366, 
-        18176484, 
-        "PRYP2", 
-        "unprocessed_pseudogene", 
-        []
-    ], 
-    [
-        "ENSG00000229940", 
-        "Y", 
-        22305925, 
-        22307951, 
-        "TSPY22P", 
-        "unprocessed_pseudogene", 
-        []
-    ], 
-    [
-        "ENSG00000225609", 
-        "Y", 
-        25618644, 
-        25620253, 
-        "CDY20P", 
-        "unprocessed_pseudogene", 
-        []
+        [
+            "ZWANG_TRANSIENTLY_UP_BY_2ND_EGF_PULSE_ONLY"
+        ]
     ]
 ]

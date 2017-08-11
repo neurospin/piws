@@ -1,80 +1,52 @@
 [
     [
-        "ENSG00000232858", 
+        "ENSG00000228319", 
         "13", 
-        24988577, 
-        24988925, 
-        "RPL34P27", 
+        56214373, 
+        56216942, 
+        "SPATA2P1", 
         "processed_pseudogene", 
-        [
-            "REACTOME_TRANSLATION", 
-            "REACTOME_SRP_DEPENDENT_COTRANSLATIONAL_PROTEIN_TARGETING_TO_MEMBRANE", 
-            "REACTOME_PEPTIDE_CHAIN_ELONGATION", 
-            "REACTOME_METABOLISM_OF_PROTEINS", 
-            "REACTOME_3_UTR_MEDIATED_TRANSLATIONAL_REGULATION", 
-            "REACTOME_METABOLISM_OF_MRNA", 
-            "REACTOME_METABOLISM_OF_RNA", 
-            "REACTOME_INFLUENZA_LIFE_CYCLE", 
-            "REACTOME_INFLUENZA_VIRAL_RNA_TRANSCRIPTION_AND_REPLICATION", 
-            "REACTOME_NONSENSE_MEDIATED_DECAY_ENHANCED_BY_THE_EXON_JUNCTION_COMPLEX"
-        ]
+        []
     ], 
     [
-        "ENSG00000152484", 
+        "ENSG00000213232", 
         "13", 
-        27066142, 
-        27171896, 
-        "USP12", 
-        "protein_coding", 
-        [
-            "DAVICIONI_MOLECULAR_ARMS_VS_ERMS_UP", 
-            "GARGALOVIC_RESPONSE_TO_OXIDIZED_PHOSPHOLIPIDS_LIGHTYELLOW_UP", 
-            "SENESE_HDAC1_TARGETS_UP", 
-            "ZHOU_INFLAMMATORY_RESPONSE_FIMA_UP", 
-            "ZHOU_INFLAMMATORY_RESPONSE_LPS_UP", 
-            "HAMAI_APOPTOSIS_VIA_TRAIL_UP", 
-            "DACOSTA_UV_RESPONSE_VIA_ERCC3_DN", 
-            "DACOSTA_UV_RESPONSE_VIA_ERCC3_COMMON_DN", 
-            "SHETH_LIVER_CANCER_VS_TXNIP_LOSS_PAM6", 
-            "NUYTTEN_EZH2_TARGETS_DN", 
-            "GEORGES_TARGETS_OF_MIR192_AND_MIR215", 
-            "KIM_GERMINAL_CENTER_T_HELPER_DN", 
-            "PENG_GLUCOSE_DEPRIVATION_DN", 
-            "MARTINEZ_RESPONSE_TO_TRABECTEDIN_DN", 
-            "FOSTER_TOLERANT_MACROPHAGE_DN", 
-            "LINDSTEDT_DENDRITIC_CELL_MATURATION_B", 
-            "CHEN_METABOLIC_SYNDROM_NETWORK", 
-            "BRUINS_UVC_RESPONSE_LATE", 
-            "PEDRIOLI_MIR31_TARGETS_DN", 
-            "ROESSLER_LIVER_CANCER_METASTASIS_UP", 
-            "ZWANG_CLASS_1_TRANSIENTLY_INDUCED_BY_EGF"
-        ]
+        63811014, 
+        63811608, 
+        "PPP1R2P10", 
+        "processed_pseudogene", 
+        []
     ], 
     [
-        "ENSG00000252812", 
+        "ENSG00000214263", 
         "13", 
-        40407122, 
-        40407440, 
-        "RN7SKP2", 
+        67266845, 
+        67267706, 
+        "RPSAP53", 
+        "processed_pseudogene", 
+        []
+    ], 
+    [
+        "ENSG00000222472", 
+        "13", 
+        96949249, 
+        96949533, 
+        "RN7SKP7", 
         "misc_RNA", 
         []
     ], 
     [
-        "ENSG00000234590", 
+        "ENSG00000235280", 
         "13", 
-        47307082, 
-        47307301, 
-        "GNG5P5", 
-        "processed_pseudogene", 
-        []
-    ], 
-    [
-        "ENSG00000226370", 
-        "13", 
-        85065087, 
-        85078920, 
-        "LINC00375", 
-        "lincRNA", 
-        []
+        112967484, 
+        112968824, 
+        "MCF2L-AS1", 
+        "antisense", 
+        [
+            "HAMAI_APOPTOSIS_VIA_TRAIL_DN", 
+            "STEIN_ESRRA_TARGETS_UP", 
+            "SMID_BREAST_CANCER_BASAL_UP", 
+            "STEIN_ESRRA_TARGETS"
+        ]
     ]
 ]
