@@ -97,7 +97,7 @@ class History(NullView):
     __select__ = authenticated_user()
     templatable = False
     div_id = "piws-history"
-    default_message = "Hostory has not been provided yet."
+    default_message = "History has not been provided yet."
 
     def __init__(self, *args, **kwargs):
         """ Initialize the History class.
