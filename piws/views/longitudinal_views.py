@@ -69,7 +69,7 @@ class QuestionnaireLongitudinalView(View):
             q_entity = qr_entity.questionnaire[0]
             if q_entity.name not in questionnaires:
                 questionnaires[q_entity.name] = dict(
-                    (entity.text, {})
+                    (unicode(entity.text), {})
                     for entity in q_entity.questions)
 
             # Get the questionnaire run associated answers and fill the
@@ -79,8 +79,11 @@ class QuestionnaireLongitudinalView(View):
             if len(qr_entity.file) > 0:
                 answers = json.loads(qr_entity.file[0].data.getvalue())
                 for qname, answer in answers.items():
-                    questionnaires[q_entity.name][qname][timepoint] = str(
-                        answer)
+                    try:
+                        questionnaires[q_entity.name][qname][
+                            timepoint] = float(answer)
+                    except Exception:
+                        continue
             else:
                 answer_entities = (list(qr_entity.int_answers) +
                                    list(qr_entity.float_answers))
@@ -107,7 +110,7 @@ class QuestionnaireLongitudinalView(View):
                     continue
 
                 # Check if we are dealing with numbers
-                html += "<option value='{0}'>{0}</option>".format(
+                html += u"<option value='{0}'>{0}</option>".format(
                     question_name)
             html += "</optgroup>"
         html += "</select>"
@@ -129,15 +132,16 @@ class QuestionnaireLongitudinalView(View):
                     continue
 
                 # Check if we are dealing with numbers
-                html += "var sdata = {};"
-                html += "sdata['x'] = [];".format(question_name)
-                html += "sdata['grid'] = [];".format(question_name)
-                html += "sdata['related_question'] = '{0}';".format(question_name)
-                html += "sdata['related_questionnaire'] = '{0}';".format(q_name)
+                html += u"var sdata = {};"
+                print u"sdata['related_question'] = '{0}';".format(question_name)
+                html += u"sdata['x'] = [];"
+                html += u"sdata['grid'] = [];"
+                html += u"sdata['related_question'] = '{0}';".format(question_name)
+                html += u"sdata['related_questionnaire'] = '{0}';".format(q_name)
                 for p in data:
-                    html += "sdata['x'].push('{0}');".format(p[0])
-                    html += "sdata['grid'].push({0});".format(p[1])
-                html += "jdata['{0}'] = sdata;".format(question_name)
+                    html += u"sdata['x'].push('{0}');".format(p[0])
+                    html += u"sdata['grid'].push({0});".format(p[1])
+                html += u"jdata['{0}'] = sdata;".format(question_name)
 
         # Add an event when the selection change
         html += "$(function() {"
