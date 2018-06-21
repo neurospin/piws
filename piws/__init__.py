@@ -15,6 +15,7 @@ from logilab.common.decorators import monkeypatch
 from logilab.common.decorators import cachedproperty
 from cubicweb.sobjects.ldapparser import DataFeedLDAPAdapter
 from cubicweb.server.sources.ldapfeed import LDAPFeedSource
+from cubicweb.etwist.http import HTTPResponse
 
 
 """
@@ -62,4 +63,17 @@ if cw_version >= version.parse("3.21.0"):
             result.append(itemdict)
         self.debug('ldap built results %s', len(result))
         return result
+
+
+@monkeypatch(HTTPResponse)
+def _finalize(self):
+    """ If the request.write failed or the connection is lost, the request
+    will have already been finished.
+    """
+    if self._code is not None:
+        self._twreq.setResponseCode(self._code)
+    if self._stream is not None:
+        self._twreq.write(str(self._stream))
+    if not self._twreq._disconnected and not self._twreq.finished:
+        self._twreq.finish()
 
