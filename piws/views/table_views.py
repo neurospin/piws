@@ -62,7 +62,6 @@ class ScoreValueTableViewSecondary(View):
                    "A timepoint T, X label L, "
                    "X {3} P".format(etype, study, rtype, pname))
         rset = self._cw.execute(rql)
-        print rset
         data = {}
         for row in rset:
             if row[1] is None:
@@ -508,7 +507,7 @@ class JHugetableView(View):
             html += "for(var i=0, l=all_data.length; i<l; ++i){"
             html += "csv_rows.push(all_data[i].join(';'));"
             html += "}"
-            html += "var csv_string = csv_rows.join('\\r\\n');"
+            html += """var csv_string = '"sep=;"\\n' + csv_rows.join('\\r\\n');"""
 
             # > create a web-browser download object
             html += "var a = window.document.createElement('a');"
@@ -903,6 +902,7 @@ class PIWSCSVView(CSVMixIn, View):
             table[key]["ID"] = key
 
         writer = self.csvwriter()
+        writer.writerow(["sep=;"])
         writer.writerow(labels)
         for psc2, data in iter(sorted(table.iteritems())):
             writer.writerow(data.values())
@@ -1033,6 +1033,7 @@ def get_questionnaires_data(self):
     id_pattern = self._cw.form['sSearch']
     labels = json.loads(self._cw.form['labels'])
     qtype = self._cw.form['qtype']
+    study = self._cw.form['study']
     column_to_filter = int(self._cw.form['iSortCol_0'])
 
     # Only the ID column can be filtered
@@ -1058,6 +1059,8 @@ def get_questionnaires_data(self):
            "Where Q is Questionnaire, QR is QuestionnaireRun, "
            "QR questionnaire Q, Q type '{1}', QR in_assessment A, Q name ID, "
            "A timepoint T".format(jtsort, qtype))
+    if study != "":
+        rql += ", QR study ST, ST name '{0}'".format(study)
     rset = self._cw.execute(rql)
 
     # Get the total number of rows (without filtering)
@@ -1076,6 +1079,8 @@ def get_questionnaires_data(self):
     ajaxcallback = "get_open_answers_data"
     rql_labels = ("Any QUT ORDERBY QUT WHERE Q is Questionnaire, Q name '{0}',"
                   "Q questions QU, QU text QUT")
+    if study != "":
+        rql_labels += ", A study ST, ST name '{0}'".format(study)
 
     # Define start and stop display index for pagination
     lower = jtstartindex

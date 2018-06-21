@@ -29,7 +29,7 @@ from cubes.piws.docgen.rst2html import create_html_doc
 cw_version = version.parse(cubicweb.__version__)
 
 
-# Sync the CW and LDAP chache properly
+# Sync the CW and LDAP cache properly
 if cw_version < version.parse("3.24.0"):
 
     class ServerStartupHook(hook.Hook):

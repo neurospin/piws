@@ -64,6 +64,7 @@ class CSVRsetView(CSVMixIn, AnyRsetView):
         labels = self._cw.form["labels"]
         if not isinstance(labels, list):
             labels = [labels]
+        writer.writerow(["sep=;"])
         writer.writerow(labels)
         rset, descr = self.cw_rset, self.cw_rset.description
         eschema = self._cw.vreg.schema.eschema

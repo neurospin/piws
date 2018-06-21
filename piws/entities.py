@@ -82,8 +82,8 @@ class Scan(AnyEntity):
     __regid__ = "Scan"
 
     def dc_title(self):
-        return u"{0} ({1}): {2}".format(
-            self.label, self.in_assessment[0].timepoint,
+        return u"{0} ({1}-{2}): {3}".format(
+            self.label, self.in_assessment[0].timepoint, self.format,
             self.subject[0].code_in_study)
 
     @property
@@ -111,19 +111,29 @@ class Assessment(AnyEntity):
 
     def dc_title(self):
         relations = []
+        dtype = None
         if self.scans:
-            relations.append("Scans")
-        if self.questionnaire_runs:
-            relations.append("QuestionnaireRun")
-        if self.genomic_measures:
-            relations.append("GenomicMeasure")
-        return u"{0}: {1} {2}".format(
+            relations = self.scans
+            dtype = "Scans"
+        elif self.questionnaire_runs:
+            relations = self.questionnaire_runs
+            dtype = "Tables"
+        elif self.genomic_measures:
+            relations = self.genomic_measures
+            dtype = "Genomic"
+        elif self.processing_runs:
+            relations = self.processing_runs
+            dtype = "Processed data"
+        return u"{0}: {1} {2} {3}".format(
             self.timepoint, self.subjects[0].code_in_study,
-            "..." if len(self.subjects) > 1 else "")
+            "..." if len(self.subjects) > 1 else "",
+            "" if dtype is None else  relations[0].label)
 
     @property
     def symbol(self):
-        if self.scans or self.questionnaire_runs:
+        if self.scans:
+            return "images/mri.png"
+        elif self.questionnaire_runs:
             return "images/questionnaire.png"
         elif self.processing_runs:
             return "images/processing.png"

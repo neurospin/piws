@@ -45,6 +45,8 @@ class PIWSPrimaryView(PrimaryView):
     # Renders the relations of the entity
     main_related_section = True
     allowed_relations = ["subject"]
+    # Enable/disable relations side boxes
+    display_relations = True
 
     def render_entity_attributes(self, entity):
         """ Renders all attributes and relations in the 'attributes' section.
@@ -104,6 +106,8 @@ class PIWSPrimaryView(PrimaryView):
         In the case of 'FileSet' object, go directly to the associated
         'ExternalResource' if only one 'FileSet' has been specified.
         """
+        if not self.display_relations:
+            return
         sideboxes = []
         boxesreg = self._cw.vreg["ctxcomponents"]
         defaultlimit = self._cw.property_value("navigation.related-limit")

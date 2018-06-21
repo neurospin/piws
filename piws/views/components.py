@@ -303,7 +303,8 @@ class PIWSNavigationtBox(component.CtxComponent):
                     "view", vid="jtable-table",
                     rql_labels=rql_labels, ajaxcallback=ajaxcallback,
                     title="All Questionnaires", elts_to_sort=["ID"],
-                    tooltip_name="All Questionnaires", qtype=qtype)
+                    tooltip_name="All Questionnaires", qtype=qtype,
+                    study=study or "")
                 w(u'<div class="btn-toolbar">')
                 w(u'<div class="btn-group-vertical btn-block">')
                 w(u'<a class="btn btn-primary" href="{0}">'.format(href))
@@ -372,7 +373,7 @@ class PIWSNavigationtBox(component.CtxComponent):
             w(u'<div class="btn-group-vertical btn-block">')
             rql = "Any GM Where GM is GenomicMeasure"
             if study is not None:
-                rql += ", GM study '{0}'".format(study)
+                rql += ", GM study ST, ST name '{0}'".format(study)
             href = self._cw.build_url(rql=rql)
             w(u'<a class="btn btn-primary" href="{0}">'.format(href))
             w(u'Genomic measures</a>')
@@ -605,7 +606,11 @@ class PIWSImageViewers(component.CtxComponent):
         """ Method to create the image box content.
         """
         # 3D image viewer
-        efentries = self.cw_rset.get_entity(0, 0).filesets[0].external_files
+        scan = self.cw_rset.get_entity(0, 0)
+        if len(scan.filesets) > 0:
+            efentries = scan.filesets[0].external_files
+        else:
+            efentries = []
         imagefiles = [e.filepath for e in efentries
                       if e.filepath.endswith(tuple(AUTHORIZED_IMAGE_EXT))]
         limagefiles = len(imagefiles)

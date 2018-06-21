@@ -81,7 +81,12 @@ class PIWSCardView(PrimaryView):
             "database-image": self._cw.data_url(
                 "images/dreamstime_s_32994616.jpg"),
             "nsap-image": self._cw.data_url("images/nsap.png"),
-            "nsap-url": "http://i2bm.cea.fr/drf/i2bm/Pages/NeuroSpin/UNATI/nsap.aspx",
+            "nsap-url": (
+                "http://joliot.cea.fr/drf/joliot/Pages/"
+                "Plateformes_et_infrastructures/plateformes_imagerie/"
+                "plateforme_neurospin/Cellules-operationnelles.aspx?"
+                "Type=Chapitre&numero=8"),
+
         }
 
         # Update card links links to content

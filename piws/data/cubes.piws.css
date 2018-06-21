@@ -75,6 +75,11 @@ search_box > input {
     width: 80%
 }
 
+.dataTables_wrapper .dataTables_processing {
+    top: 100% !important;
+    margin-top: 0 !important;
+}
+
 
 /* -- Facets ----------------------------------------------------------- */
 
