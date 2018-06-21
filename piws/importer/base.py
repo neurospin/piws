@@ -363,7 +363,10 @@ class Base(object):
         """
         # Create the device
         device_id = device_struct["identifier"]
-        extfiles = device_struct.pop("ExternalResources")
+        if "ExternalResources" in device_struct:
+            extfiles = device_struct.pop("ExternalResources")
+        else:
+            extfiles = []
         device_entity, is_created = self._get_or_create_unique_entity(
             rql=("Any X Where X is Device, X identifier "
                  "'{0}'".format(device_id)),

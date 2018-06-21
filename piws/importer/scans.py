@@ -225,7 +225,10 @@ class Scans(Base):
 
         # Go through the data structure
         nb_of_subjects = float(len(self.scans))
-        maxsize = max([len(name) for name in self.scans])
+        if len(self.scans) == 0:
+            maxsize = 0
+        else:
+            maxsize = max([len(name) for name in self.scans])
         cnt_subject = 1.
         for subject_id, list_subj_scans in self.scans.iteritems():
 

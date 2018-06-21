@@ -56,7 +56,7 @@ class Questionnaires(Base):
     annotation_operator = ": "
 
     def __init__(self, session, project_name, center_name, questionnaires,
-                 questionnaire_type, can_read=True, can_update=True,
+                 questionnaire_type, can_read=True, can_update=False,
                  data_filepath=None, store_type="RQL", piws_security_model=True,
                  use_openanswer=False):
         """ Initialize the 'Questionnaires' class.
@@ -79,7 +79,7 @@ class Questionnaires(Base):
             questionnaires.
         can_read: bool (optional, default True)
             set the read permission to the imported data.
-        can_update: bool (optional, default True)
+        can_update: bool (optional, default False)
             set the update permission to the imported data.
         data_filepath: str (optional, default None)
             the path to folder containing the current study dataset.
@@ -273,7 +273,10 @@ class Questionnaires(Base):
 
         # Information to create a progress bar
         nb_of_subjects = float(len(self.questionnaires))
-        maxsize = max([len(name) for name in self.questionnaires])
+        if len(self.questionnaires) == 0:
+            maxsize = 0
+        else:
+            maxsize = max([len(name) for name in self.questionnaires])
         cnt_subject = 1.
 
         # Add the data
