@@ -126,7 +126,9 @@ class History(NullView):
             "piws-image": self._cw.data_url(
                 "startup/images/piws-small.png"),
             "nsap-image": self._cw.data_url(
-                "startup/images/nsap.png")
+                "startup/images/nsap.png"),
+            "herby-image": self._cw.data_url(
+                "startup/images/herby.png")
         }
 
         # Get local html startup

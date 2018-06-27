@@ -118,16 +118,28 @@ img {
   height: auto;
   max-width: 100%;
 }
-
+/*
 .euaims {
   margin-bottom: 200px;
+}
+*  */
+/*
+.herby_biomede {
+  margin-bottom: 100px;
+}
+ */
+.herby_biomede .information {
+  width: 45%;
+  float: right;
+padding-top: 110px;
+padding-right: 100px;
 }
 
 .euaims .information {
   width: 45%;
   float: right;
-  padding-top: 145px;
-  padding-right: 50px;
+  padding-top: 155px;
+  padding-right: 110px;
 }
 
 .imagen .information {
@@ -140,11 +152,17 @@ img {
 
 .imagen .background {
   right: 0;
-  top: 900px;
+  top: 1200px;
   position: absolute;
   z-index: 1;
 }
 
+.euaims .background {
+  right: 40;
+  top: 350px;
+  position: absolute;
+  z-index: 1;
+}
 
 /*--------------------------------------------------------------
 # Explore
@@ -171,14 +189,23 @@ img {
   z-index: 300;
 }
 
-.start-2017 {
+/* HERBY_BIOMEDE*/
+.start-2018 {
   position: absolute;
   top: 10px;
   right: 200px;
 }
 
+/* EUAIMS*/
+.start-2017 {
+  position: absolute;
+  top: 500px;
+  right: 100px;
+}
+
+/* IMAGEN*/
 .start-2016 {
   position: absolute;
-  top: 680px;
-  right: 10px;
+  top: 1080px;
+  right: 500px;
 }
