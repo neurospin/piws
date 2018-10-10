@@ -16,8 +16,6 @@ import cubicweb
 cw_version = version.parse(cubicweb.__version__)
 if cw_version >= version.parse("3.21.0"):
     from cubicweb import _
-
-from cubicweb.web.views.primary import PrimaryView
 from cubicweb.predicates import is_instance
 from cubicweb.web.views.primary import PrimaryView
 
@@ -47,6 +45,11 @@ class PIWSPrimaryView(PrimaryView):
     allowed_relations = ["subject"]
     # Enable/disable relations side boxes
     display_relations = True
+    # Enable/disable subject history display
+    display_subject_history = False
+    relations_in_subject_history = [
+        "subject_scans", "subject_processing_runs",
+        "subject_questionnaire_runs"]
 
     def render_entity_attributes(self, entity):
         """ Renders all attributes and relations in the 'attributes' section.
@@ -95,6 +98,71 @@ class PIWSPrimaryView(PrimaryView):
                         tiphref))
                 self.render_attribute("documentation", tipbutton, table=True)
             self.w(u"</table>")
+
+        # Deal with subject history
+        if entity.cw_etype == "Subject" and self.display_subject_history:
+            self._prepare_subject_navigation(entity)
+
+    def _prepare_subject_navigation(self, entity):
+        """ Create a navigation menu for one subject to explore the
+        associated data.
+        """
+        # Add resources
+        self._cw.add_css("tree/style.css")
+        self._cw.add_js("tree/script.js")
+
+        # Get tree entities
+        related_entities = {}
+        for relation in self.relations_in_subject_history: 
+            if not hasattr(entity, relation):
+                continue
+            related_entities[relation] = getattr(entity, relation)
+
+        # Create tree
+        self.w(u"<div class='tree well'>")
+        self.w(u"<ul>")
+        for timepoint in sorted(set([e.timepoint for e in entity.assessments])):
+            self.w(u"<li>")
+            self.w(u"<span><i class='glyphicon glyphicon-folder-open'>"
+                    "</i> {0}</span>".format(
+                        timepoint))
+            for relation in related_entities:
+                sorted_entities = {}
+                for entity in related_entities[relation]:
+                    if entity.in_assessment[0].timepoint != timepoint:
+                        continue
+                    if entity.cw_etype not in sorted_entities:
+                        sorted_entities[entity.cw_etype] = {}
+                    sorted_entities[entity.cw_etype].setdefault(
+                        entity.label, []).append(entity)
+                self.w(u"<ul>")
+                for dtype in sorted_entities:
+                    self.w(u"<li>")
+                    self.w(u"<span class='alert-success'><i "
+                            "class='glyphicon-plus'></i> {0}</span>".format(
+                                dtype))
+                    self.w(u"<ul>")
+                    for label in sorted_entities[dtype]:
+                        self.w(u"<li>")
+                        self.w(u"<span class='alert-warning'><i "
+                                "class='glyphicon-plus'></i> {0}</span>".format(
+                                    label))
+                        self.w(u"<ul>")
+                        for entity in sorted_entities[dtype][label]:
+                            self.w(u"<li>")
+                            url = self._cw.build_url(
+                                rql="Any X Where X eid '{0}'".format(entity.eid))
+                            self.w(u"<span><i class='glyphicon glyphicon-transfer'>"
+                                    "</i> {0}</span><a href='{1}'>visit</a>".format(
+                                        entity.dc_title(), url))
+                            self.w(u"</li>")
+                        self.w(u"</ul>")
+                        self.w(u"</li>")
+                    self.w(u"</ul>")
+                    self.w(u"</li>")
+                self.w(u"</ul>")
+            self.w(u"</li>")
+        self.w(u"</ul></div>")
 
     def _prepare_side_boxes(self, entity):
         """ Create the right relation boxes to display.
