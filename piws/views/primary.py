@@ -103,6 +103,10 @@ class PIWSPrimaryView(PrimaryView):
         if entity.cw_etype == "Subject" and self.display_subject_history:
             self._prepare_subject_navigation(entity)
 
+        # Deal with subject questionnaires
+        if entity.cw_etype == "QuestionnaireRun":
+            self._prepare_subject_questionnaire(entity)
+
     def _prepare_subject_navigation(self, entity):
         """ Create a navigation menu for one subject to explore the
         associated data.
@@ -128,19 +132,27 @@ class PIWSPrimaryView(PrimaryView):
                         timepoint))
             for relation in related_entities:
                 sorted_entities = {}
-                for entity in related_entities[relation]:
-                    if entity.in_assessment[0].timepoint != timepoint:
+                for _entity in related_entities[relation]:
+                    if _entity.in_assessment[0].timepoint != timepoint:
                         continue
-                    if entity.cw_etype not in sorted_entities:
-                        sorted_entities[entity.cw_etype] = {}
-                    sorted_entities[entity.cw_etype].setdefault(
-                        entity.label, []).append(entity)
+                    if _entity.cw_etype not in sorted_entities:
+                        sorted_entities[_entity.cw_etype] = {}
+
+                    sorted_entities[_entity.cw_etype].setdefault(
+                        _entity.label, []).append(_entity)
                 self.w(u"<ul>")
                 for dtype in sorted_entities:
+                    url = self._cw.build_url(
+                        rql="Any X Where X is QuestionnaireRun, X subject S, "
+                            "S code_in_study '{0}', X in_assessment A, "
+                            "A timepoint '{1}'".format(
+                                entity.code_in_study, timepoint))
                     self.w(u"<li>")
                     self.w(u"<span class='alert-success'><i "
-                            "class='glyphicon-plus'></i> {0}</span>".format(
-                                dtype))
+                            "class='glyphicon-plus'></i> {0}</span><a "
+                            "style='margin-left: 0.5em' class='btn btn-primary' "
+                            "href='{1}'>&#9735;</a>".format(
+                                dtype, url))
                     self.w(u"<ul>")
                     for label in sorted_entities[dtype]:
                         self.w(u"<li>")
@@ -148,13 +160,14 @@ class PIWSPrimaryView(PrimaryView):
                                 "class='glyphicon-plus'></i> {0}</span>".format(
                                     label))
                         self.w(u"<ul>")
-                        for entity in sorted_entities[dtype][label]:
+                        for _entity in sorted_entities[dtype][label]:
                             self.w(u"<li>")
                             url = self._cw.build_url(
-                                rql="Any X Where X eid '{0}'".format(entity.eid))
+                                rql="Any X Where X eid '{0}'".format(_entity.eid))
                             self.w(u"<span><i class='glyphicon glyphicon-transfer'>"
-                                    "</i> {0}</span><a href='{1}'>visit</a>".format(
-                                        entity.dc_title(), url))
+                                    "</i> {0}</span><a style='margin-left: 0.5em' "
+                                    "class='btn btn-primary' href='{1}'>&#9735;</a>".format(
+                                        _entity.dc_title(), url))
                             self.w(u"</li>")
                         self.w(u"</ul>")
                         self.w(u"</li>")
@@ -163,6 +176,31 @@ class PIWSPrimaryView(PrimaryView):
                 self.w(u"</ul>")
             self.w(u"</li>")
         self.w(u"</ul></div>")
+
+    def _prepare_subject_questionnaire(self, entity):
+        """ Display the QunestionnaireRun assocciated data as a table.
+        """
+        if len(entity.file) == 1:
+            data = json.loads(entity.file[0].data.getvalue())
+            self.wview(
+                "jtable-hugetable-clientside", None, "null",
+                labels=data.keys(),
+                records=[[entity.eid] + data.values()],
+                csv_export=True, title="", elts_to_sort="ID")
+        else:
+            self.w("This view is not yet implemented.")
+            pass
+            #rset = entity.data.getvalue().split("\n")
+            #labels = rset[0].split(separator)
+            #records = []
+            #for index, line in enumerate(rset[1:]):
+            #    elements = line.split(separator)
+            #    if len(elements) == len(labels):
+            #        elements.insert(0, str(index))
+            #        records.append(elements)
+            #self.wview("jtable-hugetable-clientside", None, "null",
+            #           labels=labels, records=records, csv_export=True,
+            #           title="", elts_to_sort="ID")
 
     def _prepare_side_boxes(self, entity):
         """ Create the right relation boxes to display.
