@@ -33,14 +33,18 @@ def metagen_parser(root):
     metadata = {}
 
     # Get all the datasets
+    with open(os.path.join(root, "gene_pathways.json")) as f:
+        metadata["pathways"] = json.load(f)
     for chr_name in range(1, 23) + ["X", "Y"]:
         metadata[chr_name] = {
             "genes": os.path.join(root,
-                                  "genes_of_chr{0}.json".format(chr_name)),
+                                  "chr{0}_genes.json".format(chr_name)),
             "snps": os.path.join(root,
-                                 "snps_of_chr{0}.json".format(chr_name)),
+                                 "chr{0}_snps.json".format(chr_name)),
             "cpgs": os.path.join(root,
-                                 "cpgs_of_chr{0}.json".format(chr_name))}
+                                 "chr{0}_cpgs.json".format(chr_name)),
+            "cpg_islands": os.path.join(root, "chr{0}_cpg_islands.json".format(
+                                              chr_name))}
         for key, path in metadata[chr_name].items():
             with open(path, "rt") as open_file:
                 metadata[chr_name][key] = json.load(open_file)

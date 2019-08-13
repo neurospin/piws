@@ -86,17 +86,21 @@ with admincnx(instance_name) as session:
     db_subject_importer.import_data()
     db_subject_importer.cleanup()
     # > meta genetics
+    gene_pathways = metagen["pathways"]
     for chr_name, meta_struct in metagen.items():
+        if chr_name == "pathways":
+            continue  # ignore this key, not a chromosome
         db_genetic_importer.import_data(
             chromosome_name=chr_name,
             genes=meta_struct["genes"],
+            gene_pathways=gene_pathways,
+            cpg_islands=meta_struct["cpg_islands"],
             cpgs=meta_struct["cpgs"],
             snps=meta_struct["snps"])
         db_genetic_importer.cleanup()
     # > plink genetics
     db_plink_importer.import_data()
     db_plink_importer.cleanup()
-
 
     # Commit
     session.commit()

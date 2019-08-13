@@ -6,8 +6,11 @@
 # for details.
 ##########################################################################
 
+# Standard import
+import getpass
 from collections import namedtuple
 
+# Third-party import
 from pysnptools.snpreader import Bed
 from cwbrowser.cw_connection import CWInstanceConnection
 
@@ -15,19 +18,36 @@ from cwbrowser.cw_connection import CWInstanceConnection
 DEFAULT_METAGEN_URL = "http://mart.intra.cea.fr/metagen_hg38_dbsnp149"
 
 
-def get_genes(metagen_connection=None,
-              metagen_url=DEFAULT_METAGEN_URL,
-              timeout=10,
-              nb_tries=3):
+def connect_metagen_server(login=None, password=None,
+                           metagen_url=DEFAULT_METAGEN_URL):
+    """
+    Create a connection to a Metagen server. The login and password are
+    requested interactively if not provided.
+    """
+    if login is None:
+        login = raw_input("\nMetagen login: ")
+    if password is None:
+        password = getpass.getpass("Metagen password: ")
+    metagen_connection = CWInstanceConnection(url=metagen_url,
+                                              login=login,
+                                              password=password)
+    return metagen_connection
+
+
+def metagen_get_genes(metagen_connection=None,
+                      metagen_url=DEFAULT_METAGEN_URL,
+                      timeout=10,
+                      nb_tries=3):
     """
     Get all the gene names by requesting the Metagen server.
 
-    The user can provide a Metagen connection, otherwise it is created.
+    The user can provide a Metagen connection, otherwise it is created by
+    interactively requesting a login and a password.
 
     Parameters
     ----------
     metagen_connection: CWInstanceConnection, default None
-        A connection to the Metagen instance. Created if not passed.
+        A connection to the Metagen server. Created if not passed.
     metagen_url: str, default module url
         Url of the Metagen server. Ignored if a connection to the Metagen
         server is passed.
@@ -38,41 +58,41 @@ def get_genes(metagen_connection=None,
 
     Return
     ------
-    hgnc_id, chromosome: list
+    hgnc_name, chromosome: list
     """
-
     # If not passed, create a connection to the Metagen server
     if metagen_connection is None:
-        metagen_connection = CWInstanceConnection(metagen_url, "anon", "anon")
+        metagen_connection = connect_metagen_server(metagen_url=metagen_url)
 
-    rql = ("Any GN, CN Where G is Gene, G hgnc_id GN, G gene_chromosome C, "
+    rql = ("Any GN, CN Where G is Gene, G hgnc_name GN, G gene_chromosome C, "
            "C name CN")
     rset = metagen_connection.execute(rql, timeout=timeout, nb_tries=nb_tries)
 
     # Return genes as namedtuples to simplify usage
-    Gene = namedtuple("Gene", ["hgnc_id", "chromosome"])
+    Gene = namedtuple("Gene", ["hgnc_name", "chromosome"])
     genes = [Gene(name, chrom) for name, chrom in rset]
 
     return genes
 
 
-def get_snps_of_gene(gene_name,
-                     metagen_connection=None,
-                     metagen_url=DEFAULT_METAGEN_URL,
-                     timeout=10,
-                     nb_tries=3):
+def metagen_get_snps_of_gene(gene_name,
+                             metagen_connection=None,
+                             metagen_url=DEFAULT_METAGEN_URL,
+                             timeout=10,
+                             nb_tries=3):
     """
-    Get snp ids and associated metadata (chromosome and positions) associated
+    Get SNP IDs and associated metadata (chromosome and positions) associated
     to a gene by requesting the Metagen server.
 
-    The user can provide a Metagen connection, otherwise it is created.
+    The user can provide a Metagen connection, otherwise it is created by
+    interactively requesting a login and a password.
 
     Parameters
     ----------
     gene_name: str
         Gene HGNC name.
     metagen_connection: CWInstanceConnection, default None
-        A connection to the Metagen instance. Created if not passed.
+        A connection to the Metagen server. Created if not passed.
     metagen_url: str, default module url
         Url of the Metagen server. Ignored if a connection to the Metagen
         server is passed.
@@ -85,19 +105,21 @@ def get_snps_of_gene(gene_name,
     ------
     snp_ids, chromosomes, bp_positions: list
     """
-
     # If not passed, create a connection to the Metagen server
     if metagen_connection is None:
-        metagen_connection = CWInstanceConnection(metagen_url, "anon", "anon")
+        metagen_connection = connect_metagen_server(metagen_url=metagen_url)
 
-    rql = ("Any SID, CN, POS Where G is Gene, G hgnc_id '%s', "
+    rql = ("Any SID, CN, POS Where G is Gene, G hgnc_name '%s', "
            "G gene_snps S, S rs_id SID, S snp_chromosome C, "
            "C name CN, S position POS") % gene_name
     rset = metagen_connection.execute(rql, timeout=timeout, nb_tries=nb_tries)
 
-    # Return snps as namedtuples to simplify usage
-    Snp = namedtuple("Snp", ["rs_id", "chromosome", "bp_pos"])
-    snps = [Snp(rs_id, chrom, bp_pos) for rs_id, chrom, bp_pos in rset]
+    # Return SNPs as namedtuples to simplify usage
+    Snp = namedtuple("Snp", ["rs_id", "chromosome", "position"])
+    snps = [Snp(rs_id, chrom, pos) for rs_id, chrom, pos in rset]
+
+    # Sort by genomic position
+    snps.sort(key=lambda snp: snp.position)
 
     return snps
 
@@ -108,10 +130,11 @@ def metagen_get_snps_of_genes(gene_names,
                               timeout=10,
                               nb_tries=3):
     """
-    Get snp ids and associated metadata (position, chromosome) associated to
-    a list of genes by requesting the Metagen server.
+    Get IDs and associated metadata (position, chromosome) of SNPs associated
+    to a list of genes by requesting the Metagen server.
 
-    The user can provide a Metagen connection, otherwise it is created.
+    The user can provide a Metagen connection, otherwise it is created by
+    interactively requesting a login and a password.
 
     Parameters
     ----------
@@ -130,13 +153,12 @@ def metagen_get_snps_of_genes(gene_names,
     Return
     ------
     snps_of_gene; dict
-        Map <gene HGNC name> -> list of snps.
-        Each snp is given as a namedtuple: (<rs_id>, <chromosome>, <bp_pos>)
+        Map <gene HGNC name> -> list of SNPs.
+        Each SNP is a namedtuple: (<rs_id>, <chromosome>, <pos>)
     """
-
     # If not passed, create a connection to the Metagen server
     if metagen_connection is None:
-        metagen_connection = CWInstanceConnection(metagen_url, "anon", "anon")
+        metagen_connection = connect_metagen_server(metagen_url=metagen_url)
 
     # Remove redundancy
     gene_names = list(set(gene_names))
@@ -147,11 +169,11 @@ def metagen_get_snps_of_genes(gene_names,
 
     # For each gene, request the associated snps and the their metadata
     for gname in gene_names:
-        snps = get_snps_of_gene(gene_name=gname,
-                                metagen_connection=metagen_connection,
-                                metagen_url=DEFAULT_METAGEN_URL,
-                                timeout=timeout,
-                                nb_tries=nb_tries)
+        snps = metagen_get_snps_of_gene(gene_name=gname,
+                                        metagen_connection=metagen_connection,
+                                        metagen_url=DEFAULT_METAGEN_URL,
+                                        timeout=timeout,
+                                        nb_tries=nb_tries)
         snps_of_gene[gname] = snps
 
     return snps_of_gene
@@ -163,15 +185,19 @@ def metagen_get_meta_of_snps(snp_ids,
                              timeout=10,
                              nb_tries=3):
     """
-    Get snp metadata from rs ids: chromosome, basepair position, related
+    Get SNP metadata from rs IDs: chromosome, basepair position, related
     genes by requesting the Metagen server.
+
+    Calling the metagen_meta_of_snp() funtion SNP by SNP could take long
+    for thousands of variants, this function is optimized to request metadata
+    of many SNPs at once.
 
     The user can provide a Metagen connection, otherwise it is created.
 
     Parameters
     ----------
     snp_ids: list of str
-        List of snp rs ids.
+        List of SNP rs ids.
     metagen_connection: CWInstanceConnection, default None
         A connection to the Metagen instance. Created if not passed.
     metagen_url: str, default module url
@@ -185,42 +211,49 @@ def metagen_get_meta_of_snps(snp_ids,
     Return
     ------
     meta_of_snp; dict
-        Map <rs id> -> namedtuple(<chromosome>, <bp_pos>, <genes>).
+        Map <rs id> -> namedtuple("rs_id", "chromosome", "position", "maf",
+                                  "genes").
     """
-
     # If not passed, create a connection to the Metagen server
     if metagen_connection is None:
-        metagen_connection = CWInstanceConnection(metagen_url, "anon", "anon")
+        metagen_connection = connect_metagen_server(metagen_url=metagen_url)
 
     # Remove redundancy
     snp_ids = list(set(snp_ids))
 
-    SnpMetadata = namedtuple("Snp", ["chromosome", "bp_pos", "genes"])
+    # Namedtuple to store SNP metadata
+    Snp = namedtuple("Snp", ["rs_id", "chromosome", "position", "maf",
+                     "genes"])
 
-    # Dict mapping <rs id> -> namedtuple(<chromosome>, <bp_pos>, <genes>)
+    # Dict mapping <rs id> -> Snp namedtuple
     meta_of_snp = dict()
 
     # Request metadata from Metagen: requesting N variants at a time
     # (one by one would take too long when there are many variants).
-    # The requesting is done is 2 steps: request chrom, pos and then
-    # request associated genes, because not all snps are associated to genes.
+    # The requesting is done is 2 steps: request chrom, start and then
+    # request associated genes, because not all SNPs are associated to genes.
     N = 5000
     common_kwargs = dict(timeout=timeout, nb_tries=nb_tries)
     for i in range(0, len(snp_ids), N):
         subset_snp_ids = snp_ids[i: i+N]
-        # Note that we use a complicated "' ,'".join() in the rql creation
-        # instead of str(tuple()). When there is only one snp id, str(tuple())
+        # Note that we use a complicated "' ,'".join() in the RQL creation
+        # instead of str(tuple()). When there is only one SNP id, str(tuple())
         # introduces a trailing comma which is not allowed in RQL
-        rql_1 = ("Any SID, CN, POS WHERE S is Snp, S rs_id IN ('%s'), "
-                 "S rs_id SID, S chromosomes C, C name CN, "
-                 "S position POS") % "' ,'".join(subset_snp_ids)
+        rql_1 = ("Any SID, CN, SPOS, EPOS, MAF WHERE S is Snp, "
+                 "S rs_id IN ('%s'), S rs_id SID, S snp_chromosome C, "
+                 "C name CN, S position SPOS, "
+                 "S maf MAF") % "' ,'".join(subset_snp_ids)
         rset_1 = metagen_connection.execute(rql_1, **common_kwargs)
-        for snp_id, chrom, bp_pos in rset_1:
-            meta_of_snp[snp_id] = SnpMetadata(chrom, bp_pos, set())
+        for rs_id, chrom, pos, maf in rset_1:
+            meta_of_snp[rs_id] = Snp(rs_id=rs_id,
+                                     chromosome=chrom,
+                                     position=pos,
+                                     maf=maf,
+                                     genes=set())
 
-        # Look for gene-snp assocation
+        # Look for gene-SNP assocation
         rql_2 = ("Any SID, GN WHERE S is Snp, S rs_id IN ('%s'), S rs_id SID, "
-                 "S genes G, G name GN") % "' ,'".join(subset_snp_ids)
+                 "S snp_genes G, G hgnc_name GN") % "' ,'".join(subset_snp_ids)
         rset_2 = metagen_connection.execute(rql_2, **common_kwargs)
         for snp_id, gname in rset_2:
             meta_of_snp[snp_id].genes.add(gname)
